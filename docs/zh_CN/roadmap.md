@@ -1,0 +1,14 @@
+<!-- translation of docs/en/roadmap.md @ 8e61c7584e54 -->
+# 路线图
+
+> 本文是[英文原文](../en/roadmap.md)的翻译。两者不一致时，以英文版为准。
+
+计划中的工作，不分先后。这里列出的内容都尚未实现。
+
+- **不含 GDScript 的 `shared/`。** 关卡使用 `addons/iso_orbit/points_of_interest/point_of_interest.gd` 标记地点，另有两个道具脚本位于 `shared/world/props/`。它们需要改成 C# 版本也能使用的形式。见[已知问题](known-issues.md#项目文件)。
+- **C# 示例**：放在 `csharp/` 中，使用相同的组件，主场景基于 `shared/world/world.tscn` 构建。C# 版本的全局类名必须与 GDScript 版本不同：`class_name` 和 `[GlobalClass]` 共用同一个命名空间。
+- **动画。** 用 `NavigationMover.get_speed()` 驱动 `AnimationTree` 中的待机/奔跑混合，并让行走循环与 `GroundCharacter.get_step_phase()` 保持同步，脚步声已经在遵循这一节奏。
+
+---
+
+*本页对应 Iso & Orbit 1.0.0。*
