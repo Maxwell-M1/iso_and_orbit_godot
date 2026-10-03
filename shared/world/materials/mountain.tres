@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/mountain.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://cc0hfbdv7b0ck" path="res://shared/world/textures/grass_albedo.webp" id="tex_grass_albedo"]
+[ext_resource type="Texture2D" uid="uid://du5ns6at2cmb3" path="res://shared/world/textures/grass_normal.webp" id="tex_grass_normal"]
+[ext_resource type="Texture2D" uid="uid://dta3bo67qqvx0" path="res://shared/world/textures/grass_flowers.webp" id="tex_grass_flowers"]
+[ext_resource type="Texture2D" uid="uid://bnkbhna8q33mo" path="res://shared/world/textures/dirt_pebbles.webp" id="tex_dirt_pebbles"]
+[ext_resource type="Texture2D" uid="uid://cm6fdfbpejrk4" path="res://shared/world/textures/dirt_detail.webp" id="tex_dirt_detail"]
+[ext_resource type="Texture2D" uid="uid://b3imsf0hynn6g" path="res://shared/world/textures/dirt_normal.webp" id="tex_dirt_normal"]
+[ext_resource type="Texture2D" uid="uid://cw2or2bsmaopc" path="res://shared/world/textures/ground_mask_tint.webp" id="tex_ground_mask_tint"]
+[ext_resource type="Texture2D" uid="uid://ccm5vh2osdcvx" path="res://shared/world/textures/ground_mask_road.webp" id="tex_ground_mask_road"]
+[ext_resource type="Texture2D" uid="uid://bgwdais112vbb" path="res://shared/world/textures/mountain_rock_detail.webp" id="tex_mountain_rock_detail"]
+[ext_resource type="Texture2D" uid="uid://dcese07ac3s81" path="res://shared/world/textures/mountain_rock_normal.webp" id="tex_mountain_rock_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/grass_albedo = ExtResource("tex_grass_albedo")
+shader_parameter/grass_normal = ExtResource("tex_grass_normal")
+shader_parameter/grass_flowers = ExtResource("tex_grass_flowers")
+shader_parameter/dirt_pebbles = ExtResource("tex_dirt_pebbles")
+shader_parameter/dirt_detail = ExtResource("tex_dirt_detail")
+shader_parameter/dirt_normal = ExtResource("tex_dirt_normal")
+shader_parameter/ground_mask_tint = ExtResource("tex_ground_mask_tint")
+shader_parameter/ground_mask_road = ExtResource("tex_ground_mask_road")
+shader_parameter/rock_detail = ExtResource("tex_mountain_rock_detail")
+shader_parameter/rock_normal = ExtResource("tex_mountain_rock_normal")

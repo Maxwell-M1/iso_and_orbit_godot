@@ -1,0 +1,278 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/gem_blue.tres" id="gem_blue"]
+[ext_resource type="Material" path="res://shared/characters/materials/rune_glow.tres" id="rune_glow"]
+[ext_resource type="PackedScene" path="res://shared/characters/equipment/staff_archmage.tscn" id="staff_archmage"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6c89f"]
+albedo_color = Color(0.94, 0.93, 0.9, 1)
+roughness = 0.6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_a65f6"]
+material = SubResource("StandardMaterial3D_6c89f")
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2b0df"]
+albedo_color = Color(0.94, 0.93, 0.9, 1)
+roughness = 0.65
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e2b05"]
+material = SubResource("StandardMaterial3D_2b0df")
+top_radius = 0.36
+bottom_radius = 0.44
+height = 1.0
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_80a76"]
+material = ExtResource("brass")
+top_radius = 0.448
+bottom_radius = 0.448
+height = 0.05
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4e57c"]
+material = ExtResource("brass")
+top_radius = 0.362
+bottom_radius = 0.362
+height = 0.07
+radial_segments = 24
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bed78"]
+albedo_color = Color(0.82, 0.62, 0.24, 1)
+roughness = 0.6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_913fd"]
+material = SubResource("StandardMaterial3D_bed78")
+top_radius = 0.3
+bottom_radius = 0.45
+height = 0.26
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_68620"]
+material = ExtResource("brass")
+top_radius = 0.458
+bottom_radius = 0.458
+height = 0.03
+radial_segments = 24
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_92b44"]
+albedo_color = Color(0.2, 0.4, 1, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.15, 0.35, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8f851"]
+material = SubResource("StandardMaterial3D_92b44")
+radius = 0.036
+height = 0.036
+radial_segments = 12
+rings = 6
+
+[sub_resource type="TorusMesh" id="TorusMesh_cd228"]
+material = ExtResource("brass")
+inner_radius = 0.045
+outer_radius = 0.054
+rings = 28
+ring_segments = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_edf4a"]
+albedo_color = Color(0.95, 0.95, 0.93, 1)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_49c7d"]
+material = SubResource("StandardMaterial3D_edf4a")
+top_radius = 0.18
+bottom_radius = 0.0
+height = 0.75
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a5e3b"]
+material = SubResource("StandardMaterial3D_2b0df")
+top_radius = 0.46
+bottom_radius = 0.46
+height = 0.035
+radial_segments = 28
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_f776e"]
+material = SubResource("StandardMaterial3D_2b0df")
+top_radius = 0.15
+bottom_radius = 0.29
+height = 0.6
+radial_segments = 16
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ecfc9"]
+material = ExtResource("brass")
+top_radius = 0.282
+bottom_radius = 0.296
+height = 0.07
+radial_segments = 16
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b1591"]
+material = SubResource("StandardMaterial3D_2b0df")
+top_radius = 0.0
+bottom_radius = 0.15
+height = 0.36
+radial_segments = 16
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_df9f4"]
+material = ExtResource("brass")
+radius = 0.035
+height = 0.07
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1e035"]
+material = ExtResource("brass")
+top_radius = 0.2
+bottom_radius = 0.21
+height = 0.04
+radial_segments = 16
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_52ea6"]
+material = ExtResource("gem_blue")
+radius = 0.05
+height = 0.1
+radial_segments = 10
+rings = 5
+
+[sub_resource type="TorusMesh" id="TorusMesh_e65ad"]
+material = ExtResource("rune_glow")
+inner_radius = 0.64
+outer_radius = 0.66
+rings = 48
+ring_segments = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_7e047"]
+material = ExtResource("rune_glow")
+size = Vector3(0.06, 0.08, 0.012)
+
+[node name="Archmage" type="Node3D" unique_id=177619]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=2088969747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_a65f6")
+
+[node name="Robe" type="MeshInstance3D" parent="." unique_id=2089544653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CylinderMesh_e2b05")
+
+[node name="Hem" type="MeshInstance3D" parent="." unique_id=193458847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_80a76")
+
+[node name="Sash" type="MeshInstance3D" parent="." unique_id=2089565908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_4e57c")
+
+[node name="Mantle" type="MeshInstance3D" parent="." unique_id=1117115270]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("CylinderMesh_913fd")
+
+[node name="MantleTrim" type="MeshInstance3D" parent="." unique_id=2029005122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.175, 0)
+mesh = SubResource("CylinderMesh_68620")
+
+[node name="EyeRight" type="Node3D" parent="." unique_id=2102958726]
+transform = Transform3D(0.95275986, 0.13629061, -0.27142859, -0.17251043, 0.9783552, -0.11428557, 0.24997751, 0.15571097, 0.95564914, 0.095, 1.49, -0.33447722)
+
+[node name="Iris" type="MeshInstance3D" parent="EyeRight" unique_id=181966988]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_8f851")
+
+[node name="Monocle" type="MeshInstance3D" parent="EyeRight" unique_id=1019335330]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.01)
+mesh = SubResource("TorusMesh_cd228")
+
+[node name="EyeLeft" type="Node3D" parent="." unique_id=1690387571]
+transform = Transform3D(0.95275986, -0.13629061, 0.27142859, 0.17251043, 0.9783552, -0.11428557, -0.24997751, 0.15571097, 0.95564914, -0.095, 1.49, -0.33447722)
+
+[node name="Iris" type="MeshInstance3D" parent="EyeLeft" unique_id=870940313]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_8f851")
+
+[node name="Beard" type="MeshInstance3D" parent="." unique_id=216162147]
+transform = Transform3D(1, 0, 0, 0, 0.9945219, -0.104528464, 0, 0.104528464, 0.9945219, 0, 1, -0.28)
+mesh = SubResource("CylinderMesh_49c7d")
+
+[node name="Brim" type="MeshInstance3D" parent="." unique_id=2088973167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66, 0)
+mesh = SubResource("CylinderMesh_a5e3b")
+
+[node name="Hat" type="Node3D" parent="." unique_id=193458722]
+transform = Transform3D(1, 0, 0, 0, 0.9945219, -0.104528464, 0, 0.104528464, 0.9945219, 0, 1.67, 0)
+
+[node name="Crown" type="MeshInstance3D" parent="Hat" unique_id=235982362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+mesh = SubResource("CylinderMesh_f776e")
+
+[node name="Band" type="MeshInstance3D" parent="Hat" unique_id=722924358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("CylinderMesh_ecfc9")
+
+[node name="Tip" type="Node3D" parent="Hat" unique_id=347302974]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+
+[node name="Cone" type="MeshInstance3D" parent="Hat/Tip" unique_id=2110777042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+mesh = SubResource("CylinderMesh_b1591")
+
+[node name="Finial" type="MeshInstance3D" parent="Hat/Tip" unique_id=938993696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36, 0)
+mesh = SubResource("SphereMesh_df9f4")
+
+[node name="BandUpper" type="MeshInstance3D" parent="Hat" unique_id=133260850]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("CylinderMesh_1e035")
+
+[node name="Gem" type="MeshInstance3D" parent="Hat" unique_id=347288682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, -0.27)
+mesh = SubResource("SphereMesh_52ea6")
+
+[node name="Runes" type="Node3D" parent="." unique_id=235725618]
+transform = Transform3D(0.9975641, -0.06975647, 0, 0.06937434, 0.99209934, -0.104528464, 0.007291537, 0.10427384, 0.9945219, 0, 0.95, 0)
+
+[node name="RuneRing" type="MeshInstance3D" parent="Runes" unique_id=176370507]
+mesh = SubResource("TorusMesh_e65ad")
+
+[node name="Rune1" type="MeshInstance3D" parent="Runes" unique_id=1199266060]
+transform = Transform3D(0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, 0.8660254, 0.325, 0, -0.5629165)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="Rune2" type="MeshInstance3D" parent="Runes" unique_id=1199266061]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.65, 0, -3.9799706e-17)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="Rune3" type="MeshInstance3D" parent="Runes" unique_id=1199266062]
+transform = Transform3D(-0.8660254, 0, -0.50000006, 0, 1, 0, 0.50000006, 0, -0.8660254, 0.325, 0, 0.5629165)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="Rune4" type="MeshInstance3D" parent="Runes" unique_id=1199266063]
+transform = Transform3D(-0.8660254, 0, 0.49999997, 0, 1, 0, -0.49999997, 0, -0.8660254, -0.325, 0, 0.5629165)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="Rune5" type="MeshInstance3D" parent="Runes" unique_id=1199266064]
+transform = Transform3D(1.1924881e-08, 0, 1, 0, 1, 0, -1, 0, 1.1924881e-08, -0.65, 0, 1.1939911e-16)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="Rune6" type="MeshInstance3D" parent="Runes" unique_id=1199266065]
+transform = Transform3D(0.8660253, 0, 0.5000002, 0, 1, 0, -0.5000002, 0, 0.8660253, -0.325, 0, -0.5629165)
+mesh = SubResource("BoxMesh_7e047")
+
+[node name="RightHand" type="Node3D" parent="." unique_id=480002366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.98, -0.1)
+
+[node name="Staff" type="Node3D" parent="RightHand" unique_id=1130718529 instance=ExtResource("staff_archmage")]
+transform = Transform3D(0.9986295, 0.05233596, 0, -0.05182663, 0.9889109, 0.1391731, 0.007283758, -0.13898237, 0.99026805, 0, 0, 0)

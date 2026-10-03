@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://cw2w35xfjknkf"]
+
+[ext_resource type="Script" uid="uid://bcpb7phbv8457" path="res://addons/iso_orbit/ground_character/ground_character.gd" id="1_character"]
+[ext_resource type="Script" uid="uid://bqcny2xfitgjn" path="res://addons/iso_orbit/click_to_move/navigation_mover.gd" id="2_mover"]
+[ext_resource type="Resource" uid="uid://ctoftgyvevppa" path="res://gdscript/player/player_locomotion.tres" id="3_settings"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/ledge_guard.gd" id="4_ledge_guard"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/stamina.gd" id="5_stamina"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_sounds.gd" id="6_sounds"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_08_necromancer.tscn" id="15_model"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_appearance.gd" id="19_appearance"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_01_storm.tscn" id="20_look_01"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_02_chrono.tscn" id="20_look_02"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_03_hood.tscn" id="20_look_03"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_04_stargazer.tscn" id="20_look_04"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_05_pyromancer.tscn" id="20_look_05"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_06_cryomancer.tscn" id="20_look_06"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_07_druid.tscn" id="20_look_07"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_09_archmage.tscn" id="20_look_09"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/mage_options/option_10_battlemage.tscn" id="20_look_10"]
+[ext_resource type="Script" path="res://addons/iso_orbit/occluded_silhouette/occluded_silhouette.gd" id="16_silhouette"]
+[ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_mask.tres" id="17_silhouette_mask"]
+[ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_body.tres" id="17_silhouette_body"]
+[ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_gear.tres" id="17_silhouette_gear"]
+[ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_outline.tres" id="17_silhouette_outline"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/hand_sway.gd" id="18_sway"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/footstep_1.wav" id="7_step1"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/footstep_2.wav" id="8_step2"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/footstep_3.wav" id="9_step3"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/footstep_4.wav" id="10_step4"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/jump.wav" id="11_jump"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/land.wav" id="12_land"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/sprint_start.wav" id="13_sprint_start"]
+[ext_resource type="AudioStream" path="res://shared/audio/character/sprint_loop.wav" id="14_sprint_loop"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_steps"]
+random_pitch = 1.08
+random_volume_offset_db = 1.5
+streams_count = 4
+stream_0/stream = ExtResource("7_step1")
+stream_1/stream = ExtResource("8_step2")
+stream_2/stream = ExtResource("9_step3")
+stream_3/stream = ExtResource("10_step4")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.35
+height = 1.8
+
+[node name="Player" type="CharacterBody3D" unique_id=1530508516 node_paths=PackedStringArray("mover", "visual", "ledge_guard", "stamina")]
+collision_layer = 2
+floor_constant_speed = true
+script = ExtResource("1_character")
+mover = NodePath("NavigationMover")
+visual = NodePath("Visual")
+ledge_guard = NodePath("LedgeGuard")
+stamina = NodePath("Stamina")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=941711978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Visual" type="Node3D" parent="." unique_id=1355512769]
+
+[node name="Model" parent="Visual" unique_id=170123621 instance=ExtResource("20_look_10")]
+
+[node name="Silhouette" type="Node" parent="." unique_id=1188634796 node_paths=PackedStringArray("target")]
+script = ExtResource("16_silhouette")
+target = NodePath("../Visual")
+mask = ExtResource("17_silhouette_mask")
+body_fill = ExtResource("17_silhouette_body")
+gear_fill = ExtResource("17_silhouette_gear")
+outline = ExtResource("17_silhouette_outline")
+
+[node name="Appearance" type="Node" parent="." node_paths=PackedStringArray("slot", "hand_sway")]
+script = ExtResource("19_appearance")
+slot = NodePath("../Visual")
+models = Array[PackedScene]([ExtResource("20_look_01"), ExtResource("20_look_02"), ExtResource("20_look_03"), ExtResource("20_look_04"), ExtResource("20_look_05"), ExtResource("20_look_06"), ExtResource("20_look_07"), ExtResource("15_model"), ExtResource("20_look_09"), ExtResource("20_look_10")])
+hand_sway = NodePath("../RightHandSway")
+
+[node name="RightHandSway" type="Node" parent="." node_paths=PackedStringArray("character", "hand")]
+script = ExtResource("18_sway")
+character = NodePath("..")
+hand = NodePath("../Visual/Model/RightHand")
+
+[node name="NavigationMover" type="Node" parent="." unique_id=830176565]
+script = ExtResource("2_mover")
+settings = ExtResource("3_settings")
+
+[node name="LedgeGuard" type="Node" parent="." unique_id=1907245113]
+script = ExtResource("4_ledge_guard")
+
+[node name="Stamina" type="Node" parent="." unique_id=1263547089]
+script = ExtResource("5_stamina")
+
+[node name="Sounds" type="Node3D" parent="." unique_id=1720417493 node_paths=PackedStringArray("character", "footsteps", "jump", "land", "sprint_start", "sprint_loop")]
+script = ExtResource("6_sounds")
+character = NodePath("..")
+footsteps = NodePath("Footsteps")
+jump = NodePath("Jump")
+land = NodePath("Land")
+sprint_start = NodePath("SprintStart")
+sprint_loop = NodePath("SprintLoop")
+
+[node name="Footsteps" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1093318640]
+stream = SubResource("AudioStreamRandomizer_steps")
+volume_db = -8.0
+unit_size = 15.0
+max_polyphony = 3
+
+[node name="Jump" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1530873461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+stream = ExtResource("11_jump")
+volume_db = -6.0
+unit_size = 15.0
+
+[node name="Land" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1946662715]
+stream = ExtResource("12_land")
+volume_db = -3.0
+unit_size = 15.0
+max_polyphony = 2
+
+[node name="SprintStart" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1384922857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+stream = ExtResource("13_sprint_start")
+volume_db = -6.0
+unit_size = 15.0
+
+[node name="SprintLoop" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1612209374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+stream = ExtResource("14_sprint_loop")
+volume_db = -14.0
+unit_size = 15.0

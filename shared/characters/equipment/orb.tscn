@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/gem_violet.tres" id="gem_violet"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_22f48"]
+material = ExtResource("gem_violet")
+radius = 0.1
+height = 0.2
+radial_segments = 16
+rings = 8
+
+[sub_resource type="TorusMesh" id="TorusMesh_f9662"]
+material = ExtResource("brass")
+inner_radius = 0.14
+outer_radius = 0.152
+rings = 32
+ring_segments = 4
+
+[sub_resource type="TorusMesh" id="TorusMesh_35527"]
+material = ExtResource("brass")
+inner_radius = 0.17
+outer_radius = 0.182
+rings = 32
+ring_segments = 4
+
+[node name="Orb" type="Node3D" unique_id=177619]
+
+[node name="Core" type="MeshInstance3D" parent="." unique_id=2089006126]
+mesh = SubResource("SphereMesh_22f48")
+
+[node name="RingInner" type="MeshInstance3D" parent="." unique_id=841593041]
+transform = Transform3D(0.9396926, -0.34202012, 0, 0.11697777, 0.32139382, -0.9396926, 0.3213938, 0.8830222, 0.34202015, 0, 0, 0)
+mesh = SubResource("TorusMesh_f9662")
+
+[node name="RingOuter" type="MeshInstance3D" parent="." unique_id=848966660]
+transform = Transform3D(0.76604444, -0.52654076, 0.3686878, 0, 0.57357645, 0.81915206, -0.6427876, -0.62750685, 0.43938506, 0, 0, 0)
+mesh = SubResource("TorusMesh_35527")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+light_color = Color(0.7, 0.45, 1, 1)
+light_energy = 0.8
+omni_range = 2.6

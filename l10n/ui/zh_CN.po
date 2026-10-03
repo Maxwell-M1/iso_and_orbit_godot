@@ -1,0 +1,418 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Iso & Orbit - Camera and Character Controller Template\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: gdscript/main.tscn
+msgid ""
+"LMB on the ground — run there\n"
+"Hold LMB — run after the cursor\n"
+"Hold LMB + RMB — run where the camera looks\n"
+"RMB + mouse — orbit the camera\n"
+"Wheel — lower or raise the camera"
+msgstr ""
+"左键点击地面 — 跑向该点\n"
+"按住左键 — 跟随光标奔跑\n"
+"按住左键 + 右键 — 向相机所看方向奔跑\n"
+"右键 + 鼠标 — 环绕旋转相机\n"
+"滚轮 — 降低或升高相机"
+
+#: gdscript/main.tscn
+msgid "RMB + WASD — move relative to the camera"
+msgstr "右键 + WASD — 相对相机移动"
+
+#: gdscript/main.tscn
+msgid "LMB + RMB + A/D — run diagonally"
+msgstr "左键 + 右键 + A/D — 斜向奔跑"
+
+#: gdscript/main.tscn
+msgid "Shift — run faster"
+msgstr "Shift — 加速奔跑"
+
+#: gdscript/main.tscn
+msgid "Space — jump"
+msgstr "空格 — 跳跃"
+
+#: gdscript/main.tscn
+msgid "F10 — settings"
+msgstr "F10 — 设置"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Settings"
+msgstr "设置"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls"
+msgstr "操作"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Held LMB"
+msgstr "按住左键"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Straight to the cursor"
+msgstr "直奔光标"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "To the point along a path"
+msgstr "沿路径前往该点"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB + WASD"
+msgstr "右键 + WASD"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off"
+msgstr "关闭"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward, S backs up"
+msgstr "侧移：面朝前方，S 后退"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn: face the way you go, S toward the camera"
+msgstr "转向：面朝前进方向，S 走向相机"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB + RMB + A/D"
+msgstr "左键 + 右键 + A/D"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward"
+msgstr "侧移：面朝前方"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Diagonal: face the way you go"
+msgstr "斜向：面朝前进方向"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Backing up (S) slower by"
+msgstr "后退（S）减速"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+msgstr "按住右键时，W 朝相机所看方向前进。侧移模式下，角色与相机朝向一致：A 和 D 向两侧移动，S 后退。转向模式下，角色面朝前进方向：A 和 D 向左、向右走，S 走向相机。同时按住两键时，A 和 D 让奔跑方向斜向前偏。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hide the cursor while running with LMB held"
+msgstr "按住左键奔跑时隐藏光标"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+msgstr "按下一旦变为按住，光标即隐藏；松开后光标在你瞄准的位置重新出现。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character"
+msgstr "角色"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hero look"
+msgstr "英雄外观"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "All looks stand in a row south of the road to the ramp, each with its number overhead."
+msgstr "所有外观在通往坡道的路以南站成一排，头顶标有各自的编号。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Don't fall off ledges"
+msgstr "防止从边缘跌落"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+msgstr "角色在边缘处停下；斜着跑向边缘时，会像沿墙一样沿边缘滑行。低矮的台阶仍可走下。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump (Space)"
+msgstr "跳跃（空格）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump height"
+msgstr "跳跃高度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f m"
+msgstr "%.1f 米"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint (Shift)"
+msgstr "冲刺（Shift）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Shift"
+msgstr "Shift"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hold"
+msgstr "按住"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Press: on, again: off"
+msgstr "按下开启，再按关闭"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Speed bonus"
+msgstr "速度加成"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint fatigue"
+msgstr "冲刺疲劳"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Stamina lasts"
+msgstr "体力持续"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f s"
+msgstr "%.1f 秒"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Camera"
+msgstr "相机"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB tilts the camera up and down"
+msgstr "右键可上下倾斜相机"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+msgstr "关闭时：右键加鼠标只让相机绕角色旋转，相机的高度和倾角由滚轮调节。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn the camera to follow the run"
+msgstr "相机随奔跑方向转动"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera tilt"
+msgstr "对齐相机倾角"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Tilt down"
+msgstr "向下倾角"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "角色奔跑时，相机平滑过渡到此倾角。滚轮（以及可倾斜相机时的右键）照常改变倾角，奔跑中又会平滑恢复。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Catch up in"
+msgstr "跟上用时"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "instant"
+msgstr "立即"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor keeps its aim while the camera turns"
+msgstr "相机转动时光标保持瞄准"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "按住左键时，光标随世界移动，角色朝你瞄准的位置奔跑。关闭后光标在屏幕上不动，角色会像打方向盘的汽车一样偏向光标。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The camera stops at obstacles behind it"
+msgstr "相机遇到后方障碍物时停下"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+msgstr "后方有山或墙时：相机不会进入其中，而是向角色靠近，直到后方重新有空间。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Move in when the character is hidden"
+msgstr "角色被遮挡时拉近"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+msgstr "栅栏或墙几乎完全遮住角色时：相机移到障碍物前方。关闭时：角色以剪影形式透过障碍物显示。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Display"
+msgstr "显示"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS limit"
+msgstr "FPS 上限"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Unlimited"
+msgstr "不限"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Vertical sync (V-Sync)"
+msgstr "垂直同步（V-Sync）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics interpolation (character and camera)"
+msgstr "物理插值（角色和相机）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+msgstr "物理每秒运行 60 次。开启插值后，无论 FPS 多少，角色和相机都在物理帧之间平滑绘制；关闭后则逐个物理帧跳跃式移动。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Silhouette outline behind obstacles"
+msgstr "障碍物后的剪影描边"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+msgstr "当树、房屋或山遮住英雄时，英雄显示为实心剪影，法杖的轮廓叠加在上方。描边是环绕整个剪影的浅色边缘。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface"
+msgstr "界面"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface scale"
+msgstr "界面缩放"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+msgstr "提示、FPS 计数器、体力条和本窗口。50% 最小，100% 最大。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS counter"
+msgstr "FPS 计数器"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls hint and speed"
+msgstr "操作提示和速度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character path line"
+msgstr "角色路径线"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sound"
+msgstr "声音"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Volume"
+msgstr "音量"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "off"
+msgstr "关"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps"
+msgstr "脚步声"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump and landing"
+msgstr "跳跃和落地"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint start and sprinting"
+msgstr "冲刺起步和冲刺中"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+msgstr "脚步声按移动距离触发，因此冲刺时更快，也略微清亮一些。跳得越高，落地声越响。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Reset all"
+msgstr "全部重置"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Close"
+msgstr "关闭"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "1 · Storm Mage"
+msgstr "1 · 风暴法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "2 · Chronomancer"
+msgstr "2 · 时空法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "3 · Hooded Mystic"
+msgstr "3 · 兜帽秘术师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "4 · Stargazer"
+msgstr "4 · 观星者"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "5 · Pyromancer"
+msgstr "5 · 火焰法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "6 · Cryomancer"
+msgstr "6 · 冰霜法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "7 · Druid"
+msgstr "7 · 德鲁伊"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "8 · Necromancer"
+msgstr "8 · 死灵法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "9 · Archmage"
+msgstr "9 · 大法师"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "10 · Battle Mage"
+msgstr "10 · 战斗法师"
+
+#: shared/world/world.tscn
+msgid "Knight"
+msgstr "骑士"
+
+#: shared/world/world.tscn
+msgid "Ranger"
+msgstr "游侠"
+
+#: shared/world/world.tscn
+msgid "Wizard"
+msgstr "巫师"
+
+#: shared/world/world.tscn
+msgid "Dwarf"
+msgstr "矮人"
+
+#: shared/world/world.tscn
+msgid "Rogue"
+msgstr "盗贼"
+
+#: shared/world/mountain/mountain.tscn
+msgid "Windswept Peak"
+msgstr "风啸峰"
+
+#: shared/world/world.tscn
+msgid "Travelers' Camp"
+msgstr "旅人营地"
+
+#: shared/world/world.tscn
+msgid "Farmstead by the Well"
+msgstr "井边农庄"
+
+#: shared/world/world.tscn
+msgid "Ancient Circle"
+msgstr "远古石环"
+
+#: gdscript/demo/hud.gd
+msgid "Speed: %.1f m/s"
+msgstr "速度：%.1f 米/秒"
+
+#: addons/iso_orbit/points_of_interest/discovery_toast.gd
+msgid "Discovered: %s"
+msgstr "发现地点：%s"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid " (%d Hz)"
+msgstr " (%d Hz)"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid "With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no effect. The smoothest limits are those that divide this rate evenly."
+msgstr "开启 V-Sync 时，帧数永远不会超过显示器刷新率%s，高于刷新率的 FPS 上限不起作用。能整除该刷新率的上限最流畅。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Language"
+msgstr "语言"

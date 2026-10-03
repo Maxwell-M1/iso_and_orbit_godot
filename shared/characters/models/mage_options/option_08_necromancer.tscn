@@ -1,0 +1,291 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/shadow.tres" id="shadow"]
+[ext_resource type="Material" path="res://shared/characters/materials/bone.tres" id="bone"]
+[ext_resource type="PackedScene" path="res://shared/characters/equipment/staff_skull.tscn" id="staff_skull"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d408c"]
+albedo_color = Color(0.12, 0.1, 0.14, 1)
+roughness = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_480a5"]
+material = SubResource("StandardMaterial3D_d408c")
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e5bd3"]
+albedo_color = Color(0.17, 0.1, 0.21, 1)
+roughness = 0.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6b970"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.36
+bottom_radius = 0.44
+height = 0.88
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_273d8"]
+material = ExtResource("dark_steel")
+top_radius = 0.362
+bottom_radius = 0.362
+height = 0.07
+radial_segments = 24
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_76073"]
+material = ExtResource("shadow")
+radius = 0.055
+height = 0.06
+radial_segments = 16
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c6e58"]
+albedo_color = Color(0.35, 1, 0.25, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.25, 1, 0.15, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_31a60"]
+material = SubResource("StandardMaterial3D_c6e58")
+radius = 0.034
+height = 0.036
+radial_segments = 10
+rings = 5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_2"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_3"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_4"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_5"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_6"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_7"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_8"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_9"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_10"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_11"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d1505_12"]
+material = SubResource("StandardMaterial3D_e5bd3")
+top_radius = 0.06
+bottom_radius = 0.0
+height = 0.17
+radial_segments = 4
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_b4904"]
+material = SubResource("StandardMaterial3D_e5bd3")
+size = Vector3(0.13, 0.5, 0.025)
+
+[sub_resource type="SphereMesh" id="SphereMesh_74179"]
+material = ExtResource("bone")
+radius = 0.1
+height = 0.19
+radial_segments = 12
+rings = 6
+
+[sub_resource type="SphereMesh" id="SphereMesh_4c250"]
+material = ExtResource("shadow")
+radius = 0.025
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[node name="Necromancer" type="Node3D" unique_id=177619]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=2088969747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_480a5")
+
+[node name="Robe" type="MeshInstance3D" parent="." unique_id=2089544653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, 0)
+mesh = SubResource("CylinderMesh_6b970")
+
+[node name="Sash" type="MeshInstance3D" parent="." unique_id=2089565908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_273d8")
+
+[node name="EyeRight" type="Node3D" parent="." unique_id=2102958726]
+transform = Transform3D(0.9190107, -0.27163687, -0.2857143, 0.23944059, 0.9603437, -0.14285702, 0.31318918, 0.06287555, 0.9476071, 0.1, 1.5, -0.33166248)
+
+[node name="Socket" type="MeshInstance3D" parent="EyeRight" unique_id=981129598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_76073")
+
+[node name="Glow" type="MeshInstance3D" parent="EyeRight" unique_id=181888782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, -0.008)
+mesh = SubResource("SphereMesh_31a60")
+
+[node name="EyeLeft" type="Node3D" parent="." unique_id=1690387571]
+transform = Transform3D(0.9190107, 0.27163687, 0.2857143, -0.23944059, 0.9603437, -0.14285702, -0.31318918, 0.06287555, 0.9476071, -0.1, 1.5, -0.33166248)
+
+[node name="Socket" type="MeshInstance3D" parent="EyeLeft" unique_id=1801287371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_76073")
+
+[node name="Glow" type="MeshInstance3D" parent="EyeLeft" unique_id=870862107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, -0.008)
+mesh = SubResource("SphereMesh_31a60")
+
+[node name="Tatter01" type="MeshInstance3D" parent="." unique_id=1126234618]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 0.1074099, 0.095, -0.4008592)
+mesh = SubResource("CylinderMesh_d1505")
+
+[node name="Tatter02" type="MeshInstance3D" parent="." unique_id=1126234619]
+transform = Transform3D(0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, 0.70710677, 0.2934493, 0.095, -0.2934493)
+mesh = SubResource("CylinderMesh_d1505_2")
+
+[node name="Tatter03" type="MeshInstance3D" parent="." unique_id=1126234620]
+transform = Transform3D(0.25881907, 0, -0.9659258, 0, 1, 0, 0.9659258, 0, 0.25881907, 0.4008592, 0.095, -0.1074099)
+mesh = SubResource("CylinderMesh_d1505_3")
+
+[node name="Tatter04" type="MeshInstance3D" parent="." unique_id=1126234621]
+transform = Transform3D(-0.25881904, 0, -0.9659258, 0, 1, 0, 0.9659258, 0, -0.25881904, 0.4008592, 0.095, 0.1074099)
+mesh = SubResource("CylinderMesh_d1505_4")
+
+[node name="Tatter05" type="MeshInstance3D" parent="." unique_id=1126234622]
+transform = Transform3D(-0.70710677, 0, -0.70710677, 0, 1, 0, 0.70710677, 0, -0.70710677, 0.2934493, 0.095, 0.2934493)
+mesh = SubResource("CylinderMesh_d1505_5")
+
+[node name="Tatter06" type="MeshInstance3D" parent="." unique_id=1126234623]
+transform = Transform3D(-0.9659258, 0, -0.25881913, 0, 1, 0, 0.25881913, 0, -0.9659258, 0.1074099, 0.095, 0.4008592)
+mesh = SubResource("CylinderMesh_d1505_6")
+
+[node name="Tatter07" type="MeshInstance3D" parent="." unique_id=1126234624]
+transform = Transform3D(-0.9659258, 0, 0.25881907, 0, 1, 0, -0.25881907, 0, -0.9659258, -0.1074099, 0.095, 0.4008592)
+mesh = SubResource("CylinderMesh_d1505_7")
+
+[node name="Tatter08" type="MeshInstance3D" parent="." unique_id=1126234625]
+transform = Transform3D(-0.7071068, 0, 0.7071067, 0, 1, 0, -0.7071067, 0, -0.7071068, -0.2934493, 0.095, 0.2934493)
+mesh = SubResource("CylinderMesh_d1505_8")
+
+[node name="Tatter09" type="MeshInstance3D" parent="." unique_id=1126234626]
+transform = Transform3D(-0.25881898, 0, 0.9659259, 0, 1, 0, -0.9659259, 0, -0.25881898, -0.4008592, 0.095, 0.1074099)
+mesh = SubResource("CylinderMesh_d1505_9")
+
+[node name="Tatter10" type="MeshInstance3D" parent="." unique_id=1126234650]
+transform = Transform3D(0.258819, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.258819, -0.4008592, 0.095, -0.1074099)
+mesh = SubResource("CylinderMesh_d1505_10")
+
+[node name="Tatter11" type="MeshInstance3D" parent="." unique_id=1126234651]
+transform = Transform3D(0.70710665, 0, 0.7071069, 0, 1, 0, -0.7071069, 0, 0.70710665, -0.2934493, 0.095, -0.2934493)
+mesh = SubResource("CylinderMesh_d1505_11")
+
+[node name="Tatter12" type="MeshInstance3D" parent="." unique_id=1126234652]
+transform = Transform3D(0.96592575, 0, 0.25881928, 0, 1, 0, -0.25881928, 0, 0.96592575, -0.1074099, 0.095, -0.4008592)
+mesh = SubResource("CylinderMesh_d1505_12")
+
+[node name="Collar1" type="MeshInstance3D" parent="." unique_id=873028755]
+transform = Transform3D(-0.50000006, 0.14246714, -0.84030074, 0, 0.6598011, 0.2419219, 0.8660254, 0.082253456, -0.48514792, 0.26846787, 1.59, 0.155)
+mesh = SubResource("BoxMesh_b4904")
+
+[node name="Collar2" type="MeshInstance3D" parent="." unique_id=873028756]
+transform = Transform3D(-0.8660254, 0.10160721, -0.48514792, 0, 0.8150484, 0.2419219, 0.50000006, 0.17598882, -0.84030074, 0.155, 1.63, 0.26846787)
+mesh = SubResource("BoxMesh_b4904")
+
+[node name="Collar3" type="MeshInstance3D" parent="." unique_id=873028757]
+transform = Transform3D(-1, -2.1149484e-08, 8.482595e-08, 0, 0.9702957, 0.2419219, -8.742278e-08, 0.2419219, -0.9702957, 3.7962796e-17, 1.67, 0.31)
+mesh = SubResource("BoxMesh_b4904")
+
+[node name="Collar4" type="MeshInstance3D" parent="." unique_id=873028758]
+transform = Transform3D(-0.8660254, -0.10160719, 0.48514783, 0, 0.8150484, 0.2419219, -0.49999997, 0.17598882, -0.84030074, -0.155, 1.63, 0.26846787)
+mesh = SubResource("BoxMesh_b4904")
+
+[node name="Collar5" type="MeshInstance3D" parent="." unique_id=873028759]
+transform = Transform3D(-0.4999999, -0.14246716, 0.8403008, 0, 0.6598011, 0.2419219, -0.86602545, 0.082253434, -0.48514777, -0.26846787, 1.59, 0.155)
+mesh = SubResource("BoxMesh_b4904")
+
+[node name="ShoulderSkull" type="MeshInstance3D" parent="." unique_id=346539830]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.33, 1.47, 0)
+mesh = SubResource("SphereMesh_74179")
+
+[node name="ShoulderSocketFront" type="MeshInstance3D" parent="." unique_id=1677996605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36, 1.49, -0.085)
+mesh = SubResource("SphereMesh_4c250")
+
+[node name="ShoulderSocketBack" type="MeshInstance3D" parent="." unique_id=636363077]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 1.49, -0.04)
+mesh = SubResource("SphereMesh_4c250")
+
+[node name="RightHand" type="Node3D" parent="." unique_id=480002366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52, 0.98, -0.1)
+
+[node name="Staff" type="Node3D" parent="RightHand" unique_id=1130718529 instance=ExtResource("staff_skull")]
+transform = Transform3D(0.9986295, 0.05233596, 0, -0.05182663, 0.9889109, 0.1391731, 0.007283758, -0.13898237, 0.99026805, 0, 0, 0)

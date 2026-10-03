@@ -1,0 +1,418 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Iso & Orbit - Camera and Character Controller Template\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: gdscript/main.tscn
+msgid ""
+"LMB on the ground — run there\n"
+"Hold LMB — run after the cursor\n"
+"Hold LMB + RMB — run where the camera looks\n"
+"RMB + mouse — orbit the camera\n"
+"Wheel — lower or raise the camera"
+msgstr ""
+"ЛКМ по земле — бежать в точку\n"
+"Зажатая ЛКМ — бежать за курсором\n"
+"Зажатые ЛКМ + ПКМ — бежать, куда смотрит камера\n"
+"ПКМ + мышь — вращать камеру\n"
+"Колесо — опустить или поднять камеру"
+
+#: gdscript/main.tscn
+msgid "RMB + WASD — move relative to the camera"
+msgstr "ПКМ + WASD — ходить относительно камеры"
+
+#: gdscript/main.tscn
+msgid "LMB + RMB + A/D — run diagonally"
+msgstr "ЛКМ + ПКМ + A/D — бежать наискосок"
+
+#: gdscript/main.tscn
+msgid "Shift — run faster"
+msgstr "Shift — бежать быстрее"
+
+#: gdscript/main.tscn
+msgid "Space — jump"
+msgstr "Пробел — прыжок"
+
+#: gdscript/main.tscn
+msgid "F10 — settings"
+msgstr "F10 — настройки"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Settings"
+msgstr "Настройки"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls"
+msgstr "Управление"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Held LMB"
+msgstr "Зажатая ЛКМ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Straight to the cursor"
+msgstr "Напрямую к курсору"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "To the point along a path"
+msgstr "К точке по пути"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB + WASD"
+msgstr "ПКМ + WASD"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off"
+msgstr "Выключено"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward, S backs up"
+msgstr "Боком: лицом вперёд, S — спиной"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn: face the way you go, S toward the camera"
+msgstr "С поворотом: лицом по ходу, S — к камере"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB + RMB + A/D"
+msgstr "ЛКМ + ПКМ + A/D"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward"
+msgstr "Боком: лицом вперёд"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Diagonal: face the way you go"
+msgstr "Наискосок: лицом по ходу"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Backing up (S) slower by"
+msgstr "Задом (S) медленнее на"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+msgstr "С ПКМ W ведёт туда, куда смотрит камера. Боком персонаж смотрит туда же, куда камера: A и D — вбок, S — спиной вперёд. С поворотом — лицом по ходу: A и D — влево и вправо, S — к камере. С обеими кнопками A и D уводят бег наискосок вперёд."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hide the cursor while running with LMB held"
+msgstr "Прятать курсор, пока бежишь с зажатой ЛКМ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+msgstr "Курсор пропадает, как только нажатие стало удержанием, и появляется после отпускания кнопки — там, куда целились."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character"
+msgstr "Персонаж"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hero look"
+msgstr "Облик героя"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "All looks stand in a row south of the road to the ramp, each with its number overhead."
+msgstr "Все варианты стоят шеренгой к югу от дороги к пандусу — номер над головой."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Don't fall off ledges"
+msgstr "Не падать с обрывов"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+msgstr "У края персонаж останавливается, а если бежит к нему под углом — скользит вдоль, как вдоль стены. С невысоких ступенек сходить можно."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump (Space)"
+msgstr "Прыжок (пробел)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump height"
+msgstr "Высота прыжка"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f m"
+msgstr "%.1f м"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint (Shift)"
+msgstr "Бег с ускорением (Shift)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Shift"
+msgstr "Shift"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hold"
+msgstr "Держать"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Press: on, again: off"
+msgstr "Нажать: вкл, ещё раз: выкл"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Speed bonus"
+msgstr "Прибавка к скорости"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint fatigue"
+msgstr "Усталость от ускорения"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Stamina lasts"
+msgstr "Сил хватает на"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f s"
+msgstr "%.1f с"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Camera"
+msgstr "Камера"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB tilts the camera up and down"
+msgstr "ПКМ наклоняет камеру вверх-вниз"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+msgstr "Выключено — ПКМ с мышью только вращает камеру вокруг персонажа, а высоту и наклон задаёт колесо."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn the camera to follow the run"
+msgstr "Поворачивать камеру за бегом"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera tilt"
+msgstr "Выравнивать камеру по вертикали"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Tilt down"
+msgstr "Наклон вниз"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "Пока персонаж бежит, камера плавно приходит к этому наклону. Колесо (и ПКМ, если она наклоняет камеру) меняет наклон как обычно, а на бегу он снова выравнивается."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Catch up in"
+msgstr "Доворачивать за"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "instant"
+msgstr "сразу"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor keeps its aim while the camera turns"
+msgstr "Курсор держит цель, пока камера поворачивается"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "Пока ЛКМ зажата, курсор едет вместе с миром, и персонаж бежит туда, куда целились. Без этого курсор стоит на месте экрана, и персонаж забирает в его сторону, как машина за рулём."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The camera stops at obstacles behind it"
+msgstr "Камера упирается в препятствия за спиной"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+msgstr "Гора или стена позади: камера не заходит внутрь, а подходит к персонажу, пока сзади нет места."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Move in when the character is hidden"
+msgstr "Приближаться, если персонажа закрыло"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+msgstr "Забор или стена закрыли персонажа почти целиком — камера подходит ближе препятствия. Выключено — персонажа видно силуэтом сквозь препятствие."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Display"
+msgstr "Изображение"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS limit"
+msgstr "Ограничение FPS"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Unlimited"
+msgstr "Без ограничения"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Vertical sync (V-Sync)"
+msgstr "Вертикальная синхронизация (V-Sync)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics interpolation (character and camera)"
+msgstr "Интерполяция физики (персонаж и камера)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+msgstr "Физика считается 60 раз в секунду. С интерполяцией персонаж и камера между тиками рисуются плавно при любом FPS, без неё — двигаются рывками по тикам."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Silhouette outline behind obstacles"
+msgstr "Обводка силуэта за препятствиями"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+msgstr "Когда героя закрывает дерево, дом или гора, он виден сплошным силуэтом, посох — отдельным контуром поверх. Обводка — светлая кайма вокруг всего силуэта."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface"
+msgstr "Интерфейс"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface scale"
+msgstr "Масштаб интерфейса"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+msgstr "Подсказки, счётчик FPS, полоса сил и это окно. 50% — самый мелкий, 100% — самый крупный."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS counter"
+msgstr "Счётчик FPS"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls hint and speed"
+msgstr "Подсказка по управлению и скорость"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character path line"
+msgstr "Линия пути персонажа"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sound"
+msgstr "Звук"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Volume"
+msgstr "Громкость"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "off"
+msgstr "выкл"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps"
+msgstr "Шаги"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump and landing"
+msgstr "Прыжок и приземление"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint start and sprinting"
+msgstr "Рывок и бег с ускорением"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+msgstr "Шаги идут по пройденному пути, поэтому на бегу с ускорением они чаще и чуть звонче. Приземление тем громче, чем выше прыгали."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Reset all"
+msgstr "Сбросить всё"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Close"
+msgstr "Закрыть"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "1 · Storm Mage"
+msgstr "1 · Грозовой маг"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "2 · Chronomancer"
+msgstr "2 · Хрономант"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "3 · Hooded Mystic"
+msgstr "3 · Таинственный"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "4 · Stargazer"
+msgstr "4 · Звездочёт"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "5 · Pyromancer"
+msgstr "5 · Пиромант"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "6 · Cryomancer"
+msgstr "6 · Криомант"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "7 · Druid"
+msgstr "7 · Друид"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "8 · Necromancer"
+msgstr "8 · Некромант"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "9 · Archmage"
+msgstr "9 · Архимаг"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "10 · Battle Mage"
+msgstr "10 · Боевой маг"
+
+#: shared/world/world.tscn
+msgid "Knight"
+msgstr "Рыцарь"
+
+#: shared/world/world.tscn
+msgid "Ranger"
+msgstr "Следопыт"
+
+#: shared/world/world.tscn
+msgid "Wizard"
+msgstr "Волшебник"
+
+#: shared/world/world.tscn
+msgid "Dwarf"
+msgstr "Гном"
+
+#: shared/world/world.tscn
+msgid "Rogue"
+msgstr "Разбойник"
+
+#: shared/world/mountain/mountain.tscn
+msgid "Windswept Peak"
+msgstr "Вершина ветров"
+
+#: shared/world/world.tscn
+msgid "Travelers' Camp"
+msgstr "Лагерь путников"
+
+#: shared/world/world.tscn
+msgid "Farmstead by the Well"
+msgstr "Хутор у колодца"
+
+#: shared/world/world.tscn
+msgid "Ancient Circle"
+msgstr "Древний круг"
+
+#: gdscript/demo/hud.gd
+msgid "Speed: %.1f m/s"
+msgstr "Скорость: %.1f м/с"
+
+#: addons/iso_orbit/points_of_interest/discovery_toast.gd
+msgid "Discovered: %s"
+msgstr "Открыто место: %s"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid " (%d Hz)"
+msgstr " (%d Гц)"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid "With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no effect. The smoothest limits are those that divide this rate evenly."
+msgstr "С V-Sync кадров не бывает больше частоты монитора%s, и предел FPS выше неё не действует. Ровнее всего пределы, на которые эта частота делится без остатка."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Language"
+msgstr "Язык"

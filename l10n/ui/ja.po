@@ -1,0 +1,418 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Iso & Orbit - Camera and Character Controller Template\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: gdscript/main.tscn
+msgid ""
+"LMB on the ground — run there\n"
+"Hold LMB — run after the cursor\n"
+"Hold LMB + RMB — run where the camera looks\n"
+"RMB + mouse — orbit the camera\n"
+"Wheel — lower or raise the camera"
+msgstr ""
+"地面を左クリック：そこへ走る\n"
+"左ボタン長押し：カーソルを追って走る\n"
+"左右ボタン長押し：カメラの向きへ走る\n"
+"右ボタン + マウス：カメラを回す\n"
+"ホイール：カメラを下げる/上げる"
+
+#: gdscript/main.tscn
+msgid "RMB + WASD — move relative to the camera"
+msgstr "右ボタン + WASD：カメラ基準で移動"
+
+#: gdscript/main.tscn
+msgid "LMB + RMB + A/D — run diagonally"
+msgstr "左右ボタン + A/D：斜めに走る"
+
+#: gdscript/main.tscn
+msgid "Shift — run faster"
+msgstr "Shift：速く走る"
+
+#: gdscript/main.tscn
+msgid "Space — jump"
+msgstr "スペース：ジャンプ"
+
+#: gdscript/main.tscn
+msgid "F10 — settings"
+msgstr "F10：設定"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Settings"
+msgstr "設定"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls"
+msgstr "操作"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Held LMB"
+msgstr "左ボタン長押し"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Straight to the cursor"
+msgstr "カーソルへ直進"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "To the point along a path"
+msgstr "経路に沿って地点へ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB + WASD"
+msgstr "右ボタン + WASD"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off"
+msgstr "オフ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward, S backs up"
+msgstr "横移動：前を向いたまま、Sで後退"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn: face the way you go, S toward the camera"
+msgstr "旋回：進む方向を向く、Sでカメラ側へ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB + RMB + A/D"
+msgstr "左右ボタン + A/D"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward"
+msgstr "横移動：前を向いたまま"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Diagonal: face the way you go"
+msgstr "斜め：進む方向を向く"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Backing up (S) slower by"
+msgstr "後退（S）の減速"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+msgstr "右ボタンを押すと、Wでカメラの向きへ進みます。横移動ではキャラクターはカメラと同じ方向を向き、A/Dで横へ、Sで後退します。旋回では進む方向を向き、A/Dで左右へ、Sでカメラ側へ進みます。両ボタンを押すと、A/Dで斜め前へ走ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hide the cursor while running with LMB held"
+msgstr "左ボタン長押しで走る間はカーソルを隠す"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+msgstr "押下が長押しと判定された時点でカーソルが消え、離すと狙った位置に戻ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character"
+msgstr "キャラクター"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hero look"
+msgstr "主人公の外見"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "All looks stand in a row south of the road to the ramp, each with its number overhead."
+msgstr "全外見が、スロープへの道の南側に頭上の番号付きで一列に並んでいます。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Don't fall off ledges"
+msgstr "崖から落ちない"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+msgstr "縁ではキャラクターが止まり、斜めに走っていれば壁と同じように縁に沿って滑ります。低い段差は降りられます。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump (Space)"
+msgstr "ジャンプ（スペース）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump height"
+msgstr "ジャンプの高さ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f m"
+msgstr "%.1f m"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint (Shift)"
+msgstr "ダッシュ（Shift）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Shift"
+msgstr "Shift"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hold"
+msgstr "長押し"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Press: on, again: off"
+msgstr "押すとオン、もう一度でオフ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Speed bonus"
+msgstr "速度ボーナス"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint fatigue"
+msgstr "ダッシュの疲労"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Stamina lasts"
+msgstr "スタミナ持続時間"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f s"
+msgstr "%.1f秒"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Camera"
+msgstr "カメラ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB tilts the camera up and down"
+msgstr "右ボタンでカメラを上下に傾ける"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+msgstr "オフ：右ボタン + マウスはキャラクターの周りでカメラを回すだけで、高さと傾きはホイールで決めます。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn the camera to follow the run"
+msgstr "走る方向へカメラを回す"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera tilt"
+msgstr "カメラの傾きを揃える"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Tilt down"
+msgstr "見下ろし角"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "キャラクターが走る間、カメラは徐々にこの傾きになります。ホイール（傾ける設定なら右ボタンも）でいつも通り傾きを変えられ、走るとまた徐々に戻ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Catch up in"
+msgstr "追従時間"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "instant"
+msgstr "即時"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor keeps its aim while the camera turns"
+msgstr "カメラ回転中もカーソルが狙いを保つ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "左ボタン長押し中はカーソルが世界と一緒に動き、キャラクターは狙った場所へ走ります。オフでは、カーソルは画面上で止まったままで、キャラクターはハンドルを切った車のようにそちらへ曲がります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The camera stops at obstacles behind it"
+msgstr "カメラが背後の障害物で止まる"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+msgstr "背後に山や壁があると、カメラは中に入らず、後ろに余裕ができるまでキャラクターに寄ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Move in when the character is hidden"
+msgstr "キャラクターが隠れたら寄る"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+msgstr "柵や壁がキャラクターをほぼ完全に隠すと、カメラが障害物の手前まで寄ります。オフ：障害物越しにキャラクターがシルエットで表示されます。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Display"
+msgstr "表示"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS limit"
+msgstr "FPS上限"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Unlimited"
+msgstr "無制限"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Vertical sync (V-Sync)"
+msgstr "垂直同期（V-Sync）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics interpolation (character and camera)"
+msgstr "物理補間（キャラクターとカメラ）"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+msgstr "物理は毎秒60回計算されます。補間ありでは、どのFPSでもキャラクターとカメラがティック間で滑らかに描画されます。補間なしでは、ティックごとに段階的に動きます。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Silhouette outline behind obstacles"
+msgstr "障害物の裏のシルエット輪郭"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+msgstr "木や家、山が主人公を隠すと、主人公は塗りつぶしのシルエットで表示され、その上に杖の輪郭が描かれます。輪郭とは、シルエット全体を囲む明るい縁取りです。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface"
+msgstr "インターフェース"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface scale"
+msgstr "UIスケール"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+msgstr "ヒント、FPSカウンター、スタミナバー、このウィンドウの大きさ。50%が最小、100%が最大です。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS counter"
+msgstr "FPSカウンター"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls hint and speed"
+msgstr "操作ヒントと速度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character path line"
+msgstr "キャラクターの経路線"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sound"
+msgstr "サウンド"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Volume"
+msgstr "音量"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "off"
+msgstr "オフ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps"
+msgstr "足音"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump and landing"
+msgstr "ジャンプと着地"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint start and sprinting"
+msgstr "ダッシュ開始とダッシュ中"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+msgstr "足音は移動距離に合わせて鳴るため、ダッシュ中は間隔が短く、少し明るい音になります。高く跳ぶほど着地音は大きくなります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Reset all"
+msgstr "すべてリセット"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Close"
+msgstr "閉じる"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "1 · Storm Mage"
+msgstr "1 · 嵐の魔導士"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "2 · Chronomancer"
+msgstr "2 · 時の魔導士"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "3 · Hooded Mystic"
+msgstr "3 · フードの秘術師"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "4 · Stargazer"
+msgstr "4 · 星読み"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "5 · Pyromancer"
+msgstr "5 · 炎の魔導士"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "6 · Cryomancer"
+msgstr "6 · 氷の魔導士"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "7 · Druid"
+msgstr "7 · ドルイド"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "8 · Necromancer"
+msgstr "8 · 死霊術師"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "9 · Archmage"
+msgstr "9 · 大魔導士"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "10 · Battle Mage"
+msgstr "10 · 戦闘魔導士"
+
+#: shared/world/world.tscn
+msgid "Knight"
+msgstr "騎士"
+
+#: shared/world/world.tscn
+msgid "Ranger"
+msgstr "レンジャー"
+
+#: shared/world/world.tscn
+msgid "Wizard"
+msgstr "魔法使い"
+
+#: shared/world/world.tscn
+msgid "Dwarf"
+msgstr "ドワーフ"
+
+#: shared/world/world.tscn
+msgid "Rogue"
+msgstr "盗賊"
+
+#: shared/world/mountain/mountain.tscn
+msgid "Windswept Peak"
+msgstr "吹きさらしの峰"
+
+#: shared/world/world.tscn
+msgid "Travelers' Camp"
+msgstr "旅人の野営地"
+
+#: shared/world/world.tscn
+msgid "Farmstead by the Well"
+msgstr "井戸のそばの農家"
+
+#: shared/world/world.tscn
+msgid "Ancient Circle"
+msgstr "古代の円環"
+
+#: gdscript/demo/hud.gd
+msgid "Speed: %.1f m/s"
+msgstr "速度：%.1f m/s"
+
+#: addons/iso_orbit/points_of_interest/discovery_toast.gd
+msgid "Discovered: %s"
+msgstr "発見：%s"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid " (%d Hz)"
+msgstr " (%d Hz)"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid "With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no effect. The smoothest limits are those that divide this rate evenly."
+msgstr "V-Syncでは、フレーム数がモニターのリフレッシュレート%sを超えることはなく、それより高いFPS上限は効果がありません。最も滑らかなのは、このレートを割り切れる上限値です。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Language"
+msgstr "言語"

@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/stone_masonry.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://dft2ni7hrc2k1" path="res://shared/world/textures/masonry_detail.webp" id="tex_masonry_detail"]
+[ext_resource type="Texture2D" uid="uid://jvn00iqpe2bt" path="res://shared/world/textures/masonry_streaks.webp" id="tex_masonry_streaks"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/stone_color = Color(0.55, 0.54, 0.51, 1)
+shader_parameter/block_size = Vector2(1.1, 0.4)
+shader_parameter/slab_size = Vector2(1.2, 1.0)
+shader_parameter/moss_amount = 0.15
+shader_parameter/stone_detail = ExtResource("tex_masonry_detail")
+shader_parameter/stone_streaks = ExtResource("tex_masonry_streaks")

@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/rock.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://cw6lufce7r4tt" path="res://shared/world/textures/boulder_detail.webp" id="tex_boulder_detail"]
+[ext_resource type="Texture2D" uid="uid://wjvajjvlcflp" path="res://shared/world/textures/boulder_normal.webp" id="tex_boulder_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/rock_detail = ExtResource("tex_boulder_detail")
+shader_parameter/rock_normal = ExtResource("tex_boulder_normal")

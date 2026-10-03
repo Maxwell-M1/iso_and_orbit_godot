@@ -1,0 +1,146 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://shared/world/mountain/mountain_mesh.res" id="1_mesh"]
+[ext_resource type="Shape3D" path="res://shared/world/mountain/mountain_shape.res" id="2_shape"]
+[ext_resource type="Material" path="res://shared/world/materials/rock.tres" id="3_stone"]
+[ext_resource type="Material" path="res://shared/world/materials/stone_altar.tres" id="9_altar"]
+[ext_resource type="Material" path="res://shared/world/materials/mountain.tres" id="10_mountain"]
+[ext_resource type="Material" path="res://shared/world/materials/crystal.tres" id="4_crystal"]
+[ext_resource type="Material" path="res://shared/world/materials/wood_pole.tres" id="5_wood"]
+[ext_resource type="Material" path="res://shared/world/materials/banner.tres" id="6_banner"]
+[ext_resource type="Script" path="res://shared/world/props/hover_spin.gd" id="7_spin"]
+[ext_resource type="Script" path="res://addons/iso_orbit/points_of_interest/point_of_interest.gd" id="8_poi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_altar"]
+size = Vector3(1.4, 0.9, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_altar"]
+material = ExtResource("9_altar")
+size = Vector3(1.4, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stone"]
+size = Vector3(0.6, 1.8, 0.45)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stone"]
+material = ExtResource("3_stone")
+size = Vector3(0.6, 1.8, 0.45)
+
+[sub_resource type="SphereMesh" id="SphereMesh_crystal"]
+material = ExtResource("4_crystal")
+radius = 0.32
+height = 1.1
+radial_segments = 4
+rings = 2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pole"]
+material = ExtResource("5_wood")
+top_radius = 0.06
+bottom_radius = 0.07
+height = 3.4
+radial_segments = 6
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_flag"]
+material = ExtResource("6_banner")
+size = Vector3(1.0, 0.65, 0.04)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_summit"]
+radius = 4.0
+
+[node name="Mountain" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = ExtResource("2_shape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = ExtResource("10_mountain")
+mesh = ExtResource("1_mesh")
+
+[node name="Shrine" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+
+[node name="Altar" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Altar"]
+shape = SubResource("BoxShape3D_altar")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Altar"]
+mesh = SubResource("BoxMesh_altar")
+
+[node name="Crystal" type="MeshInstance3D" parent="Shrine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+mesh = SubResource("SphereMesh_crystal")
+script = ExtResource("7_spin")
+
+[node name="Glow" type="OmniLight3D" parent="Shrine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(0.45, 0.82, 1, 1)
+light_energy = 2.0
+omni_range = 7.0
+
+[node name="Stone1" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(0.573569716, 0, -0.81915675, 0, 1, 0, 0.81915675, 0, 0.573569716, -2.703, 0.9, 1.893)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Stone1"]
+shape = SubResource("BoxShape3D_stone")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Stone1"]
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Stone2" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(-0.422606244, 0, -0.906313391, 0, 1, 0, 0.906313391, 0, -0.422606244, -2.991, 0.9, -1.395)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Stone2"]
+shape = SubResource("BoxShape3D_stone")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Stone2"]
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Stone3" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(-0.996190895, 0, -0.087199203, 0, 1, 0, 0.087199203, 0, -0.996190895, -0.288, 0.9, -3.287)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Stone3"]
+shape = SubResource("BoxShape3D_stone")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Stone3"]
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Stone4" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(-0.573569716, 0, 0.81915675, 0, 1, 0, -0.81915675, 0, -0.573569716, 2.703, 0.9, -1.893)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Stone4"]
+shape = SubResource("BoxShape3D_stone")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Stone4"]
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Stone5" type="StaticBody3D" parent="Shrine"]
+transform = Transform3D(0.422606244, 0, 0.906313391, 0, 1, 0, -0.906313391, 0, 0.422606244, 2.991, 0.9, 1.395)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Stone5"]
+shape = SubResource("BoxShape3D_stone")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrine/Stone5"]
+mesh = SubResource("BoxMesh_stone")
+
+[node name="Banner" type="Node3D" parent="Shrine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.334, 0, -3.665)
+
+[node name="Pole" type="MeshInstance3D" parent="Shrine/Banner"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+mesh = SubResource("CylinderMesh_pole")
+
+[node name="Flag" type="MeshInstance3D" parent="Shrine/Banner"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52, 3.05, 0)
+mesh = SubResource("BoxMesh_flag")
+
+[node name="Summit" type="Area3D" parent="Shrine"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("8_poi")
+title = "Windswept Peak"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrine/Summit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_summit")

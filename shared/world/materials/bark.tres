@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/bark.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://bowynnyiypoet" path="res://shared/world/textures/bark_detail.webp" id="tex_bark_detail"]
+[ext_resource type="Texture2D" uid="uid://dcuxb356haasq" path="res://shared/world/textures/bark_normal.webp" id="tex_bark_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/bark_detail = ExtResource("tex_bark_detail")
+shader_parameter/bark_normal = ExtResource("tex_bark_normal")

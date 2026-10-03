@@ -1,0 +1,11 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Crash logs of the .NET build
+mono_crash.*.json
+
+# Settings of an external IDE
+.idea/
+.vscode/
+.vs/

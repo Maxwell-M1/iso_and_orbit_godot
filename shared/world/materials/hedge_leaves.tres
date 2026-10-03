@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/hedge_foliage.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://cpf28vanu86io" path="res://shared/world/textures/leaves_broad_detail.webp" id="tex_leaves_broad_detail"]
+[ext_resource type="Texture2D" uid="uid://cabth8om3qg4h" path="res://shared/world/textures/leaves_broad_normal.webp" id="tex_leaves_broad_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/leaves_detail = ExtResource("tex_leaves_broad_detail")
+shader_parameter/leaves_normal = ExtResource("tex_leaves_broad_normal")

@@ -1,0 +1,57 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_97a87"]
+albedo_color = Color(0.42, 0.1, 0.12, 1)
+roughness = 0.75
+
+[sub_resource type="BoxMesh" id="BoxMesh_d8a0d"]
+material = SubResource("StandardMaterial3D_97a87")
+size = Vector3(0.012, 0.3, 0.23)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b727d"]
+material = SubResource("StandardMaterial3D_97a87")
+size = Vector3(0.074, 0.3, 0.022)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8dda9"]
+albedo_color = Color(0.93, 0.88, 0.74, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_fae08"]
+material = SubResource("StandardMaterial3D_8dda9")
+size = Vector3(0.05, 0.284, 0.215)
+
+[sub_resource type="BoxMesh" id="BoxMesh_512dc"]
+material = ExtResource("brass")
+size = Vector3(0.006, 0.08, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bd04f"]
+material = ExtResource("brass")
+size = Vector3(0.08, 0.04, 0.012)
+
+[node name="Spellbook" type="Node3D" unique_id=177619]
+
+[node name="CoverOuter" type="MeshInstance3D" parent="." unique_id=456965363]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.031, 0, 0)
+mesh = SubResource("BoxMesh_d8a0d")
+
+[node name="CoverInner" type="MeshInstance3D" parent="." unique_id=449591744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.031, 0, 0)
+mesh = SubResource("BoxMesh_d8a0d")
+
+[node name="Spine" type="MeshInstance3D" parent="." unique_id=236726692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.114)
+mesh = SubResource("BoxMesh_b727d")
+
+[node name="Pages" type="MeshInstance3D" parent="." unique_id=232627413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.004)
+mesh = SubResource("BoxMesh_fae08")
+
+[node name="Emblem" type="MeshInstance3D" parent="." unique_id=817822999]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, -0.039, 0.02, 0)
+mesh = SubResource("BoxMesh_512dc")
+
+[node name="Clasp" type="MeshInstance3D" parent="." unique_id=217599672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.118)
+mesh = SubResource("BoxMesh_bd04f")

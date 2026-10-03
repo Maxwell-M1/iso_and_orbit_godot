@@ -1,0 +1,187 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/lightning.tres" id="lightning"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_43190"]
+material = ExtResource("dark_steel")
+top_radius = 0.021
+bottom_radius = 0.026
+height = 1.66
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cb04d"]
+material = ExtResource("leather")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.22
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e3431"]
+material = ExtResource("brass")
+top_radius = 0.027
+bottom_radius = 0.02
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cc1a3"]
+material = ExtResource("dark_steel")
+top_radius = 0.036
+bottom_radius = 0.03
+height = 0.06
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_10112"]
+material = ExtResource("dark_steel")
+top_radius = 0.006
+bottom_radius = 0.01
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a4fc0"]
+material = ExtResource("dark_steel")
+top_radius = 0.004
+bottom_radius = 0.006
+height = 0.08
+radial_segments = 6
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_4b546"]
+material = ExtResource("lightning")
+radius = 0.06
+height = 0.12
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_6186f"]
+material = ExtResource("lightning")
+size = Vector3(0.014, 0.084, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6186f_2"]
+material = ExtResource("lightning")
+size = Vector3(0.014, 0.084, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6186f_3"]
+material = ExtResource("lightning")
+size = Vector3(0.014, 0.084, 0.012)
+
+[node name="StormStaff" type="Node3D" unique_id=177619]
+
+[node name="Shaft" type="MeshInstance3D" parent="." unique_id=236430235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0)
+mesh = SubResource("CylinderMesh_43190")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_cb04d")
+
+[node name="Ferrule" type="MeshInstance3D" parent="." unique_id=68464218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, 0)
+mesh = SubResource("CylinderMesh_e3431")
+
+[node name="Collar" type="MeshInstance3D" parent="." unique_id=742283298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.81, 0)
+mesh = SubResource("CylinderMesh_cc1a3")
+
+[node name="Prong1" type="Node3D" parent="." unique_id=1254711292]
+transform = Transform3D(0.89879405, 0.43837115, 0, -0.43837115, 0.89879405, 0, 0, 0, 1, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong1" unique_id=1347170128]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_10112")
+
+[node name="Tip" type="Node3D" parent="Prong1" unique_id=1347172120]
+transform = Transform3D(0.66913056, -0.74314487, 0, 0.74314487, 0.66913056, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong1/Tip" unique_id=1727940600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_a4fc0")
+
+[node name="Prong2" type="Node3D" parent="." unique_id=1254711293]
+transform = Transform3D(-0.4493971, -0.2191856, 0.8660254, -0.43837115, 0.89879405, 0, -0.7783785, -0.37964055, -0.50000006, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong2" unique_id=1348356049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_10112")
+
+[node name="Tip" type="Node3D" parent="Prong2" unique_id=1348358041]
+transform = Transform3D(0.66913056, -0.74314487, 0, 0.74314487, 0.66913056, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong2/Tip" unique_id=1795741977]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_a4fc0")
+
+[node name="Prong3" type="Node3D" parent="." unique_id=1254711294]
+transform = Transform3D(-0.44939694, -0.21918553, -0.86602545, -0.43837115, 0.89879405, 0, 0.77837855, 0.37964058, -0.4999999, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong3" unique_id=1349541970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("CylinderMesh_10112")
+
+[node name="Tip" type="Node3D" parent="Prong3" unique_id=1349543962]
+transform = Transform3D(0.66913056, -0.74314487, 0, 0.74314487, 0.66913056, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong3/Tip" unique_id=1863543354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_a4fc0")
+
+[node name="Orb" type="MeshInstance3D" parent="." unique_id=193466888]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.97, 0)
+mesh = SubResource("SphereMesh_4b546")
+
+[node name="Bolt1" type="Node3D" parent="." unique_id=216533511]
+transform = Transform3D(0.49999997, -0.663414, -0.5566704, 0, -0.64278764, 0.76604444, -0.86602545, -0.3830222, -0.3213938, 0, 0.97, 0)
+
+[node name="Segment1" type="MeshInstance3D" parent="Bolt1" unique_id=1794706234]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.030903164, 0)
+mesh = SubResource("BoxMesh_6186f")
+
+[node name="Segment2" type="MeshInstance3D" parent="Bolt1" unique_id=1794706235]
+transform = Transform3D(0.88294756, 0.46947157, 0, -0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.0927095, 0)
+mesh = SubResource("BoxMesh_6186f")
+
+[node name="Segment3" type="MeshInstance3D" parent="Bolt1" unique_id=1794706236]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.15451582, 0)
+mesh = SubResource("BoxMesh_6186f")
+
+[node name="Bolt2" type="Node3D" parent="." unique_id=216533512]
+transform = Transform3D(-1, 6.696973e-08, 5.619428e-08, 0, -0.64278764, 0.76604444, 8.742278e-08, 0.76604444, 0.64278764, 0, 0.97, 0)
+
+[node name="Segment1" type="MeshInstance3D" parent="Bolt2" unique_id=1862507611]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.030903164, 0)
+mesh = SubResource("BoxMesh_6186f_2")
+
+[node name="Segment2" type="MeshInstance3D" parent="Bolt2" unique_id=1862507612]
+transform = Transform3D(0.88294756, 0.46947157, 0, -0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.0927095, 0)
+mesh = SubResource("BoxMesh_6186f_2")
+
+[node name="Segment3" type="MeshInstance3D" parent="Bolt2" unique_id=1862507613]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.15451582, 0)
+mesh = SubResource("BoxMesh_6186f_2")
+
+[node name="Bolt3" type="Node3D" parent="." unique_id=216533513]
+transform = Transform3D(0.4999999, 0.663414, 0.5566704, 0, -0.64278764, 0.76604444, 0.86602545, -0.38302216, -0.32139376, 0, 0.97, 0)
+
+[node name="Segment1" type="MeshInstance3D" parent="Bolt3" unique_id=1930308988]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.030903164, 0)
+mesh = SubResource("BoxMesh_6186f_3")
+
+[node name="Segment2" type="MeshInstance3D" parent="Bolt3" unique_id=1930308989]
+transform = Transform3D(0.88294756, 0.46947157, 0, -0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.0927095, 0)
+mesh = SubResource("BoxMesh_6186f_3")
+
+[node name="Segment3" type="MeshInstance3D" parent="Bolt3" unique_id=1930308990]
+transform = Transform3D(0.88294756, -0.46947157, 0, 0.46947157, 0.88294756, 0, 0, 0, 1, 0.016431505, -0.15451582, 0)
+mesh = SubResource("BoxMesh_6186f_3")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.97, 0)
+light_color = Color(0.6, 0.85, 1, 1)
+light_energy = 0.9
+omni_range = 2.4

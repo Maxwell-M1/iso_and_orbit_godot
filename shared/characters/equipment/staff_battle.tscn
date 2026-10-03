@@ -1,0 +1,89 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/gem_blue.tres" id="gem_blue"]
+[ext_resource type="Material" path="res://shared/characters/materials/steel.tres" id="steel"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_43190"]
+material = ExtResource("dark_steel")
+top_radius = 0.021
+bottom_radius = 0.026
+height = 1.66
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cb04d"]
+material = ExtResource("leather")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.22
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e3431"]
+material = ExtResource("brass")
+top_radius = 0.027
+bottom_radius = 0.02
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_84fdc"]
+material = ExtResource("leather")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.14
+radial_segments = 10
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_95474"]
+material = ExtResource("brass")
+size = Vector3(0.17, 0.03, 0.045)
+
+[sub_resource type="SphereMesh" id="SphereMesh_65a3b"]
+material = ExtResource("gem_blue")
+radius = 0.04
+height = 0.08
+radial_segments = 10
+rings = 5
+
+[sub_resource type="PrismMesh" id="PrismMesh_a2150"]
+material = ExtResource("steel")
+size = Vector3(0.065, 0.32, 0.016)
+
+[node name="BattleStaff" type="Node3D" unique_id=177619]
+
+[node name="Shaft" type="MeshInstance3D" parent="." unique_id=236430235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0)
+mesh = SubResource("CylinderMesh_43190")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_cb04d")
+
+[node name="Ferrule" type="MeshInstance3D" parent="." unique_id=68464218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, 0)
+mesh = SubResource("CylinderMesh_e3431")
+
+[node name="GripUpper" type="MeshInstance3D" parent="." unique_id=337041123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("CylinderMesh_84fdc")
+
+[node name="Guard" type="MeshInstance3D" parent="." unique_id=222666744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.82, 0)
+mesh = SubResource("BoxMesh_95474")
+
+[node name="Gem" type="MeshInstance3D" parent="." unique_id=193457758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+mesh = SubResource("SphereMesh_65a3b")
+
+[node name="Blade" type="MeshInstance3D" parent="." unique_id=216413245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.07, 0)
+mesh = SubResource("PrismMesh_a2150")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+light_color = Color(0.5, 0.65, 1, 1)
+light_energy = 0.4
+omni_range = 1.8

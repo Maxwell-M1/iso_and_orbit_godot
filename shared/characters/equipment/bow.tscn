@@ -1,0 +1,148 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/dark_wood.tres" id="dark_wood"]
+[ext_resource type="Material" path="res://shared/characters/materials/bone.tres" id="bone"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1651a"]
+material = ExtResource("dark_wood")
+top_radius = 0.01775
+bottom_radius = 0.02
+height = 0.17724554
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2f2f7"]
+material = ExtResource("dark_wood")
+top_radius = 0.0155
+bottom_radius = 0.01775
+height = 0.17724556
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3bba7"]
+material = ExtResource("dark_wood")
+top_radius = 0.01325
+bottom_radius = 0.0155
+height = 0.17724553
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2e7e8"]
+material = ExtResource("dark_wood")
+top_radius = 0.011
+bottom_radius = 0.01325
+height = 0.17724556
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_67db8"]
+material = ExtResource("bone")
+radius = 0.016
+height = 0.032
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1651a_2"]
+material = ExtResource("dark_wood")
+top_radius = 0.01775
+bottom_radius = 0.02
+height = 0.17724554
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2f2f7_2"]
+material = ExtResource("dark_wood")
+top_radius = 0.0155
+bottom_radius = 0.01775
+height = 0.17724556
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3bba7_2"]
+material = ExtResource("dark_wood")
+top_radius = 0.01325
+bottom_radius = 0.0155
+height = 0.17724553
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2e7e8_2"]
+material = ExtResource("dark_wood")
+top_radius = 0.011
+bottom_radius = 0.01325
+height = 0.17724556
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_67db8_2"]
+material = ExtResource("bone")
+radius = 0.016
+height = 0.032
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_be7e6"]
+material = ExtResource("leather")
+top_radius = 0.026
+bottom_radius = 0.026
+height = 0.15
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_32c03"]
+material = ExtResource("bone")
+top_radius = 0.004
+bottom_radius = 0.004
+height = 1.1890317
+radial_segments = 4
+rings = 1
+
+[node name="Bow" type="Node3D" unique_id=177619]
+
+[node name="LimbUpper1" type="MeshInstance3D" parent="." unique_id=236884230]
+transform = Transform3D(1, 0, 0, 0, 0.9945219, -0.104528464, 0, 0.104528464, 0.9945219, 0, 0.08316468, 0.00874096)
+mesh = SubResource("CylinderMesh_1651a")
+
+[node name="LimbUpper2" type="MeshInstance3D" parent="." unique_id=236884231]
+transform = Transform3D(1, 0, 0, 0, 0.95105654, -0.309017, 0, 0.309017, 0.95105654, 0, 0.24585934, 0.04332278)
+mesh = SubResource("CylinderMesh_2f2f7")
+
+[node name="LimbUpper3" type="MeshInstance3D" parent="." unique_id=236884232]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0.39780876, 0.11097502)
+mesh = SubResource("CylinderMesh_3bba7")
+
+[node name="LimbUpper4" type="MeshInstance3D" parent="." unique_id=236884233]
+transform = Transform3D(1, 0, 0, 0, 0.7431448, -0.6691306, 0, 0.6691306, 0.7431448, 0, 0.532372, 0.20874096)
+mesh = SubResource("CylinderMesh_2e7e8")
+
+[node name="NockUpper" type="MeshInstance3D" parent="." unique_id=623982492]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.59451586, 0.26469553)
+mesh = SubResource("SphereMesh_67db8")
+
+[node name="LimbLower1" type="MeshInstance3D" parent="." unique_id=2031214979]
+transform = Transform3D(1, 0, 0, 0, -0.9945219, -0.104528494, 0, 0.104528494, -0.9945219, 0, -0.08316468, 0.00874096)
+mesh = SubResource("CylinderMesh_1651a_2")
+
+[node name="LimbLower2" type="MeshInstance3D" parent="." unique_id=2031214980]
+transform = Transform3D(1, 0, 0, 0, -0.9510565, -0.30901703, 0, 0.30901703, -0.9510565, 0, -0.24585934, 0.04332278)
+mesh = SubResource("CylinderMesh_2f2f7_2")
+
+[node name="LimbLower3" type="MeshInstance3D" parent="." unique_id=2031214981]
+transform = Transform3D(1, 0, 0, 0, -0.8660254, -0.50000006, 0, 0.50000006, -0.8660254, 0, -0.39780876, 0.11097502)
+mesh = SubResource("CylinderMesh_3bba7_2")
+
+[node name="LimbLower4" type="MeshInstance3D" parent="." unique_id=2031214982]
+transform = Transform3D(1, 0, 0, 0, -0.7431448, -0.6691306, 0, 0.6691306, -0.7431448, 0, -0.532372, 0.20874096)
+mesh = SubResource("CylinderMesh_2e7e8_2")
+
+[node name="NockLower" type="MeshInstance3D" parent="." unique_id=613280889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.59451586, 0.26469553)
+mesh = SubResource("SphereMesh_67db8_2")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_be7e6")
+
+[node name="String" type="MeshInstance3D" parent="." unique_id=1374591964]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.26469553)
+mesh = SubResource("CylinderMesh_32c03")

@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/stone_column.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://wjsmf7rravlr" path="res://shared/world/textures/column_detail.webp" id="tex_column_detail"]
+[ext_resource type="Texture2D" uid="uid://dw7cmyivlcvvj" path="res://shared/world/textures/column_normal.webp" id="tex_column_normal"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/stone_detail = ExtResource("tex_column_detail")
+shader_parameter/stone_normal = ExtResource("tex_column_normal")

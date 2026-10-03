@@ -1,0 +1,428 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/flame.tres" id="flame"]
+[ext_resource type="PackedScene" path="res://shared/characters/equipment/staff_fire.tscn" id="staff_fire"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_9a205"]
+albedo_color = Color(0.45, 0.1, 0.08, 1)
+roughness = 0.7
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_9398b"]
+material = SubResource("StandardMaterial3D_9a205")
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_41bb4"]
+albedo_color = Color(0.62, 0.13, 0.07, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_83799"]
+material = SubResource("StandardMaterial3D_41bb4")
+top_radius = 0.36
+bottom_radius = 0.44
+height = 1.0
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e9985"]
+material = ExtResource("dark_steel")
+top_radius = 0.448
+bottom_radius = 0.448
+height = 0.05
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_273d8"]
+material = ExtResource("dark_steel")
+top_radius = 0.362
+bottom_radius = 0.362
+height = 0.07
+radial_segments = 24
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_be7c1"]
+albedo_color = Color(1, 0.35, 0.05, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0.3, 0, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_4495e"]
+material = SubResource("StandardMaterial3D_be7c1")
+radius = 0.055
+height = 0.042
+radial_segments = 16
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aba34"]
+albedo_color = Color(1, 0.85, 0.3, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0.75, 0.2, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_f9de9"]
+material = SubResource("StandardMaterial3D_aba34")
+radius = 0.026
+height = 0.02
+radial_segments = 10
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a874c"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.16
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b949f"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6c661"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a874c_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.16
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b949f_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6c661_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a874c_3"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.16
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b949f_3"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6c661_3"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a874c_4"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.16
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b949f_4"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6c661_4"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ee50e"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1ecdd"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.38
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ee50e_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1ecdd_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.38
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ee50e_3"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1ecdd_3"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.38
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ee50e_4"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1ecdd_4"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.38
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ee50e_5"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.055
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5efdb"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4b6f0"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.3
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_24bed"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.36
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4b6f0_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.3
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5efdb_2"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.05
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[node name="Pyromancer" type="Node3D" unique_id=177619]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=2088969747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_9398b")
+
+[node name="Robe" type="MeshInstance3D" parent="." unique_id=2089544653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CylinderMesh_83799")
+
+[node name="Hem" type="MeshInstance3D" parent="." unique_id=193458847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_e9985")
+
+[node name="Sash" type="MeshInstance3D" parent="." unique_id=2089565908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_273d8")
+
+[node name="EyeRight" type="Node3D" parent="." unique_id=2102958726]
+transform = Transform3D(0.8887499, -0.3584563, -0.28571427, 0.3397792, 0.9335357, -0.11428557, 0.30769086, 0.0044915304, 0.9514758, 0.1, 1.49, -0.3330165)
+
+[node name="Flame" type="MeshInstance3D" parent="EyeRight" unique_id=1706161114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_4495e")
+
+[node name="Core" type="MeshInstance3D" parent="EyeRight" unique_id=181748382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, -0.016)
+mesh = SubResource("SphereMesh_f9de9")
+
+[node name="EyeLeft" type="Node3D" parent="." unique_id=1690387571]
+transform = Transform3D(0.8887499, 0.3584563, 0.28571427, -0.3397792, 0.9335357, -0.11428557, -0.30769086, 0.0044915304, 0.9514758, -0.1, 1.49, -0.3330165)
+
+[node name="Flame" type="MeshInstance3D" parent="EyeLeft" unique_id=819960711]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_4495e")
+
+[node name="Core" type="MeshInstance3D" parent="EyeLeft" unique_id=870721707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, -0.016)
+mesh = SubResource("SphereMesh_f9de9")
+
+[node name="HemFlame01" type="MeshInstance3D" parent="." unique_id=1966697637]
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 0.14, -0.43)
+mesh = SubResource("CylinderMesh_a874c")
+
+[node name="HemFlame02" type="MeshInstance3D" parent="." unique_id=1966697638]
+transform = Transform3D(0.8660254, 0.08682409, -0.49240386, 0, 0.9848077, 0.17364818, 0.5, -0.15038373, 0.8528685, 0.215, 0.16, -0.37239093)
+mesh = SubResource("CylinderMesh_b949f")
+
+[node name="HemFlame03" type="MeshInstance3D" parent="." unique_id=1966697639]
+transform = Transform3D(0.49999997, 0.15038374, -0.85286856, 0, 0.9848077, 0.17364818, 0.86602545, -0.08682408, 0.49240384, 0.37239093, 0.18, -0.215)
+mesh = SubResource("CylinderMesh_6c661")
+
+[node name="HemFlame04" type="MeshInstance3D" parent="." unique_id=1966697640]
+transform = Transform3D(-4.371139e-08, 0.17364818, -0.9848077, 0, 0.9848077, 0.17364818, 1, 7.590403e-09, -4.304731e-08, 0.43, 0.14, -2.6329036e-17)
+mesh = SubResource("CylinderMesh_a874c_2")
+
+[node name="HemFlame05" type="MeshInstance3D" parent="." unique_id=1966697641]
+transform = Transform3D(-0.50000006, 0.15038373, -0.8528685, 0, 0.9848077, 0.17364818, 0.8660254, 0.0868241, -0.49240392, 0.37239093, 0.16, 0.215)
+mesh = SubResource("CylinderMesh_b949f_2")
+
+[node name="HemFlame06" type="MeshInstance3D" parent="." unique_id=1966697642]
+transform = Transform3D(-0.8660254, 0.0868241, -0.49240392, 0, 0.9848077, 0.17364818, 0.50000006, 0.15038373, -0.8528685, 0.215, 0.18, 0.37239093)
+mesh = SubResource("CylinderMesh_6c661_2")
+
+[node name="HemFlame07" type="MeshInstance3D" parent="." unique_id=1966697643]
+transform = Transform3D(-1, -1.5180806e-08, 8.609462e-08, 0, 0.9848077, 0.17364818, -8.742278e-08, 0.17364818, -0.9848077, 5.2658073e-17, 0.14, 0.43)
+mesh = SubResource("CylinderMesh_a874c_3")
+
+[node name="HemFlame08" type="MeshInstance3D" parent="." unique_id=1966697644]
+transform = Transform3D(-0.8660254, -0.08682408, 0.49240384, 0, 0.9848077, 0.17364818, -0.49999997, 0.15038373, -0.8528685, -0.215, 0.16, 0.37239093)
+mesh = SubResource("CylinderMesh_b949f_3")
+
+[node name="HemFlame09" type="MeshInstance3D" parent="." unique_id=1966697645]
+transform = Transform3D(-0.4999999, -0.15038374, 0.85286856, 0, 0.9848077, 0.17364818, -0.86602545, 0.086824074, -0.49240378, -0.37239093, 0.18, 0.215)
+mesh = SubResource("CylinderMesh_6c661_3")
+
+[node name="HemFlame10" type="MeshInstance3D" parent="." unique_id=1966697669]
+transform = Transform3D(1.1924881e-08, -0.17364818, 0.9848077, 0, 0.9848077, 0.17364818, -1, -2.0707338e-09, 1.17437144e-08, -0.43, 0.14, 7.898711e-17)
+mesh = SubResource("CylinderMesh_a874c_4")
+
+[node name="HemFlame11" type="MeshInstance3D" parent="." unique_id=1966697670]
+transform = Transform3D(0.4999999, -0.15038374, 0.85286856, 0, 0.9848077, 0.17364818, -0.86602545, -0.086824074, 0.49240378, -0.37239093, 0.16, -0.215)
+mesh = SubResource("CylinderMesh_b949f_4")
+
+[node name="HemFlame12" type="MeshInstance3D" parent="." unique_id=1966697671]
+transform = Transform3D(0.8660253, -0.08682412, 0.49240404, 0, 0.9848077, 0.17364818, -0.5000002, -0.15038373, 0.85286844, -0.215, 0.18, -0.37239093)
+mesh = SubResource("CylinderMesh_6c661_4")
+
+[node name="CollarFlame1" type="MeshInstance3D" parent="." unique_id=1274997176]
+transform = Transform3D(0.76604444, 0.24079245, -0.59598225, 0, 0.92718387, 0.37460658, 0.6427876, -0.28696528, 0.710264, 0.23783141, 1.36, -0.28343645)
+mesh = SubResource("CylinderMesh_ee50e")
+
+[node name="CollarFlame2" type="MeshInstance3D" parent="." unique_id=1274997177]
+transform = Transform3D(0.25881907, 0.36184216, -0.89559084, 0, 0.92718387, 0.37460658, 0.9659258, -0.09695533, 0.23997287, 0.35739255, 1.41, -0.09576305)
+mesh = SubResource("CylinderMesh_1ecdd")
+
+[node name="CollarFlame3" type="MeshInstance3D" parent="." unique_id=1274997178]
+transform = Transform3D(-0.34202012, 0.35201505, -0.87126786, 0, 0.92718387, 0.37460658, 0.9396926, 0.12812299, -0.31711555, 0.34768626, 1.36, 0.12654746)
+mesh = SubResource("CylinderMesh_ee50e_2")
+
+[node name="CollarFlame4" type="MeshInstance3D" parent="." unique_id=1274997179]
+transform = Transform3D(-0.81915206, 0.2148655, -0.5318108, 0, 0.92718387, 0.37460658, 0.57357645, 0.30685976, -0.75950456, 0.21222328, 1.41, 0.30308625)
+mesh = SubResource("CylinderMesh_1ecdd_2")
+
+[node name="CollarFlame5" type="MeshInstance3D" parent="." unique_id=1274997180]
+transform = Transform3D(-1, -3.2749146e-08, 8.105699e-08, 0, 0.92718387, 0.37460658, -8.742278e-08, 0.37460658, -0.92718387, 4.5310436e-17, 1.36, 0.37)
+mesh = SubResource("CylinderMesh_ee50e_3")
+
+[node name="CollarFlame6" type="MeshInstance3D" parent="." unique_id=1274997181]
+transform = Transform3D(-0.81915206, -0.21486549, 0.53181076, 0, 0.92718387, 0.37460658, -0.5735764, 0.30685976, -0.75950456, -0.21222328, 1.41, 0.30308625)
+mesh = SubResource("CylinderMesh_1ecdd_3")
+
+[node name="CollarFlame7" type="MeshInstance3D" parent="." unique_id=1274997182]
+transform = Transform3D(-0.34202006, -0.35201505, 0.8712679, 0, 0.92718387, 0.37460658, -0.9396927, 0.12812297, -0.3171155, -0.34768626, 1.36, 0.12654746)
+mesh = SubResource("CylinderMesh_ee50e_4")
+
+[node name="CollarFlame8" type="MeshInstance3D" parent="." unique_id=1274997183]
+transform = Transform3D(0.258819, -0.36184216, 0.89559084, 0, 0.92718387, 0.37460658, -0.9659258, -0.09695531, 0.23997281, -0.35739255, 1.41, -0.09576305)
+mesh = SubResource("CylinderMesh_1ecdd_4")
+
+[node name="CollarFlame9" type="MeshInstance3D" parent="." unique_id=1274997184]
+transform = Transform3D(0.7660443, -0.24079253, 0.59598243, 0, 0.92718387, 0.37460658, -0.64278775, -0.28696525, 0.7102639, -0.23783141, 1.36, -0.28343645)
+mesh = SubResource("CylinderMesh_ee50e_5")
+
+[node name="CrownFlame1" type="MeshInstance3D" parent="." unique_id=848914340]
+transform = Transform3D(-0.50000006, 0.36599815, -0.7848855, 0, 0.90630776, 0.42261827, 0.8660254, 0.21130916, -0.45315394, 0.1125833, 1.816, 0.065)
+mesh = SubResource("CylinderMesh_5efdb")
+
+[node name="CrownFlame2" type="MeshInstance3D" parent="." unique_id=848914341]
+transform = Transform3D(-0.8660254, 0.21130916, -0.45315394, 0, 0.90630776, 0.42261827, 0.50000006, 0.36599815, -0.7848855, 0.065, 1.84, 0.1125833)
+mesh = SubResource("CylinderMesh_4b6f0")
+
+[node name="CrownFlame3" type="MeshInstance3D" parent="." unique_id=848914342]
+transform = Transform3D(-1, -3.6946464e-08, 7.923194e-08, 0, 0.90630776, 0.42261827, -8.742278e-08, 0.42261827, -0.90630776, 1.5919883e-17, 1.864, 0.13)
+mesh = SubResource("CylinderMesh_24bed")
+
+[node name="CrownFlame4" type="MeshInstance3D" parent="." unique_id=848914343]
+transform = Transform3D(-0.8660254, -0.21130912, 0.45315385, 0, 0.90630776, 0.42261827, -0.49999997, 0.36599815, -0.7848855, -0.065, 1.84, 0.1125833)
+mesh = SubResource("CylinderMesh_4b6f0_2")
+
+[node name="CrownFlame5" type="MeshInstance3D" parent="." unique_id=848914344]
+transform = Transform3D(-0.4999999, -0.36599818, 0.7848856, 0, 0.90630776, 0.42261827, -0.86602545, 0.21130909, -0.4531538, -0.1125833, 1.816, 0.065)
+mesh = SubResource("CylinderMesh_5efdb_2")
+
+[node name="RightHand" type="Node3D" parent="." unique_id=480002366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52, 0.98, -0.1)
+
+[node name="Staff" type="Node3D" parent="RightHand" unique_id=1130718529 instance=ExtResource("staff_fire")]
+transform = Transform3D(0.9986295, 0.05233596, 0, -0.05182663, 0.9889109, 0.1391731, 0.007283758, -0.13898237, 0.99026805, 0, 0, 0)

@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/iso_orbit/ui_screens/ui_root.gd" id="1_root"]
+[ext_resource type="PackedScene" path="res://gdscript/ui/settings/settings_screen.tscn" id="2_settings"]
+
+[node name="UiRoot" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_root")
+settings_screen = ExtResource("2_settings")

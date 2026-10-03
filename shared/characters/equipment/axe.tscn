@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/dark_wood.tres" id="dark_wood"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/steel.tres" id="steel"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_f0e57"]
+material = ExtResource("dark_wood")
+top_radius = 0.024
+bottom_radius = 0.028
+height = 1.02
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_10400"]
+material = ExtResource("leather")
+top_radius = 0.031
+bottom_radius = 0.031
+height = 0.2
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_0879d"]
+material = ExtResource("brass")
+radius = 0.036
+height = 0.072
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_ecaf2"]
+material = ExtResource("dark_steel")
+size = Vector3(0.085, 0.17, 0.075)
+
+[sub_resource type="PrismMesh" id="PrismMesh_3d265"]
+material = ExtResource("steel")
+size = Vector3(0.36, 0.24, 0.022)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_aff05"]
+material = ExtResource("steel")
+top_radius = 0.0
+bottom_radius = 0.032
+height = 0.12
+radial_segments = 8
+rings = 1
+
+[node name="Axe" type="Node3D" unique_id=177619]
+
+[node name="Handle" type="MeshInstance3D" parent="." unique_id=921420881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+mesh = SubResource("CylinderMesh_f0e57")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_10400")
+
+[node name="Pommel" type="MeshInstance3D" parent="." unique_id=1251080559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.26, 0)
+mesh = SubResource("SphereMesh_0879d")
+
+[node name="Socket" type="MeshInstance3D" parent="." unique_id=1368125198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 0)
+mesh = SubResource("BoxMesh_ecaf2")
+
+[node name="BladeRight" type="MeshInstance3D" parent="." unique_id=1832424315]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0.155, 0.66, 0)
+mesh = SubResource("PrismMesh_3d265")
+
+[node name="BladeLeft" type="MeshInstance3D" parent="." unique_id=1096512200]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -0.155, 0.66, 0)
+mesh = SubResource("PrismMesh_3d265")
+
+[node name="Spike" type="MeshInstance3D" parent="." unique_id=236726593]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.805, 0)
+mesh = SubResource("CylinderMesh_aff05")

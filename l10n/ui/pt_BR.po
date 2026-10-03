@@ -1,0 +1,418 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Iso & Orbit - Camera and Character Controller Template\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: gdscript/main.tscn
+msgid ""
+"LMB on the ground — run there\n"
+"Hold LMB — run after the cursor\n"
+"Hold LMB + RMB — run where the camera looks\n"
+"RMB + mouse — orbit the camera\n"
+"Wheel — lower or raise the camera"
+msgstr ""
+"BEM no chão — correr até lá\n"
+"Segurar BEM — correr atrás do cursor\n"
+"Segurar BEM + BDM — correr para onde a câmera olha\n"
+"BDM + mouse — girar a câmera\n"
+"Roda — abaixar ou erguer a câmera"
+
+#: gdscript/main.tscn
+msgid "RMB + WASD — move relative to the camera"
+msgstr "BDM + WASD — mover-se em relação à câmera"
+
+#: gdscript/main.tscn
+msgid "LMB + RMB + A/D — run diagonally"
+msgstr "BEM + BDM + A/D — correr na diagonal"
+
+#: gdscript/main.tscn
+msgid "Shift — run faster"
+msgstr "Shift — correr mais rápido"
+
+#: gdscript/main.tscn
+msgid "Space — jump"
+msgstr "Espaço — pular"
+
+#: gdscript/main.tscn
+msgid "F10 — settings"
+msgstr "F10 — configurações"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Settings"
+msgstr "Configurações"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls"
+msgstr "Controles"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Held LMB"
+msgstr "BEM segurado"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Straight to the cursor"
+msgstr "Direto ao cursor"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "To the point along a path"
+msgstr "Ao ponto por um caminho"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB + WASD"
+msgstr "BDM + WASD"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off"
+msgstr "Desligado"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward, S backs up"
+msgstr "Lateral: olha à frente, S recua"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn: face the way you go, S toward the camera"
+msgstr "Virar: olha para onde vai, S rumo à câmera"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB + RMB + A/D"
+msgstr "BEM + BDM + A/D"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward"
+msgstr "Lateral: olha à frente"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Diagonal: face the way you go"
+msgstr "Diagonal: olha para onde vai"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Backing up (S) slower by"
+msgstr "Recuo (S) mais lento em"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+msgstr "Com o BDM, W leva para onde a câmera olha. No modo Lateral, o personagem olha para onde a câmera olha: A e D dão passos para o lado, S recua. No modo Virar, o personagem olha para onde vai: A e D vão para a esquerda e a direita, S rumo à câmera. Com os dois botões, A e D desviam a corrida na diagonal para a frente."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hide the cursor while running with LMB held"
+msgstr "Ocultar o cursor ao correr segurando o BEM"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+msgstr "O cursor some quando o botão passa a ser segurado e volta ao soltar, onde você mirou."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character"
+msgstr "Personagem"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hero look"
+msgstr "Aparência do herói"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "All looks stand in a row south of the road to the ramp, each with its number overhead."
+msgstr "Todas as aparências ficam em fila ao sul da estrada da rampa, com o número sobre a cabeça."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Don't fall off ledges"
+msgstr "Não cair de bordas"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+msgstr "Na borda o personagem para, ou desliza ao longo dela se correr em ângulo, como numa parede. Degraus baixos ainda podem ser descidos."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump (Space)"
+msgstr "Pulo (Espaço)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump height"
+msgstr "Altura do pulo"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f m"
+msgstr "%.1f m"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint (Shift)"
+msgstr "Corrida rápida (Shift)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Shift"
+msgstr "Shift"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hold"
+msgstr "Segurar"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Press: on, again: off"
+msgstr "Apertar: liga, de novo: desliga"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Speed bonus"
+msgstr "Bônus de velocidade"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint fatigue"
+msgstr "Cansaço na corrida rápida"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Stamina lasts"
+msgstr "Fôlego dura"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f s"
+msgstr "%.1f s"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Camera"
+msgstr "Câmera"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB tilts the camera up and down"
+msgstr "BDM inclina a câmera na vertical"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+msgstr "Desligado: o BDM com o mouse só gira a câmera ao redor do personagem, e a roda define a altura e a inclinação."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn the camera to follow the run"
+msgstr "Virar a câmera para seguir a corrida"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera tilt"
+msgstr "Alinhar a inclinação da câmera"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Tilt down"
+msgstr "Inclinação para baixo"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "Enquanto o personagem corre, a câmera vai suavemente até esta inclinação. A roda (e o BDM, se ele inclinar a câmera) muda a inclinação como sempre, e na corrida ela volta suavemente."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Catch up in"
+msgstr "Alcançar em"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "instant"
+msgstr "imediato"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor keeps its aim while the camera turns"
+msgstr "O cursor mantém a mira enquanto a câmera gira"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "Com o BEM segurado, o cursor se move com o mundo e o personagem corre para onde você mirou. Sem isso, o cursor fica parado na tela e o personagem vira na direção dele, como um carro sendo guiado."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The camera stops at obstacles behind it"
+msgstr "A câmera para em obstáculos atrás dela"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+msgstr "Montanha ou parede atrás: a câmera não entra nela, mas se aproxima do personagem até haver espaço atrás."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Move in when the character is hidden"
+msgstr "Aproximar se o personagem for encoberto"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+msgstr "Uma cerca ou parede esconde quase todo o personagem: a câmera vai para a frente do obstáculo. Desligado: o personagem aparece como silhueta através do obstáculo."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Display"
+msgstr "Exibição"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS limit"
+msgstr "Limite de FPS"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Unlimited"
+msgstr "Sem limite"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Vertical sync (V-Sync)"
+msgstr "Sincronização vertical (V-Sync)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics interpolation (character and camera)"
+msgstr "Interpolação de física (personagem e câmera)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+msgstr "A física roda 60 vezes por segundo. Com interpolação, o personagem e a câmera são desenhados suavemente entre os ticks em qualquer FPS; sem ela, movem-se aos saltos, tick a tick."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Silhouette outline behind obstacles"
+msgstr "Contorno da silhueta atrás de obstáculos"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+msgstr "Quando uma árvore, uma casa ou a montanha esconde o herói, ele aparece como uma silhueta sólida com o cajado contornado por cima. O contorno é uma borda clara em volta de toda a silhueta."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface"
+msgstr "Interface"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface scale"
+msgstr "Escala da interface"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+msgstr "Dicas, o contador de FPS, a barra de fôlego e esta janela. 50% é o menor, 100% o maior."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS counter"
+msgstr "Contador de FPS"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls hint and speed"
+msgstr "Dica de controles e velocidade"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character path line"
+msgstr "Linha do caminho do personagem"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sound"
+msgstr "Som"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Volume"
+msgstr "Volume"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "off"
+msgstr "mudo"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps"
+msgstr "Passos"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump and landing"
+msgstr "Pulo e aterrissagem"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint start and sprinting"
+msgstr "Arranque e corrida rápida"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+msgstr "Os passos seguem a distância percorrida, então na corrida rápida ficam mais frequentes e um pouco mais agudos. Quanto mais alto o pulo, mais forte a aterrissagem."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Reset all"
+msgstr "Redefinir tudo"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Close"
+msgstr "Fechar"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "1 · Storm Mage"
+msgstr "1 · Mago da Tempestade"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "2 · Chronomancer"
+msgstr "2 · Cronomante"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "3 · Hooded Mystic"
+msgstr "3 · Místico Encapuzado"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "4 · Stargazer"
+msgstr "4 · Astrólogo"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "5 · Pyromancer"
+msgstr "5 · Piromante"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "6 · Cryomancer"
+msgstr "6 · Criomante"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "7 · Druid"
+msgstr "7 · Druida"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "8 · Necromancer"
+msgstr "8 · Necromante"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "9 · Archmage"
+msgstr "9 · Arquimago"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "10 · Battle Mage"
+msgstr "10 · Mago de Batalha"
+
+#: shared/world/world.tscn
+msgid "Knight"
+msgstr "Cavaleiro"
+
+#: shared/world/world.tscn
+msgid "Ranger"
+msgstr "Patrulheiro"
+
+#: shared/world/world.tscn
+msgid "Wizard"
+msgstr "Mago"
+
+#: shared/world/world.tscn
+msgid "Dwarf"
+msgstr "Anão"
+
+#: shared/world/world.tscn
+msgid "Rogue"
+msgstr "Ladino"
+
+#: shared/world/mountain/mountain.tscn
+msgid "Windswept Peak"
+msgstr "Pico dos Ventos"
+
+#: shared/world/world.tscn
+msgid "Travelers' Camp"
+msgstr "Acampamento dos Viajantes"
+
+#: shared/world/world.tscn
+msgid "Farmstead by the Well"
+msgstr "Sítio do Poço"
+
+#: shared/world/world.tscn
+msgid "Ancient Circle"
+msgstr "Círculo Antigo"
+
+#: gdscript/demo/hud.gd
+msgid "Speed: %.1f m/s"
+msgstr "Velocidade: %.1f m/s"
+
+#: addons/iso_orbit/points_of_interest/discovery_toast.gd
+msgid "Discovered: %s"
+msgstr "Descoberto: %s"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid " (%d Hz)"
+msgstr " (%d Hz)"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid "With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no effect. The smoothest limits are those that divide this rate evenly."
+msgstr "Com V-Sync nunca há mais quadros que a taxa de atualização do monitor%s, e um limite de FPS acima dela não tem efeito. Os limites mais suaves são os que dividem essa taxa por igual."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Language"
+msgstr "Idioma"

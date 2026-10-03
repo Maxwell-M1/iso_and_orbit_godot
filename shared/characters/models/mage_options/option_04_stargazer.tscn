@@ -1,0 +1,256 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/silver.tres" id="silver"]
+[ext_resource type="Material" path="res://shared/characters/materials/star_glow.tres" id="star_glow"]
+[ext_resource type="Material" path="res://shared/characters/materials/eyes_pale.tres" id="eyes_pale"]
+[ext_resource type="PackedScene" path="res://shared/characters/equipment/staff_star.tscn" id="staff_star"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_75472"]
+albedo_color = Color(0.09, 0.11, 0.33, 1)
+roughness = 0.7
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_e2e2b"]
+material = SubResource("StandardMaterial3D_75472")
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_75472_2"]
+albedo_color = Color(0.09, 0.11, 0.33, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4c50d"]
+material = SubResource("StandardMaterial3D_75472_2")
+top_radius = 0.36
+bottom_radius = 0.44
+height = 1.0
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_49e9c"]
+material = ExtResource("silver")
+top_radius = 0.448
+bottom_radius = 0.448
+height = 0.05
+radial_segments = 24
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4f78e"]
+material = ExtResource("silver")
+top_radius = 0.362
+bottom_radius = 0.362
+height = 0.07
+radial_segments = 24
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_82066"]
+albedo_color = Color(0.95, 0.95, 0.97, 1)
+roughness = 0.35
+
+[sub_resource type="SphereMesh" id="SphereMesh_ab7b1"]
+material = SubResource("StandardMaterial3D_82066")
+radius = 0.048
+height = 0.11
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8b2bd"]
+albedo_color = Color(0.04, 0.05, 0.14, 1)
+roughness = 0.3
+
+[sub_resource type="SphereMesh" id="SphereMesh_a2aad"]
+material = SubResource("StandardMaterial3D_8b2bd")
+radius = 0.026
+height = 0.05
+radial_segments = 12
+rings = 6
+
+[sub_resource type="SphereMesh" id="SphereMesh_90d6a"]
+material = ExtResource("star_glow")
+radius = 0.009
+height = 0.018
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_41974"]
+material = ExtResource("star_glow")
+radius = 0.028
+height = 0.07
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_73f91"]
+material = SubResource("StandardMaterial3D_75472_2")
+height = 0.035
+radial_segments = 28
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_37f88"]
+material = SubResource("StandardMaterial3D_75472_2")
+top_radius = 0.15
+bottom_radius = 0.29
+height = 0.6
+radial_segments = 16
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_65391"]
+material = ExtResource("silver")
+top_radius = 0.282
+bottom_radius = 0.296
+height = 0.07
+radial_segments = 16
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_9e13e"]
+material = SubResource("StandardMaterial3D_75472_2")
+top_radius = 0.0
+bottom_radius = 0.15
+height = 0.5
+radial_segments = 16
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_940b7"]
+material = ExtResource("eyes_pale")
+radius = 0.05
+height = 0.1
+radial_segments = 10
+rings = 5
+
+[node name="Stargazer" type="Node3D" unique_id=177619]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=2088969747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_e2e2b")
+
+[node name="Robe" type="MeshInstance3D" parent="." unique_id=2089544653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CylinderMesh_4c50d")
+
+[node name="Hem" type="MeshInstance3D" parent="." unique_id=193458847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_49e9c")
+
+[node name="Sash" type="MeshInstance3D" parent="." unique_id=2089565908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_4f78e")
+
+[node name="EyeRight" type="Node3D" parent="." unique_id=2102958726]
+transform = Transform3D(0.9579996, -0.024580218, -0.28571427, 0, 0.9963198, -0.085714154, 0.28676966, 0.08211412, 0.9544739, 0.1, 1.48, -0.33406585)
+
+[node name="White" type="MeshInstance3D" parent="EyeRight" unique_id=1726186966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_ab7b1")
+
+[node name="Pupil" type="MeshInstance3D" parent="EyeRight" unique_id=1718359967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0.022, -0.014)
+mesh = SubResource("SphereMesh_a2aad")
+
+[node name="Glint" type="MeshInstance3D" parent="EyeRight" unique_id=1707355795]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01, 0.034, -0.022)
+mesh = SubResource("SphereMesh_90d6a")
+
+[node name="EyeLeft" type="Node3D" parent="." unique_id=1690387571]
+transform = Transform3D(0.9579996, 0.024580218, 0.28571427, 0, 0.9963198, -0.085714154, -0.28676966, 0.08211412, 0.9544739, -0.1, 1.48, -0.33406585)
+
+[node name="White" type="MeshInstance3D" parent="EyeLeft" unique_id=839986563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0, 0)
+mesh = SubResource("SphereMesh_ab7b1")
+
+[node name="Pupil" type="MeshInstance3D" parent="EyeLeft" unique_id=832159564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.4, 0, 0.022, -0.014)
+mesh = SubResource("SphereMesh_a2aad")
+
+[node name="Glint" type="MeshInstance3D" parent="EyeLeft" unique_id=821155392]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01, 0.034, -0.022)
+mesh = SubResource("SphereMesh_90d6a")
+
+[node name="Star01" type="MeshInstance3D" parent="." unique_id=1373988736]
+transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, -0.14638463, 0.25, -0.40218845)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star02" type="MeshInstance3D" parent="." unique_id=1373988737]
+transform = Transform3D(0.81915206, 0, -0.57357645, 0, 1, 0, 0.57357645, 0, 0.81915206, 0.23631349, 0.45, -0.33749065)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star03" type="MeshInstance3D" parent="." unique_id=1373988738]
+transform = Transform3D(0.49999997, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, 0.49999997, -0.33948195, 0.7, -0.196)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star04" type="MeshInstance3D" parent="." unique_id=1373988739]
+transform = Transform3D(0.17364822, 0, -0.9848077, 0, 1, 0, 0.9848077, 0, 0.17364822, 0.4175585, 0.3, -0.07362682)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star05" type="MeshInstance3D" parent="." unique_id=1373988740]
+transform = Transform3D(-0.76604444, 0, -0.64278764, 0, 1, 0, 0.64278764, 0, -0.76604444, 0.2596862, 0.55, 0.30948195)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star06" type="MeshInstance3D" parent="." unique_id=1373988741]
+transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, -0.36026657, 0.4, 0.208)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star07" type="MeshInstance3D" parent="." unique_id=1373988742]
+transform = Transform3D(0.9848077, 0, -0.17364818, 0, 1, 0, 0.17364818, 0, 0.9848077, 0.0666809, 0.8, -0.37816617)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star08" type="MeshInstance3D" parent="." unique_id=1373988743]
+transform = Transform3D(-0.9396926, 0, 0.3420202, 0, 1, 0, -0.3420202, 0, -0.9396926, -0.13270381, 0.75, 0.36460075)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star09" type="MeshInstance3D" parent="." unique_id=1373988744]
+transform = Transform3D(-0.9848077, 0, -0.1736483, 0, 1, 0, 0.1736483, 0, -0.9848077, 0.075016014, 0.2, 0.42543694)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star10" type="MeshInstance3D" parent="." unique_id=1373988768]
+transform = Transform3D(-0.34202012, 0, -0.9396926, 0, 1, 0, 0.9396926, 0, -0.34202012, 0.3570832, 0.85, 0.12996766)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star11" type="MeshInstance3D" parent="." unique_id=1373988769]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.436, 0.15, -2.6696419e-17)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Star12" type="MeshInstance3D" parent="." unique_id=1373988770]
+transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, 0.34294605, 0.65, -0.198)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="Brim" type="MeshInstance3D" parent="." unique_id=2088973167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.66, 0)
+mesh = SubResource("CylinderMesh_73f91")
+
+[node name="Hat" type="Node3D" parent="." unique_id=193458722]
+transform = Transform3D(1, 0, 0, 0, 0.9945219, -0.104528464, 0, 0.104528464, 0.9945219, 0, 1.67, 0)
+
+[node name="Crown" type="MeshInstance3D" parent="Hat" unique_id=235982362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+mesh = SubResource("CylinderMesh_37f88")
+
+[node name="Band" type="MeshInstance3D" parent="Hat" unique_id=722924358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("CylinderMesh_65391")
+
+[node name="Tip" type="Node3D" parent="Hat" unique_id=347302974]
+transform = Transform3D(1, 0, 0, 0, 0.95105654, -0.309017, 0, 0.309017, 0.95105654, 0, 0.6, 0)
+
+[node name="Cone" type="MeshInstance3D" parent="Hat/Tip" unique_id=2110777042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("CylinderMesh_9e13e")
+
+[node name="Moon" type="MeshInstance3D" parent="Hat" unique_id=723334954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.235)
+mesh = SubResource("SphereMesh_940b7")
+
+[node name="HatStar1" type="MeshInstance3D" parent="Hat" unique_id=249740857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17619023, 0.3, -0.14784116)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="HatStar2" type="MeshInstance3D" parent="Hat" unique_id=249740858]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, -0.21133333)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="HatStar3" type="MeshInstance3D" parent="Hat" unique_id=249740859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14759123, 0.46, -0.123843744)
+mesh = SubResource("SphereMesh_41974")
+
+[node name="RightHand" type="Node3D" parent="." unique_id=480002366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52, 0.98, -0.1)
+
+[node name="Staff" type="Node3D" parent="RightHand" unique_id=1130718529 instance=ExtResource("staff_star")]
+transform = Transform3D(0.9986295, 0.05233596, 0, -0.05182663, 0.9889109, 0.1391731, 0.007283758, -0.13898237, 0.99026805, 0, 0, 0)

@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/steel.tres" id="steel"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a3f0b"]
+material = ExtResource("leather")
+top_radius = 0.016
+bottom_radius = 0.018
+height = 0.1
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_be75e"]
+material = ExtResource("brass")
+radius = 0.022
+height = 0.044
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_3b575"]
+material = ExtResource("brass")
+size = Vector3(0.11, 0.022, 0.03)
+
+[sub_resource type="BoxMesh" id="BoxMesh_c0f45"]
+material = ExtResource("steel")
+size = Vector3(0.034, 0.2, 0.008)
+
+[sub_resource type="PrismMesh" id="PrismMesh_be489"]
+material = ExtResource("steel")
+size = Vector3(0.034, 0.06, 0.008)
+
+[node name="Dagger" type="Node3D" unique_id=177619]
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_a3f0b")
+
+[node name="Pommel" type="MeshInstance3D" parent="." unique_id=1251080559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.062, 0)
+mesh = SubResource("SphereMesh_be75e")
+
+[node name="Guard" type="MeshInstance3D" parent="." unique_id=222666744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("BoxMesh_3b575")
+
+[node name="Blade" type="MeshInstance3D" parent="." unique_id=216413245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.171, 0)
+mesh = SubResource("BoxMesh_c0f45")
+
+[node name="Tip" type="MeshInstance3D" parent="." unique_id=193472050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.301, 0)
+mesh = SubResource("PrismMesh_be489")

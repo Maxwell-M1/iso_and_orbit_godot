@@ -1,0 +1,418 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Iso & Orbit - Camera and Character Controller Template\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: gdscript/main.tscn
+msgid ""
+"LMB on the ground — run there\n"
+"Hold LMB — run after the cursor\n"
+"Hold LMB + RMB — run where the camera looks\n"
+"RMB + mouse — orbit the camera\n"
+"Wheel — lower or raise the camera"
+msgstr ""
+"Zemine sol tık — oraya koş\n"
+"Sol tuş basılı — imlecin peşinden koş\n"
+"Sol + sağ tuş basılı — kameranın baktığı yöne koş\n"
+"Sağ tuş + fare — kamerayı döndür\n"
+"Tekerlek — kamerayı alçalt veya yükselt"
+
+#: gdscript/main.tscn
+msgid "RMB + WASD — move relative to the camera"
+msgstr "Sağ tuş + WASD — kameraya göre hareket et"
+
+#: gdscript/main.tscn
+msgid "LMB + RMB + A/D — run diagonally"
+msgstr "Sol + sağ tuş + A/D — çapraz koş"
+
+#: gdscript/main.tscn
+msgid "Shift — run faster"
+msgstr "Shift — daha hızlı koş"
+
+#: gdscript/main.tscn
+msgid "Space — jump"
+msgstr "Boşluk — zıpla"
+
+#: gdscript/main.tscn
+msgid "F10 — settings"
+msgstr "F10 — ayarlar"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Settings"
+msgstr "Ayarlar"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls"
+msgstr "Kontroller"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Held LMB"
+msgstr "Basılı sol tuş"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Straight to the cursor"
+msgstr "Doğrudan imlece"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "To the point along a path"
+msgstr "Yol boyunca noktaya"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB + WASD"
+msgstr "Sağ tuş + WASD"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off"
+msgstr "Kapalı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward, S backs up"
+msgstr "Yana adım: yüz önde, S ile geri geri"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn: face the way you go, S toward the camera"
+msgstr "Dönüş: yüz gidiş yönünde, S kameraya doğru"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB + RMB + A/D"
+msgstr "Sol + sağ tuş + A/D"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sidestep: face forward"
+msgstr "Yana adım: yüz önde"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Diagonal: face the way you go"
+msgstr "Çapraz: yüz gidiş yönünde"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Backing up (S) slower by"
+msgstr "Geri yürürken (S) yavaşlama"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+msgstr "Sağ tuşla W, kameranın baktığı yöne götürür. Yana adımda karakter kamerayla aynı yöne bakar: A ve D yana, S geri geri. Dönüşte karakter gittiği yöne bakar: A ve D sola ve sağa, S kameraya doğru. İki tuşla A ve D koşuyu çapraz ileriye saptırır."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hide the cursor while running with LMB held"
+msgstr "Basılı sol tuşla koşarken imleci gizle"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+msgstr "Basış, basılı tutmaya dönüştüğü anda imleç gizlenir; bırakınca nişan aldığınız yerde yeniden belirir."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character"
+msgstr "Karakter"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hero look"
+msgstr "Kahraman görünümü"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "All looks stand in a row south of the road to the ramp, each with its number overhead."
+msgstr "Tüm görünümler rampaya giden yolun güneyinde sıra hâlinde durur; her birinin başının üstünde numarası var."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Don't fall off ledges"
+msgstr "Kenarlardan düşmeyi önle"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+msgstr "Kenarda karakter durur; kenara açılı koşuyorsa duvar boyunca kayar gibi kenar boyunca kayar. Alçak basamaklardan yine de inilebilir."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump (Space)"
+msgstr "Zıplama (Boşluk)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump height"
+msgstr "Zıplama yüksekliği"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f m"
+msgstr "%.1f m"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint (Shift)"
+msgstr "Depar (Shift)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Shift"
+msgstr "Shift"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hold"
+msgstr "Basılı tut"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Press: on, again: off"
+msgstr "Bas: açık, tekrar: kapalı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Speed bonus"
+msgstr "Hız artışı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint fatigue"
+msgstr "Depar yorgunluğu"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Stamina lasts"
+msgstr "Dayanıklılık süresi"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "%.1f s"
+msgstr "%.1f sn"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Camera"
+msgstr "Kamera"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB tilts the camera up and down"
+msgstr "Sağ tuş kamerayı yukarı ve aşağı eğer"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+msgstr "Kapalıyken sağ tuş ve fare kamerayı yalnızca karakterin etrafında döndürür; yüksekliği ve eğimi tekerlek belirler."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Turn the camera to follow the run"
+msgstr "Kamerayı koşu yönüne çevir"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera tilt"
+msgstr "Kamera eğimini hizala"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Tilt down"
+msgstr "Aşağı eğim"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "Karakter koşarken kamera yavaşça bu eğime gelir. Tekerlek (ve kamerayı eğiyorsa sağ tuş) eğimi her zamanki gibi değiştirir; koşarken eğim yavaşça geri döner."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Catch up in"
+msgstr "Yetişme süresi"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "instant"
+msgstr "anında"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The cursor keeps its aim while the camera turns"
+msgstr "Kamera dönerken imleç hedefini korur"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "Sol tuş basılıyken imleç dünyayla birlikte hareket eder ve karakter nişan aldığınız yere koşar. Bu olmadan imleç ekranda yerinde kalır ve karakter, direksiyonu kırılan bir araba gibi ona doğru döner."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The camera stops at obstacles behind it"
+msgstr "Kamera arkasındaki engellerde durur"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+msgstr "Arkada dağ veya duvar varsa kamera içine girmez; arkada yer açılana kadar karaktere doğru yaklaşır."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Move in when the character is hidden"
+msgstr "Karakter gizlenince yaklaş"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+msgstr "Çit veya duvar karakteri neredeyse tamamen gizlerse kamera engelin önüne geçer. Kapalıyken karakter engelin ardından siluet olarak görünür."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Display"
+msgstr "Görüntü"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS limit"
+msgstr "FPS sınırı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Unlimited"
+msgstr "Sınırsız"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Vertical sync (V-Sync)"
+msgstr "Dikey senkronizasyon (V-Sync)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics interpolation (character and camera)"
+msgstr "Fizik enterpolasyonu (karakter ve kamera)"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+msgstr "Fizik saniyede 60 kez hesaplanır. Enterpolasyonla karakter ve kamera her FPS'te tikler arasında akıcı çizilir; o olmadan tikten tike kesik kesik hareket eder."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Silhouette outline behind obstacles"
+msgstr "Engel arkasında siluet konturu"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+msgstr "Ağaç, ev ya da dağ kahramanı gizlediğinde kahraman dolu bir siluet olarak görünür, asası üstte kendi hattıyla çizilir. Kontur, tüm siluetin çevresinde açık renkli bir kenardır."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface"
+msgstr "Arayüz"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Interface scale"
+msgstr "Arayüz ölçeği"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+msgstr "İpuçları, FPS sayacı, dayanıklılık çubuğu ve bu pencere. %50 en küçük, %100 en büyük boyuttur."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "FPS counter"
+msgstr "FPS sayacı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Controls hint and speed"
+msgstr "Kontrol ipuçları ve hız"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Character path line"
+msgstr "Karakter yol çizgisi"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sound"
+msgstr "Ses"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Volume"
+msgstr "Ses düzeyi"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "off"
+msgstr "kapalı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps"
+msgstr "Ayak sesleri"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Jump and landing"
+msgstr "Zıplama ve iniş"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Sprint start and sprinting"
+msgstr "Depar başlangıcı ve depar"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+msgstr "Ayak sesleri kat edilen mesafeyi izler, bu yüzden deparda daha sık ve biraz daha parlak gelir. Zıplama ne kadar yüksekse iniş o kadar gürültülü olur."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Reset all"
+msgstr "Tümünü sıfırla"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Close"
+msgstr "Kapat"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "1 · Storm Mage"
+msgstr "1 · Fırtına Büyücüsü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "2 · Chronomancer"
+msgstr "2 · Zaman Büyücüsü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "3 · Hooded Mystic"
+msgstr "3 · Kukuletalı Mistik"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "4 · Stargazer"
+msgstr "4 · Yıldız Gözcüsü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "5 · Pyromancer"
+msgstr "5 · Ateş Büyücüsü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "6 · Cryomancer"
+msgstr "6 · Buz Büyücüsü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "7 · Druid"
+msgstr "7 · Druid"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "8 · Necromancer"
+msgstr "8 · Ölü Çağıran"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "9 · Archmage"
+msgstr "9 · Başbüyücü"
+
+#: gdscript/ui/settings/settings_screen.tscn shared/world/world.tscn
+msgid "10 · Battle Mage"
+msgstr "10 · Savaş Büyücüsü"
+
+#: shared/world/world.tscn
+msgid "Knight"
+msgstr "Şövalye"
+
+#: shared/world/world.tscn
+msgid "Ranger"
+msgstr "Korucu"
+
+#: shared/world/world.tscn
+msgid "Wizard"
+msgstr "Büyücü"
+
+#: shared/world/world.tscn
+msgid "Dwarf"
+msgstr "Cüce"
+
+#: shared/world/world.tscn
+msgid "Rogue"
+msgstr "Haydut"
+
+#: shared/world/mountain/mountain.tscn
+msgid "Windswept Peak"
+msgstr "Rüzgârlı Doruk"
+
+#: shared/world/world.tscn
+msgid "Travelers' Camp"
+msgstr "Yolcular Kampı"
+
+#: shared/world/world.tscn
+msgid "Farmstead by the Well"
+msgstr "Kuyu Başındaki Çiftlik"
+
+#: shared/world/world.tscn
+msgid "Ancient Circle"
+msgstr "Kadim Çember"
+
+#: gdscript/demo/hud.gd
+msgid "Speed: %.1f m/s"
+msgstr "Hız: %.1f m/sn"
+
+#: addons/iso_orbit/points_of_interest/discovery_toast.gd
+msgid "Discovered: %s"
+msgstr "Keşfedildi: %s"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid " (%d Hz)"
+msgstr " (%d Hz)"
+
+#: gdscript/ui/settings/settings_screen.gd
+msgid "With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no effect. The smoothest limits are those that divide this rate evenly."
+msgstr "V-Sync açıkken kare sayısı monitörün yenileme hızını%s hiçbir zaman aşmaz ve bunun üstündeki bir FPS sınırının etkisi olmaz. En akıcı sınırlar, bu hızı tam bölenlerdir."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Language"
+msgstr "Dil"

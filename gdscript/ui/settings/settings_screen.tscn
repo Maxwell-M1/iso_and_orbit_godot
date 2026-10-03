@@ -1,0 +1,772 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gdscript/ui/settings/settings_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://gdscript/ui/settings/setting_check_button.gd" id="2_check"]
+[ext_resource type="Script" path="res://gdscript/ui/settings/setting_option_button.gd" id="3_option"]
+[ext_resource type="Script" path="res://gdscript/ui/settings/setting_slider.gd" id="4_slider"]
+[ext_resource type="Script" path="res://gdscript/ui/settings/setting_language_button.gd" id="5_language"]
+
+[node name="SettingsScreen" type="Control" node_paths=PackedStringArray("initial_focus")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_screen")
+initial_focus = NodePath("Center/Window/Layout/Tabs/Gameplay/Page/List/HoldModeRow/HoldMode")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Window" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+theme_type_variation = &"WindowPanel"
+
+[node name="Layout" type="VBoxContainer" parent="Center/Window"]
+layout_mode = 2
+theme_type_variation = &"WindowLayout"
+
+[node name="Title" type="Label" parent="Center/Window/Layout"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Settings"
+
+[node name="Tabs" type="TabContainer" parent="Center/Window/Layout"]
+custom_minimum_size = Vector2(0, 440)
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Gameplay" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+metadata/_tab_name = "Controls"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Gameplay"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Gameplay/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="HoldModeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+layout_mode = 2
+
+[node name="HoldModeLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/HoldModeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Held LMB"
+
+[node name="HoldMode" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/HoldModeRow"]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Straight to the cursor"
+popup/item_0/id = 0
+popup/item_1/text = "To the point along a path"
+popup/item_1/id = 1
+script = ExtResource("3_option")
+key = &"gameplay/hold_mode"
+
+[node name="CameraKeysRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+layout_mode = 2
+
+[node name="CameraKeysLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraKeysRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "RMB + WASD"
+
+[node name="CameraKeys" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraKeysRow"]
+layout_mode = 2
+selected = 2
+item_count = 3
+popup/item_0/text = "Off"
+popup/item_0/id = 0
+popup/item_1/text = "Sidestep: face forward, S backs up"
+popup/item_1/id = 1
+popup/item_2/text = "Turn: face the way you go, S toward the camera"
+popup/item_2/id = 2
+script = ExtResource("3_option")
+key = &"gameplay/camera_keys_mode"
+
+[node name="CameraSteerKeysRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+layout_mode = 2
+
+[node name="CameraSteerKeysLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraSteerKeysRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LMB + RMB + A/D"
+
+[node name="CameraSteerKeys" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraSteerKeysRow"]
+layout_mode = 2
+selected = 2
+item_count = 3
+popup/item_0/text = "Off"
+popup/item_0/id = 0
+popup/item_1/text = "Sidestep: face forward"
+popup/item_1/id = 1
+popup/item_2/text = "Diagonal: face the way you go"
+popup/item_2/id = 2
+script = ExtResource("3_option")
+key = &"gameplay/camera_steer_keys_mode"
+
+[node name="BackwardSlowdownRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BackwardSlowdownLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/BackwardSlowdownRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Backing up (S) slower by"
+
+[node name="BackwardSlowdown" type="HSlider" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/BackwardSlowdownRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 80.0
+step = 5.0
+value = 30.0
+script = ExtResource("4_slider")
+key = &"gameplay/backward_slowdown"
+value_label = NodePath("../BackwardSlowdownValue")
+value_format = "%d%%"
+
+[node name="BackwardSlowdownValue" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/BackwardSlowdownRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "30%"
+horizontal_alignment = 2
+
+[node name="CameraKeysHint" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+autowrap_mode = 3
+
+[node name="HideCursor" type="CheckButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+layout_mode = 2
+text = "Hide the cursor while running with LMB held"
+script = ExtResource("2_check")
+key = &"gameplay/hide_cursor_on_hold"
+
+[node name="HideCursorHint" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
+autowrap_mode = 3
+
+[node name="Character" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+visible = false
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+metadata/_tab_name = "Character"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Character"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="LookRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+layout_mode = 2
+
+[node name="LookLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/LookRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hero look"
+
+[node name="Look" type="OptionButton" parent="Center/Window/Layout/Tabs/Character/Page/List/LookRow"]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 9
+item_count = 10
+popup/item_0/text = "1 · Storm Mage"
+popup/item_0/id = 1
+popup/item_1/text = "2 · Chronomancer"
+popup/item_1/id = 2
+popup/item_2/text = "3 · Hooded Mystic"
+popup/item_2/id = 3
+popup/item_3/text = "4 · Stargazer"
+popup/item_3/id = 4
+popup/item_4/text = "5 · Pyromancer"
+popup/item_4/id = 5
+popup/item_5/text = "6 · Cryomancer"
+popup/item_5/id = 6
+popup/item_6/text = "7 · Druid"
+popup/item_6/id = 7
+popup/item_7/text = "8 · Necromancer"
+popup/item_7/id = 8
+popup/item_8/text = "9 · Archmage"
+popup/item_8/id = 9
+popup/item_9/text = "10 · Battle Mage"
+popup/item_9/id = 10
+script = ExtResource("3_option")
+key = &"character/look"
+
+[node name="LookHint" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "All looks stand in a row south of the road to the ramp, each with its number overhead."
+autowrap_mode = 3
+
+[node name="LedgeGuard" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+layout_mode = 2
+text = "Don't fall off ledges"
+script = ExtResource("2_check")
+key = &"gameplay/ledge_guard"
+
+[node name="LedgeGuardHint" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "At an edge the character stops, or slides along it when running at an angle, as along a wall. Low steps can still be walked down."
+autowrap_mode = 3
+
+[node name="Jump" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+layout_mode = 2
+text = "Jump (Space)"
+script = ExtResource("2_check")
+key = &"character/jump"
+
+[node name="JumpHeightRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="JumpHeightLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/JumpHeightRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Jump height"
+
+[node name="JumpHeight" type="HSlider" parent="Center/Window/Layout/Tabs/Character/Page/List/JumpHeightRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 0.5
+max_value = 1.5
+step = 0.1
+value = 1.0
+script = ExtResource("4_slider")
+key = &"character/jump_height"
+value_label = NodePath("../JumpHeightValue")
+value_format = "%.1f m"
+
+[node name="JumpHeightValue" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/JumpHeightRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "1.0 m"
+horizontal_alignment = 2
+
+[node name="Sprint" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+layout_mode = 2
+text = "Sprint (Shift)"
+script = ExtResource("2_check")
+key = &"character/sprint"
+
+[node name="SprintModeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SprintModeLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintModeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Shift"
+
+[node name="SprintMode" type="OptionButton" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintModeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Hold"
+popup/item_0/id = 0
+popup/item_1/text = "Press: on, again: off"
+popup/item_1/id = 1
+script = ExtResource("3_option")
+key = &"character/sprint_mode"
+
+[node name="SprintBonusRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SprintBonusLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintBonusRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Speed bonus"
+
+[node name="SprintBonus" type="HSlider" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintBonusRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 10.0
+max_value = 100.0
+step = 5.0
+value = 50.0
+script = ExtResource("4_slider")
+key = &"character/sprint_bonus"
+value_label = NodePath("../SprintBonusValue")
+value_format = "+%d%%"
+
+[node name="SprintBonusValue" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintBonusRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "+50%"
+horizontal_alignment = 2
+
+[node name="Fatigue" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sprint fatigue"
+script = ExtResource("2_check")
+key = &"character/fatigue"
+
+[node name="SprintDurationRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SprintDurationLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintDurationRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stamina lasts"
+
+[node name="SprintDuration" type="HSlider" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintDurationRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 3.0
+max_value = 10.0
+step = 0.5
+value = 5.0
+script = ExtResource("4_slider")
+key = &"character/sprint_duration"
+value_label = NodePath("../SprintDurationValue")
+value_format = "%.1f s"
+
+[node name="SprintDurationValue" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintDurationRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "5.0 s"
+horizontal_alignment = 2
+
+[node name="Camera" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+visible = false
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 2
+metadata/_tab_name = "Camera"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Camera"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="MousePitch" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "RMB tilts the camera up and down"
+script = ExtResource("2_check")
+key = &"camera/mouse_pitch"
+
+[node name="MousePitchHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+autowrap_mode = 3
+
+[node name="CameraFollow" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "Turn the camera to follow the run"
+script = ExtResource("2_check")
+key = &"camera/follow"
+
+[node name="AlignPitch" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "Align the camera tilt"
+script = ExtResource("2_check")
+key = &"camera/align_pitch"
+
+[node name="AlignPitchRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="AlignPitchLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tilt down"
+
+[node name="AlignPitchAngle" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 8.0
+max_value = 80.0
+value = 22.0
+script = ExtResource("4_slider")
+key = &"camera/align_pitch_angle"
+value_label = NodePath("../AlignPitchValue")
+value_format = "%d°"
+
+[node name="AlignPitchValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "22°"
+horizontal_alignment = 2
+
+[node name="AlignPitchHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+autowrap_mode = 3
+
+[node name="FollowTimeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FollowTimeLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Catch up in"
+
+[node name="FollowTime" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 10.0
+step = 0.1
+value = 1.1
+script = ExtResource("4_slider")
+key = &"camera/follow_time"
+value_label = NodePath("../FollowTimeValue")
+value_format = "%.1f s"
+zero_text = "instant"
+
+[node name="FollowTimeValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "1.1 s"
+horizontal_alignment = 2
+
+[node name="KeepAim" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "The cursor keeps its aim while the camera turns"
+script = ExtResource("2_check")
+key = &"camera/keep_aim"
+
+[node name="KeepAimHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+autowrap_mode = 3
+
+[node name="KeepOut" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "The camera stops at obstacles behind it"
+script = ExtResource("2_check")
+key = &"camera/keep_out_of_geometry"
+
+[node name="KeepOutHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "A mountain or a wall behind: the camera does not go inside but moves toward the character until there is room behind."
+autowrap_mode = 3
+
+[node name="PullIn" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "Move in when the character is hidden"
+script = ExtResource("2_check")
+key = &"camera/pull_in_on_occlusion"
+
+[node name="PullInHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "A fence or a wall hides the character almost entirely: the camera moves in front of the obstacle. Off: the character shows as a silhouette through the obstacle."
+autowrap_mode = 3
+
+[node name="Graphics" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+visible = false
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 3
+metadata/_tab_name = "Display"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Graphics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Graphics/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="MaxFpsRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+layout_mode = 2
+
+[node name="MaxFpsLabel" type="Label" parent="Center/Window/Layout/Tabs/Graphics/Page/List/MaxFpsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "FPS limit"
+
+[node name="MaxFps" type="OptionButton" parent="Center/Window/Layout/Tabs/Graphics/Page/List/MaxFpsRow"]
+layout_mode = 2
+selected = 5
+item_count = 6
+popup/item_0/text = "24"
+popup/item_0/id = 24
+popup/item_1/text = "30"
+popup/item_1/id = 30
+popup/item_2/text = "60"
+popup/item_2/id = 60
+popup/item_3/text = "120"
+popup/item_3/id = 120
+popup/item_4/text = "240"
+popup/item_4/id = 240
+popup/item_5/text = "Unlimited"
+popup/item_5/id = 0
+script = ExtResource("3_option")
+key = &"display/max_fps"
+
+[node name="Vsync" type="CheckButton" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+layout_mode = 2
+text = "Vertical sync (V-Sync)"
+script = ExtResource("2_check")
+key = &"display/vsync"
+
+[node name="VsyncHint" type="Label" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+autowrap_mode = 3
+
+[node name="PhysicsInterpolation" type="CheckButton" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+layout_mode = 2
+text = "Physics interpolation (character and camera)"
+script = ExtResource("2_check")
+key = &"display/physics_interpolation"
+
+[node name="InterpolationHint" type="Label" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "Physics runs 60 times a second. With interpolation the character and the camera are drawn smoothly between ticks at any FPS; without it they move in steps, tick by tick."
+autowrap_mode = 3
+
+[node name="SilhouetteOutline" type="CheckButton" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+layout_mode = 2
+text = "Silhouette outline behind obstacles"
+script = ExtResource("2_check")
+key = &"display/silhouette_outline"
+
+[node name="SilhouetteHint" type="Label" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "When a tree, a house or the mountain hides the hero, the hero shows as a solid silhouette with the staff outlined on top. The outline is a light rim around the whole silhouette."
+autowrap_mode = 3
+
+[node name="Interface" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+visible = false
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 4
+metadata/_tab_name = "Interface"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Interface"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Interface/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="LanguageRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+
+[node name="LanguageLabel" type="Label" parent="Center/Window/Layout/Tabs/Interface/Page/List/LanguageRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Language"
+
+[node name="Language" type="OptionButton" parent="Center/Window/Layout/Tabs/Interface/Page/List/LanguageRow"]
+layout_mode = 2
+script = ExtResource("5_language")
+key = &"interface/language"
+
+[node name="UiScaleRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+
+[node name="UiScaleLabel" type="Label" parent="Center/Window/Layout/Tabs/Interface/Page/List/UiScaleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Interface scale"
+
+[node name="UiScale" type="HSlider" parent="Center/Window/Layout/Tabs/Interface/Page/List/UiScaleRow" node_paths=PackedStringArray("value_label")]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 50.0
+value = 75.0
+step = 5.0
+script = ExtResource("4_slider")
+key = &"interface/ui_scale"
+value_label = NodePath("../UiScaleValue")
+value_format = "%d%%"
+apply_on_release = true
+
+[node name="UiScaleValue" type="Label" parent="Center/Window/Layout/Tabs/Interface/Page/List/UiScaleRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "75%"
+horizontal_alignment = 2
+
+[node name="UiScaleHint" type="Label" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "Hints, the FPS counter, the stamina bar and this window. 50% is the smallest, 100% the largest."
+autowrap_mode = 3
+
+[node name="FpsCounter" type="CheckButton" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+text = "FPS counter"
+script = ExtResource("2_check")
+key = &"interface/fps_counter"
+
+[node name="Help" type="CheckButton" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+text = "Controls hint and speed"
+script = ExtResource("2_check")
+key = &"interface/help"
+
+[node name="PathLine" type="CheckButton" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+text = "Character path line"
+script = ExtResource("2_check")
+key = &"interface/path_line"
+
+[node name="Sound" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
+visible = false
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_tab_index = 5
+metadata/_tab_name = "Sound"
+
+[node name="Page" type="MarginContainer" parent="Center/Window/Layout/Tabs/Sound"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TabPage"
+
+[node name="List" type="VBoxContainer" parent="Center/Window/Layout/Tabs/Sound/Page"]
+layout_mode = 2
+theme_type_variation = &"SettingsList"
+
+[node name="SoundVolumeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+layout_mode = 2
+
+[node name="SoundVolumeLabel" type="Label" parent="Center/Window/Layout/Tabs/Sound/Page/List/SoundVolumeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Volume"
+
+[node name="SoundVolume" type="HSlider" parent="Center/Window/Layout/Tabs/Sound/Page/List/SoundVolumeRow" node_paths=PackedStringArray("value_label")]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+step = 5.0
+value = 100.0
+script = ExtResource("4_slider")
+key = &"sound/volume"
+value_label = NodePath("../SoundVolumeValue")
+value_format = "%d%%"
+zero_text = "off"
+
+[node name="SoundVolumeValue" type="Label" parent="Center/Window/Layout/Tabs/Sound/Page/List/SoundVolumeRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SoundFootsteps" type="CheckButton" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+layout_mode = 2
+text = "Footsteps"
+script = ExtResource("2_check")
+key = &"sound/footsteps"
+
+[node name="SoundJump" type="CheckButton" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+layout_mode = 2
+text = "Jump and landing"
+script = ExtResource("2_check")
+key = &"sound/jump"
+
+[node name="SoundSprint" type="CheckButton" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+layout_mode = 2
+text = "Sprint start and sprinting"
+script = ExtResource("2_check")
+key = &"sound/sprint"
+
+[node name="SoundHint" type="Label" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "Footsteps follow the distance covered, so when sprinting they come faster and a little brighter. The higher the jump, the louder the landing."
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Center/Window/Layout"]
+layout_mode = 2
+alignment = 2
+
+[node name="Reset" type="Button" parent="Center/Window/Layout/Buttons"]
+layout_mode = 2
+text = "Reset all"
+
+[node name="Close" type="Button" parent="Center/Window/Layout/Buttons"]
+layout_mode = 2
+text = "Close"
+
+[connection signal="pressed" from="Center/Window/Layout/Buttons/Reset" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="Center/Window/Layout/Buttons/Close" to="." method="request_close"]

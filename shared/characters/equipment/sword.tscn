@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/steel.tres" id="steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/dark_steel.tres" id="dark_steel"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5fc69"]
+material = ExtResource("leather")
+top_radius = 0.02
+bottom_radius = 0.022
+height = 0.15
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_aca79"]
+material = ExtResource("brass")
+radius = 0.032
+height = 0.064
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_3926b"]
+material = ExtResource("brass")
+size = Vector3(0.24, 0.035, 0.045)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ceb4a"]
+material = ExtResource("steel")
+size = Vector3(0.06, 0.82, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_87e85"]
+material = ExtResource("dark_steel")
+size = Vector3(0.014, 0.6, 0.016)
+
+[sub_resource type="PrismMesh" id="PrismMesh_6f6a1"]
+material = ExtResource("steel")
+size = Vector3(0.06, 0.1, 0.012)
+
+[node name="Sword" type="Node3D" unique_id=177619]
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_5fc69")
+
+[node name="Pommel" type="MeshInstance3D" parent="." unique_id=1251080559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.095, 0)
+mesh = SubResource("SphereMesh_aca79")
+
+[node name="Guard" type="MeshInstance3D" parent="." unique_id=222666744]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("BoxMesh_3926b")
+
+[node name="Blade" type="MeshInstance3D" parent="." unique_id=216413245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.515, 0)
+mesh = SubResource("BoxMesh_ceb4a")
+
+[node name="Fuller" type="MeshInstance3D" parent="." unique_id=866805135]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.43, 0)
+mesh = SubResource("BoxMesh_87e85")
+
+[node name="Tip" type="MeshInstance3D" parent="." unique_id=193472050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, 0)
+mesh = SubResource("PrismMesh_6f6a1")

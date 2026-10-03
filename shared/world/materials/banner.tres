@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/canvas.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://b7u563mxlcqui" path="res://shared/world/textures/cloth_weave_detail.webp" id="tex_cloth_weave_detail"]
+[ext_resource type="Texture2D" uid="uid://pbmgkyle6qhl" path="res://shared/world/textures/noise_detail.webp" id="tex_noise_detail"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/cloth_color = Color(0.68, 0.14, 0.12, 1)
+shader_parameter/cloth_dark_color = Color(0.42, 0.08, 0.07, 1)
+shader_parameter/panel_width = 0.0
+shader_parameter/folds = 0.6
+shader_parameter/banner = true
+shader_parameter/cloth_weave = ExtResource("tex_cloth_weave_detail")
+shader_parameter/noise_texture = ExtResource("tex_noise_detail")

@@ -1,0 +1,130 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/wood.tres" id="wood"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/gem_amber.tres" id="gem_amber"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4f4d0"]
+material = ExtResource("wood")
+top_radius = 0.021
+bottom_radius = 0.026
+height = 1.66
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cb04d"]
+material = ExtResource("leather")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.22
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e3431"]
+material = ExtResource("brass")
+top_radius = 0.027
+bottom_radius = 0.02
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_be8df"]
+material = ExtResource("brass")
+top_radius = 0.034
+bottom_radius = 0.03
+height = 0.06
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_62411"]
+material = ExtResource("brass")
+top_radius = 0.007
+bottom_radius = 0.011
+height = 0.22
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_189cf"]
+material = ExtResource("brass")
+top_radius = 0.004
+bottom_radius = 0.007
+height = 0.09
+radial_segments = 6
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_e6968"]
+material = ExtResource("gem_amber")
+radius = 0.06
+height = 0.2
+radial_segments = 6
+rings = 2
+
+[node name="Staff" type="Node3D" unique_id=177619]
+
+[node name="Shaft" type="MeshInstance3D" parent="." unique_id=236430235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0)
+mesh = SubResource("CylinderMesh_4f4d0")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_cb04d")
+
+[node name="Ferrule" type="MeshInstance3D" parent="." unique_id=68464218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, 0)
+mesh = SubResource("CylinderMesh_e3431")
+
+[node name="Collar" type="MeshInstance3D" parent="." unique_id=742283298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.81, 0)
+mesh = SubResource("CylinderMesh_be8df")
+
+[node name="Prong1" type="Node3D" parent="." unique_id=1254711292]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong1" unique_id=1347170128]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0)
+mesh = SubResource("CylinderMesh_62411")
+
+[node name="Tip" type="Node3D" parent="Prong1" unique_id=1347172120]
+transform = Transform3D(0.7193398, -0.6946584, 0, 0.6946584, 0.7193398, 0, 0, 0, 1, 0, 0.22, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong1/Tip" unique_id=1727940600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("CylinderMesh_189cf")
+
+[node name="Prong2" type="Node3D" parent="." unique_id=1254711293]
+transform = Transform3D(-0.45677277, -0.20336835, 0.8660254, -0.40673664, 0.9135454, 0, -0.79115355, -0.35224426, -0.50000006, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong2" unique_id=1348356049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0)
+mesh = SubResource("CylinderMesh_62411")
+
+[node name="Tip" type="Node3D" parent="Prong2" unique_id=1348358041]
+transform = Transform3D(0.7193398, -0.6946584, 0, 0.6946584, 0.7193398, 0, 0, 0, 1, 0, 0.22, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong2/Tip" unique_id=1795741977]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("CylinderMesh_189cf")
+
+[node name="Prong3" type="Node3D" parent="." unique_id=1254711294]
+transform = Transform3D(-0.45677263, -0.20336829, -0.86602545, -0.40673664, 0.9135454, 0, 0.7911536, 0.3522443, -0.4999999, 0, 0.83, 0)
+
+[node name="Rod" type="MeshInstance3D" parent="Prong3" unique_id=1349541970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0)
+mesh = SubResource("CylinderMesh_62411")
+
+[node name="Tip" type="Node3D" parent="Prong3" unique_id=1349543962]
+transform = Transform3D(0.7193398, -0.6946584, 0, 0.6946584, 0.7193398, 0, 0, 0, 1, 0, 0.22, 0)
+
+[node name="Hook" type="MeshInstance3D" parent="Prong3/Tip" unique_id=1863543354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("CylinderMesh_189cf")
+
+[node name="Gem" type="MeshInstance3D" parent="." unique_id=193457758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.98, 0)
+mesh = SubResource("SphereMesh_e6968")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.98, 0)
+light_color = Color(1, 0.7, 0.35, 1)
+light_energy = 0.6
+omni_range = 2.2

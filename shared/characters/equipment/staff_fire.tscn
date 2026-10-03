@@ -1,0 +1,104 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/dark_wood.tres" id="dark_wood"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/flame.tres" id="flame"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_27637"]
+material = ExtResource("dark_wood")
+top_radius = 0.021
+bottom_radius = 0.026
+height = 1.66
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cb04d"]
+material = ExtResource("leather")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.22
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e3431"]
+material = ExtResource("brass")
+top_radius = 0.027
+bottom_radius = 0.02
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7d1e2"]
+material = ExtResource("brass")
+top_radius = 0.075
+bottom_radius = 0.03
+height = 0.09
+radial_segments = 12
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_3dc64"]
+material = ExtResource("flame")
+radius = 0.065
+height = 0.13
+radial_segments = 12
+rings = 6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_c4844"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.035
+height = 0.18
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6c661"]
+material = ExtResource("flame")
+top_radius = 0.0
+bottom_radius = 0.04
+height = 0.24
+radial_segments = 6
+rings = 1
+
+[node name="FireStaff" type="Node3D" unique_id=177619]
+
+[node name="Shaft" type="MeshInstance3D" parent="." unique_id=236430235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0)
+mesh = SubResource("CylinderMesh_27637")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_cb04d")
+
+[node name="Ferrule" type="MeshInstance3D" parent="." unique_id=68464218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.85, 0)
+mesh = SubResource("CylinderMesh_e3431")
+
+[node name="Cup" type="MeshInstance3D" parent="." unique_id=193453933]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0)
+mesh = SubResource("CylinderMesh_7d1e2")
+
+[node name="Ember" type="MeshInstance3D" parent="." unique_id=220008080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.92, 0)
+mesh = SubResource("SphereMesh_3dc64")
+
+[node name="Flame1" type="MeshInstance3D" parent="." unique_id=855737563]
+transform = Transform3D(1, 0, 0, 0, 0.9781476, 0.2079117, 0, -0.2079117, 0.9781476, 0, 0.98, -0.025)
+mesh = SubResource("CylinderMesh_c4844")
+
+[node name="Flame2" type="MeshInstance3D" parent="." unique_id=855737564]
+transform = Transform3D(-0.50000006, 0.18005681, -0.8471007, 0, 0.9781476, 0.2079117, 0.8660254, 0.103955865, -0.48907387, 0.021650635, 0.98, 0.0125)
+mesh = SubResource("CylinderMesh_c4844")
+
+[node name="Flame3" type="MeshInstance3D" parent="." unique_id=855737565]
+transform = Transform3D(-0.4999999, -0.18005683, 0.84710073, 0, 0.9781476, 0.2079117, -0.86602545, 0.103955835, -0.48907372, -0.021650635, 0.98, 0.0125)
+mesh = SubResource("CylinderMesh_c4844")
+
+[node name="FlameTop" type="MeshInstance3D" parent="." unique_id=2037828413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02, 0)
+mesh = SubResource("CylinderMesh_6c661")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+light_color = Color(1, 0.55, 0.2, 1)
+light_energy = 0.9
+omni_range = 2.6

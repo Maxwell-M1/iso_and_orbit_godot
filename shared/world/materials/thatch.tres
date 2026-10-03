@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/thatch.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://b4wyyrunorrob" path="res://shared/world/textures/thatch_detail.webp" id="tex_thatch_detail"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/thatch_detail = ExtResource("tex_thatch_detail")

@@ -1,0 +1,92 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/rock.tres" id="1_rock"]
+[ext_resource type="Material" path="res://shared/world/materials/wood_log.tres" id="2_wood"]
+[ext_resource type="Material" path="res://shared/world/materials/fire.tres" id="3_fire"]
+[ext_resource type="Script" path="res://shared/world/props/flicker.gd" id="4_flicker"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_fire"]
+height = 0.5
+radius = 0.75
+
+[sub_resource type="SphereMesh" id="SphereMesh_stone"]
+material = ExtResource("1_rock")
+radius = 0.18
+height = 0.22
+radial_segments = 6
+rings = 3
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_log"]
+material = ExtResource("2_wood")
+top_radius = 0.08
+bottom_radius = 0.08
+height = 0.9
+radial_segments = 6
+rings = 1
+
+[sub_resource type="PrismMesh" id="PrismMesh_flame"]
+material = ExtResource("3_fire")
+left_to_right = 0.5
+size = Vector3(0.45, 0.7, 0.05)
+
+[node name="Campfire" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("CylinderShape3D_fire")
+
+[node name="Stone0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.08, 0.0)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.373, 0.08, 0.47)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.136, 0.08, 0.584)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.542, 0.08, 0.256)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.538, 0.08, -0.266)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.126, 0.08, -0.587)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Stone6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.381, 0.08, -0.464)
+mesh = SubResource("SphereMesh_stone")
+
+[node name="Log1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("CylinderMesh_log")
+
+[node name="Log2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -0.5, 0.866, 0.999978, 0, 0, 0, 0.866, 0.5, 0, 0.14, 0)
+mesh = SubResource("CylinderMesh_log")
+
+[node name="Log3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -0.5, -0.866, 0.999978, 0, 0, 0, -0.866, 0.5, 0, 0.16, 0)
+mesh = SubResource("CylinderMesh_log")
+
+[node name="FlameA" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("PrismMesh_flame")
+
+[node name="FlameB" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0.45, 0)
+mesh = SubResource("PrismMesh_flame")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+light_color = Color(1, 0.62, 0.3, 1)
+light_energy = 1.6
+shadow_enabled = true
+omni_range = 7.0
+script = ExtResource("4_flicker")

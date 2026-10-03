@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/timber_plaster.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://bp4il8u70capn" path="res://shared/world/textures/plaster_detail.webp" id="tex_plaster_detail"]
+[ext_resource type="Texture2D" uid="uid://dqhhscjxlaipf" path="res://shared/world/textures/wood_grain_detail.webp" id="tex_wood_grain_detail"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/plaster_detail = ExtResource("tex_plaster_detail")
+shader_parameter/wood_grain = ExtResource("tex_wood_grain_detail")

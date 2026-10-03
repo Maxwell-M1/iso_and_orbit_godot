@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/characters/materials/steel.tres" id="steel"]
+[ext_resource type="Material" path="res://shared/characters/materials/brass.tres" id="brass"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cd320"]
+albedo_color = Color(0.62, 0.1, 0.1, 1)
+roughness = 0.6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_372fd"]
+material = SubResource("StandardMaterial3D_cd320")
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.05
+radial_segments = 24
+rings = 1
+
+[sub_resource type="TorusMesh" id="TorusMesh_0c8c9"]
+material = ExtResource("steel")
+inner_radius = 0.345
+outer_radius = 0.39
+rings = 32
+ring_segments = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_9ee26"]
+material = ExtResource("brass")
+size = Vector3(0.06, 0.56, 0.012)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8369a"]
+material = ExtResource("brass")
+size = Vector3(0.42, 0.06, 0.012)
+
+[sub_resource type="SphereMesh" id="SphereMesh_684b7"]
+material = ExtResource("brass")
+radius = 0.09
+height = 0.07
+radial_segments = 12
+rings = 4
+is_hemisphere = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_33807"]
+material = ExtResource("leather")
+size = Vector3(0.04, 0.18, 0.05)
+
+[node name="Shield" type="Node3D" unique_id=177619]
+
+[node name="Face" type="MeshInstance3D" parent="." unique_id=2089098196]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.07)
+mesh = SubResource("CylinderMesh_372fd")
+
+[node name="Rim" type="MeshInstance3D" parent="." unique_id=193469869]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.07)
+mesh = SubResource("TorusMesh_0c8c9")
+
+[node name="CrossVertical" type="MeshInstance3D" parent="." unique_id=1178920777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.098)
+mesh = SubResource("BoxMesh_9ee26")
+
+[node name="CrossHorizontal" type="MeshInstance3D" parent="." unique_id=422306841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -0.098)
+mesh = SubResource("BoxMesh_8369a")
+
+[node name="Boss" type="MeshInstance3D" parent="." unique_id=2088970236]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, -0.095)
+mesh = SubResource("SphereMesh_684b7")
+
+[node name="Handle" type="MeshInstance3D" parent="." unique_id=921420881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.025)
+mesh = SubResource("BoxMesh_33807")

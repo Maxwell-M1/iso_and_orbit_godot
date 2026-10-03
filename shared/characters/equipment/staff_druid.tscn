@@ -1,0 +1,167 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://shared/world/materials/dark_wood.tres" id="dark_wood"]
+[ext_resource type="Material" path="res://shared/characters/materials/leather.tres" id="leather"]
+[ext_resource type="Material" path="res://shared/characters/materials/leaf.tres" id="leaf"]
+[ext_resource type="Material" path="res://shared/characters/materials/seed_glow.tres" id="seed_glow"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7722b"]
+material = ExtResource("dark_wood")
+top_radius = 0.022
+bottom_radius = 0.027
+height = 0.46056786
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_d1033"]
+material = ExtResource("dark_wood")
+radius = 0.032
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_8913d"]
+material = ExtResource("dark_wood")
+top_radius = 0.022
+bottom_radius = 0.027
+height = 0.49195763
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_d1033_2"]
+material = ExtResource("dark_wood")
+radius = 0.032
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a2fad"]
+material = ExtResource("dark_wood")
+top_radius = 0.022
+bottom_radius = 0.027
+height = 0.43253365
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_d1033_3"]
+material = ExtResource("dark_wood")
+radius = 0.032
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a42ff"]
+material = ExtResource("dark_wood")
+top_radius = 0.022
+bottom_radius = 0.027
+height = 0.36092228
+radial_segments = 8
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_d1033_4"]
+material = ExtResource("dark_wood")
+radius = 0.032
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_10400"]
+material = ExtResource("leather")
+top_radius = 0.031
+bottom_radius = 0.031
+height = 0.2
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_abeea"]
+material = ExtResource("dark_wood")
+top_radius = 0.008
+bottom_radius = 0.016
+height = 0.2
+radial_segments = 6
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_07db6"]
+material = ExtResource("leaf")
+radius = 0.05
+height = 0.022
+radial_segments = 8
+rings = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_abec4"]
+material = ExtResource("seed_glow")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 5
+
+[node name="DruidStaff" type="Node3D" unique_id=177619]
+
+[node name="Segment1" type="MeshInstance3D" parent="." unique_id=1811305513]
+transform = Transform3D(0.99896896, 0.045395955, -0.0005155304, -0.045395955, 0.99871117, -0.022697978, -0.0005155304, 0.022697978, 0.9997422, 0.01, -0.64, 0.005)
+mesh = SubResource("CylinderMesh_7722b")
+
+[node name="Knot1" type="MeshInstance3D" parent="." unique_id=227174130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.42, 0.01)
+mesh = SubResource("SphereMesh_d1033")
+
+[node name="Segment2" type="MeshInstance3D" parent="." unique_id=1811305514]
+transform = Transform3D(0.99675184, -0.08051571, -0.0017095401, 0.08051571, 0.9958521, 0.042376693, -0.0017095401, -0.042376693, 0.99910027, 0.0010000002, -0.18499999, 0)
+mesh = SubResource("CylinderMesh_8913d")
+
+[node name="Knot2" type="MeshInstance3D" parent="." unique_id=227174131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.018, 0.05, -0.01)
+mesh = SubResource("SphereMesh_d1033_2")
+
+[node name="Segment3" type="MeshInstance3D" parent="." unique_id=1811305515]
+transform = Transform3D(0.99528474, 0.0969618, -0.0025934011, -0.0969618, 0.99385834, -0.053328987, -0.0025934011, 0.053328987, 0.9985736, 0.0020000003, 0.255, 0.0010000002)
+mesh = SubResource("CylinderMesh_a2fad")
+
+[node name="Knot3" type="MeshInstance3D" parent="." unique_id=227174132]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.022, 0.46, 0.012)
+mesh = SubResource("SphereMesh_d1033_3")
+
+[node name="Segment4" type="MeshInstance3D" parent="." unique_id=1811305516]
+transform = Transform3D(0.9979151, -0.06453084, -0.0011372372, 0.06453084, 0.9972948, 0.03519864, -0.0011372372, -0.03519864, 0.9993797, 0.011, 0.63, 0.006)
+mesh = SubResource("CylinderMesh_a42ff")
+
+[node name="Knot4" type="MeshInstance3D" parent="." unique_id=227174133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("SphereMesh_d1033_4")
+
+[node name="Grip" type="MeshInstance3D" parent="." unique_id=2089152855]
+mesh = SubResource("CylinderMesh_10400")
+
+[node name="Twig1" type="MeshInstance3D" parent="." unique_id=238163889]
+transform = Transform3D(0.9396926, 0.12812299, -0.31711555, 0, 0.92718387, 0.37460658, 0.34202012, -0.35201505, 0.87126786, 0.011970705, 0.89, -0.032889243)
+mesh = SubResource("CylinderMesh_abeea")
+
+[node name="Leaf1" type="MeshInstance3D" parent="." unique_id=228020910]
+transform = Transform3D(0.9396926, 0.26200262, -0.21984631, 0, 0.64278764, 0.76604444, 0.34202012, -0.7198463, 0.6040228, 0.030781813, 0.97, -0.08457234)
+mesh = SubResource("SphereMesh_07db6")
+
+[node name="Twig2" type="MeshInstance3D" parent="." unique_id=238163890]
+transform = Transform3D(-0.76604444, 0.24079248, -0.5959823, 0, 0.92718387, 0.37460658, 0.64278764, 0.28696528, -0.710264, 0.022497566, 0.89, 0.026811555)
+mesh = SubResource("CylinderMesh_abeea")
+
+[node name="Leaf2" type="MeshInstance3D" parent="." unique_id=228020911]
+transform = Transform3D(-0.76604444, 0.4924039, -0.41317594, 0, 0.64278764, 0.76604444, 0.64278764, 0.58682406, -0.4924039, 0.057850886, 0.97, 0.068944)
+mesh = SubResource("SphereMesh_07db6")
+
+[node name="Twig3" type="MeshInstance3D" parent="." unique_id=238163891]
+transform = Transform3D(-0.17364813, -0.36891547, 0.9130979, 0, 0.92718387, 0.37460658, -0.9848078, 0.06504973, -0.16100375, -0.03446827, 0.89, 0.0060776863)
+mesh = SubResource("CylinderMesh_abeea")
+
+[node name="Leaf3" type="MeshInstance3D" parent="." unique_id=228020912]
+transform = Transform3D(-0.17364813, -0.7544065, 0.63302225, 0, 0.64278764, 0.76604444, -0.9848078, 0.13302219, -0.11161888, -0.088632695, 0.97, 0.015628336)
+mesh = SubResource("SphereMesh_07db6")
+
+[node name="Seed" type="MeshInstance3D" parent="." unique_id=2089569798]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.93, 0)
+mesh = SubResource("SphereMesh_abec4")
+
+[node name="Glow" type="OmniLight3D" parent="." unique_id=2089146526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.93, 0)
+light_color = Color(0.5, 1, 0.4, 1)
+light_energy = 0.6
+omni_range = 2.2
