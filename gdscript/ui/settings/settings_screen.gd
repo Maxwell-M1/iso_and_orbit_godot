@@ -30,11 +30,15 @@ const _DEPENDENCY_KEYS: Array[StringName] = [
 @onready var _sprint_duration_row: Control = %SprintDurationRow
 @onready var _sprint_duration: SettingSlider = %SprintDuration
 @onready var _vsync_hint: Label = %VsyncHint
+@onready var _fullscreen: CheckButton = %Fullscreen
 
 
 func _ready() -> void:
 	Settings.changed.connect(_on_setting_changed)
 	_update_dependent_rows()
+	# Inside the editor (the Game tab or its floating window) the window belongs to the editor, and the game cannot
+	# change its mode.
+	_set_enabled(_fullscreen, not Engine.is_embedded_in_editor())
 	# The code composes the V-Sync hint from a translation and the monitor's refresh rate.
 	_vsync_hint.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	_update_vsync_hint()

@@ -63,8 +63,9 @@ uma escolha salva não se perca.
 | **Interpolação de física (personagem e câmera)** | `display/physics_interpolation` | ligado | `SceneTree.physics_interpolation` |
 | **Contorno da silhueta atrás de obstáculos** | `display/silhouette_outline` | ligado | `OccludedSilhouette.outline_enabled` |
 
-A tela cheia não funciona enquanto o jogo roda dentro da aba Jogo (Game) do editor, onde a janela pertence ao editor.
-Para testá-la pelo editor, desligue **Embed Game on Next Play** no menu da aba Jogo.
+A tela cheia não funciona enquanto o jogo roda dentro do editor, na aba Jogo (Game) ou na janela flutuante dela (**Make
+Game Workspace Floating on Next Play**): a janela pertence ao editor, então lá a chave fica desativada. Para testá-la
+pelo editor, desligue **Embed Game on Next Play** no menu da aba Jogo: o jogo então abre na própria janela.
 
 Com V-Sync nunca há mais quadros que a taxa de atualização do monitor, então um limite de FPS igual ou acima dessa taxa
 nem é aplicado: ele brigaria com o V-Sync e daria menos quadros do que o monitor mostra (um limite de 240 num monitor

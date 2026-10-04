@@ -58,8 +58,9 @@ not lost.
 | **Physics interpolation (character and camera)** | `display/physics_interpolation` | on | `SceneTree.physics_interpolation` |
 | **Silhouette outline behind obstacles** | `display/silhouette_outline` | on | `OccludedSilhouette.outline_enabled` |
 
-Full screen does not work while the game runs inside the editor's Game tab, where the window belongs to the editor. To
-try it from the editor, turn off **Embed Game on Next Play** in the Game tab's menu.
+Full screen does not work while the game runs inside the editor, in the Game tab or in its floating window (**Make Game
+Workspace Floating on Next Play**): the window belongs to the editor, so the switch is disabled there. To try it from
+the editor, turn off **Embed Game on Next Play** in the Game tab's menu: the game then opens in its own window.
 
 With V-Sync there are never more frames than the monitor's refresh rate, so an FPS limit at or above that rate is not
 set at all: it would fight V-Sync and give fewer frames than the monitor shows (a 240 limit on a 240 Hz monitor gave

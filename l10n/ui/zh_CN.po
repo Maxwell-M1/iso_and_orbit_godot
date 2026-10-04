@@ -238,8 +238,8 @@ msgid "Fullscreen"
 msgstr "全屏"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "The game takes the whole screen. It does not work while the game runs inside the editor's Game tab."
-msgstr "游戏占满整个屏幕。游戏在编辑器的“游戏”选项卡（Game）中运行时无效。"
+msgid "The game takes the whole screen. Unavailable while the game runs inside the editor: in the Game tab or in its floating window."
+msgstr "游戏占满整个屏幕。游戏在编辑器内运行时（“游戏”选项卡（Game）或其浮动窗口中）不可用。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "FPS limit"

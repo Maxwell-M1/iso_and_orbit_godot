@@ -63,9 +63,10 @@ Personaje, así no se pierde una elección guardada.
 | **Interpolación de física (personaje y cámara)** | `display/physics_interpolation` | activado | `SceneTree.physics_interpolation` |
 | **Contorno de silueta tras obstáculos** | `display/silhouette_outline` | activado | `OccludedSilhouette.outline_enabled` |
 
-La pantalla completa no funciona mientras el juego se ejecuta dentro de la pestaña Juego (Game) del editor, donde la
-ventana pertenece al editor. Para probarla desde el editor, desactiva **Embed Game on Next Play** en el menú de la
-pestaña Juego.
+La pantalla completa no funciona mientras el juego se ejecuta dentro del editor, en la pestaña Juego (Game) o en su
+ventana flotante (**Make Game Workspace Floating on Next Play**): la ventana pertenece al editor, así que allí el
+interruptor está desactivado. Para probarla desde el editor, desactiva **Embed Game on Next Play** en el menú de la
+pestaña Juego: entonces el juego se abre en su propia ventana.
 
 Con V-Sync nunca hay más fotogramas que la frecuencia de actualización del monitor, así que un límite de FPS igual o
 superior a esa frecuencia no se aplica en absoluto: competiría con V-Sync y daría menos fotogramas de los que muestra

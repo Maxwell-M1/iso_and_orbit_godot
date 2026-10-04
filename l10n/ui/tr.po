@@ -238,8 +238,8 @@ msgid "Fullscreen"
 msgstr "Tam ekran"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "The game takes the whole screen. It does not work while the game runs inside the editor's Game tab."
-msgstr "Oyun tüm ekranı kaplar. Oyun editörün Oyun (Game) sekmesinde çalışırken işe yaramaz."
+msgid "The game takes the whole screen. Unavailable while the game runs inside the editor: in the Game tab or in its floating window."
+msgstr "Oyun tüm ekranı kaplar. Oyun editörün içinde çalışırken kullanılamaz: Oyun (Game) sekmesinde ya da onun kayan penceresinde."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "FPS limit"

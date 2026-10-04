@@ -47,7 +47,8 @@ const CAMERA_KEEP_AIM := &"camera/keep_aim"
 const CAMERA_KEEP_OUT := &"camera/keep_out_of_geometry"
 ## The camera moves closer if an obstacle hides the character (CameraArm.pull_in_on_occlusion).
 const CAMERA_PULL_IN := &"camera/pull_in_on_occlusion"
-## The window takes the whole screen. Inside the editor's Game tab the window mode does not change.
+## The window takes the whole screen. Inside the editor (the Game tab or its floating window) the window mode does not
+## change.
 const FULLSCREEN := &"display/fullscreen"
 const MAX_FPS := &"display/max_fps"
 const VSYNC := &"display/vsync"

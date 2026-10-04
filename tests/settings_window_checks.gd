@@ -34,7 +34,9 @@ func _check_settings_window() -> void:
 	(screen.find_child("LedgeGuard") as CheckButton).button_pressed = false
 	# A headless window has no window mode to change, so only the setting is checked.
 	var settings: GameSettings = _tree.root.get_node(^"Settings")
-	(screen.find_child("Fullscreen") as CheckButton).button_pressed = true
+	var fullscreen := screen.find_child("Fullscreen") as CheckButton
+	var fullscreen_available := not fullscreen.disabled
+	fullscreen.button_pressed = true
 	var max_fps := screen.find_child("MaxFps") as OptionButton
 	max_fps.select(1)
 	max_fps.item_selected.emit(1)
@@ -60,7 +62,8 @@ func _check_settings_window() -> void:
 		_player.ledge_guard.enabled, Engine.max_fps, _tree.physics_interpolation, fps_counter.visible,
 		_rig.follow_movement, _rig.follow_time, follow_time_text.text, slider_locked])
 	_expect(not _player.ledge_guard.enabled, "the ledge guard switch reaches the character")
-	_expect(settings.get_value(GameSettings.FULLSCREEN), "the fullscreen switch changes its setting")
+	_expect(fullscreen_available and settings.get_value(GameSettings.FULLSCREEN),
+			"the fullscreen switch is available outside the editor and changes its setting")
 	_expect(Engine.max_fps == 30, "the FPS limit is applied")
 	_expect(_tree.physics_interpolation != interpolation_default, "the physics interpolation switch reaches the engine")
 	_expect(not fps_counter.visible, "the FPS counter hides")
