@@ -90,9 +90,11 @@ física.
 **Oculto** (`hide_cursor_while_held`, ligado por padrão). Na corrida, o cursor só ficaria piscando, especialmente
 enquanto a câmera gira e o cursor se move com o mundo. Ele some assim que o pressionamento passa a contar como segurar
 (um clique curto não mexe nele) e reaparece ao soltar, onde você mirou. Enquanto isso, o modo do mouse é
-`MOUSE_MODE_CONFINED_HIDDEN`: um cursor simplesmente oculto poderia sair da janela e aparecer na borda dela. Enquanto o
-botão direito orbita a câmera, a câmera captura o cursor; solte o botão direito com o esquerdo ainda segurado e o
-cursor fica oculto de novo. Pausar (a janela de configurações) ou trocar para outra janela o mostra na hora.
+`MOUSE_MODE_CONFINED_HIDDEN`: um cursor simplesmente oculto poderia sair da janela e aparecer na borda dela. No macOS o
+motor confina o cursor movendo-o por conta própria e conta duas vezes cada movimento que mantém a mira (abaixo), então a
+mira se desvia; lá o modo é `MOUSE_MODE_HIDDEN`, e o próprio componente mantém o cursor dentro da janela. Enquanto o
+botão direito orbita a câmera, a câmera captura o cursor; solte o botão direito com o esquerdo ainda segurado e o cursor
+fica oculto de novo. Pausar (a janela de configurações) ou trocar para outra janela o mostra na hora.
 `is_cursor_hidden()` informa se o componente o ocultou.
 
 **Mantém a mira** (`keep_aim_on_camera_turn`, ligado por padrão). Enquanto o botão esquerdo está segurado, a direção da

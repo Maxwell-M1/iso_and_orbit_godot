@@ -84,9 +84,11 @@ position.
 **Hidden** (`hide_cursor_while_held`, on by default). On the run the cursor would only flicker, especially while the
 camera turns and the cursor moves with the world. It hides as soon as a press becomes a hold (a short click does not
 touch it) and reappears on release where you aimed. The mouse mode meanwhile is `MOUSE_MODE_CONFINED_HIDDEN`: a plain
-hidden cursor could leave the window and appear at its edge. While the right button orbits the camera, the camera
-captures the cursor; release the right button with the left one still held and the cursor is hidden again. Pausing
-(the settings window) or switching to another window shows it at once. `is_cursor_hidden()` tells whether the
+hidden cursor could leave the window and appear at its edge. On macOS the engine confines the cursor by moving it on its
+own and counts every move that keeps the aim (below) a second time, so the aim drifts off; there the mode is
+`MOUSE_MODE_HIDDEN`, and the component keeps the cursor in the window itself. While the right button orbits the camera,
+the camera captures the cursor; release the right button with the left one still held and the cursor is hidden again.
+Pausing (the settings window) or switching to another window shows it at once. `is_cursor_hidden()` tells whether the
 component has hidden it.
 
 **Keeps its aim** (`keep_aim_on_camera_turn`, on by default). While the left button is held, the running direction

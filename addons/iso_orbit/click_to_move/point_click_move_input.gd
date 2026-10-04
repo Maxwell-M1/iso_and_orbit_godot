@@ -144,6 +144,13 @@ var _has_aim := false
 var _mouse_seen := Vector2.ZERO
 # We hid the cursor (not the camera or the UI), so showing it again is also up to us.
 var _cursor_hidden := false
+# The mouse mode that hides the cursor. Not just hidden but confined to the window: otherwise the invisible cursor goes
+# past the window edge and appears there. On macOS the engine confines the cursor itself: it detaches the cursor from
+# the mouse and moves it by the mouse event deltas, and a shift by warp_mouse() gets into the next delta once more. Every
+# aim correction in _keep_aim() would then count twice, as mouse movement, and with the camera following the run the
+# aim would drift further in the direction of the turn until the cursor got stuck at the window edge. So there the
+# cursor is only hidden, and _process() keeps it in the window.
+var _hidden_mouse_mode := Input.MOUSE_MODE_HIDDEN if OS.has_feature("macos") else Input.MOUSE_MODE_CONFINED_HIDDEN
 # The keys with RMB drive the character: when they are released, stopping it is also up to us.
 var _keys_steering := false
 
@@ -205,6 +212,11 @@ func _process(_delta: float) -> void:
 	else:
 		_cursor = mouse
 		_has_aim = false
+		if _cursor_hidden and _hidden_mouse_mode == Input.MOUSE_MODE_HIDDEN:
+			# The engine does not keep this hidden cursor in the window (see _hidden_mouse_mode): bring it back.
+			_cursor = _clamp_to_window(mouse)
+			if _cursor != mouse:
+				get_viewport().warp_mouse(_cursor)
 
 
 func _physics_process(delta: float) -> void:
@@ -317,7 +329,8 @@ func _keep_aim(mouse: Vector2) -> void:
 	if _has_aim and not view.is_position_behind(feet + _aim_offset):
 		# Where the aim ended up on the screen after the camera moved, plus the mouse movement during the frame.
 		cursor = view.unproject_position(feet + _aim_offset) + (mouse - _mouse_seen)
-		cursor = cursor.clamp(Vector2.ZERO, get_viewport().get_visible_rect().size - Vector2.ONE)
+	# Also without an aim: on macOS the engine does not keep the hidden cursor in the window (see _hidden_mouse_mode).
+	cursor = _clamp_to_window(cursor)
 	_mouse_seen = mouse
 	# Do not move it by less than a pixel: the system cursor sits on whole window pixels.
 	if cursor.distance_to(mouse) > 1.0:
@@ -339,9 +352,7 @@ func _update_cursor_visibility() -> void:
 	if not (_holding and hide_cursor_while_held):
 		_show_cursor()
 	elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
-		# Not just hidden but confined to the window: otherwise the invisible cursor goes past the window edge and
-		# appears there.
-		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+		Input.mouse_mode = _hidden_mouse_mode
 		_cursor_hidden = true
 
 
@@ -350,7 +361,7 @@ func _show_cursor() -> void:
 		return
 	_cursor_hidden = false
 	# The mode may have been changed without us (camera capture, a menu): then it is no longer ours.
-	if Input.mouse_mode == Input.MOUSE_MODE_CONFINED_HIDDEN:
+	if Input.mouse_mode == _hidden_mouse_mode:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
@@ -414,6 +425,10 @@ func _pick_point(screen_position: Vector2, allow_horizon: bool) -> Variant:
 	if allow_horizon:
 		return _ground_point(screen_position, mover.get_body().global_position.y)
 	return null
+
+
+func _clamp_to_window(screen_position: Vector2) -> Vector2:
+	return screen_position.clamp(Vector2.ZERO, get_viewport().get_visible_rect().size - Vector2.ONE)
 
 
 func _get_camera() -> Camera3D:
