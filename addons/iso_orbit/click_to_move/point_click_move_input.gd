@@ -67,6 +67,13 @@ enum HoldMode {
 	FOLLOW_POINT,
 }
 
+## On macOS, how close to the window edge the hidden system cursor may come before it is returned to the center (see
+## [method _is_cursor_roaming]).
+const _EDGE_MARGIN := 8.0
+## How long after the system cursor is moved mouse positions from before the move may still arrive: in the editor's
+## Game view on macOS the cursor moves a frame or two later.
+const _LATE_POSITIONS_MSEC := 250
+
 ## What to drive.
 @export var mover: NavigationMover
 
@@ -149,8 +156,12 @@ var _cursor_hidden := false
 # the mouse and moves it by the mouse event deltas, and a shift by warp_mouse() gets into the next delta once more. Every
 # aim correction in _keep_aim() would then count twice, as mouse movement, and with the camera following the run the
 # aim would drift further in the direction of the turn until the cursor got stuck at the window edge. So there the
-# cursor is only hidden, and _process() keeps it in the window.
+# cursor is only hidden, and the component keeps it in the window (see _is_cursor_roaming()).
 var _hidden_mouse_mode := Input.MOUSE_MODE_HIDDEN if OS.has_feature("macos") else Input.MOUSE_MODE_CONFINED_HIDDEN
+# After _recenter_system_cursor(): where the system cursor was before the move, relative to where it was moved, and
+# until when mouse positions from before the move may still arrive (see _mouse_moved()).
+var _late_offset := Vector2.ZERO
+var _late_until_msec := 0
 # The keys with RMB drive the character: when they are released, stopping it is also up to us.
 var _keys_steering := false
 
@@ -200,8 +211,8 @@ func _notification(what: int) -> void:
 func _process(_delta: float) -> void:
 	_update_cursor_visibility()
 	if _is_cursor_captured():
-		# The camera is being rotated: the cursor is captured and sits in the center of the window. Remember where it
-		# was before the capture (it returns there), and start the aim anew.
+		# The camera is being rotated: the cursor is captured and sits in the center of the window. Afterwards the
+		# camera returns it where it was, and the aim starts anew from _cursor.
 		_has_aim = false
 		return
 	var mouse := get_viewport().get_mouse_position()
@@ -211,8 +222,10 @@ func _process(_delta: float) -> void:
 		_keep_aim(mouse)
 	else:
 		_cursor = mouse
+		_mouse_seen = mouse
+		_late_until_msec = 0
 		_has_aim = false
-		if _cursor_hidden and _hidden_mouse_mode == Input.MOUSE_MODE_HIDDEN:
+		if _is_cursor_roaming():
 			# The engine does not keep this hidden cursor in the window (see _hidden_mouse_mode): bring it back.
 			_cursor = _clamp_to_window(mouse)
 			if _cursor != mouse:
@@ -317,23 +330,31 @@ func _run_to_click_point() -> void:
 
 
 ## The cursor stays over the same ground point (relative to the character's feet) however the camera moves, and mouse
-## movement moves it as usual. The system cursor is moved there too.
+## movement moves it as usual. The system cursor is moved there too (a hidden one on macOS only when it is shown again,
+## see [method _is_cursor_roaming]).
 func _keep_aim(mouse: Vector2) -> void:
 	var view := _get_camera()
 	if view == null:
 		_cursor = mouse
+		_mouse_seen = mouse
 		return
 	# The feet are where the camera sees them: the camera is placed by the interpolated position.
 	var feet := mover.get_body().get_global_transform_interpolated().origin
-	var cursor := mouse
+	var moved := _mouse_moved(mouse)
+	# Without an aim (the press itself, right after the camera was rotated, the cursor above the horizon) the cursor
+	# moves on the screen.
+	var cursor := _cursor + moved
 	if _has_aim and not view.is_position_behind(feet + _aim_offset):
 		# Where the aim ended up on the screen after the camera moved, plus the mouse movement during the frame.
-		cursor = view.unproject_position(feet + _aim_offset) + (mouse - _mouse_seen)
-	# Also without an aim: on macOS the engine does not keep the hidden cursor in the window (see _hidden_mouse_mode).
+		cursor = view.unproject_position(feet + _aim_offset) + moved
 	cursor = _clamp_to_window(cursor)
-	_mouse_seen = mouse
+	if _is_cursor_roaming():
+		# The hidden system cursor only measures the mouse movement: keep it away from the window edges, where it would
+		# stop or leave the window.
+		if not get_viewport().get_visible_rect().grow(-_EDGE_MARGIN).has_point(_mouse_seen):
+			_recenter_system_cursor()
 	# Do not move it by less than a pixel: the system cursor sits on whole window pixels.
-	if cursor.distance_to(mouse) > 1.0:
+	elif cursor.distance_to(mouse) > 1.0:
 		get_viewport().warp_mouse(cursor)
 		# Warping rounds to a window pixel (and where it is not supported, the cursor does not move); from now on,
 		# count as mouse movement only what moved after the warp.
@@ -345,11 +366,42 @@ func _keep_aim(mouse: Vector2) -> void:
 		_aim_offset = (aim as Vector3) - feet
 
 
+## The mouse movement since the previous frame. After [method _recenter_system_cursor], a position closer to where the
+## system cursor was before the move is a late one, and its movement is counted from there.
+func _mouse_moved(mouse: Vector2) -> Vector2:
+	var moved := mouse - _mouse_seen
+	if Time.get_ticks_msec() < _late_until_msec and (moved - _late_offset).length() < moved.length():
+		moved -= _late_offset
+	_mouse_seen += moved
+	return moved
+
+
+## The hidden system cursor goes to the center of the window, as far from its edges as possible.
+func _recenter_system_cursor() -> void:
+	get_viewport().warp_mouse((get_viewport().get_visible_rect().size / 2.0).floor())
+	var landed := get_viewport().get_mouse_position()
+	_late_offset = _mouse_seen - landed
+	_late_until_msec = Time.get_ticks_msec() + _LATE_POSITIONS_MSEC
+	_mouse_seen = landed
+
+
+## On macOS the hidden system cursor does not follow the aim every frame. In the editor's Game view the engine moves
+## it a frame or two after [method Viewport.warp_mouse], and mouse positions from before the move keep arriving
+## meanwhile: the aim would jump back and forth while the camera turns, and the character would twitch. So the
+## component moves its own cursor by the mouse movement, returns the system cursor to the center of the window when it
+## comes to the window edge, and puts it where the aim is when it shows it again.
+func _is_cursor_roaming() -> bool:
+	return _cursor_hidden and _hidden_mouse_mode == Input.MOUSE_MODE_HIDDEN and Input.mouse_mode == _hidden_mouse_mode
+
+
 ## Hides the cursor while running with the button held ([member hide_cursor_while_held]) and shows it afterward. Only
 ## a visible cursor is hidden: a captured one (the camera is being rotated) is left alone, and when the camera releases
 ## it (and makes it visible), it is hidden again if the button is still held.
 func _update_cursor_visibility() -> void:
 	if not (_holding and hide_cursor_while_held):
+		if _is_cursor_roaming():
+			# The system cursor was not following the aim: it appears where the aim is.
+			get_viewport().warp_mouse(_cursor)
 		_show_cursor()
 	elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 		Input.mouse_mode = _hidden_mouse_mode

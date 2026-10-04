@@ -93,10 +93,13 @@ la cámara gira y el cursor se mueve con el mundo. Se oculta en cuanto una pulsa
 (un clic corto no lo toca) y reaparece al soltar, donde apuntaste. Mientras tanto, el modo del mouse es
 `MOUSE_MODE_CONFINED_HIDDEN`: un cursor simplemente oculto podría salir de la ventana y aparecer en su borde. En macOS
 el motor confina el cursor moviéndolo por su cuenta y cuenta dos veces cada movimiento que mantiene la mira (abajo), así
-que la mira se desvía; allí el modo es `MOUSE_MODE_HIDDEN` y el propio componente mantiene el cursor dentro de la
-ventana. Mientras el botón derecho orbita la cámara, la cámara captura el cursor; suelta el botón derecho con el
-izquierdo todavía mantenido y el cursor vuelve a quedar oculto. Al pausar (la ventana de configuración) o al cambiar a
-otra ventana, se muestra de inmediato. `is_cursor_hidden()` indica si el componente lo ha ocultado.
+que la mira se desvía. Allí el modo es `MOUSE_MODE_HIDDEN` y el cursor del sistema oculto no sigue la mira: en la
+pestaña Juego (Game) del editor cada uno de esos movimientos le llega uno o dos fotogramas tarde, y el personaje daría
+tirones en los giros. El componente mueve su propio cursor según el movimiento del mouse, devuelve el cursor del sistema
+al centro de la ventana cuando llega al borde y, al soltar, lo coloca donde apuntaste. Mientras el botón derecho orbita
+la cámara, la cámara captura el cursor; suelta el botón derecho con el izquierdo todavía mantenido y el cursor vuelve a
+quedar oculto. Al pausar (la ventana de configuración) o al cambiar a otra ventana, se muestra de inmediato.
+`is_cursor_hidden()` indica si el componente lo ha ocultado.
 
 **Mantiene la mira** (`keep_aim_on_camera_turn`, activado por defecto). Mientras se mantiene el botón izquierdo, la
 dirección de carrera viene del cursor, un punto en la pantalla. Si la cámara gira mientras el cursor se queda quieto

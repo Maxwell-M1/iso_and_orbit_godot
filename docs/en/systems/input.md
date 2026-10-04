@@ -85,11 +85,13 @@ position.
 camera turns and the cursor moves with the world. It hides as soon as a press becomes a hold (a short click does not
 touch it) and reappears on release where you aimed. The mouse mode meanwhile is `MOUSE_MODE_CONFINED_HIDDEN`: a plain
 hidden cursor could leave the window and appear at its edge. On macOS the engine confines the cursor by moving it on its
-own and counts every move that keeps the aim (below) a second time, so the aim drifts off; there the mode is
-`MOUSE_MODE_HIDDEN`, and the component keeps the cursor in the window itself. While the right button orbits the camera,
-the camera captures the cursor; release the right button with the left one still held and the cursor is hidden again.
-Pausing (the settings window) or switching to another window shows it at once. `is_cursor_hidden()` tells whether the
-component has hidden it.
+own and counts every move that keeps the aim (below) a second time, so the aim drifts off. There the mode is
+`MOUSE_MODE_HIDDEN`, and the hidden system cursor does not follow the aim: in the editor's Game tab each such move
+reaches it a frame or two late, and the character would twitch on turns. The component moves its own cursor by the mouse
+movement, returns the system cursor to the center of the window when it reaches the edge, and on release puts it where
+you aimed. While the right button orbits the camera, the camera captures the cursor; release the right button with the
+left one still held and the cursor is hidden again. Pausing (the settings window) or switching to another window shows
+it at once. `is_cursor_hidden()` tells whether the component has hidden it.
 
 **Keeps its aim** (`keep_aim_on_camera_turn`, on by default). While the left button is held, the running direction
 comes from the cursor, a point on the screen. If the camera turns while the cursor stays still on the screen, a
