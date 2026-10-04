@@ -45,7 +45,10 @@ const float TILE = 4.0;
 
 varying vec3 local_position;
 varying vec3 local_normal;
-varying vec3 half_extent;
+// The half sides of the box, flat: every pixel of a face gets the exact value. Interpolated, it would differ in the last
+// digits from pixel to pixel, and a count of courses that falls on a half (a 1.4 m step with 0.4 m courses) would round
+// up in some pixels and down in others: two layouts mixed, flickering as the camera moves.
+varying flat vec3 half_extent;
 varying vec3 world_position;
 
 void vertex() {
@@ -66,7 +69,8 @@ vec2 course(float u, float stone_length, float row) {
 
 // Courses that the length 2·extent divides into: x is how many (at least one), y is the course width.
 vec2 rows_of(float extent, float wanted) {
-	float count = max(1.0, round(2.0 * extent / wanted));
+	// Rounded half up: round() may go either way at a half.
+	float count = max(1.0, floor(2.0 * extent / wanted + 0.5));
 	return vec2(count, 2.0 * extent / count);
 }
 

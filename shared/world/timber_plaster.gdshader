@@ -42,7 +42,9 @@ struct Part {
 
 varying vec3 local_position;
 varying vec3 local_normal;
-varying vec3 half_extent;
+// The half sides of the box, flat: every pixel of a face gets the exact value. Interpolated, it would differ in the last
+// digits from pixel to pixel, and a count rounded at a half would differ too: the layout would flicker.
+varying flat vec3 half_extent;
 varying vec3 world_position;
 
 void vertex() {
@@ -72,7 +74,8 @@ Part part_at(vec2 f, vec2 extent, float seed) {
 	}
 	float above_plinth = from_bottom - plinth_height;
 	// Posts: at the corners (both faces of a corner share one post) and at equal bays.
-	float bays = max(1.0, round(2.0 * extent.x / bay_width));
+	// Rounded half up: round() may go either way at a half.
+	float bays = max(1.0, floor(2.0 * extent.x / bay_width + 0.5));
 	float bay = 2.0 * extent.x / bays;
 	float post = round((f.x + extent.x) / bay);
 	float to_post = abs(f.x + extent.x - post * bay) - beam_width * (post < 0.5 || post > bays - 0.5 ? 1.0 : 0.5);

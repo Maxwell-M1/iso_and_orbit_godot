@@ -1,74 +1,74 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://4qncb4aiqhwd"]
 
-[ext_resource type="PackedScene" path="res://shared/world/world.tscn" id="1_world"]
-[ext_resource type="PackedScene" path="res://gdscript/player/player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://addons/iso_orbit/click_to_move/point_click_move_input.gd" id="3_input"]
-[ext_resource type="Script" path="res://addons/iso_orbit/orbit_camera/orbit_camera_rig.gd" id="4_camera"]
+[ext_resource type="PackedScene" uid="uid://cg6tw5ia2xed4" path="res://shared/world/world.tscn" id="1_world"]
+[ext_resource type="PackedScene" uid="uid://cw2w35xfjknkf" path="res://gdscript/player/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://cyi4p1jtx0mn0" path="res://addons/iso_orbit/click_to_move/point_click_move_input.gd" id="3_input"]
+[ext_resource type="Script" uid="uid://bj25id7ftv7xd" path="res://addons/iso_orbit/orbit_camera/orbit_camera_rig.gd" id="4_camera"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/click_to_move/click_marker.tscn" id="5_marker"]
-[ext_resource type="Script" path="res://addons/iso_orbit/click_to_move/navigation_path_view.gd" id="6_path_view"]
-[ext_resource type="Script" path="res://gdscript/demo/hud.gd" id="7_hud"]
+[ext_resource type="Script" uid="uid://c27yi0w48nkdr" path="res://addons/iso_orbit/click_to_move/navigation_path_view.gd" id="6_path_view"]
+[ext_resource type="Script" uid="uid://bkx1pl1u185h3" path="res://gdscript/demo/hud.gd" id="7_hud"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/ui_screens/fps_counter.tscn" id="8_fps"]
-[ext_resource type="PackedScene" path="res://addons/iso_orbit/points_of_interest/discovery_toast.tscn" id="13_toast"]
-[ext_resource type="Script" path="res://gdscript/demo/settings_applier.gd" id="9_applier"]
+[ext_resource type="Script" uid="uid://er6yhyof6pcs" path="res://gdscript/demo/settings_applier.gd" id="9_applier"]
 [ext_resource type="PackedScene" path="res://gdscript/ui/ui_root.tscn" id="10_ui_root"]
-[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_action_input.gd" id="11_actions"]
+[ext_resource type="Script" uid="uid://bmuwcu4h5tdp4" path="res://addons/iso_orbit/ground_character/character_action_input.gd" id="11_actions"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/ground_character/stamina_bar.tscn" id="12_stamina_bar"]
-[ext_resource type="Script" path="res://addons/iso_orbit/orbit_camera/camera_arm.gd" id="14_arm"]
-[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
+[ext_resource type="PackedScene" path="res://addons/iso_orbit/points_of_interest/discovery_toast.tscn" id="13_toast"]
+[ext_resource type="Script" uid="uid://c4skgj3oyx1kh" path="res://addons/iso_orbit/orbit_camera/camera_arm.gd" id="14_arm"]
+[ext_resource type="Script" uid="uid://c87pp147hwgur" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=94359211]
 
-[node name="World" parent="." instance=ExtResource("1_world")]
+[node name="World" parent="." unique_id=675439468 instance=ExtResource("1_world")]
 
-[node name="Player" parent="." groups=["player"] instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=1867483770 groups=["player"] instance=ExtResource("2_player")]
 
-[node name="PlayerInput" type="Node" parent="." node_paths=PackedStringArray("mover", "camera")]
+[node name="PlayerInput" type="Node" parent="." unique_id=1263002197 node_paths=PackedStringArray("mover", "camera")]
 script = ExtResource("3_input")
 mover = NodePath("../Player/NavigationMover")
 camera = NodePath("../CameraRig/CameraArm/Camera3D")
 
-[node name="PlayerActionInput" type="Node" parent="." node_paths=PackedStringArray("character")]
+[node name="PlayerActionInput" type="Node" parent="." unique_id=957766112 node_paths=PackedStringArray("character")]
 script = ExtResource("11_actions")
 character = NodePath("../Player")
 
-[node name="CameraRig" type="Node3D" parent="." node_paths=PackedStringArray("target", "arm")]
+[node name="CameraRig" type="Node3D" parent="." unique_id=1161148146 node_paths=PackedStringArray("target", "arm")]
 script = ExtResource("4_camera")
 target = NodePath("../Player")
 arm = NodePath("CameraArm")
 height_follow_time = 0.15
 
-[node name="CameraArm" type="Node3D" parent="CameraRig" node_paths=PackedStringArray("fade_target")]
+[node name="CameraArm" type="Node3D" parent="CameraRig" unique_id=253517607 node_paths=PackedStringArray("fade_target")]
 script = ExtResource("14_arm")
 fade_target = NodePath("../../Player/Visual")
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig/CameraArm"]
+[node name="Camera3D" type="Camera3D" parent="CameraRig/CameraArm" unique_id=853064253]
 current = true
 fov = 45.0
 far = 300.0
 
-[node name="ClickMarker" parent="." instance=ExtResource("5_marker")]
+[node name="ClickMarker" parent="." unique_id=1095703120 instance=ExtResource("5_marker")]
 
-[node name="PathView" type="MeshInstance3D" parent="." node_paths=PackedStringArray("mover")]
+[node name="PathView" type="MeshInstance3D" parent="." unique_id=500089121 node_paths=PackedStringArray("mover")]
 visible = false
 script = ExtResource("6_path_view")
 mover = NodePath("../Player/NavigationMover")
 
-[node name="Hud" type="CanvasLayer" parent="." node_paths=PackedStringArray("character")]
+[node name="Hud" type="CanvasLayer" parent="." unique_id=1610239526 node_paths=PackedStringArray("character")]
 script = ExtResource("7_hud")
 character = NodePath("../Player")
 
-[node name="Panel" type="PanelContainer" parent="Hud"]
+[node name="Panel" type="PanelContainer" parent="Hud" unique_id=883681759]
 offset_left = 12.0
 offset_top = 12.0
 offset_right = 12.0
 offset_bottom = 12.0
 mouse_filter = 2
 
-[node name="Lines" type="VBoxContainer" parent="Hud/Panel"]
+[node name="Lines" type="VBoxContainer" parent="Hud/Panel" unique_id=1239027514]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Help" type="Label" parent="Hud/Panel/Lines"]
+[node name="Help" type="Label" parent="Hud/Panel/Lines" unique_id=1635511370]
 layout_mode = 2
 text = "LMB on the ground — run there
 Hold LMB — run after the cursor
@@ -76,34 +76,34 @@ Hold LMB + RMB — run where the camera looks
 RMB + mouse — orbit the camera
 Wheel — lower or raise the camera"
 
-[node name="KeysHelp" type="Label" parent="Hud/Panel/Lines"]
+[node name="KeysHelp" type="Label" parent="Hud/Panel/Lines" unique_id=309071952]
 layout_mode = 2
 text = "RMB + WASD — move relative to the camera"
 
-[node name="StrafeHelp" type="Label" parent="Hud/Panel/Lines"]
+[node name="StrafeHelp" type="Label" parent="Hud/Panel/Lines" unique_id=134204790]
 layout_mode = 2
 text = "LMB + RMB + A/D — run diagonally"
 
-[node name="SprintHelp" type="Label" parent="Hud/Panel/Lines"]
+[node name="SprintHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1022974947]
 layout_mode = 2
 text = "Shift — run faster"
 
-[node name="JumpHelp" type="Label" parent="Hud/Panel/Lines"]
+[node name="JumpHelp" type="Label" parent="Hud/Panel/Lines" unique_id=415046652]
 layout_mode = 2
 text = "Space — jump"
 
-[node name="MenuHelp" type="Label" parent="Hud/Panel/Lines"]
+[node name="MenuHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1126561867]
 layout_mode = 2
 text = "F10 — settings"
 
-[node name="SpeedLabel" type="Label" parent="Hud/Panel/Lines"]
+[node name="SpeedLabel" type="Label" parent="Hud/Panel/Lines" unique_id=1600821109]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Speed: 0.0 m/s"
 
-[node name="FpsCounter" parent="Hud" instance=ExtResource("8_fps")]
+[node name="FpsCounter" parent="Hud" unique_id=889670422 instance=ExtResource("8_fps")]
 
-[node name="CharacterState" type="PanelContainer" parent="Hud"]
+[node name="CharacterState" type="PanelContainer" parent="Hud" unique_id=379679227]
 visible = false
 anchors_preset = 1
 anchor_left = 1.0
@@ -115,22 +115,19 @@ offset_bottom = 44.0
 grow_horizontal = 0
 mouse_filter = 2
 
-[node name="Monitor" type="Label" parent="Hud/CharacterState" node_paths=PackedStringArray("character")]
+[node name="Monitor" type="Label" parent="Hud/CharacterState" unique_id=1413839158 node_paths=PackedStringArray("character")]
 custom_minimum_size = Vector2(380, 0)
 layout_mode = 2
 script = ExtResource("15_monitor")
 character = NodePath("../../../Player")
 
-[node name="DiscoveryToast" parent="Hud" instance=ExtResource("13_toast")]
+[node name="DiscoveryToast" parent="Hud" unique_id=1319316861 instance=ExtResource("13_toast")]
 
-[node name="StaminaBar" parent="Hud" node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
+[node name="StaminaBar" parent="Hud" unique_id=301746729 node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
 stamina = NodePath("../../Player/Stamina")
 
-[node name="SettingsApplier" type="Node" parent="." node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "path_view", "help_panel", "fps_counter", "character_state", "keys_help", "strafe_help", "sprint_help", "jump_help", "player_appearance", "player_hover", "player_silhouette")]
+[node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "player_appearance", "player_hover", "player_silhouette", "path_view", "help_panel", "fps_counter", "character_state", "keys_help", "strafe_help", "sprint_help", "jump_help")]
 script = ExtResource("9_applier")
-player_appearance = NodePath("../Player/Appearance")
-player_hover = NodePath("../Player/Visual/Hover")
-player_silhouette = NodePath("../Player/Silhouette")
 player = NodePath("../Player")
 player_actions = NodePath("../PlayerActionInput")
 ledge_guard = NodePath("../Player/LedgeGuard")
@@ -138,6 +135,9 @@ player_input = NodePath("../PlayerInput")
 camera_rig = NodePath("../CameraRig")
 camera_arm = NodePath("../CameraRig/CameraArm")
 character_sounds = NodePath("../Player/Sounds")
+player_appearance = NodePath("../Player/Appearance")
+player_hover = NodePath("../Player/Visual/Hover")
+player_silhouette = NodePath("../Player/Silhouette")
 path_view = NodePath("../PathView")
 help_panel = NodePath("../Hud/Panel")
 fps_counter = NodePath("../Hud/FpsCounter")
@@ -147,10 +147,10 @@ strafe_help = NodePath("../Hud/Panel/Lines/StrafeHelp")
 sprint_help = NodePath("../Hud/Panel/Lines/SprintHelp")
 jump_help = NodePath("../Hud/Panel/Lines/JumpHelp")
 
-[node name="UiRoot" parent="." instance=ExtResource("10_ui_root")]
+[node name="UiRoot" parent="." unique_id=414458971 instance=ExtResource("10_ui_root")]
 
 [connection signal="destination_picked" from="PlayerInput" to="ClickMarker" method="show_at"]
-[connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
 [connection signal="hold_pending_changed" from="PlayerInput" to="CameraRig" method="set_follow_paused"]
+[connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
 [connection signal="arrived" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]
 [connection signal="destination_cancelled" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]

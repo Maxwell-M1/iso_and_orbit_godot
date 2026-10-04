@@ -30,7 +30,9 @@ const float NOISE_CYCLES = 8.0;
 
 varying vec3 local_position;
 varying vec3 local_normal;
-varying vec3 half_extent;
+// The half sides of the box, flat: every pixel of a face gets the exact value; interpolated, it would differ in the last
+// digits from pixel to pixel.
+varying flat vec3 half_extent;
 varying vec3 world_position;
 
 void vertex() {

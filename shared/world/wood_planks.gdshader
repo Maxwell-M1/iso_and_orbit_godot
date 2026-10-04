@@ -52,7 +52,9 @@ struct Board {
 
 varying vec3 local_position;
 varying vec3 local_normal;
-varying vec3 half_extent;
+// The half sides of the box, flat: every pixel of a face gets the exact value. Interpolated, it would differ in the last
+// digits from pixel to pixel, and a count rounded at a half would differ too: the layout would flicker.
+varying flat vec3 half_extent;
 varying vec3 world_position;
 
 void vertex() {
@@ -118,7 +120,8 @@ Board board_at(vec2 f, vec2 extent, bool side, float seed) {
 	}
 	// Cladding: rows of planks across, inside the frame; planks end at the frame, the brace and the posts.
 	float inner_y = extent.y - frame;
-	float rows = max(1.0, round(2.0 * inner_y / plank_width));
+	// Rounded half up: round() may go either way at a half.
+	float rows = max(1.0, floor(2.0 * inner_y / plank_width + 0.5));
 	float width = 2.0 * inner_y / rows;
 	float row = clamp(floor((f.y + inner_y) / width), 0.0, rows - 1.0);
 	float at = f.y + inner_y - row * width;
@@ -198,7 +201,7 @@ void fragment() {
 		nail = min(length(af - corner), min(length(af - vec2(0.0, corner.y)), length(af - vec2(corner.x, 0.0))));
 	}
 	if (post_spacing > 0.0 && board.id.y > 90.0) {
-		float rows = max(1.0, round(2.0 * face_extent.y / plank_width));
+		float rows = max(1.0, floor(2.0 * face_extent.y / plank_width + 0.5));
 		float width = 2.0 * face_extent.y / rows;
 		float row_center = (clamp(floor((f.y + face_extent.y) / width), 0.0, rows - 1.0) + 0.5) * width - face_extent.y;
 		nail = length(vec2(board.grain.y, f.y - row_center));
