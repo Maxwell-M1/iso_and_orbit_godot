@@ -86,20 +86,20 @@ camera turns and the cursor moves with the world. It hides as soon as a press be
 touch it) and reappears on release where you aimed. The mouse mode meanwhile is `MOUSE_MODE_CONFINED_HIDDEN`: a plain
 hidden cursor could leave the window and appear at its edge. On macOS the engine confines the cursor by moving it on its
 own and counts every move that keeps the aim (below) a second time, so the aim drifts off. There the mode is
-`MOUSE_MODE_HIDDEN`, and the hidden system cursor does not follow the aim: in the editor's Game tab each such move
-reaches it a frame or two late, and the character would twitch on turns. The component moves its own cursor by the mouse
-movement, returns the system cursor to the center of the window when it reaches the edge, and on release puts it where
-you aimed. While the right button orbits the camera, the camera captures the cursor; release the right button with the
-left one still held and the cursor is hidden again. Pausing (the settings window) or switching to another window shows
-it at once. `is_cursor_hidden()` tells whether the component has hidden it.
+`MOUSE_MODE_HIDDEN`. The hidden system cursor does not follow the aim on any system: nobody sees it, and in the editor's
+Game tab on macOS each such move reaches it a frame or two late, so the character would twitch on turns. The component
+moves its own cursor by the mouse movement, returns the system cursor to the center of the window when it reaches the
+edge, and on release puts it where you aimed. While the right button orbits the camera, the camera captures the cursor;
+release the right button with the left one still held and the cursor is hidden again. Pausing (the settings window) or
+switching to another window shows it at once. `is_cursor_hidden()` tells whether the component has hidden it.
 
-**Keeps its aim** (`keep_aim_on_camera_turn`, on by default). While the left button is held, the running direction
-comes from the cursor, a point on the screen. If the camera turns while the cursor stays still on the screen, a
-different spot of ground is under the cursor, the character turns after it, the camera turns after the character,
-and the character runs in circles (77.6° in 1.25 s with the demo's 1.1 s catch-up time; with "instant" it just
-spins). So while the button is held, the component moves the system cursor with the world
-(`Viewport.warp_mouse()`): the cursor stays over the same spot of ground, the character runs where you aimed, and
-the camera eases behind it. Moving the mouse turns the character as usual. After release the cursor is left alone.
+**Keeps its aim** (`keep_aim_on_camera_turn`, on by default). While the left button is held, the running direction comes
+from the cursor, a point on the screen. If the camera turns while the cursor stays still on the screen, a different spot
+of ground is under the cursor, the character turns after it, the camera turns after the character, and the character
+runs in circles (77.6° in 1.25 s with the demo's 1.1 s catch-up time; with "instant" it just spins). So while the button
+is held, the component moves the cursor with the world (the visible system cursor with `Viewport.warp_mouse()`, a hidden
+one only on release): the cursor stays over the same spot of ground, the character runs where you aimed, and the camera
+eases behind it. Moving the mouse turns the character as usual. After release the cursor is left alone.
 
 Off, the cursor steers like a car: hold it to the right of the character and the character veers right until the
 cursor is straight ahead. Where the system cannot move the cursor (Wayland, for example), the running direction still

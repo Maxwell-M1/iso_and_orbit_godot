@@ -93,22 +93,22 @@ la cámara gira y el cursor se mueve con el mundo. Se oculta en cuanto una pulsa
 (un clic corto no lo toca) y reaparece al soltar, donde apuntaste. Mientras tanto, el modo del mouse es
 `MOUSE_MODE_CONFINED_HIDDEN`: un cursor simplemente oculto podría salir de la ventana y aparecer en su borde. En macOS
 el motor confina el cursor moviéndolo por su cuenta y cuenta dos veces cada movimiento que mantiene la mira (abajo), así
-que la mira se desvía. Allí el modo es `MOUSE_MODE_HIDDEN` y el cursor del sistema oculto no sigue la mira: en la
-pestaña Juego (Game) del editor cada uno de esos movimientos le llega uno o dos fotogramas tarde, y el personaje daría
-tirones en los giros. El componente mueve su propio cursor según el movimiento del mouse, devuelve el cursor del sistema
-al centro de la ventana cuando llega al borde y, al soltar, lo coloca donde apuntaste. Mientras el botón derecho orbita
-la cámara, la cámara captura el cursor; suelta el botón derecho con el izquierdo todavía mantenido y el cursor vuelve a
-quedar oculto. Al pausar (la ventana de configuración) o al cambiar a otra ventana, se muestra de inmediato.
-`is_cursor_hidden()` indica si el componente lo ha ocultado.
+que la mira se desvía. Allí el modo es `MOUSE_MODE_HIDDEN`. El cursor del sistema oculto no sigue la mira en ningún
+sistema: nadie lo ve, y en la pestaña Juego (Game) del editor en macOS cada uno de esos movimientos le llega uno o dos
+fotogramas tarde, así que el personaje daría tirones en los giros. El componente mueve su propio cursor según el
+movimiento del mouse, devuelve el cursor del sistema al centro de la ventana cuando llega al borde y, al soltar, lo
+coloca donde apuntaste. Mientras el botón derecho orbita la cámara, la cámara captura el cursor; suelta el botón derecho
+con el izquierdo todavía mantenido y el cursor vuelve a quedar oculto. Al pausar (la ventana de configuración) o al
+cambiar a otra ventana, se muestra de inmediato. `is_cursor_hidden()` indica si el componente lo ha ocultado.
 
 **Mantiene la mira** (`keep_aim_on_camera_turn`, activado por defecto). Mientras se mantiene el botón izquierdo, la
-dirección de carrera viene del cursor, un punto en la pantalla. Si la cámara gira mientras el cursor se queda quieto
-en la pantalla, bajo el cursor queda otro punto del suelo, el personaje gira tras él, la cámara gira tras el
-personaje y el personaje corre en círculos (77,6° en 1,25 s con el tiempo de alcance de 1,1 s de la demo; con "al
-instante" simplemente da vueltas sobre sí mismo). Por eso, mientras se mantiene el botón, el componente mueve el
-cursor del sistema junto con el mundo (`Viewport.warp_mouse()`): el cursor se queda sobre el mismo punto del suelo,
-el personaje corre adonde apuntaste y la cámara se coloca suavemente detrás. Mover el mouse gira al personaje como
-siempre. Después de soltar, el cursor queda libre.
+dirección de carrera viene del cursor, un punto en la pantalla. Si la cámara gira mientras el cursor se queda quieto en
+la pantalla, bajo el cursor queda otro punto del suelo, el personaje gira tras él, la cámara gira tras el personaje y el
+personaje corre en círculos (77,6° en 1,25 s con el tiempo de alcance de 1,1 s de la demo; con "al instante" simplemente
+da vueltas sobre sí mismo). Por eso, mientras se mantiene el botón, el componente mueve el cursor junto con el mundo (el
+cursor del sistema visible con `Viewport.warp_mouse()`, uno oculto solo al soltar): el cursor se queda sobre el mismo
+punto del suelo, el personaje corre adonde apuntaste y la cámara se coloca suavemente detrás. Mover el mouse gira al
+personaje como siempre. Después de soltar, el cursor queda libre.
 
 Desactivado, el cursor conduce como un auto: mantenlo a la derecha del personaje y el personaje se desvía a la derecha
 hasta que el cursor queda justo delante. Donde el sistema no puede mover el cursor (Wayland, por ejemplo), la

@@ -87,20 +87,20 @@ dönerken ve imleç dünyayla birlikte hareket ederken. Basış basılı tutmaya
 dokunmaz) ve bırakınca nişan aldığınız yerde yeniden belirir. Bu sırada fare modu `MOUSE_MODE_CONFINED_HIDDEN` olur:
 sıradan gizli bir imleç pencereden çıkıp kenarında belirebilirdi. macOS'ta motor imleci kendisi hareket ettirerek
 pencerede tutar ve hedefi korumak için yapılan her kaydırmayı (aşağıda) ikinci kez sayar, bu yüzden nişan kayar. Orada
-mod `MOUSE_MODE_HIDDEN` olur ve gizli sistem imleci nişanı izlemez: editörün Oyun (Game) sekmesinde bu kaydırmaların her
-biri ona bir iki kare geç ulaşır ve karakter dönüşlerde sarsılırdı. Bileşen kendi imlecini fare hareketiyle taşır,
-sistem imleci kenara ulaştığında onu pencerenin ortasına geri getirir ve bırakınca nişan aldığınız yere koyar. Sağ tuş
-kamerayı döndürürken imleci kamera yakalar; sol tuş hâlâ basılıyken sağ tuşu bırakırsanız imleç yeniden gizlenir.
-Duraklatma (ayarlar penceresi) veya başka bir pencereye geçme imleci hemen gösterir. `is_cursor_hidden()`, bileşenin
-imleci gizleyip gizlemediğini söyler.
+mod `MOUSE_MODE_HIDDEN` olur. Gizli sistem imleci hiçbir sistemde nişanı izlemez: onu kimse görmez, macOS'ta editörün
+Oyun (Game) sekmesinde de bu kaydırmaların her biri ona bir iki kare geç ulaşır ve karakter dönüşlerde sarsılırdı.
+Bileşen kendi imlecini fare hareketiyle taşır, sistem imleci kenara ulaştığında onu pencerenin ortasına geri getirir ve
+bırakınca nişan aldığınız yere koyar. Sağ tuş kamerayı döndürürken imleci kamera yakalar; sol tuş hâlâ basılıyken sağ
+tuşu bırakırsanız imleç yeniden gizlenir. Duraklatma (ayarlar penceresi) veya başka bir pencereye geçme imleci hemen
+gösterir. `is_cursor_hidden()`, bileşenin imleci gizleyip gizlemediğini söyler.
 
 **Hedefini korur** (`keep_aim_on_camera_turn`, varsayılan olarak açık). Sol tuş basılıyken koşu yönü imleçten, yani
 ekrandaki bir noktadan gelir. İmleç ekranda sabit dururken kamera dönerse imlecin altına zeminin farklı bir noktası
 gelir, karakter ona doğru döner, kamera karakterin ardından döner ve karakter daireler çizerek koşar (demonun 1,1 sn
-yetişme süresiyle 1,25 sn'de 77,6°; "anında" ile yerinde fırıl fırıl döner). Bu yüzden tuş basılıyken bileşen sistem
-imlecini dünyayla birlikte hareket ettirir (`Viewport.warp_mouse()`): imleç zeminde aynı noktanın üstünde kalır,
-karakter nişan aldığınız yere koşar ve kamera yavaşça arkasına geçer. Fareyi hareket ettirmek karakteri her zamanki
-gibi döndürür. Bırakıldıktan sonra imlece dokunulmaz.
+yetişme süresiyle 1,25 sn'de 77,6°; "anında" ile yerinde fırıl fırıl döner). Bu yüzden tuş basılıyken bileşen imleci
+dünyayla birlikte hareket ettirir (görünür sistem imlecini `Viewport.warp_mouse()` ile, gizli olanı yalnızca bırakınca):
+imleç zeminde aynı noktanın üstünde kalır, karakter nişan aldığınız yere koşar ve kamera yavaşça arkasına geçer. Fareyi
+hareket ettirmek karakteri her zamanki gibi döndürür. Bırakıldıktan sonra imlece dokunulmaz.
 
 Kapalıyken imleç bir araba gibi yönlendirir: imleci karakterin sağında tutun, karakter imleç tam önüne gelene kadar
 sağa kıvrılır. Sistemin imleci hareket ettiremediği yerlerde (örneğin Wayland) koşu yönü yine korunur, ancak imleç

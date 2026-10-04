@@ -67,7 +67,7 @@ enum HoldMode {
 	FOLLOW_POINT,
 }
 
-## On macOS, how close to the window edge the hidden system cursor may come before it is returned to the center (see
+## How close to the window edge the hidden system cursor may come before it is returned to the center (see
 ## [method _is_cursor_roaming]).
 const _EDGE_MARGIN := 8.0
 ## How long after the system cursor is moved mouse positions from before the move may still arrive: in the editor's
@@ -226,7 +226,7 @@ func _process(_delta: float) -> void:
 		_late_until_msec = 0
 		_has_aim = false
 		if _is_cursor_roaming():
-			# The engine does not keep this hidden cursor in the window (see _hidden_mouse_mode): bring it back.
+			# On macOS the engine does not keep the hidden cursor in the window (see _hidden_mouse_mode): bring it back.
 			_cursor = _clamp_to_window(mouse)
 			if _cursor != mouse:
 				get_viewport().warp_mouse(_cursor)
@@ -330,8 +330,8 @@ func _run_to_click_point() -> void:
 
 
 ## The cursor stays over the same ground point (relative to the character's feet) however the camera moves, and mouse
-## movement moves it as usual. The system cursor is moved there too (a hidden one on macOS only when it is shown again,
-## see [method _is_cursor_roaming]).
+## movement moves it as usual. The system cursor is moved there too (a hidden one only when it is shown again, see
+## [method _is_cursor_roaming]).
 func _keep_aim(mouse: Vector2) -> void:
 	var view := _get_camera()
 	if view == null:
@@ -386,13 +386,13 @@ func _recenter_system_cursor() -> void:
 	_mouse_seen = get_viewport().get_mouse_position()
 
 
-## On macOS the hidden system cursor does not follow the aim every frame. In the editor's Game view the engine moves
-## it a frame or two after [method Viewport.warp_mouse], and mouse positions from before the move keep arriving
-## meanwhile: the aim would jump back and forth while the camera turns, and the character would twitch. So the
-## component moves its own cursor by the mouse movement, returns the system cursor to the center of the window when it
-## comes to the window edge, and puts it where the aim is when it shows it again.
+## The hidden system cursor does not follow the aim every frame. Nobody sees it, and where the system moves it late
+## (in the editor's Game view on macOS, a frame or two after [method Viewport.warp_mouse], while mouse positions from
+## before the move keep arriving), the aim would jump back and forth while the camera turns, and the character would
+## twitch. So the component moves its own cursor by the mouse movement, returns the system cursor to the center of the
+## window when it comes to the window edge, and puts it where the aim is when it shows it again.
 func _is_cursor_roaming() -> bool:
-	return _cursor_hidden and _hidden_mouse_mode == Input.MOUSE_MODE_HIDDEN and Input.mouse_mode == _hidden_mouse_mode
+	return _cursor_hidden and Input.mouse_mode == _hidden_mouse_mode
 
 
 ## Hides the cursor while running with the button held ([member hide_cursor_while_held]) and shows it afterward. Only
