@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ dabbac251e72 -->
+<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
 # Configuración
 
 > Esta es una traducción del [original en inglés](../en/settings.md).
@@ -108,4 +108,4 @@ de alcance sin el seguimiento ni la alineación de la inclinación.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

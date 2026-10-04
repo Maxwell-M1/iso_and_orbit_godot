@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 77aade651b48 -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 6c214bf8ea42 -->
 # オービットカメラ
 
 [English](README.md) · [Español](README.es.md) · **日本語** · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -41,4 +41,4 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

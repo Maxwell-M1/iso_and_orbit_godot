@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 8409307c5782 -->
+<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
 # Mimari
 
 > Bu, [İngilizce orijinalin](../en/architecture.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -201,4 +201,4 @@ Bileşenlerin kendileri ayarları hiçbir zaman okumaz, bkz. [Ayarlar](settings.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 3f969cf9dfdc -->
+<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
 # Интерфейс
 
 > Это перевод [английского оригинала](../../en/systems/ui.md). При расхождениях верен оригинал.
@@ -135,4 +135,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

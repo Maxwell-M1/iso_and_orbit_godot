@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ dabbac251e72 -->
+<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
 # 設定
 
 > これは[英語の原文](../en/settings.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -89,4 +89,4 @@ UIスケールは、ヒント、FPSカウンター、スタミナバー、ウィ
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

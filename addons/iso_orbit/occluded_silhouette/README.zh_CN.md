@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ 9da2f485c778 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ ed5707ab8355 -->
 # 遮挡剪影
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文**
@@ -38,4 +38,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

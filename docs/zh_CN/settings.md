@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ dabbac251e72 -->
+<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
 # 设置
 
 > 本文是[英文原文](../en/settings.md)的翻译。两者不一致时，以英文版为准。
@@ -89,4 +89,4 @@ F10 打开设置窗口并暂停游戏；按 Esc 或 F10 关闭。更改立即生
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

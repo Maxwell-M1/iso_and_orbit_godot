@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ ac381bae4d1d -->
+<!-- translation of docs/en/index.md @ b40c280f0207 -->
 # Belgeler
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · **Türkçe** · [简体中文](../zh_CN/index.md)
@@ -48,4 +48,4 @@ doğrudur.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

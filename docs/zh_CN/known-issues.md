@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # 已知问题
 
 > 本文是[英文原文](../en/known-issues.md)的翻译。两者不一致时，以英文版为准。
@@ -42,4 +42,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

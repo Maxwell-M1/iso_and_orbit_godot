@@ -123,4 +123,4 @@ your own, and take the controls from `gdscript/ui/settings/`; see [UI](systems/u
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

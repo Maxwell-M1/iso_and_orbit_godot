@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 22bbe02ebe51 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ c944f71371be -->
 # 地面角色
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文**
@@ -50,4 +50,4 @@ AI 也可以驱动同一个身体：调用 `NavigationMover.move_to()` 和 `Grou
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

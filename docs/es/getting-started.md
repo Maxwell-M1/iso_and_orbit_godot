@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ ec03eff6cca9 -->
+<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
 # Primeros pasos
 
 > Esta es una traducción del [original en inglés](../en/getting-started.md).
@@ -67,4 +67,4 @@ obtener el código de salida. En un clon nuevo, importa primero el proyecto una 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

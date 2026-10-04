@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # ワールドとナビゲーション
 
 > これは[英語の原文](../../en/systems/world-and-navigation.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -118,4 +118,4 @@ Recastのメッシュは、地面からセルの高さ約2つ分浮いていま�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

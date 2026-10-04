@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ 70a550884801 -->
+<!-- translation of docs/en/testing.md @ 9fd6c842b560 -->
 # Testler
 
 > Bu, [İngilizce orijinalin](../en/testing.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -82,4 +82,4 @@ o çalıştırma için tüm oyunu bozar. Ayarlar düğümünü `_tree.root.get_n
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

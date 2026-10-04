@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # Bilinen sorunlar
 
 > Bu, [İngilizce orijinalin](../en/known-issues.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -81,4 +81,4 @@ gerektiğini söyler.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

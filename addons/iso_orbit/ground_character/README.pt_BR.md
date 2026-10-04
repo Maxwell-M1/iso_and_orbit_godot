@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 22bbe02ebe51 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ c944f71371be -->
 # Personagem terrestre
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · **Português (Brasil)** · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -58,4 +58,4 @@ No repositório do template: `docs/pt_BR/integration.md`, `docs/pt_BR/systems/lo
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

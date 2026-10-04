@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 9c463782c813 -->
+<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
 # Kendi projenizde kullanma
 
 > Bu, [İngilizce orijinalin](../en/integration.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -136,4 +136,4 @@ arayüz öğelerini `gdscript/ui/settings/` içinden alın; bkz. [Arayüz](syste
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

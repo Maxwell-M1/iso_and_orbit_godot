@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 7b2e479acc2d -->
+<!-- translation of docs/en/systems/characters.md @ 1eac13a73cbf -->
 # Personajes
 
 > Esta es una traducción del [original en inglés](../../en/systems/characters.md).
@@ -135,4 +135,4 @@ cualquier otra escena.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

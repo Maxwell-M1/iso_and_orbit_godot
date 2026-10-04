@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # Известные проблемы
 
 > Это перевод [английского оригинала](../en/known-issues.md). При расхождениях верен оригинал.
@@ -79,4 +79,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ 551102f71d1a -->
+<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
 # Áudio
 
 > Esta é uma tradução do [original em inglês](../../en/systems/audio.md).
@@ -48,4 +48,4 @@ Sons reais gravados podem substituir estes: coloque arquivos com os mesmos nomes
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

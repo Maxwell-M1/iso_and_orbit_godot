@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 22bbe02ebe51 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ c944f71371be -->
 # Zemin Karakteri
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
@@ -60,4 +60,4 @@ Aynı gövdeyi yapay zekâ da yönetebilir: `NavigationMover.move_to()` ve `Grou
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

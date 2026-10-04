@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # 既知の問題
 
 > これは[英語の原文](../en/known-issues.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -42,4 +42,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ui_screens/README.md @ b7618a65d4df -->
+<!-- translation of addons/iso_orbit/ui_screens/README.md @ fe8d4c35a41a -->
 # Arayüz Pencereleri
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
@@ -41,4 +41,4 @@ Görünüm proje temasından gelir; `FpsCounter`, `FpsCounter` tema türü varya
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

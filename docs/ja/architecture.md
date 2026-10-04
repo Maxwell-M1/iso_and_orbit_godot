@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 8409307c5782 -->
+<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
 # アーキテクチャ
 
 > これは[英語の原文](../en/architecture.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -160,4 +160,4 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

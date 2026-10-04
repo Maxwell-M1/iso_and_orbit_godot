@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # Dünya ve navigasyon
 
 > Bu, [İngilizce orijinalin](../../en/systems/world-and-navigation.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -205,4 +205,4 @@ editördeki Hata Ayıklama → Görünür Navigasyon (Debug → Visible Navigati
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

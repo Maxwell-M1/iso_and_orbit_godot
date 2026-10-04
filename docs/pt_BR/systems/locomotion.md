@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 1ec8642147fb -->
+<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
 # Locomoção
 
 > Esta é uma tradução do [original em inglês](../../en/systems/locomotion.md).
@@ -202,4 +202,4 @@ mudá-las.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

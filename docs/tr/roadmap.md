@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 8e61c7584e54 -->
+<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
 # Yol haritası
 
 > Bu, [İngilizce orijinalin](../en/roadmap.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -17,4 +17,4 @@ Belirli bir sıra olmadan planlanan çalışmalar. Buradakilerin hiçbiri henüz
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

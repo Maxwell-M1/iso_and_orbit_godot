@@ -2,7 +2,7 @@
 
 **English** · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
-Version 1.0.0 · Godot 4.7 (tested on 4.7.2) · GDScript · MIT
+Version 1.1.0 · Godot 4.7 (tested on 4.7.2) · GDScript · MIT
 
 A click-to-move character controller and an orbit camera for isometric and top-down RPGs. Click the ground and
 the hero runs there, pathing around obstacles; hold the button and the hero follows the cursor. The camera
@@ -191,4 +191,4 @@ MIT, see [LICENSE](LICENSE). Exception: `icon.svg`, the Godot logo by Andrea Cal
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

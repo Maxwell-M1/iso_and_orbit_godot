@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 55e4adada582 -->
+<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
 # カメラ
 
 > これは[英語の原文](../../en/systems/camera.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -126,4 +126,4 @@ Joltは、キャストの開始時点で球が触れているボディを報告�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

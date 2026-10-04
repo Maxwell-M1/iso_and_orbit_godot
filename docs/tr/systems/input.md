@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 6012ceb531ff -->
+<!-- translation of docs/en/systems/input.md @ 4f1e5987b000 -->
 # Girdi
 
 > Bu, [İngilizce orijinalin](../../en/systems/input.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -165,4 +165,4 @@ takılı kalır; bunu Windows ayarlarından kapatın.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

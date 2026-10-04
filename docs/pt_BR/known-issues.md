@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # Problemas conhecidos
 
 > Esta é uma tradução do [original em inglês](../en/known-issues.md).
@@ -81,4 +81,4 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

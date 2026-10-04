@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 8e61c7584e54 -->
+<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
 # Hoja de ruta
 
 > Esta es una traducción del [original en inglés](../en/roadmap.md).
@@ -19,4 +19,4 @@ Trabajo planificado, sin un orden particular. Nada de esto está implementado to
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

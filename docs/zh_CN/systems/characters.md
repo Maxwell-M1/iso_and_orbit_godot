@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 7b2e479acc2d -->
+<!-- translation of docs/en/systems/characters.md @ 1eac13a73cbf -->
 # 角色
 
 > 本文是[英文原文](../../en/systems/characters.md)的翻译。两者不一致时，以英文版为准。
@@ -93,4 +93,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

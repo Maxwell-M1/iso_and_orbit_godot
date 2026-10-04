@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 6012ceb531ff -->
+<!-- translation of docs/en/systems/input.md @ 4f1e5987b000 -->
 # Ввод
 
 > Это перевод [английского оригинала](../../en/systems/input.md). При расхождениях верен оригинал.
@@ -166,4 +166,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

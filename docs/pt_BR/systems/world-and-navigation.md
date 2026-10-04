@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # Mundo e navegação
 
 > Esta é uma tradução do [original em inglês](../../en/systems/world-and-navigation.md).
@@ -209,4 +209,4 @@ Depurar → Navegação Visível (Debug → Visible Navigation) no editor mostra
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

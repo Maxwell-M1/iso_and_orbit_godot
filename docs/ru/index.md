@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ ac381bae4d1d -->
+<!-- translation of docs/en/index.md @ b40c280f0207 -->
 # Документация
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · **Русский** · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -48,4 +48,4 @@ Godot 4.7, с демо-уровнем. Общий обзор — в [README](../
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

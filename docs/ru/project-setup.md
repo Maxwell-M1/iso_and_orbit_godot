@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ 6e49af9494f6 -->
+<!-- translation of docs/en/project-setup.md @ 7a7b1e97933c -->
 # Настройка проекта
 
 > Это перевод [английского оригинала](../en/project-setup.md). При расхождениях верен оригинал.
@@ -76,4 +76,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

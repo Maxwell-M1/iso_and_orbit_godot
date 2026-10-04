@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ 6e49af9494f6 -->
+<!-- translation of docs/en/project-setup.md @ 7a7b1e97933c -->
 # Preparación del proyecto
 
 > Esta es una traducción del [original en inglés](../en/project-setup.md).
@@ -78,4 +78,4 @@ volver a los valores por defecto, o usa **Restablecer todo** en la ventana de co
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

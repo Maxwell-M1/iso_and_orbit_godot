@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 55e4adada582 -->
+<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
 # Cámara
 
 > Esta es una traducción del [original en inglés](../../en/systems/camera.md).
@@ -185,4 +185,4 @@ De `tests/camera_checks.gd` y `tests/camera_arm_checks.gd`:
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

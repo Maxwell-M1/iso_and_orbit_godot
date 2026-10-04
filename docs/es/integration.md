@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 9c463782c813 -->
+<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
 # Uso en tu proyecto
 
 > Esta es una traducción del [original en inglés](../en/integration.md).
@@ -136,4 +136,4 @@ regístralo como el autoload `Settings`, reemplaza sus claves y `DEFAULTS` por l
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

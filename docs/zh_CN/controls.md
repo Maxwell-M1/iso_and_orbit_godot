@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ b096a8a367b0 -->
+<!-- translation of docs/en/controls.md @ 4a1d22271190 -->
 # 操作
 
 > 本文是[英文原文](../en/controls.md)的翻译。两者不一致时，以英文版为准。
@@ -71,4 +71,4 @@ WASD 只在按住右键时有效，否则不起作用。模式分别针对单独
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

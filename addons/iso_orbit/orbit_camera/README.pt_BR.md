@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 77aade651b48 -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 6c214bf8ea42 -->
 # Câmera orbital
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · **Português (Brasil)** · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -47,4 +47,4 @@ como o braço funciona) e `docs/pt_BR/project-setup.md`.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

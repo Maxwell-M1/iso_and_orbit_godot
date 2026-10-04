@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 7b2e479acc2d -->
+<!-- translation of docs/en/systems/characters.md @ 1eac13a73cbf -->
 # Персонажи
 
 > Это перевод [английского оригинала](../../en/systems/characters.md). При расхождениях верен оригинал.
@@ -127,4 +127,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

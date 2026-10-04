@@ -1,11 +1,11 @@
-<!-- translation of README.md @ ed3c07c99517 -->
+<!-- translation of README.md @ 6853806db277 -->
 # Iso & Orbit - Kamera ve Karakter Kontrolcüsü Şablonu
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
 
 > Bu, [İngilizce orijinalin](README.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
-Sürüm 1.0.0 · Godot 4.7 (4.7.2 üzerinde test edildi) · GDScript · MIT
+Sürüm 1.1.0 · Godot 4.7 (4.7.2 üzerinde test edildi) · GDScript · MIT
 
 İzometrik ve yukarıdan bakışlı RPG'ler için tıklayarak hareket eden bir karakter kontrolcüsü ve bir yörünge kamerası.
 Zemine tıklayın, kahraman engellerin etrafından dolanarak oraya koşar; tuşu basılı tutun, kahraman imleci izler.
@@ -198,4 +198,4 @@ MIT, bkz. [LICENSE](LICENSE). İstisna: `icon.svg`, Andrea Calabró'nun Godot lo
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

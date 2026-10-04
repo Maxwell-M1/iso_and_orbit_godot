@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 8409307c5782 -->
+<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
 # Arquitectura
 
 > Esta es una traducción del [original en inglés](../en/architecture.md).
@@ -200,4 +200,4 @@ a `gdscript/`. Por ahora quedan dos excepciones: `world.tscn` y `mountain.tscn` 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

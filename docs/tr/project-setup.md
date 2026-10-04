@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ 6e49af9494f6 -->
+<!-- translation of docs/en/project-setup.md @ 7a7b1e97933c -->
 # Proje yapılandırması
 
 > Bu, [İngilizce orijinalin](../en/project-setup.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -76,4 +76,4 @@ penceresinde **Tümünü sıfırla** düğmesini kullanın.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

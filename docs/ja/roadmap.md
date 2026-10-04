@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 8e61c7584e54 -->
+<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
 # ロードマップ
 
 > これは[英語の原文](../en/roadmap.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -11,4 +11,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

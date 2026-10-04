@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 77aade651b48 -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 6c214bf8ea42 -->
 # 环绕相机
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文**
@@ -41,4 +41,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

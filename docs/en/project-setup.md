@@ -72,4 +72,4 @@ Data Folder). Delete the file to return to the defaults, or use **Reset all** in
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

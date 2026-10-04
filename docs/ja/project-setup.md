@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ 6e49af9494f6 -->
+<!-- translation of docs/en/project-setup.md @ 7a7b1e97933c -->
 # プロジェクトのセットアップ
 
 > これは[英語の原文](../en/project-setup.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -68,4 +68,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

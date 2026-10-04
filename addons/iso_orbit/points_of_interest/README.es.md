@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 4bf86f099c43 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 6dce2786aac6 -->
 # Puntos de interés
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -38,4 +38,4 @@ En el repositorio de la plantilla: `docs/es/systems/world-and-navigation.md` y `
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

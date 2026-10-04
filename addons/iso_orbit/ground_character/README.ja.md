@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 22bbe02ebe51 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ c944f71371be -->
 # 地上キャラクター
 
 [English](README.md) · [Español](README.es.md) · **日本語** · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -50,4 +50,4 @@ AIも同じボディを動かせます：`NavigationMover.move_to()`と`GroundCh
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

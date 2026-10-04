@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ c34a86f53e66 -->
+<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
 # Sözlük
 
 > Bu, [İngilizce orijinalin](../en/glossary.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -43,4 +43,4 @@ Terimler, bu belgelerde ve kodda kullanıldıkları anlamıyla.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

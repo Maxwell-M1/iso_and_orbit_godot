@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 3f969cf9dfdc -->
+<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
 # UI
 
 > これは[英語の原文](../../en/systems/ui.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -92,4 +92,4 @@ UIスケールはルートウィンドウの`content_scale_factor`です。ス�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

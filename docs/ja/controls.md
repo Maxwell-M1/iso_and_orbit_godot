@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ b096a8a367b0 -->
+<!-- translation of docs/en/controls.md @ 4a1d22271190 -->
 # 操作方法
 
 > これは[英語の原文](../en/controls.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -71,4 +71,4 @@ WASDは右ボタンを押している間だけ機能します。押していな�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

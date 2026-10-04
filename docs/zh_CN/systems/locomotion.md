@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 1ec8642147fb -->
+<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
 # 移动
 
 > 本文是[英文原文](../../en/systems/locomotion.md)的翻译。两者不一致时，以英文版为准。
@@ -155,4 +155,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

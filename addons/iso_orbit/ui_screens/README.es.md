@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ui_screens/README.md @ b7618a65d4df -->
+<!-- translation of addons/iso_orbit/ui_screens/README.md @ fe8d4c35a41a -->
 # Pantallas de UI
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -41,4 +41,4 @@ En el repositorio de la plantilla: `docs/es/systems/ui.md`.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

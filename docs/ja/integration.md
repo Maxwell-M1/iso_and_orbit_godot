@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 9c463782c813 -->
+<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
 # プロジェクトへの組み込み
 
 > これは[英語の原文](../en/integration.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -97,4 +97,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

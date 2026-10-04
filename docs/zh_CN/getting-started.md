@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ ec03eff6cca9 -->
+<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
 # 快速上手
 
 > 本文是[英文原文](../en/getting-started.md)的翻译。两者不一致时，以英文版为准。
@@ -54,4 +54,4 @@ godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

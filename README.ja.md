@@ -1,11 +1,11 @@
-<!-- translation of README.md @ ed3c07c99517 -->
+<!-- translation of README.md @ 6853806db277 -->
 # Iso & Orbit - Camera and Character Controller Template
 
 [English](README.md) · [Español](README.es.md) · **日本語** · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
 > これは[英語の原文](README.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
 
-バージョン 1.0.0 · Godot 4.7（4.7.2でテスト済み） · GDScript · MIT
+バージョン 1.1.0 · Godot 4.7（4.7.2でテスト済み） · GDScript · MIT
 
 アイソメトリックやトップダウンのRPG向けの、クリック移動式キャラクターコントローラーとオービットカメラです。地面をクリックすると、主人公は障害物を避けながらそこへ走ります。ボタンを長押しすると、主人公はカーソルを追いかけます。カメラは回転とズームができ、壁にめり込みません。
 
@@ -157,4 +157,4 @@ MIT。[LICENSE](LICENSE)を参照してください。例外：`icon.svg`（Andr
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

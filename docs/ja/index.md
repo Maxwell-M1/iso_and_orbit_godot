@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ ac381bae4d1d -->
+<!-- translation of docs/en/index.md @ b40c280f0207 -->
 # ドキュメント
 
 [English](../en/index.md) · [Español](../es/index.md) · **日本語** · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -40,4 +40,4 @@ Godot 4.7でアイソメトリックやトップダウンのRPGを作るため�
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

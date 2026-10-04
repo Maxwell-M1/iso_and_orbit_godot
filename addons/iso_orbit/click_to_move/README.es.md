@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 784d979b2a2a -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fabef0a2f5e6 -->
 # Movimiento por clic
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -63,4 +63,4 @@ En el repositorio de la plantilla: `docs/es/integration.md`, `docs/es/systems/lo
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

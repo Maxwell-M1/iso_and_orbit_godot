@@ -1,11 +1,11 @@
-<!-- translation of README.md @ ed3c07c99517 -->
+<!-- translation of README.md @ 6853806db277 -->
 # Iso & Orbit - Plantilla de cámara y controlador de personaje
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
 > Esta es una traducción del [original en inglés](README.md). Si hay diferencias, la versión en inglés es la correcta.
 
-Versión 1.0.0 · Godot 4.7 (probado en 4.7.2) · GDScript · MIT
+Versión 1.1.0 · Godot 4.7 (probado en 4.7.2) · GDScript · MIT
 
 Un controlador de personaje con movimiento por clic y una cámara orbital para RPG isométricos y cenitales. Haz clic
 en el suelo y el héroe corre hasta allí, rodeando los obstáculos; mantén el botón y el héroe sigue al cursor. La
@@ -199,4 +199,4 @@ MIT, ver [LICENSE](LICENSE). Excepción: `icon.svg`, el logo de Godot de Andrea 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

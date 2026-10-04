@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ b096a8a367b0 -->
+<!-- translation of docs/en/controls.md @ 4a1d22271190 -->
 # Controles
 
 > Esta é uma tradução do [original em inglês](../en/controls.md).
@@ -96,4 +96,4 @@ Detalhes: [Locomoção](systems/locomotion.md).
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

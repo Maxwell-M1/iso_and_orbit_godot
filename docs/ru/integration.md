@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 9c463782c813 -->
+<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
 # Использование в своём проекте
 
 > Это перевод [английского оригинала](../en/integration.md). При расхождениях верен оригинал.
@@ -129,4 +129,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

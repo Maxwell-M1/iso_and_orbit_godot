@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ 70a550884801 -->
+<!-- translation of docs/en/testing.md @ 9fd6c842b560 -->
 # テスト
 
 > これは[英語の原文](../en/testing.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -63,4 +63,4 @@ godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd -- c
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 1ec8642147fb -->
+<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
 # Передвижение
 
 > Это перевод [английского оригинала](../../en/systems/locomotion.md). При расхождениях верен оригинал.
@@ -197,4 +197,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

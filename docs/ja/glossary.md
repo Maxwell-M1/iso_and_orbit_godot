@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ c34a86f53e66 -->
+<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
 # 用語集
 
 > これは[英語の原文](../en/glossary.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -43,4 +43,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

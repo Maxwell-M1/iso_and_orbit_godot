@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 55e4adada582 -->
+<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
 # Камера
 
 > Это перевод [английского оригинала](../../en/systems/camera.md). При расхождениях верен оригинал.
@@ -172,4 +172,4 @@ Jolt не сообщает о телах, которых сфера касает
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

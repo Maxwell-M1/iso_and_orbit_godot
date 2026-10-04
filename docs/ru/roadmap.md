@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 8e61c7584e54 -->
+<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
 # Планы
 
 > Это перевод [английского оригинала](../en/roadmap.md). При расхождениях верен оригинал.
@@ -16,4 +16,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

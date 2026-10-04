@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 8409307c5782 -->
+<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
 # 架构
 
 > 本文是[英文原文](../en/architecture.md)的翻译。两者不一致时，以英文版为准。
@@ -160,4 +160,4 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

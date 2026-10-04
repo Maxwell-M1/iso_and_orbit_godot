@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # Мир и навигация
 
 > Это перевод [английского оригинала](../../en/systems/world-and-navigation.md). При расхождениях верен оригинал.
@@ -196,4 +196,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

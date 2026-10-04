@@ -193,4 +193,4 @@ live in `shared/world/props/`. See [Known issues](known-issues.md).
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

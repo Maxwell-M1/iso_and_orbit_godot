@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 4b99df29bb4c -->
+<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
 # Problemas conocidos
 
 > Esta es una traducción del [original en inglés](../en/known-issues.md).
@@ -86,4 +86,4 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

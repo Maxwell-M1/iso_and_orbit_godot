@@ -72,4 +72,4 @@ Limitations of the project and engine quirks it works around. Each entry says wh
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

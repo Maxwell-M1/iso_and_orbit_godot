@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ b096a8a367b0 -->
+<!-- translation of docs/en/controls.md @ 4a1d22271190 -->
 # Kontroller
 
 > Bu, [İngilizce orijinalin](../en/controls.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -94,4 +94,4 @@ Ayrıntılar: [Hareket](systems/locomotion.md).
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

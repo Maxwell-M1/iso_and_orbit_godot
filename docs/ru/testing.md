@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ 70a550884801 -->
+<!-- translation of docs/en/testing.md @ 9fd6c842b560 -->
 # Тесты
 
 > Это перевод [английского оригинала](../en/testing.md). При расхождениях верен оригинал.
@@ -82,4 +82,4 @@ godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd -- c
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

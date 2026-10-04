@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 3f969cf9dfdc -->
+<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
 # Interfaz de usuario
 
 > Esta es una traducción del [original en inglés](../../en/systems/ui.md).
@@ -143,4 +143,4 @@ listados en `SCRIPT_STRINGS` en `tests/localization_checks.gd`, así que agrega 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

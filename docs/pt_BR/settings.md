@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ dabbac251e72 -->
+<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
 # Configurações
 
 > Esta é uma tradução do [original em inglês](../en/settings.md).
@@ -107,4 +107,4 @@ seguir nem o alinhamento da inclinação.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

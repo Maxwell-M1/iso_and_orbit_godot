@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 1ec8642147fb -->
+<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
 # ロコモーション
 
 > これは[英語の原文](../../en/systems/locomotion.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -155,4 +155,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.0.0 に対応しています。*
+*このページは Iso & Orbit 1.1.0 に対応しています。*

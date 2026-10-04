@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ 551102f71d1a -->
+<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
 # Звук
 
 > Это перевод [английского оригинала](../../en/systems/audio.md). При расхождениях верен оригинал.
@@ -46,4 +46,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

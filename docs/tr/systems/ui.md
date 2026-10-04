@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 3f969cf9dfdc -->
+<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
 # Arayüz
 
 > Bu, [İngilizce orijinalin](../../en/systems/ui.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -138,4 +138,4 @@ birlikte bir `msgid` ekleyin. Test metinleri sahnelerden toplar; yalnızca betik
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

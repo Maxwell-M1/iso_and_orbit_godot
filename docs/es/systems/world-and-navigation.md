@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # Mundo y navegación
 
 > Esta es una traducción del [original en inglés](../../en/systems/world-and-navigation.md).
@@ -219,4 +219,4 @@ Configuración (F10) → Interfaz → **Línea de ruta del personaje** muestra l
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

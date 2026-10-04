@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 9c463782c813 -->
+<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
 # 在你的项目中使用
 
 > 本文是[英文原文](../en/integration.md)的翻译。两者不一致时，以英文版为准。
@@ -97,4 +97,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

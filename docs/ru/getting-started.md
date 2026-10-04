@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ ec03eff6cca9 -->
+<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
 # Начало работы
 
 > Это перевод [английского оригинала](../en/getting-started.md). При расхождениях верен оригинал.
@@ -64,4 +64,4 @@ godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd
 
 ---
 
-*Страница соответствует Iso & Orbit 1.0.0.*
+*Страница соответствует Iso & Orbit 1.1.0.*

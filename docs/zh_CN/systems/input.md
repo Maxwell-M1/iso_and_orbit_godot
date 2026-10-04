@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 6012ceb531ff -->
+<!-- translation of docs/en/systems/input.md @ 4f1e5987b000 -->
 # 输入
 
 > 本文是[英文原文](../../en/systems/input.md)的翻译。两者不一致时，以英文版为准。
@@ -112,4 +112,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

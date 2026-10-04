@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 7b2e479acc2d -->
+<!-- translation of docs/en/systems/characters.md @ 1eac13a73cbf -->
 # Karakterler
 
 > Bu, [İngilizce orijinalin](../../en/systems/characters.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -132,4 +132,4 @@ gibi düzenleyin.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

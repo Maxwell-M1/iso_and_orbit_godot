@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 55e4adada582 -->
+<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
 # Kamera
 
 > Bu, [İngilizce orijinalin](../../en/systems/camera.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -174,4 +174,4 @@ gövde varsa (arkasında uçurum olan bir çit), boş alan hedefe daha yakında 
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

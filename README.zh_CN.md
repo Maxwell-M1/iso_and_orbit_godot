@@ -1,11 +1,11 @@
-<!-- translation of README.md @ ed3c07c99517 -->
+<!-- translation of README.md @ 6853806db277 -->
 # Iso & Orbit - 相机与角色控制器模板
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文**
 
 > 本文是[英文原文](README.md)的翻译。两者不一致时，以英文版为准。
 
-版本 1.0.0 · Godot 4.7（已在 4.7.2 上测试）· GDScript · MIT
+版本 1.1.0 · Godot 4.7（已在 4.7.2 上测试）· GDScript · MIT
 
 适用于等距视角和俯视角 RPG 的点击移动角色控制器与环绕相机。点击地面，英雄就会绕开障碍物跑过去；按住按键，英雄会跟随光标。相机可以环绕旋转、缩放，并且不会穿墙。
 
@@ -157,4 +157,4 @@ MIT，见 [LICENSE](LICENSE)。例外：`icon.svg` 是 Andrea Calabró 设计的
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

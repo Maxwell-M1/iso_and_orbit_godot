@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 6012ceb531ff -->
+<!-- translation of docs/en/systems/input.md @ 4f1e5987b000 -->
 # Entrada
 
 > Esta es una traducción del [original en inglés](../../en/systems/input.md).
@@ -176,4 +176,4 @@ el propio sistema; desactívalas en la configuración de Windows.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

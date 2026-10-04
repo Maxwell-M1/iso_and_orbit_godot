@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ dabbac251e72 -->
+<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
 # Ayarlar
 
 > Bu, [İngilizce orijinalin](../en/settings.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -105,4 +105,4 @@ dayanıklılık süresi, eğim hizalama olmadan eğim açısı ve ne takip ne de
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

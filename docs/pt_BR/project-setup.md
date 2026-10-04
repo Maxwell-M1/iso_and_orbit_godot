@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ 6e49af9494f6 -->
+<!-- translation of docs/en/project-setup.md @ 7a7b1e97933c -->
 # Configuração do projeto
 
 > Esta é uma tradução do [original em inglês](../en/project-setup.md).
@@ -78,4 +78,4 @@ ou use **Redefinir tudo** na janela de configurações.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

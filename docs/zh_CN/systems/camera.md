@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 55e4adada582 -->
+<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
 # 相机
 
 > 本文是[英文原文](../../en/systems/camera.md)的翻译。两者不一致时，以英文版为准。
@@ -126,4 +126,4 @@ Jolt 不会报告球体在投射起点处就接触到的物体。因此，如果
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

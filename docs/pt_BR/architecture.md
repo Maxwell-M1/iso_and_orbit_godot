@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 8409307c5782 -->
+<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
 # Arquitetura
 
 > Esta é uma tradução do [original em inglês](../en/architecture.md).
@@ -198,4 +198,4 @@ uma propriedade de nó. Os próprios componentes nunca leem configurações, vej
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

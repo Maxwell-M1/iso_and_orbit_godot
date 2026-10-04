@@ -190,4 +190,4 @@ demo's settings at 60 physics ticks. Their limits are computed from the settings
 
 ---
 
-*This page matches Iso & Orbit 1.0.0.*
+*This page matches Iso & Orbit 1.1.0.*

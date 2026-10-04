@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ ec03eff6cca9 -->
+<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
 # Başlarken
 
 > Bu, [İngilizce orijinalin](../en/getting-started.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -63,4 +63,4 @@ Burada `godot`, Godot 4.7.2 çalıştırılabilir dosyanızdır. Windows'ta çı
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

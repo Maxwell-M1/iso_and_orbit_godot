@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ 70a550884801 -->
+<!-- translation of docs/en/testing.md @ 9fd6c842b560 -->
 # Pruebas
 
 > Esta es una traducción del [original en inglés](../en/testing.md).
@@ -87,4 +87,4 @@ que una clase así no compila y rompe todo el juego en esa ejecución. Obtén el
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.0.0.*
+*Esta página corresponde a Iso & Orbit 1.1.0.*

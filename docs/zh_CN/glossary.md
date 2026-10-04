@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ c34a86f53e66 -->
+<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
 # 术语表
 
 > 本文是[英文原文](../en/glossary.md)的翻译。两者不一致时，以英文版为准。
@@ -43,4 +43,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*

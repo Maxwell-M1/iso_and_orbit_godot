@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 1ec8642147fb -->
+<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
 # Hareket
 
 > Bu, [İngilizce orijinalin](../../en/systems/locomotion.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -197,4 +197,4 @@ ayarlarını saniyede 60 fizik tikiyle ölçer. Sınırları ayarlardan hesaplan
 
 ---
 
-*Bu sayfa Iso & Orbit 1.0.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*

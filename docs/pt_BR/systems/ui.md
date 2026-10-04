@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 3f969cf9dfdc -->
+<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
 # UI
 
 > Esta é uma tradução do [original em inglês](../../en/systems/ui.md).
@@ -140,4 +140,4 @@ arquivo `.po`. O teste coleta as strings das cenas; as strings que só os script
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

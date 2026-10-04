@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ 70a550884801 -->
+<!-- translation of docs/en/testing.md @ 9fd6c842b560 -->
 # Testes
 
 > Esta é uma tradução do [original em inglês](../en/testing.md). Onde houver diferenças, a versão em inglês é a correta.
@@ -82,4 +82,4 @@ falha ao compilar e quebra o jogo inteiro naquela execução. Obtenha o nó de c
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

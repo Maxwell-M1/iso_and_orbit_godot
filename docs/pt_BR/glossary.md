@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ c34a86f53e66 -->
+<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
 # Glossário
 
 > Esta é uma tradução do [original em inglês](../en/glossary.md).
@@ -44,4 +44,4 @@ Os termos como esta documentação e o código os usam.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.0.0.*
+*Esta página corresponde ao Iso & Orbit 1.1.0.*

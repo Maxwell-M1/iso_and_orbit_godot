@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 873b592ebf01 -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
 # 世界与导航
 
 > 本文是[英文原文](../../en/systems/world-and-navigation.md)的翻译。两者不一致时，以英文版为准。
@@ -118,4 +118,4 @@ Recast 网格悬浮在地面上方约两个单元格高度处（这里为 0.05 �
 
 ---
 
-*本页对应 Iso & Orbit 1.0.0。*
+*本页对应 Iso & Orbit 1.1.0。*
