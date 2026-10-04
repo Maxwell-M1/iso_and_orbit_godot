@@ -11,7 +11,7 @@ extends UiScreen
 ## Settings that decide whether other controls of the window can be changed (see [method _update_dependent_rows]).
 const _DEPENDENCY_KEYS: Array[StringName] = [
 	GameSettings.CAMERA_KEYS_MODE, GameSettings.JUMP, GameSettings.SPRINT, GameSettings.FATIGUE,
-	GameSettings.CAMERA_FOLLOW, GameSettings.CAMERA_ALIGN_PITCH,
+	GameSettings.CAMERA_FOLLOW, GameSettings.CAMERA_ALIGN_PITCH, GameSettings.CHARACTER_HOVER,
 ]
 
 @onready var _follow_time_row: Control = %FollowTimeRow
@@ -29,6 +29,7 @@ const _DEPENDENCY_KEYS: Array[StringName] = [
 @onready var _fatigue: CheckButton = %Fatigue
 @onready var _sprint_duration_row: Control = %SprintDurationRow
 @onready var _sprint_duration: SettingSlider = %SprintDuration
+@onready var _sound_footsteps: CheckButton = %SoundFootsteps
 @onready var _vsync_hint: Label = %VsyncHint
 @onready var _fullscreen: CheckButton = %Fullscreen
 
@@ -67,7 +68,7 @@ func _on_setting_changed(key: StringName, _value: Variant) -> void:
 ## Controls that make sense only with another setting: the backward slowdown with sidestepping on RMB (only there
 ## does S move the character backward), the jump height with jumping, everything about the sprint with the sprint,
 ## the stamina also with fatigue; the pitch when the camera aligns it, the camera speed when the camera follows the
-## run or aligns the pitch.
+## run or aligns the pitch; the footstep sounds without floating (a floating hero has no steps).
 func _update_dependent_rows() -> void:
 	var camera_keys: int = Settings.get_value(GameSettings.CAMERA_KEYS_MODE)
 	var jump: bool = Settings.get_value(GameSettings.JUMP)
@@ -75,6 +76,7 @@ func _update_dependent_rows() -> void:
 	var fatigue: bool = Settings.get_value(GameSettings.FATIGUE)
 	var follow: bool = Settings.get_value(GameSettings.CAMERA_FOLLOW)
 	var align_pitch: bool = Settings.get_value(GameSettings.CAMERA_ALIGN_PITCH)
+	var hover: bool = Settings.get_value(GameSettings.CHARACTER_HOVER)
 	_set_enabled(_backward_slowdown, camera_keys == PointClickMoveInput.KeysMode.SIDESTEP, _backward_slowdown_row)
 	_set_enabled(_jump_height, jump, _jump_height_row)
 	_set_enabled(_sprint_mode, sprint, _sprint_mode_row)
@@ -83,6 +85,7 @@ func _update_dependent_rows() -> void:
 	_set_enabled(_sprint_duration, sprint and fatigue, _sprint_duration_row)
 	_set_enabled(_align_pitch_angle, align_pitch, _align_pitch_row)
 	_set_enabled(_follow_time, follow or align_pitch, _follow_time_row)
+	_set_enabled(_sound_footsteps, not hover)
 
 
 ## A disabled control cannot be changed, and its row is paler (a button without a row looks disabled anyway).

@@ -10,6 +10,10 @@ extends Node
 ## [member edge_margin] around it. If there is no ground there, the movement is turned along the edge until ground is
 ## found, and is shortened by the cosine of the turn, as when sliding along a wall. Running straight into the edge
 ## means stopping.
+##
+## Ground is what the body can stand on: not steeper than [member CharacterBody3D.floor_max_angle] (with the margin
+## [constant GroundCharacter.FLOOR_ANGLE_MARGIN], as the engine's own floor check). A mistake in the setup is printed
+## as a warning when the component enters the tree ([method get_setup_warnings]).
 
 ## Guard the edge. A disabled component changes nothing.
 @export var enabled := true
@@ -29,8 +33,9 @@ extends Node
 ## step up).
 @export_range(0.0, 2.0, 0.01, "suffix:m") var probe_height := 0.5
 
-## What counts as ground.
-@export_flags_3d_physics var floor_mask := 1
+## What counts as ground. 0 (the default) takes the body's [member CollisionObject3D.collision_mask]: the guard counts
+## as ground exactly what the body stands on.
+@export_flags_3d_physics var floor_mask := 0
 
 ## How many times to refine the slide angle, twice as finely each time (6 gives a precision of about 1.4°).
 @export_range(1, 12) var slide_iterations := 6
@@ -43,6 +48,20 @@ func _ready() -> void:
 	_body = get_parent() as CharacterBody3D
 	assert(_body != null, "LedgeGuard must be a child of a CharacterBody3D.")
 	_query.exclude = [_body.get_rid()]
+	for warning in get_setup_warnings():
+		push_warning("%s: %s" % [name, warning])
+
+
+## Problems in how the guard is set up, one line each; empty if there are none.
+func get_setup_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	var body := get_parent() as CharacterBody3D
+	if body == null:
+		warnings.append("LedgeGuard must be a child of a CharacterBody3D.")
+	elif floor_mask & ~body.collision_mask != 0:
+		warnings.append("floor_mask has layers the body does not collide with: the guard counts as ground something "
+				+ "the body falls through. 0 takes the body's mask.")
+	return warnings
 
 
 ## The velocity corrected near a cliff: the horizontal part changes, the vertical part stays as is.
@@ -110,9 +129,10 @@ func _has_floor(point: Vector3) -> bool:
 	var feet := _body.global_position.y
 	_query.from = Vector3(point.x, feet + probe_height, point.z)
 	_query.to = Vector3(point.x, feet - max_drop, point.z)
-	_query.collision_mask = floor_mask
+	_query.collision_mask = floor_mask if floor_mask != 0 else _body.collision_mask
 	var hit := _body.get_world_3d().direct_space_state.intersect_ray(_query)
 	if hit.is_empty():
 		return false
 	# A steep slope is not ground: the character cannot stand on it.
-	return (hit.normal as Vector3).angle_to(_body.up_direction) <= _body.floor_max_angle
+	var steepness := (hit.normal as Vector3).angle_to(_body.up_direction)
+	return steepness <= _body.floor_max_angle + GroundCharacter.FLOOR_ANGLE_MARGIN

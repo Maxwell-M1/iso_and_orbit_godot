@@ -238,6 +238,19 @@ theme_type_variation = &"HintLabel"
 text = "All looks stand in a row south of the road to the ramp, each with its number overhead."
 autowrap_mode = 3
 
+[node name="Hover" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+layout_mode = 2
+text = "Float above the ground"
+script = ExtResource("2_check")
+key = &"character/hover"
+
+[node name="HoverHint" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "The hero hangs above the ground and glides over stairs, with no footsteps. Slopes, stairs and jumps work as usual."
+autowrap_mode = 3
+
 [node name="LedgeGuard" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
 layout_mode = 2
 text = "Don't fall off ledges"
@@ -752,6 +765,7 @@ text = "100%"
 horizontal_alignment = 2
 
 [node name="SoundFootsteps" type="CheckButton" parent="Center/Window/Layout/Tabs/Sound/Page/List"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Footsteps"
 script = ExtResource("2_check")

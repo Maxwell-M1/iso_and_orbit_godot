@@ -118,6 +118,14 @@ msgid "All looks stand in a row south of the road to the ramp, each with its num
 msgstr "所有外观在通往坡道的路以南站成一排，头顶标有各自的编号。"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Float above the ground"
+msgstr "悬浮在地面上方"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The hero hangs above the ground and glides over stairs, with no footsteps. Slopes, stairs and jumps work as usual."
+msgstr "主角悬浮在地面上方，在楼梯上平滑滑行，没有脚步声。斜坡、台阶和跳跃照常工作。"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Don't fall off ledges"
 msgstr "防止从边缘跌落"
 
@@ -450,6 +458,10 @@ msgid "Step %d · %s · cycle %.2f"
 msgstr "第 %d 步 · %s · 周期 %.2f"
 
 #: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "No steps"
+msgstr "无脚步"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "Stamina %d%%"
 msgstr "体力 %d%%"
 
@@ -488,6 +500,10 @@ msgstr "以 %.1f 米/秒触地"
 #: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "landing at %.1f m/s"
 msgstr "以 %.1f 米/秒落地"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "stair %+.2f m"
+msgstr "台阶 %+.2f 米"
 
 #: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "sprint started"

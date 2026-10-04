@@ -118,6 +118,14 @@ msgid "All looks stand in a row south of the road to the ramp, each with its num
 msgstr "Todas as aparências ficam em fila ao sul da estrada da rampa, com o número sobre a cabeça."
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Float above the ground"
+msgstr "Flutuar acima do chão"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The hero hangs above the ground and glides over stairs, with no footsteps. Slopes, stairs and jumps work as usual."
+msgstr "O herói flutua acima do chão e desliza sobre as escadas, sem som de passos. Encostas, degraus e pulos funcionam como sempre."
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Don't fall off ledges"
 msgstr "Não cair de bordas"
 
@@ -450,6 +458,10 @@ msgid "Step %d · %s · cycle %.2f"
 msgstr "Passo %d · %s · ciclo %.2f"
 
 #: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "No steps"
+msgstr "Sem passos"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "Stamina %d%%"
 msgstr "Fôlego %d%%"
 
@@ -488,6 +500,10 @@ msgstr "tocou o chão a %.1f m/s"
 #: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "landing at %.1f m/s"
 msgstr "aterrissagem a %.1f m/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "stair %+.2f m"
+msgstr "degrau %+.2f m"
 
 #: addons/iso_orbit/ground_character/character_monitor.gd
 msgid "sprint started"

@@ -16,7 +16,7 @@ extends Label
 ## Print every event to the output ([method @GlobalScope.print]) with its time and the character's name.
 @export var log_events := false
 
-## Show and log steps too: there are several per second.
+## Show and log steps and stairs too: there are several per second.
 @export var include_steps := true
 
 var _events: Array[Dictionary] = []
@@ -36,6 +36,7 @@ func _ready() -> void:
 	character.touched_floor.connect(_on_touched_floor)
 	character.landed.connect(_on_landed)
 	character.sprint_changed.connect(_on_sprint_changed)
+	character.stair_taken.connect(_on_stair_taken)
 
 
 func _process(_delta: float) -> void:
@@ -66,8 +67,11 @@ func get_state_lines() -> PackedStringArray:
 	else:
 		lines.append(tr("In the air %.2f s · vertical %+.1f m/s") % [character.get_air_time(),
 			_signed(character.velocity.y, 0.1)])
-	lines.append(tr("Step %d · %s · cycle %.2f") % [floori(character.get_step_phase()),
-		_get_foot_name(character.get_step_foot(), true), character.get_gait_cycle()])
+	if character.is_counting_steps():
+		lines.append(tr("Step %d · %s · cycle %.2f") % [floori(character.get_step_phase()),
+			_get_foot_name(character.get_step_foot(), true), character.get_gait_cycle()])
+	else:
+		lines.append(tr("No steps"))
 	if character.stamina != null:
 		var stamina := tr("Stamina %d%%") % roundi(character.stamina.get_ratio() * 100.0)
 		if character.is_exhausted():
@@ -105,6 +109,11 @@ func _on_touched_floor(fall_speed: float) -> void:
 
 func _on_landed(impact_speed: float) -> void:
 	_add_event("landing at %.1f m/s", [impact_speed])
+
+
+func _on_stair_taken(height: float) -> void:
+	if include_steps:
+		_add_event("stair %+.2f m", [height])
 
 
 func _on_sprint_changed(sprinting: bool) -> void:

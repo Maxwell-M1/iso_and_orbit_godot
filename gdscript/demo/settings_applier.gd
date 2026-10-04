@@ -14,6 +14,9 @@ extends Node
 ## The player's look.
 @export var player_appearance: CharacterAppearance
 
+## The player's floating above the ground. While floating, it turns the player's steps off by itself.
+@export var player_hover: CharacterHover
+
 ## The player's silhouette behind obstacles.
 @export var player_silhouette: OccludedSilhouette
 
@@ -90,6 +93,9 @@ func _apply(key: StringName, value: Variant) -> void:
 		GameSettings.CHARACTER_LOOK:
 			if player_appearance != null:
 				player_appearance.set_look(int(value))
+		GameSettings.CHARACTER_HOVER:
+			if player_hover != null:
+				player_hover.enabled = value
 		GameSettings.SILHOUETTE_OUTLINE:
 			if player_silhouette != null:
 				player_silhouette.outline_enabled = value

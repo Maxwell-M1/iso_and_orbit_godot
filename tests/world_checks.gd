@@ -1,7 +1,7 @@
 extends "res://tests/check_suite.gd"
 ## World: the mountain with a trail and "Windswept Peak", places (camp, hamlet, ruins) discovered with a message,
 ## characters standing at the places and not letting anyone through, a line of hero mage options with a free walkway
-## along it.
+## along it; paths climb exactly the stairs the character steps onto.
 
 
 func _checks() -> Array[Callable]:
@@ -11,6 +11,7 @@ func _checks() -> Array[Callable]:
 		_check_route.bind("around the knight at the hamlet", Vector3(-26.6, 0, 22.6), Vector3(-32.6, 0, 22.6), 15.0),
 		_check_characters_at_places,
 		_check_mage_options,
+		_check_navigation_climb,
 	]
 
 
@@ -187,3 +188,14 @@ func _check_mage_options() -> void:
 	_expect(_player.global_position.x >= 21.0 and ticks * DT < 4.5 and drift < 0.05,
 			"the walkway in front of the line is free: straight past all ten at full speed")
 	await _teleport(Vector3.ZERO)
+
+
+## The navigation mesh lets paths climb the stairs the character steps onto, and no higher: its agent_max_climb is
+## the character's max_step_height.
+func _check_navigation_climb() -> void:
+	print("\n== the navigation mesh climbs the character's stairs")
+	var region: NavigationRegion3D = _main.get_node("World/NavigationRegion3D")
+	var climb := region.navigation_mesh.agent_max_climb
+	print("agent_max_climb %.2f m, max_step_height %.2f m" % [climb, _player.max_step_height])
+	_expect(is_equal_approx(climb, _player.max_step_height),
+			"the navigation mesh's agent_max_climb equals the character's max_step_height")

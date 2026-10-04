@@ -1,7 +1,7 @@
 extends "res://tests/check_suite.gd"
 ## Camera: the follow and its pauses (while RMB is held and while it is not yet clear whether it is a click or a hold),
 ## the cursor keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the
-## setting), leveling the pitch on the run.
+## setting), leveling the pitch on the run, gliding up the stairs.
 
 
 func _checks() -> Array[Callable]:
@@ -10,6 +10,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_follow_pauses,
 		_check_camera,
 		_check_camera_pitch_follow,
+		_check_height_follow,
 	]
 
 
@@ -333,3 +334,37 @@ func _watch_pitch_on_run(angle: float, follow_time: float, seconds: float) -> Di
 ## How far down the camera looks, in degrees.
 func _camera_pitch() -> float:
 	return -rad_to_deg(_rig.rotation.x)
+
+
+## Up the staircase east of the platform: the character is put onto every stair at once, and with the demo's
+## height_follow_time the camera rises along a smooth line: the change of its rise per frame is much smaller than
+## without it, and on the platform it ends at the same height.
+func _check_height_follow() -> void:
+	print("\n== the camera glides up the stairs")
+	var follow_time := _rig.height_follow_time
+	var jerks := PackedFloat32Array()
+	var ends := PackedFloat32Array()
+	for time: float in [0.0, follow_time]:
+		_rig.height_follow_time = time
+		await _teleport(Vector3(36, 0, 18))
+		_rig.snap()
+		_arrived = false
+		_mover.move_to(Vector3(26, 1.6, 18))
+		var heights := PackedFloat32Array()
+		while not _arrived and heights.size() < 300:
+			await _tree.process_frame
+			heights.append(_rig.global_position.y)
+		await _settle_camera()
+		var jerk := 0.0
+		for i in range(2, heights.size()):
+			jerk = maxf(jerk, absf(heights[i] - 2.0 * heights[i - 1] + heights[i - 2]))
+		jerks.append(jerk)
+		ends.append(_rig.global_position.y - _player.global_position.y)
+	_rig.height_follow_time = follow_time
+	await _teleport(Vector3.ZERO)
+	print("height_follow_time 0: the rise per frame changes by up to %.3f m; %.2f s: by up to %.3f m; above the character at the end %.2f and %.2f m" % [
+		jerks[0], follow_time, jerks[1], ends[0], ends[1]])
+	_expect(follow_time > 0.0 and jerks[1] < 0.4 * jerks[0],
+			"with the demo's height_follow_time the camera glides up the stairs")
+	_expect(is_equal_approx(ends[0], _rig.focus_height) and is_equal_approx(ends[1], _rig.focus_height),
+			"after the stairs the camera is at its height over the character")

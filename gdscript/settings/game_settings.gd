@@ -35,6 +35,8 @@ const FATIGUE := &"character/fatigue"
 const SPRINT_DURATION := &"character/sprint_duration"
 ## Hero look: the number of the variant in the lineup of variants, starting from 1 (the player's CharacterAppearance).
 const CHARACTER_LOOK := &"character/look"
+## The hero floats above the ground (the player's CharacterHover); while floating, it has no steps.
+const CHARACTER_HOVER := &"character/hover"
 ## RMB pitches the camera with vertical mouse movement (OrbitCameraRig.mouse_pitch).
 const CAMERA_MOUSE_PITCH := &"camera/mouse_pitch"
 const CAMERA_FOLLOW := &"camera/follow"
@@ -89,6 +91,7 @@ const DEFAULTS := {
 	FATIGUE: true,
 	SPRINT_DURATION: 5.0,
 	CHARACTER_LOOK: 10,  # battle mage
+	CHARACTER_HOVER: false,
 	CAMERA_MOUSE_PITCH: false,
 	CAMERA_FOLLOW: false,
 	CAMERA_FOLLOW_TIME: 1.1,

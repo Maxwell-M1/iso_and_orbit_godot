@@ -1,8 +1,11 @@
 extends "res://tests/check_suite.gd"
 ## What the character reports about itself, for animations and the interface: the state and its changes, the blend
-## of speeds, movement in the model's axes, turning, floor contact and time in the air, feet and the gait cycle. Stairs
-## and slopes: up and down a staircase without leaving the ground, a block too high, a gentle and a steep slope. Routes
-## on the level without a false take-off. The monitor panel shows the state and the latest events.
+## of speeds, movement and acceleration in the model's axes, turning, floor contact and time in the air, feet and the
+## gait cycle, the steps switch. Stairs and slopes: up and down a staircase without leaving the ground with the real
+## height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a false take-off.
+## Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without lag, a jump,
+## a ledge and a wall, turning it off and on. The monitor panel shows the state and the latest events. The demo's
+## character is set up without warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
 const STRIP_Z := 34.0
@@ -10,15 +13,61 @@ const STRIP_Z := 34.0
 
 func _checks() -> Array[Callable]:
 	return [
+		_check_setup,
 		_check_run_and_sprint,
 		_check_jump_and_fall,
 		_check_feet,
+		_check_steps_switch,
 		_check_sidestep_and_turn,
+		_check_acceleration,
 		_check_stairs,
 		_check_slopes_and_high_block,
 		_check_level_routes,
+		_check_hover,
+		_check_hover_toggle,
 		_check_monitor,
 	]
+
+
+## The demo's character, its ledge guard and its hover have no setup warnings, and mistakes in the setup give them.
+## The spring of the inertia stays calm at its stiffest settings, strongly and barely damped.
+func _check_setup() -> void:
+	print("\n== setup warnings and the spring")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var guard := _player.ledge_guard
+	var clean := [_player.get_setup_warnings(), guard.get_setup_warnings(), hover.get_setup_warnings()]
+	var max_drop := guard.max_drop
+	guard.max_drop = _player.max_step_height - 0.1
+	var low_guard := _player.get_setup_warnings()
+	guard.max_drop = max_drop
+	# The guard would count layer 3 as ground, and the body falls through it.
+	guard.floor_mask = _player.collision_mask | 0b100
+	var wide_mask := guard.get_setup_warnings()
+	guard.floor_mask = 0
+	# A second hover outside the tree: not under the character's visual node and with no model.
+	var stray := CharacterHover.new()
+	stray.character = _player
+	var misplaced := "\n".join(stray.get_setup_warnings())
+	stray.free()
+	# From 1 toward 0 for 10 s at 10 Hz, the stiffest spring the components allow.
+	var springs := []
+	for damping: float in [2.0, 0.05]:
+		var spring := DampedSpring.new()
+		spring.value = 1.0
+		var largest := 0.0
+		for i in 600:
+			largest = maxf(largest, absf(spring.update(0.0, 10.0, damping, DT)))
+		springs.append([largest, absf(spring.value)])
+	print("demo: %s; a guard lower than a stair: %s; a guard's mask wider than the body's: %s; a stray hover: %s; a 10 Hz spring damped 2 and 0.05: largest %.3f and %.3f, at the end %.5f and %.5f" % [
+		clean, low_guard, wide_mask, misplaced.replace("\n", " / "), springs[0][0], springs[1][0], springs[0][1],
+		springs[1][1]])
+	_expect(clean.all(func(warnings: PackedStringArray) -> bool: return warnings.is_empty()),
+			"the demo's character, ledge guard and hover have no setup warnings")
+	_expect(low_guard.size() == 1 and wide_mask.size() == 1 and misplaced.contains("visual node")
+			and misplaced.contains("Nothing to lift"),
+			"a guard lower than a stair, a guard's mask wider than the body's and a stray hover are warned about")
+	_expect(springs[0][0] <= 1.0 and springs[1][0] < 1.1 and springs[0][1] < 0.001 and springs[1][1] < 0.001,
+			"the spring stays calm and settles at 10 Hz, strongly and barely damped")
 
 
 ## Standing, running, sprinting and standing again: the states in this order, the blend 0, 1 and 2.
@@ -155,6 +204,36 @@ func _check_feet() -> void:
 	_expect(backward == 0, "between steps the gait cycle only grows")
 
 
+## Without steps the character runs as usual, but there are no steps and the step rhythm stands still. Turned back on
+## mid-run, the steps start as from a standstill: the first one comes after first_step_distance.
+func _check_steps_switch() -> void:
+	print("\n== the steps switch")
+	await _teleport(Vector3(-30, 0, STRIP_Z))
+	var steps := PackedFloat32Array()
+	var on_step := func(_sprinting: bool) -> void: steps.append(_player.global_position.x)
+	_player.stepped.connect(on_step)
+	_player.steps_enabled = false
+	var phase := _player.get_step_phase()
+	_mover.steer(Vector3.RIGHT)
+	await _ticks(60)
+	var steps_off := steps.size()
+	var phase_still := _player.get_step_phase() == phase
+	var speed := _player.get_move_speed()
+	var turned_on_at := _player.global_position.x
+	_player.steps_enabled = true
+	await _ticks(30)
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	_player.stepped.disconnect(on_step)
+	var first := steps[0] - turned_on_at if not steps.is_empty() else -1.0
+	print("steps off: %d steps in 1 s at %.2f m/s, the rhythm stood still %s; turned on: the first step after %.2f m (first_step_distance %.2f)" % [
+		steps_off, speed, phase_still, first, _player.first_step_distance])
+	_expect(steps_off == 0 and phase_still and speed > 0.95 * _mover.settings.max_speed,
+			"steps off: the character runs, with no steps and a still rhythm")
+	_expect(first >= _player.first_step_distance - 0.001 and first < _player.first_step_distance + speed * DT + 0.001,
+			"turned back on, the first step comes after first_step_distance")
+
+
 ## A sidestep and backing up in the model's axes; the turn rate: positive to the left, no more than the model's turn
 ## speed, 0 when running straight.
 func _check_sidestep_and_turn() -> void:
@@ -191,22 +270,65 @@ func _check_sidestep_and_turn() -> void:
 			"turning left: a positive rate no faster than the model turns")
 
 
+## The acceleration in the model's axes: forward at the mover's rate when speeding up, backward when braking, to the
+## left in a left turn.
+func _check_acceleration() -> void:
+	print("\n== acceleration in the model's axes")
+	await _teleport(Vector3(-30, 0, STRIP_Z))
+	_mover.steer(Vector3.RIGHT)
+	var speeding := PackedFloat32Array()
+	for i in 40:
+		await _tree.physics_frame
+		speeding.append(_player.get_local_acceleration().y)
+	# Running east, then to the north: a turn to the left.
+	_mover.steer(Vector3.FORWARD)
+	var sideways := PackedFloat32Array()
+	for i in 20:
+		await _tree.physics_frame
+		sideways.append(_player.get_local_acceleration().x)
+	await _ticks(30)
+	_mover.stop()
+	var braking := PackedFloat32Array()
+	for i in 40:
+		await _tree.physics_frame
+		braking.append(_player.get_local_acceleration().y)
+	await _ticks_until_stopped(120)
+	var settings := _mover.settings
+	var speed_up := settings.max_speed / settings.acceleration_time
+	var slow_down := settings.max_speed / settings.stop_time
+	print("speeding up: up to %.1f m/s² forward (mover %.1f); turning left: sideways %.1f..%.1f m/s²; braking: down to %.1f m/s² (mover %.1f)" % [
+		_max(speeding), speed_up, _min(sideways), _max(sideways), _min(braking), -slow_down])
+	_expect(absf(_max(speeding) - speed_up) < 0.05 * speed_up and _min(speeding) > -0.01,
+			"speeding up: forward at the mover's acceleration")
+	_expect(_min(sideways) < -0.3 * speed_up and _max(sideways) < 0.1 * speed_up, "a left turn: to the left")
+	_expect(absf(_min(braking) + slow_down) < 0.05 * slow_down and _max(braking) < 0.01,
+			"braking: backward at the mover's deceleration")
+
+
 ## The staircase east of the platform (0.2 m stairs): a click on the platform leads up the stairs and back down
-## without leaving the ground and almost at full speed. Without stepping the character stops at the first stair.
+## without leaving the ground and almost at full speed, and each stair is reported with its height. Without stepping
+## the character stops at the first stair.
 func _check_stairs() -> void:
 	print("\n== stairs up and down")
 	var events := []
 	var connections := _record_events(events)
+	var stairs := PackedFloat32Array()
+	var on_stair := func(height: float) -> void: stairs.append(height)
+	_player.stair_taken.connect(on_stair)
 	var bottom := Vector3(36, 0, 18)
 	var top := Vector3(26, 1.6, 18)
 	await _teleport(bottom)
 	events.clear()
 	var up := await _run_on_stairs(top)
 	var up_events := events.duplicate()
+	var up_stairs := stairs.duplicate()
 	events.clear()
+	stairs.clear()
 	var down := await _run_on_stairs(bottom)
 	var down_events := events.duplicate()
+	var down_stairs := stairs.duplicate()
 	_disconnect_all(connections)
+	_player.stair_taken.disconnect(on_stair)
 
 	var step_height := _player.max_step_height
 	_player.max_step_height = 0.0
@@ -225,6 +347,7 @@ func _check_stairs() -> void:
 	print("down: arrived %s, on the stairs %s, speed median %.2f min %.2f, events %s" % [down.arrived,
 		down.on_stairs, down.median, down.lowest, down_events])
 	print("without stepping: highest %.2f m" % highest)
+	print("stairs reported up: %s; down: %s" % [_fmt(up_stairs), _fmt(down_stairs)])
 	_expect(up.arrived and up.on_stairs and down.arrived and down.on_stairs,
 			"a click on the platform leads up the stairs, a click below leads down them")
 	_expect(not up_events.has("left_floor") and not down_events.has("left_floor"),
@@ -233,6 +356,9 @@ func _check_stairs() -> void:
 			and up.lowest > 0.6 * max_speed and down.lowest > 0.6 * max_speed,
 			"on the stairs the character keeps running")
 	_expect(highest < 0.15, "with max_step_height 0 the character stops at the first stair")
+	_expect(up_stairs.size() == 8 and _min(up_stairs) > 0.18 and _max(up_stairs) < 0.22
+			and down_stairs.size() == 8 and _max(down_stairs) < -0.18 and _min(down_stairs) > -0.22,
+			"every stair is reported once with its height: +0.2 m up, -0.2 m down")
 
 
 ## Runs to [param target] and measures the speed while the character is on the stairs (x from 30 to 32.8).
@@ -345,6 +471,278 @@ func _check_level_routes() -> void:
 	_expect(false_events.is_empty(), "on the trail, the ramp, the meadow and in the maze the character stays on the ground")
 
 
+## Floating, turned on by the setting: the model hangs at its height and sways, and the steps stop. For the shape of
+## its path the sway is off: over the stairs the model glides much more smoothly than the body jumps and never moves
+## against the way; along the ramp it keeps its height over the ground without lag, only rounding the bends at its
+## ends a little; in a jump, and as it lands, it moves exactly
+## with the body, and with the pushes on it sags a little on landing and stays above the ground; it neither dips before
+## a guarded ledge nor rises before a block too high or a terrace behind a wall.
+func _check_hover() -> void:
+	print("\n== floating: height and sway, no steps, stairs, ramp, jump, ledge, walls")
+	var settings: GameSettings = _tree.root.get_node(^"Settings")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var off_by_default := not hover.enabled and not hover.is_floating() and _player.is_counting_steps() \
+			and hover.transform == Transform3D.IDENTITY
+	var changes := []
+	var on_change := func(floating: bool) -> void: changes.append(floating)
+	hover.floating_changed.connect(on_change)
+	var steps := [0]
+	var on_step := func(_sprinting: bool) -> void: steps[0] += 1
+	_player.stepped.connect(on_step)
+	settings.set_value(GameSettings.CHARACTER_HOVER, true)
+	var steps_stopped := hover.is_floating() and not _player.is_counting_steps() and _player.steps_enabled
+	await _teleport(Vector3(-30, 0, STRIP_Z))
+	await _ticks(60)
+	var standing := PackedFloat32Array()
+	for i in 180:
+		await _tree.physics_frame
+		standing.append(hover.get_hover_height())
+
+	var bob := hover.bob_height
+	hover.bob_height = 0.0
+	await _teleport(Vector3(36, 0, 18))
+	var up := await _float_route(hover, Vector3(26, 1.6, 18))
+	var down := await _float_route(hover, Vector3(36, 0, 18))
+	await _teleport(Vector3(10, 0, 18))
+	# The ramp rises 1.6 m from x 16 to x 22 at 15°; its middle half is from x 17.5 to x 20.5.
+	var ramp_up := await _float_route(hover, Vector3(26, 1.6, 18), Vector2(17.5, 20.5))
+	var ramp_down := await _float_route(hover, Vector3(10, 0, 18), Vector2(17.5, 20.5))
+	var kicks := [hover.jump_kick, hover.landing_kick]
+	hover.jump_kick = 0.0
+	hover.landing_kick = 0.0
+	var plain_jump := await _float_jump(hover)
+	hover.jump_kick = kicks[0]
+	hover.landing_kick = kicks[1]
+	var pushed_jump := await _float_jump(hover)
+	# The platform's north edge, with the ledge guard on: the character stops there.
+	await _teleport(Vector3(25, 1.6, 18))
+	var at_ledge := await _float_steering(hover, Vector3.FORWARD)
+	var block_shape := BoxShape3D.new()
+	block_shape.size = Vector3(1, 0.4, 3)
+	var block := await _add_body(block_shape, Vector3(-10, 0.2, STRIP_Z))
+	await _teleport(Vector3(-14, 0, STRIP_Z))
+	var at_block := await _float_steering(hover, Vector3.RIGHT)
+	_free_body(block)
+	# A wall 1.5 m high with a terrace 0.25 m high right behind it, out of the character's reach.
+	var wall_shape := BoxShape3D.new()
+	wall_shape.size = Vector3(0.2, 1.5, 3)
+	var wall := await _add_body(wall_shape, Vector3(-10, 0.75, STRIP_Z))
+	var terrace_shape := BoxShape3D.new()
+	terrace_shape.size = Vector3(2, 0.25, 3)
+	var terrace := await _add_body(terrace_shape, Vector3(-8.9, 0.125, STRIP_Z))
+	await _teleport(Vector3(-14, 0, STRIP_Z))
+	var at_wall := await _float_steering(hover, Vector3.RIGHT)
+	_free_body(wall)
+	_free_body(terrace)
+	hover.bob_height = bob
+	_player.stepped.disconnect(on_step)
+	hover.floating_changed.disconnect(on_change)
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	await _ticks(60)
+	await _teleport(Vector3.ZERO)
+
+	var height := hover.height
+	print("off by default %s; on: floating with the steps stopped %s, events %s; standing %.3f..%.3f m (height %.2f, sway %.2f); steps while floating %d" % [
+		off_by_default, steps_stopped, changes, _min(standing), _max(standing), height, bob, steps[0]])
+	print("without the sway:")
+	for route: Array in [["stairs up", up], ["stairs down", down], ["ramp up", ramp_up], ["ramp down", ramp_down]]:
+		var run: Dictionary = route[1]
+		print("%s: arrived %s; jerk body %.3f model %.3f; model against the way %.4f m; lowest over the ground %.3f m, in the middle %.3f m" % [
+			route[0], run.arrived, run.body_jerk, run.model_jerk, run.against, run.clearance, run.middle_clearance])
+	print("a jump without the pushes: off the height in the air up to %.4f m, after landing %.4f..%.4f m; with them: %.4f m, %.4f..%.4f m" % [
+		plain_jump.in_air, plain_jump.low, plain_jump.high, pushed_jump.in_air, pushed_jump.low, pushed_jump.high])
+	print("height over the body at the guarded ledge %.3f..%.3f m, at the block %.3f..%.3f m, at the wall %.3f..%.3f m" % [
+		at_ledge.x, at_ledge.y, at_block.x, at_block.y, at_wall.x, at_wall.y])
+	_expect(off_by_default and steps_stopped and changes == [true],
+			"floating is off by default; the setting turns it on and stops the steps, without the steps switch")
+	_expect(_min(standing) > height - bob - 0.005 and _max(standing) < height + bob + 0.005
+			and _max(standing) - _min(standing) > bob, "standing, the model hangs at its height and sways")
+	_expect(steps[0] == 0, "no steps while floating")
+	var glides := true
+	for run: Dictionary in [up, down]:
+		glides = glides and run.arrived and run.model_jerk < 0.4 * run.body_jerk and run.against < 0.001 \
+				and run.clearance > 0.4 * height
+	# Along the line of the stairs, so over the edge of a stair the model is lower by about half a stair.
+	_expect(glides, "over the stairs the model glides: smoother than the body, never against the way, above the stairs")
+	_expect(ramp_up.arrived and ramp_down.arrived and ramp_up.middle_clearance > height - 0.01
+			and ramp_down.middle_clearance > height - 0.01 and ramp_up.clearance > height - 0.08
+			and ramp_down.clearance > height - 0.08,
+			"along the ramp the model keeps its height over the ground; at the bends it dips less than 8 cm")
+	_expect(plain_jump.in_air < 0.002 and plain_jump.low > -0.002 and plain_jump.high < 0.002,
+			"in a jump and as it lands, the model moves exactly with the body")
+	_expect(pushed_jump.low < -0.01 and pushed_jump.low > -hover.max_drop and height + pushed_jump.low > 0.0,
+			"with the pushes the model sags a little on landing and stays above the ground")
+	_expect(at_ledge.x > height - 0.01 and at_block.y < height + 0.01 and at_wall.y < height + 0.01,
+			"the model neither dips before a guarded ledge nor rises before a block too high or a terrace behind a wall")
+
+
+## Runs to [param target] floating: how the body and the model move ([method _check_hover]); the lowest height of the
+## model over the ground is also measured while the body's x is within [param middle].
+func _float_route(hover: CharacterHover, target: Vector3, middle := Vector2.ZERO) -> Dictionary:
+	_arrived = false
+	_mover.move_to(target)
+	var climbing := target.y > _player.global_position.y
+	var body := PackedFloat32Array()
+	var model := PackedFloat32Array()
+	var clearance := INF
+	var middle_clearance := INF
+	var time := 0.0
+	while not _arrived and time < 10.0:
+		await _tree.physics_frame
+		time += DT
+		var feet := _player.global_position.y
+		body.append(feet)
+		model.append(feet + hover.get_hover_height())
+		var ground := _player.get_ground_height(_player.global_position, 0.3, 0.6)
+		if not is_nan(ground):
+			clearance = minf(clearance, model[-1] - ground)
+			var x := _player.global_position.x
+			if x > middle.x and x < middle.y:
+				middle_clearance = minf(middle_clearance, model[-1] - ground)
+	var against := 0.0
+	var body_jerk := 0.0
+	var model_jerk := 0.0
+	for i in range(1, model.size()):
+		against = maxf(against, model[i - 1] - model[i] if climbing else model[i] - model[i - 1])
+		if i >= 2:
+			body_jerk = maxf(body_jerk, absf(body[i] - 2.0 * body[i - 1] + body[i - 2]))
+			model_jerk = maxf(model_jerk, absf(model[i] - 2.0 * model[i - 1] + model[i - 2]))
+	return {
+		arrived = _arrived,
+		against = against,
+		body_jerk = body_jerk,
+		model_jerk = model_jerk,
+		clearance = clearance,
+		middle_clearance = middle_clearance,
+	}
+
+
+## A jump in place, floating: how far the model is from its height, m, in the air (the most either way) and after
+## landing (the lowest and the highest).
+func _float_jump(hover: CharacterHover) -> Dictionary:
+	await _teleport(Vector3(-20, 0, STRIP_Z))
+	await _ticks(30)
+	_player.jump()
+	var in_air := 0.0
+	var low := INF
+	var high := -INF
+	var was_in_air := false
+	for i in 120:
+		await _tree.physics_frame
+		var off := hover.get_hover_height() - hover.height
+		if not _player.is_on_floor():
+			was_in_air = true
+			in_air = maxf(in_air, absf(off))
+		elif was_in_air:
+			low = minf(low, off)
+			high = maxf(high, off)
+	return {in_air = in_air, low = low, high = high}
+
+
+## Steers in [param direction] for 1.5 s floating: the lowest (x) and the highest (y) height of the model over the
+## body, m.
+func _float_steering(hover: CharacterHover, direction: Vector3) -> Vector2:
+	_mover.steer(direction)
+	var heights := PackedFloat32Array()
+	for i in 90:
+		await _tree.physics_frame
+		heights.append(hover.get_hover_height())
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	return Vector2(_min(heights), _max(heights))
+
+
+## Floating turned off mid-run: the model settles smoothly in rise_time, and then the steps come back; turned on again,
+## it rises smoothly and the steps stop at once. The game's own switch of the steps is kept, and steps_while_floating
+## keeps the steps. A hover turned on before the first physics tick floats at once, and out of the tree it lets the
+## steps go.
+func _check_hover_toggle() -> void:
+	print("\n== floating turned off and on mid-run, the steps, and at the start")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var changes := []
+	var on_change := func(floating: bool) -> void: changes.append(floating)
+	hover.floating_changed.connect(on_change)
+	hover.enabled = true
+	await _teleport(Vector3(-30, 0, STRIP_Z))
+	_mover.steer(Vector3.RIGHT)
+	await _ticks(30)
+	changes.clear()
+	var last := _player.global_position.y + hover.get_hover_height()
+	var largest := 0.0
+	hover.enabled = false
+	var settled := -1
+	var steps_at_settle := false
+	for i in 50:
+		await _tree.physics_frame
+		var model := _player.global_position.y + hover.get_hover_height()
+		largest = maxf(largest, absf(model - last))
+		last = model
+		if settled < 0 and not hover.is_floating():
+			settled = i + 1
+			steps_at_settle = _player.is_counting_steps()
+	hover.enabled = true
+	var stopped_at_once := not _player.is_counting_steps()
+	for i in 40:
+		await _tree.physics_frame
+		var model := _player.global_position.y + hover.get_hover_height()
+		largest = maxf(largest, absf(model - last))
+		last = model
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	# The game turns the steps off while the hero floats: they stay off after it settles.
+	_player.steps_enabled = false
+	hover.enabled = false
+	await _ticks(40)
+	var switch_kept := not _player.is_counting_steps() and not _player.steps_enabled
+	_player.steps_enabled = true
+	var switch_back := _player.is_counting_steps()
+	hover.steps_while_floating = true
+	hover.enabled = true
+	await _ticks(2)
+	var kept_while_floating := hover.is_floating() and _player.is_counting_steps()
+	hover.steps_while_floating = false
+	var stopped_again := not _player.is_counting_steps()
+	hover.enabled = false
+	await _ticks(40)
+	hover.floating_changed.disconnect(on_change)
+	var steps_back := _player.is_counting_steps() and not hover.is_floating()
+
+	# A second hero, its hover turned on before its first tick.
+	var second: GroundCharacter = (load("res://gdscript/player/player.tscn") as PackedScene).instantiate()
+	second.position = Vector3(-30, 0, 30)
+	_main.add_child(second)
+	var second_hover: CharacterHover = second.get_node("Visual/Hover")
+	second_hover.enabled = true
+	var at_once := second_hover.get_hover_height()
+	await _ticks(1)
+	var after_tick := second_hover.get_hover_height()
+	var visual := second_hover.get_parent()
+	visual.remove_child(second_hover)
+	var let_go := second.is_counting_steps()
+	visual.add_child(second_hover)
+	var taken_back := not second.is_counting_steps()
+	second.queue_free()
+	await _ticks(1)
+	await _teleport(Vector3.ZERO)
+	var rise_ticks := roundi(hover.rise_time / DT)
+	print("turned off mid-run: largest move of the model in a tick %.3f m; settled after %d ticks (rise_time %d ticks), steps then %s; on again: steps stopped at once %s; events %s" % [
+		largest, settled, rise_ticks, steps_at_settle, stopped_at_once, changes])
+	print("the steps switched off while floating stay off %s, and back on %s; kept with steps_while_floating %s, stopped without it %s; back at the end %s" % [
+		switch_kept, switch_back, kept_while_floating, stopped_again, steps_back])
+	print("a hover on before its first tick: %.3f m at once, %.3f m after a tick; out of the tree the steps are let go %s, back in it stopped %s" % [
+		at_once, after_tick, let_go, taken_back])
+	_expect(largest < 0.03 and absi(settled - rise_ticks) <= 1,
+			"turned off and on mid-run, the model moves smoothly in rise_time")
+	_expect(steps_at_settle and stopped_at_once and changes == [false, true, false, true, false] and steps_back,
+			"the steps come back once the model settles, and stop at once when it rises")
+	_expect(switch_kept and switch_back and kept_while_floating and stopped_again,
+			"the game's steps switch is kept; steps_while_floating keeps the steps")
+	var height_range := hover.bob_height + 0.005
+	_expect(absf(at_once - hover.height) <= height_range and absf(after_tick - hover.height) <= height_range
+			and let_go and taken_back,
+			"a hover turned on before its first tick floats at once; out of the tree it lets the steps go")
+
+
 ## The monitor panel: hidden by default, the setting shows it; it names the state and lists the latest events.
 func _check_monitor() -> void:
 	print("\n== the character monitor")
@@ -365,6 +763,9 @@ func _check_monitor() -> void:
 	await _ticks(60)
 	await _frames(1)
 	var events := monitor.get_event_lines()
+	_player.steps_enabled = false
+	var no_steps := "\n".join(monitor.get_state_lines()).contains("No steps")
+	_player.steps_enabled = true
 	settings.set_value(GameSettings.CHARACTER_STATE, false)
 	monitor.history_size = history_size
 	print("hidden by default %s, shown by the setting %s; in the air:\n%s\nevents:\n%s" % [hidden, shown, in_air,
@@ -377,6 +778,7 @@ func _check_monitor() -> void:
 			"the events of the jump are in the list")
 	_expect(events.size() <= 10 and not monitor.log_events,
 			"the list keeps only the latest events; the log to the output is off by default")
+	_expect(no_steps, "without steps the panel says so")
 
 
 ## Records the character's events into [param events] in order: signal names and the names of new states. Returns

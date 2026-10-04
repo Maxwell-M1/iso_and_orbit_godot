@@ -164,6 +164,18 @@ func _check_settings_window() -> void:
 			"the sprint switch reaches the character, its hint hides, its controls lock (and jump height without jump)")
 	_expect(is_equal_approx(_mover.settings.sprint_speed_multiplier, 1.8) and bonus_text == "+80%",
 			"sprint bonus 80% makes the sprint 1.8 times faster")
+	var hover_switch := screen.find_child("Hover") as CheckButton
+	var footsteps := screen.find_child("SoundFootsteps") as CheckButton
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var walking := not hover.enabled and not footsteps.disabled
+	hover_switch.button_pressed = true
+	var floating := hover.enabled and footsteps.disabled
+	hover_switch.button_pressed = false
+	var walking_again := not hover.enabled and not footsteps.disabled
+	print("character tab: walking %s, the floating switch on: floating with the footsteps sound locked %s, off: walking %s" % [
+		walking, floating, walking_again])
+	_expect(walking and floating and walking_again,
+			"the floating switch reaches the hero; the footsteps sound switch locks while the hero floats")
 
 	var master := AudioServer.get_bus_index(&"Master")
 	var volume := screen.find_child("SoundVolume") as HSlider
@@ -240,6 +252,7 @@ func _check_settings_window() -> void:
 				func(flip: bool) -> bool: return not flip)
 			and not AudioServer.is_bus_mute(master) and is_zero_approx(AudioServer.get_bus_volume_db(master))
 			and is_equal_approx(_mover.settings.backward_speed_multiplier, 0.7)
+			and not hover.enabled and not footsteps.disabled
 			and backward.editable == (keys_default == PointClickMoveInput.KeysMode.SIDESTEP),
 			"reset brings back the defaults, controls follow")
 

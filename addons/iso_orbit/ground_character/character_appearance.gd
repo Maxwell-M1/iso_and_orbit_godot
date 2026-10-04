@@ -11,7 +11,8 @@ extends Node
 ## The look changed; [param model] is the new model.
 signal look_changed(model: Node3D)
 
-## The node that holds the model (for the player, Visual: [GroundCharacter] turns it).
+## The node that holds the model (for the player, Visual/Hover: the [CharacterHover] under the Visual node that
+## [GroundCharacter] turns).
 @export var slot: Node3D
 
 ## Name of the model node inside [member slot].

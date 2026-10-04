@@ -5,10 +5,12 @@ extends Node
 ##
 ## - In time with the steps ([method GroundCharacter.get_step_phase]) the hand swings back and forth, the item lags
 ##   slightly behind in tilt, and the hand dips on every step. The swing grows with speed (more when sprinting); when
-##   the character stands or is in the air, the hand smoothly returns to its place.
+##   the character stands or is in the air, the hand smoothly returns to its place. Without steps
+##   ([method GroundCharacter.is_counting_steps]: turned off, or stopped while the character floats) the hand does not
+##   swing: the swing fades out, and comes back smoothly with the steps.
 ## - While running, the item leans forward.
-## - Inertia: when accelerating, braking and turning, the item lags behind and sways on a spring; on landing and on
-##   the jump push-off, the hand sags.
+## - Inertia: when accelerating, braking and turning ([method GroundCharacter.get_local_acceleration]), the item lags
+##   behind and sways on a spring ([DampedSpring]); on landing and on the jump push-off, the hand sags.
 ##
 ## Moves the hand node relative to its position in the model. Runs in the physics tick after the character (the node
 ## is its child or has a higher priority), so physics interpolation smooths the movement, just as it does for the body.
@@ -16,8 +18,8 @@ extends Node
 ## The character whose steps and speed to track.
 @export var character: GroundCharacter
 
-## The hand node in the model (for example, [code]Visual/Model/RightHand[/code]). The model faces −Z. When the model
-## is changed ([CharacterAppearance]), assign the new model's hand: its current position becomes the hand's place.
+## The hand node in the model (for example, [code]Visual/Hover/Model/RightHand[/code]). The model faces −Z. When the
+## model is changed ([CharacterAppearance]), assign the new model's hand: its current position becomes the hand's place.
 @export var hand: Node3D:
 	set(value):
 		hand = value
@@ -39,9 +41,10 @@ extends Node
 @export_range(0.5, 30.0, 0.5) var swing_response := 8.0
 
 @export_group("Inertia")
-## Item tilt per 1 m/s² of body acceleration: back when speeding up, forward when braking, outward in turns.
-@export_range(0.0, 5.0, 0.01, "radians_as_degrees") var tilt_per_acceleration := deg_to_rad(0.45)
-## Inertia does not tilt the item more than this.
+## Item tilt per 1 m/s² of body acceleration ([method GroundCharacter.get_local_acceleration]). Positive lags behind:
+## back when speeding up, forward when braking, outward in turns. Negative tilts into the acceleration.
+@export_range(-5.0, 5.0, 0.01, "radians_as_degrees") var tilt_per_acceleration := deg_to_rad(0.45)
+## Inertia does not tilt the item more than this, in any direction.
 @export_range(0.0, 60.0, 0.5, "radians_as_degrees") var max_inertia_tilt := deg_to_rad(14.0)
 ## Downward kick of the hand on landing, per 1 m/s of fall speed.
 @export_range(0.0, 0.5, 0.005) var landing_kick := 0.06
@@ -54,24 +57,13 @@ extends Node
 ## Spring damping: at 1 the item returns without swaying; below 1 it sways.
 @export_range(0.05, 2.0, 0.01) var spring_damping := 0.45
 
-## A damped spring: the value is pulled toward the target and, if damping is below 1, oscillates around it.
-class Spring:
-	var value := 0.0
-	var speed := 0.0
-
-	func update(target: float, frequency: float, damping: float, delta: float) -> float:
-		var omega := TAU * frequency
-		speed += (omega * omega * (target - value) - 2.0 * damping * omega * speed) * delta
-		value += speed * delta
-		return value
-
-
 var _rest := Transform3D.IDENTITY
 var _swing_scale := 0.0
-var _last_velocity := Vector3.ZERO
-var _pitch := Spring.new()
-var _roll := Spring.new()
-var _drop := Spring.new()
+# How much of the swing the steps give: 1 with steps, 0 without them, smoothly in between.
+var _step_share := 1.0
+var _pitch := DampedSpring.new()
+var _roll := DampedSpring.new()
+var _drop := DampedSpring.new()
 
 
 func _init() -> void:
@@ -83,36 +75,32 @@ func _ready() -> void:
 	assert(character != null, "HandSway needs the character property set.")
 	character.landed.connect(_on_landed)
 	character.jumped.connect(_on_jumped)
+	_step_share = 1.0 if character.is_counting_steps() else 0.0
 
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(hand):
 		return
 	var on_floor := character.is_on_floor()
-	var planar := character.get_move_velocity()
 	var full_speed := character.mover.settings.max_speed
-	var target_scale := clampf(planar.length() / full_speed, 0.0, max_swing_scale) if on_floor else 0.0
-	_swing_scale = lerpf(_swing_scale, target_scale, 1.0 - exp(-swing_response * delta))
+	var target_scale := clampf(character.get_move_speed() / full_speed, 0.0, max_swing_scale) if on_floor else 0.0
+	var weight := 1.0 - exp(-swing_response * delta)
+	_swing_scale = lerpf(_swing_scale, target_scale, weight)
+	_step_share = lerpf(_step_share, 1.0 if character.is_counting_steps() else 0.0, weight)
 
-	# Body acceleration in the model's axes: −Z is forward, +X is right.
-	var acceleration := (planar - _last_velocity) / delta
-	_last_velocity = planar
-	var local := hand.get_parent_node_3d().global_basis.orthonormalized().inverse() * acceleration
-	var forward_acceleration := -local.z
-	var right_acceleration := local.x
 	# Accelerating forward tilts the top back (+X rotation); accelerating right tilts the top left (+Z rotation).
-	var pitch_target := clampf(forward_acceleration * tilt_per_acceleration, -max_inertia_tilt, max_inertia_tilt)
-	var roll_target := clampf(right_acceleration * tilt_per_acceleration, -max_inertia_tilt, max_inertia_tilt)
-	_pitch.update(pitch_target, spring_frequency, spring_damping, delta)
-	_roll.update(roll_target, spring_frequency, spring_damping, delta)
+	var inertia := (character.get_local_acceleration() * tilt_per_acceleration).limit_length(max_inertia_tilt)
+	_pitch.update(inertia.y, spring_frequency, spring_damping, delta)
+	_roll.update(inertia.x, spring_frequency, spring_damping, delta)
 	_drop.update(0.0, spring_frequency, spring_damping, delta)
-	_drop.value = clampf(_drop.value, -max_drop, max_drop)
+	_drop.keep_within(max_drop)
 
 	# A step is the extreme position of the hand (cos = ±1) and the lowest point; halfway between steps the hand is in
-	# the middle.
+	# the middle. Without steps (a floating character) the hand does not swing, only leans with the run.
 	var phase := character.get_step_phase()
-	var swing := cos(PI * phase) * _swing_scale
-	var dip := (1.0 + cos(TAU * phase)) * 0.5 * _swing_scale
+	var step_scale := _swing_scale * _step_share
+	var swing := cos(PI * phase) * step_scale
+	var dip := (1.0 + cos(TAU * phase)) * 0.5 * step_scale
 	var pitch := swing * swing_tilt - minf(_swing_scale, 1.0) * run_lean + _pitch.value
 	var offset := Vector3(0.0, -dip * step_drop + _drop.value, -swing * swing_distance)
 	var tilt := Basis.from_euler(Vector3(pitch, 0.0, _roll.value))

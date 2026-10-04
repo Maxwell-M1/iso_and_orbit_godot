@@ -14,7 +14,7 @@ const SCRIPT_STRINGS: Array[String] = [
 	"On the ground · slope %.0f°", "In the air %.2f s · vertical %+.1f m/s", "Step %d · %s · cycle %.2f",
 	"Stamina %d%%", "exhausted", "Standing", "Running", "Sprinting", "Jumping", "Falling", "step, %s",
 	"touched the ground at %.1f m/s", "landing at %.1f m/s", "sprint started", "sprint ended", "%.2f s", "left foot",
-	"right foot",
+	"right foot", "No steps", "stair %+.2f m",
 ]
 
 ## Strings without letters (numbers, percentages, degrees) need no translation; the letters in "%d", "%.1f" do not

@@ -23,6 +23,7 @@
 [ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_gear.tres" id="17_silhouette_gear"]
 [ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_outline.tres" id="17_silhouette_outline"]
 [ext_resource type="Script" path="res://addons/iso_orbit/ground_character/hand_sway.gd" id="18_sway"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_hover.gd" id="21_hover"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_1.wav" id="7_step1"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_2.wav" id="8_step2"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_3.wav" id="9_step3"]
@@ -60,7 +61,11 @@ shape = SubResource("CapsuleShape3D_body")
 
 [node name="Visual" type="Node3D" parent="." unique_id=1355512769]
 
-[node name="Model" parent="Visual" unique_id=170123621 instance=ExtResource("20_look_10")]
+[node name="Hover" type="Node3D" parent="Visual"]
+script = ExtResource("21_hover")
+enabled = false
+
+[node name="Model" parent="Visual/Hover" unique_id=170123621 instance=ExtResource("20_look_10")]
 
 [node name="Silhouette" type="Node" parent="." unique_id=1188634796 node_paths=PackedStringArray("target")]
 script = ExtResource("16_silhouette")
@@ -72,14 +77,14 @@ outline = ExtResource("17_silhouette_outline")
 
 [node name="Appearance" type="Node" parent="." node_paths=PackedStringArray("slot", "hand_sway")]
 script = ExtResource("19_appearance")
-slot = NodePath("../Visual")
+slot = NodePath("../Visual/Hover")
 models = Array[PackedScene]([ExtResource("20_look_01"), ExtResource("20_look_02"), ExtResource("20_look_03"), ExtResource("20_look_04"), ExtResource("20_look_05"), ExtResource("20_look_06"), ExtResource("20_look_07"), ExtResource("15_model"), ExtResource("20_look_09"), ExtResource("20_look_10")])
 hand_sway = NodePath("../RightHandSway")
 
 [node name="RightHandSway" type="Node" parent="." node_paths=PackedStringArray("character", "hand")]
 script = ExtResource("18_sway")
 character = NodePath("..")
-hand = NodePath("../Visual/Model/RightHand")
+hand = NodePath("../Visual/Hover/Model/RightHand")
 
 [node name="NavigationMover" type="Node" parent="." unique_id=830176565]
 script = ExtResource("2_mover")

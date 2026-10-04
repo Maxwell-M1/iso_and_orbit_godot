@@ -10,15 +10,20 @@ extends CharacterBody3D
 ## The character tells what it is doing, so that animations, sounds, effects and the interface do not compute it
 ## themselves (the character itself knows nothing about them):
 ## - signals for moments: [signal state_changed], [signal stepped], [signal jumped], [signal left_floor],
-##   [signal touched_floor], [signal landed], [signal sprint_changed];
+##   [signal touched_floor], [signal landed], [signal sprint_changed], [signal stair_taken];
 ## - queries for what changes every tick (read them in [code]_process[/code] or [code]_physics_process[/code]):
 ##   [method get_state], [method get_move_velocity], [method get_move_speed], [method get_locomotion_blend],
-##   [method get_local_movement], [method get_turn_rate], [method get_air_time], [method get_step_phase],
-##   [method get_gait_cycle], [method get_step_foot].
+##   [method get_local_movement], [method get_local_acceleration], [method get_turn_rate], [method get_air_time],
+##   [method get_step_phase], [method get_gait_cycle], [method get_step_foot];
+## - the ground around the character: [method get_ground_height].
 ## [CharacterMonitor] shows all of this as text.
 ##
 ## Ground: the body walks up slopes up to [member CharacterBody3D.floor_max_angle] (the body's Floor → Max Angle) and
-## steps up and down stairs up to [member max_step_height].
+## steps up and down stairs up to [member max_step_height]. Up is +Y: [member CharacterBody3D.up_direction] must stay
+## [code]Vector3.UP[/code].
+##
+## A mistake in the setup (a component in the wrong place, settings that contradict each other) is printed as a warning
+## when the character enters the tree; [method get_setup_warnings] returns the same list.
 
 ## [method get_state] changed: [param state] is the new state, [param previous] the old one. Emitted at the end of the
 ## physics tick, after the other signals of that tick.
@@ -40,6 +45,14 @@ signal touched_floor(fall_speed: float)
 ## A real landing: [signal touched_floor] at a fall speed of at least [member landing_min_speed]. [param impact_speed]
 ## is that speed, m/s. Stepping off a bump does not count as a landing.
 signal landed(impact_speed: float)
+## The character stepped onto a stair: up ([param height] > 0) or down ([param height] < 0). [param height] is the
+## height of the stair, m: from the ground the character stood on to the ground of the stair. Emitted at the end of the
+## physics tick, before [signal state_changed]. Only stairs that the character steps onto count (see
+## [member max_step_height]). A stair low enough for the round bottom of a capsule to climb by itself (up to
+## [code]radius × (1 − cos floor_max_angle)[/code]) or for the floor snap to take down
+## ([member CharacterBody3D.floor_snap_length]) passes without the signal. It is for sounds and animations: the body
+## is put onto the stair at once, and smoothing that on screen is up to the model ([CharacterHover]) or the camera.
+signal stair_taken(height: float)
 
 ## What the character is doing ([method get_state]).
 enum State {
@@ -60,10 +73,15 @@ enum Foot { LEFT, RIGHT }
 
 ## Below this horizontal speed the character counts as standing: [constant State.IDLE], no steps.
 const IDLE_SPEED := 0.1
+## Ground counts as standable up to this much steeper than [member CharacterBody3D.floor_max_angle], rad: the engine's
+## own floor check of the body has the same margin. [LedgeGuard] uses it too.
+const FLOOR_ANGLE_MARGIN := 0.01
 # How much farther than the movement of the tick a stair is looked for, m.
 const _STAIR_LOOK_AHEAD := 0.05
 # The step of the search for a place past a stair edge, m.
 const _STAIR_SEARCH_STEP := 0.02
+# How far down the ground under the body is looked for, m: the body stands on it within the safe margin.
+const _SUPPORT_PROBE := 0.05
 
 ## The component that computes the horizontal velocity.
 @export var mover: NavigationMover
@@ -113,6 +131,16 @@ const _STAIR_SEARCH_STEP := 0.02
 @export_range(0.5, 60.0, 0.5, "suffix:s") var sprint_duration := 5.0
 
 @export_group("Steps")
+## Count steps: [signal stepped] and the step rhythm ([method get_step_phase], [method get_gait_cycle],
+## [method get_step_foot]). Off for a character without legs (on wheels, always floating): then there are no steps,
+## and the rhythm stands still at its last values, so leg animations should not follow it. When the steps come back,
+## they start as from a standstill: the first step comes after [member first_step_distance]. Components can also stop
+## the steps for a while without touching this switch ([method set_steps_suppressed]; [CharacterHover] does it while
+## the character floats).
+@export var steps_enabled := true:
+	set(value):
+		steps_enabled = value
+		_update_counting_steps()
 ## How far to travel on the ground from one step to the next ([signal stepped]). Steps are counted by the distance
 ## traveled, not by time, so they are more frequent when sprinting, and there are none against a wall where the
 ## character stands.
@@ -130,6 +158,14 @@ var _turn_rate := 0.0
 var _model_yaw := 0.0
 # The horizontal velocity the body moved with in the last tick (get_move_speed).
 var _move_velocity := Vector3.ZERO
+# The horizontal velocity the body was driven with in the last tick and how it changed, per second
+# (get_local_acceleration).
+var _driven_velocity := Vector3.ZERO
+var _acceleration := Vector3.ZERO
+# A stair taken in this tick, for stair_taken at its end; the height of the ground at the place found past a stair edge.
+var _stair_pending := false
+var _stair_height := 0.0
+var _place_ground := 0.0
 # Jump and floor contact.
 var _coyote_left := 0.0
 var _jump_buffer_left := 0.0
@@ -137,9 +173,11 @@ var _was_on_floor := true
 var _jumping := false
 var _air_time := 0.0
 var _fall_speed := 0.0
-# Steps: the stretch of path to the next step, its length (first_step_distance from a standstill, stride_length after
-# that) and the step rhythm (get_step_phase) at its start and at its end; at the end it is always a whole number, the
-# moment of the step.
+# Steps: whether they are counted now and who stops them (set_steps_suppressed); the stretch of path to the next
+# step, its length (first_step_distance from a standstill, stride_length after that) and the step rhythm
+# (get_step_phase) at its start and at its end; at the end it is always a whole number, the moment of the step.
+var _counting_steps := true
+var _step_suppressors: Array[Object] = []
 var _to_next_step := 0.0
 var _step_segment := 0.0
 var _phase_from := 0.0
@@ -149,14 +187,19 @@ var _ray_query := PhysicsRayQueryParameters3D.new()
 
 func _ready() -> void:
 	assert(mover != null, "GroundCharacter needs the mover property set.")
+	for warning in get_setup_warnings():
+		push_warning("%s: %s" % [name, warning])
 	_to_next_step = first_step_distance
 	_step_segment = first_step_distance
 	_ray_query.exclude = [get_rid()]
+	# A ray that starts inside something finds no ground: that thing's top is higher than where the ray starts.
+	_ray_query.hit_from_inside = true
 	_model_yaw = _get_model_yaw()
 
 
 ## One tick of the body, in this order: sprint, horizontal velocity, jump and gravity, the ledge guard,
-## [method move_and_slide] with stairs, then what the tick changed: floor contact, steps, the model's turn, the state.
+## [method move_and_slide] with stairs, then what the tick changed: floor contact, the stair, steps, the model's turn,
+## the state.
 func _physics_process(delta: float) -> void:
 	_update_sprint(delta)
 	var planar := mover.compute_velocity(delta)
@@ -169,13 +212,35 @@ func _physics_process(delta: float) -> void:
 	# the air anyway).
 	if ledge_guard != null and not jumping:
 		velocity = ledge_guard.constrain(velocity, delta)
+	_measure_acceleration(delta)
 	# After move_and_slide() the floor has already canceled the fall speed, so remember it beforehand.
 	_fall_speed = maxf(_fall_speed, -velocity.y)
 	_move_body(delta, jumping)
 	_update_floor_contact(delta)
+	_report_stair()
 	_report_steps(delta)
 	_turn_visual(delta)
 	_update_state()
+
+
+## Problems in how the character is set up, one line each; empty if there are none. The same lines are printed as
+## warnings when the character enters the tree.
+func get_setup_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if mover != null and mover.get_parent() != self:
+		warnings.append("The mover must be a child of the character: it moves its parent.")
+	if ledge_guard != null:
+		if ledge_guard.get_parent() != self:
+			warnings.append("The ledge guard must be a child of the character: it checks the ground under its parent.")
+		elif ledge_guard.max_drop < max_step_height:
+			warnings.append(("LedgeGuard.max_drop (%.2f m) is lower than max_step_height (%.2f m): the guard stops the "
+					+ "character at stairs down that it could step down.") % [ledge_guard.max_drop, max_step_height])
+	if max_step_height > 0.0 and floor_snap_length >= max_step_height:
+		warnings.append(("Floor → Snap Length (%.2f m) is not lower than max_step_height (%.2f m): the floor snap takes "
+				+ "stairs down by itself, without stair_taken.") % [floor_snap_length, max_step_height])
+	if not up_direction.is_equal_approx(Vector3.UP):
+		warnings.append("Up Direction is not +Y: the character supports only +Y as up.")
+	return warnings
 
 
 #region Commands
@@ -185,6 +250,19 @@ func jump() -> void:
 	if not can_jump:
 		return
 	_jump_buffer_left = jump_buffer_time if jump_buffer_time > 0.0 else get_physics_process_delta_time()
+
+
+## Stops the steps for [param source] (a component, such as [CharacterHover] while the character floats) while
+## [param suppressed] is [code]true[/code], without touching [member steps_enabled]. Steps are counted when
+## [member steps_enabled] is on and no source stops them ([method is_counting_steps]), so several sources and the
+## game's own switch never undo each other. A source lets the steps go when it no longer needs to stop them, also when
+## it leaves the tree, as [CharacterHover] does.
+func set_steps_suppressed(source: Object, suppressed: bool) -> void:
+	if suppressed and not _step_suppressors.has(source):
+		_step_suppressors.append(source)
+	elif not suppressed:
+		_step_suppressors.erase(source)
+	_update_counting_steps()
 
 #endregion
 
@@ -210,10 +288,13 @@ func get_move_speed() -> float:
 
 ## The speed for a 1D blend of animations: 0 standing, 1 at the running speed
 ## ([member LocomotionSettings.max_speed]), 2 at the full sprint speed; in between, in proportion. Does not depend on
-## how the speeds are tuned, so the blend points stay at 0, 1 and 2.
+## how the speeds are tuned, so the blend points stay at 0, 1 and 2. Below [constant IDLE_SPEED] it is 0, as the
+## character counts as standing.
 func get_locomotion_blend() -> float:
 	var settings := mover.settings
 	var speed := get_move_speed()
+	if speed < IDLE_SPEED:
+		return 0.0
 	if speed <= settings.max_speed:
 		return speed / settings.max_speed
 	var sprint := settings.max_speed * settings.sprint_speed_multiplier
@@ -228,10 +309,17 @@ func get_locomotion_blend() -> float:
 func get_local_movement() -> Vector2:
 	if _move_velocity.length() < IDLE_SPEED:
 		return Vector2.ZERO
-	var forward := Vector3.FORWARD.rotated(Vector3.UP, _model_yaw)
-	var right := forward.cross(Vector3.UP)
-	var direction := _move_velocity.normalized()
-	return Vector2(direction.dot(right), direction.dot(forward)) * get_locomotion_blend()
+	return _to_model_axes(_move_velocity.normalized()) * get_locomotion_blend()
+
+
+## How fast the movement speeds up, slows down and turns, m/s², in the model's axes as in
+## [method get_local_movement]: x is to the model's right, y is forward. Speeding up forward gives y > 0, braking
+## y < 0, a turn to the left x < 0 (the velocity turns to the left). It is how the velocity the body is driven with
+## changes (the [member mover]'s, after the [member ledge_guard]), so it is smooth: stairs do not jerk it, and hitting a
+## wall does not show in it. For inertia: an item that lags behind ([HandSway]), a model that leans
+## ([CharacterHover]).
+func get_local_acceleration() -> Vector2:
+	return _to_model_axes(_acceleration)
 
 
 ## How fast the model turns, rad/s: positive to the left (counterclockwise seen from above), negative to the right.
@@ -265,6 +353,12 @@ func get_step_foot() -> Foot:
 	return Foot.LEFT if posmod(floori(get_step_phase()), 2) == 0 else Foot.RIGHT
 
 
+## Steps are counted now: [member steps_enabled] is on and no component stops them
+## ([method set_steps_suppressed]). Otherwise there is no [signal stepped], and the step rhythm stands still.
+func is_counting_steps() -> bool:
+	return _counting_steps
+
+
 ## The character is sprinting now.
 func is_sprinting() -> bool:
 	return mover.sprinting
@@ -278,6 +372,23 @@ func is_exhausted() -> bool:
 ## Initial jump speed for [member jump_height]: v = √(2·g·h).
 func get_jump_speed() -> float:
 	return sqrt(2.0 * get_gravity().length() * gravity_scale * jump_height)
+
+
+## The height of the ground under [param point]: of the first surface that a ray going down meets from [param above]
+## meters above the point to [param below] meters below it. NAN if there is none, if it is too steep to stand on
+## (steeper than [member CharacterBody3D.floor_max_angle]), or if the ray starts inside something (a wall higher than
+## [param above]). The ray hits what the body collides with ([member CollisionObject3D.collision_mask]), except the
+## body itself. For example, for a model floating over the ground ([CharacterHover]) or for feet that should stand on
+## the stairs.
+func get_ground_height(point: Vector3, above: float, below: float) -> float:
+	_ray_query.from = point + up_direction * above
+	_ray_query.to = point - up_direction * below
+	_ray_query.collision_mask = collision_mask
+	var hit := get_world_3d().direct_space_state.intersect_ray(_ray_query)
+	# A ray that starts inside a shape hits it at once, with no normal.
+	if hit.is_empty() or hit.normal == Vector3.ZERO or not _is_floor(hit.normal):
+		return NAN
+	return (hit.position as Vector3).dot(up_direction)
 
 #endregion
 
@@ -328,11 +439,12 @@ func _move_body(delta: float, jumping: bool) -> void:
 		velocity.z = horizontal.z
 		_move_velocity = horizontal
 		return
+	var start := global_transform
 	move_and_slide()
 	var real := get_real_velocity()
 	_move_velocity = Vector3(real.x, 0.0, real.z)
 	if not jumping:
-		_step_down(horizontal)
+		_step_down(horizontal, start)
 
 
 ## Steps onto a stair: if [param motion] (the horizontal movement of this tick) runs into a wall whose top is ground
@@ -350,20 +462,39 @@ func _step_up(motion: Vector3) -> bool:
 	var place: Variant = _find_stair_place(max_step_height, motion.normalized(), motion.length())
 	if place == null:
 		return false
+	_note_stair(_get_support_height(global_transform))
 	global_position = place
 	return true
 
 
-## Keeps the character on the ground going down a stair: if it stood on the ground before the tick and is in the air
-## now without a jump, and there is ground no deeper than [member max_step_height] under it (or a little farther
-## along [param horizontal], the velocity of the tick), it is put on that ground.
-func _step_down(horizontal: Vector3) -> void:
+## Keeps the character on the ground going down a stair: if it stood on the ground before the tick (at [param start])
+## and is in the air now without a jump, and there is ground no deeper than [member max_step_height] under it (or a
+## little farther along [param horizontal], the velocity of the tick), it is put on that ground.
+func _step_down(horizontal: Vector3, start: Transform3D) -> void:
 	if max_step_height <= 0.0 or not _was_on_floor or is_on_floor() or velocity.y > 0.0:
 		return
 	var place: Variant = _find_stair_place(0.0, horizontal.normalized(), 0.0)
 	if place != null:
+		_note_stair(_get_support_height(start))
 		global_position = place
 		apply_floor_snap()
+
+
+## Remembers the stair for [signal stair_taken]: from the ground at [param from] to the ground of the place just found.
+func _note_stair(from: float) -> void:
+	if is_nan(from):
+		return
+	_stair_pending = true
+	_stair_height = _place_ground - from
+
+
+## The height of the ground that the body placed at [param from] stands on: of the point it touches, the edge of a
+## stair too. NAN if the body does not touch the ground there.
+func _get_support_height(from: Transform3D) -> float:
+	var hit := KinematicCollision3D.new()
+	if not test_move(from, -up_direction * _SUPPORT_PROBE, hit) or not _is_floor(hit.get_normal()):
+		return NAN
+	return hit.get_position().dot(up_direction)
 
 
 ## Where the body stands on the other side of a stair edge, or [code]null[/code]. The body is lifted by [param lift]
@@ -390,27 +521,19 @@ func _find_stair_place(lift: float, direction: Vector3, distance: float) -> Vari
 			var place := probe.origin + hit.get_travel()
 			var height := place.dot(up_direction) - feet
 			# The ground itself, a little past the touch point along the way: a stair top, not a steep slope.
-			var ground := _floor_height_at(hit.get_position() + direction * 0.05, 0.1) - feet
-			if absf(height) > 0.01 and absf(height) <= max_step_height + 0.01 and ground <= max_step_height + 0.01:
+			var ground := get_ground_height(hit.get_position() + direction * 0.05, 0.05, 0.1)
+			var stair := absf(height) > 0.01 and absf(height) <= max_step_height + 0.01
+			if stair and ground - feet <= max_step_height + 0.01:
+				_place_ground = ground
 				return place
 		distance += _STAIR_SEARCH_STEP
 	return null
 
 
-## The height of the ground (not too steep to stand on) under [param point], no deeper than [param depth]; NAN if
-## there is none.
-func _floor_height_at(point: Vector3, depth: float) -> float:
-	_ray_query.from = point + up_direction * 0.05
-	_ray_query.to = point - up_direction * depth
-	_ray_query.collision_mask = collision_mask
-	var hit := get_world_3d().direct_space_state.intersect_ray(_ray_query)
-	if hit.is_empty() or not _is_floor(hit.normal):
-		return NAN
-	return (hit.position as Vector3).dot(up_direction)
-
-
+## Whether ground with [param normal] is not too steep to stand on. The engine checks the body's floor with the same
+## small margin over [member CharacterBody3D.floor_max_angle].
 func _is_floor(normal: Vector3) -> bool:
-	return normal.angle_to(up_direction) <= floor_max_angle + 0.01
+	return normal.angle_to(up_direction) <= floor_max_angle + FLOOR_ANGLE_MARGIN
 
 #endregion
 
@@ -437,10 +560,17 @@ func _update_floor_contact(delta: float) -> void:
 	_was_on_floor = on_floor
 
 
+## [signal stair_taken], if the body stepped onto a stair in this tick.
+func _report_stair() -> void:
+	if _stair_pending:
+		_stair_pending = false
+		stair_taken.emit(_stair_height)
+
+
 ## Steps follow the distance traveled on the ground: while the character stands (or is pressed against a wall) there
 ## are no steps, and once it starts moving, the first step comes after [member first_step_distance].
 func _report_steps(delta: float) -> void:
-	if not is_on_floor():
+	if not _counting_steps or not is_on_floor():
 		return
 	var speed := get_move_speed()
 	if speed < IDLE_SPEED:
@@ -454,6 +584,16 @@ func _report_steps(delta: float) -> void:
 		_to_next_step += stride_length
 		_step_segment = stride_length
 		stepped.emit(is_sprinting())
+
+
+## Whether steps are counted ([method is_counting_steps]). When they come back, the rhythm starts as from a
+## standstill.
+func _update_counting_steps() -> void:
+	_step_suppressors = _step_suppressors.filter(func(source: Object) -> bool: return is_instance_valid(source))
+	var counting := steps_enabled and _step_suppressors.is_empty()
+	if counting and not _counting_steps and is_node_ready():
+		_start_step_segment(first_step_distance)
+	_counting_steps = counting
 
 
 ## A new stretch of [param length] to the next step that does not start at a step (from a standstill, after a
@@ -483,6 +623,20 @@ func _turn_visual(delta: float) -> void:
 func _get_model_yaw() -> float:
 	var forward := -visual.global_basis.z if visual != null else mover.get_facing()
 	return atan2(-forward.x, -forward.z)
+
+
+## [param vector] (horizontal) in the model's axes: x is to the right, y is forward.
+func _to_model_axes(vector: Vector3) -> Vector2:
+	var forward := Vector3.FORWARD.rotated(Vector3.UP, _model_yaw)
+	var right := forward.cross(Vector3.UP)
+	return Vector2(vector.dot(right), vector.dot(forward))
+
+
+## How the horizontal velocity the body is driven with changed since the last tick ([method get_local_acceleration]).
+func _measure_acceleration(delta: float) -> void:
+	var driven := Vector3(velocity.x, 0.0, velocity.z)
+	_acceleration = (driven - _driven_velocity) / delta if delta > 0.0 else Vector3.ZERO
+	_driven_velocity = driven
 
 
 func _update_state() -> void:

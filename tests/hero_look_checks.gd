@@ -17,7 +17,7 @@ func _checks() -> Array[Callable]:
 ## property and a setting.
 func _check_player_model() -> void:
 	print("\n== player model: the staff in the right hand, one silhouette for the body, one for the gear, the outline")
-	var staff: Node3D = _player.get_node("Visual/Model/RightHand/Staff")
+	var staff: Node3D = _player.get_node("Visual/Hover/Model/RightHand/Staff")
 	var silhouette: OccludedSilhouette = _player.get_node("Silhouette")
 	var sides := PackedFloat32Array()
 	for direction: Vector3 in [Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(-1, 0, -1)]:
@@ -41,10 +41,10 @@ func _check_player_model() -> void:
 			gear_count += 1
 	var new_gear := MeshInstance3D.new()
 	new_gear.mesh = BoxMesh.new()
-	_player.get_node("Visual/Model/RightHand").add_child(new_gear)
+	_player.get_node("Visual/Hover/Model/RightHand").add_child(new_gear)
 	var new_body := MeshInstance3D.new()
 	new_body.mesh = BoxMesh.new()
-	_player.get_node("Visual/Model").add_child(new_body)
+	_player.get_node("Visual/Hover/Model").add_child(new_body)
 	var added_right := new_gear.material_overlay == gear and new_body.material_overlay == body
 	new_gear.free()
 	new_body.free()
@@ -71,10 +71,10 @@ func _check_player_model() -> void:
 ## returns; on landing the hand dips.
 func _check_hand_sway() -> void:
 	print("\n== the staff sways in the hand: in step with the stride, lags on start, settles on stop, dips on landing")
-	var hand: Node3D = _player.get_node("Visual/Model/RightHand")
+	var hand: Node3D = _player.get_node("Visual/Hover/Model/RightHand")
 	# Compare with where the hand is in the model itself (right now the hand may still be swaying after the previous
 	# checks).
-	var model: Node3D = (load(_player.get_node("Visual/Model").scene_file_path) as PackedScene).instantiate()
+	var model: Node3D = (load(_player.get_node("Visual/Hover/Model").scene_file_path) as PackedScene).instantiate()
 	var rest := (model.get_node("RightHand") as Node3D).transform
 	model.free()
 	await _teleport(Vector3(-30, 0, 34))
@@ -142,7 +142,7 @@ func _check_appearance() -> void:
 	var appearance: CharacterAppearance = _player.get_node("Appearance")
 	var sway: HandSway = _player.get_node("RightHandSway")
 	var silhouette: OccludedSilhouette = _player.get_node("Silhouette")
-	var visual: Node3D = _player.get_node("Visual")
+	var slot := appearance.slot
 	var default_look := appearance.get_look()
 	var default_scene := appearance.get_model().scene_file_path
 	var report := PackedStringArray()
@@ -164,7 +164,7 @@ func _check_appearance() -> void:
 		var swing := hand.transform.origin.distance_to(rest.origin)
 		_mover.stop()
 		await _ticks_until_stopped(60)
-		var right := appearance.get_look() == number and visual.get_child_count() == 1 and sway.hand == hand \
+		var right := appearance.get_look() == number and slot.get_child_count() == 1 and sway.hand == hand \
 				and covered == meshes.size() and swing > 0.02
 		report.append("%d %s%s" % [
 			number, model.scene_file_path.get_file().get_basename().trim_prefix("option_"), "" if right else " (!)"])

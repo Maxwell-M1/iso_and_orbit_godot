@@ -14,7 +14,8 @@ extends Node3D
 ## the end: the node sets the arm length from the zoom, and the arm shortens near obstacles. Without an arm, the child
 ## must be the [Camera3D] itself, and it is placed directly at that distance. The position updates every frame from
 ## the interpolated position of the target, so physics interpolation on the camera itself is off: otherwise it would
-## smooth what is already smoothed and lag by a tick.
+## smooth what is already smoothed and lag by a tick. The height can follow the target smoothly
+## ([member height_follow_time]): on stairs the camera glides instead of jerking up with every stair.
 
 ## The node to follow.
 @export var target: Node3D
@@ -95,6 +96,10 @@ extends Node3D
 @export_range(0.0, 100.0, 0.1) var rotation_sharpness := 30.0
 ## How fast the camera catches up with the wheel zoom.
 @export_range(0.0, 100.0, 0.1) var zoom_sharpness := 10.0
+## In how many seconds the camera almost catches up with the target's height (5% of the change remains). A character
+## is put onto every stair at once, and the camera glides up and down a flight instead of following each jerk; it also
+## rises and falls a little behind the target in a jump. 0 follows the height exactly.
+@export_range(0.0, 2.0, 0.01, "suffix:s") var height_follow_time := 0.0
 
 var _yaw := 0.0
 var _target_yaw := 0.0
@@ -109,6 +114,9 @@ var _follow_paused := false
 var _target_velocity := Vector3.ZERO
 var _last_target_position := Vector3.ZERO
 var _has_target_position := false
+# The target's height that the camera follows (height_follow_time).
+var _follow_height := 0.0
+var _has_follow_height := false
 
 
 func _ready() -> void:
@@ -165,6 +173,7 @@ func _process(delta: float) -> void:
 	_yaw = _smooth(_yaw, _target_yaw, rotation_sharpness, delta)
 	_pitch_offset = _smooth(_pitch_offset, _target_pitch_offset, rotation_sharpness, delta)
 	_zoom = _smooth(_zoom, _target_zoom, zoom_sharpness, delta)
+	_follow_target_height(delta)
 	_apply_transform()
 
 
@@ -184,6 +193,7 @@ func snap() -> void:
 	# A jump of the target is not running: do not turn toward it.
 	_has_target_position = false
 	_target_velocity = Vector3.ZERO
+	_has_follow_height = false
 	_apply_transform()
 	if arm != null:
 		arm.snap()
@@ -281,10 +291,25 @@ func _add_zoom(amount: float) -> void:
 	_target_pitch_offset = clampf(_target_pitch_offset, min_pitch - base_pitch, max_pitch - base_pitch)
 
 
+## Follows the height of the target smoothly ([member height_follow_time]), from its interpolated position.
+func _follow_target_height(delta: float) -> void:
+	if target == null:
+		return
+	var height := target.get_global_transform_interpolated().origin.y
+	if not _has_follow_height or height_follow_time <= 0.0:
+		_follow_height = height
+		_has_follow_height = true
+		return
+	# exp(-3) ≈ 0.05: after height_follow_time, 5% of the change remains, whatever the FPS.
+	_follow_height = lerpf(_follow_height, height, 1.0 - exp(-3.0 * delta / height_follow_time))
+
+
 func _apply_transform() -> void:
 	if target != null:
-		var focus := target.get_global_transform_interpolated().origin + Vector3.UP * focus_height
-		global_position = focus
+		var focus := target.get_global_transform_interpolated().origin
+		if _has_follow_height:
+			focus.y = _follow_height
+		global_position = focus + Vector3.UP * focus_height
 	var pitch := clampf(_get_base_pitch(_zoom) + _pitch_offset, min_pitch, max_pitch)
 	# The default Node3D rotation order is YXZ: pitch first, then rotation around the vertical.
 	rotation = Vector3(pitch, _yaw, 0.0)
