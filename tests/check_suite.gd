@@ -150,6 +150,20 @@ func _wait_until(condition: Callable, max_ticks: int) -> void:
 		await _tree.physics_frame
 
 
+## A jump in place at [param at]: the vertical speed after every tick in the air, from the take-off to the landing.
+func _record_jump(at: Vector3) -> PackedFloat32Array:
+	await _teleport(at)
+	_player.jump()
+	var speeds := PackedFloat32Array()
+	for i in 600:
+		await _tree.physics_frame
+		if not _player.is_on_floor():
+			speeds.append(_player.velocity.y)
+		elif not speeds.is_empty():
+			break
+	return speeds
+
+
 ## Waits until the character stops (no more than [param max_ticks]). Returns the time in seconds or −1.
 func _ticks_until_stopped(max_ticks: int) -> float:
 	for i in max_ticks:
@@ -244,6 +258,16 @@ static func _min(values: PackedFloat32Array) -> float:
 	for value: float in values:
 		result = minf(result, value)
 	return result
+
+
+## The largest difference between two series, value by value; INF if their lengths differ.
+static func _largest_difference(a: PackedFloat32Array, b: PackedFloat32Array) -> float:
+	if a.size() != b.size():
+		return INF
+	var largest := 0.0
+	for i in a.size():
+		largest = maxf(largest, absf(a[i] - b[i]))
+	return largest
 
 
 ## After how many seconds the value first dropped to [param limit]; -1 if it never did.

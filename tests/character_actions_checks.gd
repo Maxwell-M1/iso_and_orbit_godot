@@ -1,6 +1,6 @@
 extends "res://tests/check_suite.gd"
-## Sprint and fatigue, releasing Shift, the jump, the character's signals (steps, jump, landing, sprint) and the
-## sounds on them.
+## Sprint and fatigue, releasing Shift, the jump, the fall settings, the character's signals (steps, jump, landing,
+## sprint) and the sounds on them.
 
 
 func _checks() -> Array[Callable]:
@@ -8,6 +8,7 @@ func _checks() -> Array[Callable]:
 		_check_sprint,
 		_check_sprint_key_release,
 		_check_jump,
+		_check_fall_settings,
 		_check_character_events,
 		_check_character_sounds,
 	]
@@ -293,8 +294,10 @@ func _check_jump() -> void:
 	var coyote := await _jump_after_leaving_edge(3)
 	var late := await _jump_after_leaving_edge(9)
 	guard.enabled = true
-	print("off the edge, guard off: Space 3 ticks after leaving the floor jumps %s, 9 ticks after %s" % [coyote, late])
-	_expect(coyote and not late, "coyote_time: a late press still jumps, a too late one does not")
+	print("off the edge, guard off: Space 3 ticks after leaving the floor jumps %s, rising %.3f m above the take-off; 9 ticks after: jumps %s" % [
+		coyote.jumped, coyote.rise, late.jumped])
+	_expect(coyote.jumped and not late.jumped, "coyote_time: a late press still jumps, a too late one does not")
+	_expect(absf(coyote.rise - _player.jump_height) < 0.02, "a jump in coyote time is jump_height high, as from the ground")
 
 	await _teleport(Vector3(25, 1.6, 17))
 	_mover.steer(Vector3.FORWARD)
@@ -333,6 +336,19 @@ func _check_jump() -> void:
 	print("can_jump off: jumps after Space %d, on floor %s" % [jumps[0] - jumps_before, _player.is_on_floor()])
 	_expect(jumps[0] == jumps_before and _player.is_on_floor(), "can_jump off: Space does nothing")
 	_player.can_jump = true
+
+	# Nothing to push off with: no take-off, and no jumped that would play the jump sound.
+	var jump_height := _player.jump_height
+	_player.jump_height = 0.0
+	jumps_before = jumps[0]
+	_send_key(KEY_SPACE)
+	for i in 20:
+		await _tree.physics_frame
+	var flat_jumps: int = jumps[0] - jumps_before
+	var flat_on_floor := _player.is_on_floor()
+	_player.jump_height = jump_height
+	print("jump_height 0: jumps after Space %d, on floor %s" % [flat_jumps, flat_on_floor])
+	_expect(flat_jumps == 0 and flat_on_floor, "jump_height 0: Space does nothing, without a jumped")
 	_player.jumped.disconnect(on_jumped)
 	await _teleport(Vector3.ZERO)
 
@@ -352,11 +368,14 @@ func _watch_flight() -> Dictionary:
 
 
 ## A run north off the platform without the ledge guard; Space [param ticks] ticks after leaving the edge. Whether
-## the character jumped.
-func _jump_after_leaving_edge(ticks: int) -> bool:
+## the character jumped, and how high it rose above the point it pushed off from.
+func _jump_after_leaving_edge(ticks: int) -> Dictionary:
 	await _teleport(Vector3(25, 1.6, 15.5))
-	var jumped := [false]
-	var on_jumped := func() -> void: jumped[0] = true
+	# Whether it jumped, and the height it pushed off from: the body has not moved yet in the tick of jumped.
+	var jumped := [false, 0.0]
+	var on_jumped := func() -> void:
+		jumped[0] = true
+		jumped[1] = _player.global_position.y
 	_player.jumped.connect(on_jumped)
 	_mover.steer(Vector3.FORWARD)
 	for i in 120:
@@ -365,16 +384,220 @@ func _jump_after_leaving_edge(ticks: int) -> bool:
 			break
 	for i in ticks - 1:
 		await _tree.physics_frame
+	var top := _player.global_position.y
 	_send_key(KEY_SPACE)
 	for i in 3:
 		await _tree.physics_frame
+		top = maxf(top, _player.global_position.y)
 	_mover.stop()
 	for i in 120:
 		await _tree.physics_frame
+		top = maxf(top, _player.global_position.y)
 		if _player.is_on_floor() and _player.global_position.y < 0.05:
 			break
 	_player.jumped.disconnect(on_jumped)
-	return jumped[0]
+	return {jumped = jumped[0], rise = top - jumped[1] if jumped[0] else 0.0}
+
+
+## The fall settings ([FallSettings]). Without them, and with a new resource (the character's own gravity, no limit),
+## a jump goes exactly as the physics says, tick by tick. With a slower fall a jump rises as high and as long, comes
+## down with the weaker gravity up to the speed limit and goes on at it, and touches the ground at the limit without a
+## landing; a limit of exactly landing_min_speed lands. A fall thrown faster than the limit slows down to it smoothly
+## in braking_time, or at once with 0, and touches the ground at the speed it has then; a falling character teleported
+## onto the ground does not land. Sources put their fall in place of the character's own and give it back: the
+## highest priority counts, of equal ones the latest; a source that changes its settings keeps its place, and a source
+## that the game drops lets go by itself.
+func _check_fall_settings() -> void:
+	print("\n== fall settings: as before without them, a slower fall up to a limit, braking to it, falls put in place")
+	var own_fall := _player.fall
+	var landing_speed := _player.landing_min_speed
+	var gravity := _player.get_gravity().length()
+	var rise := gravity * _player.gravity_scale
+	var touchdowns := PackedFloat32Array()
+	var on_touched := func(speed: float) -> void: touchdowns.append(speed)
+	var landings := PackedFloat32Array()
+	var on_landed := func(speed: float) -> void: landings.append(speed)
+	_player.touched_floor.connect(on_touched)
+	_player.landed.connect(on_landed)
+
+	# Without fall settings and with a new resource: in the k-th tick in the air the speed is v − g·dt·(k + ½).
+	_player.fall = null
+	var plain := await _record_jump(Vector3(-20, 0, 34))
+	_player.fall = FallSettings.new()
+	var with_new := await _record_jump(Vector3(-20, 0, 34))
+	var off_formula := 0.0
+	for k in plain.size():
+		off_formula = maxf(off_formula, absf(plain[k] - (_player.get_jump_speed() - rise * DT * (k + 0.5))))
+
+	# A slower fall: gravity 0.5 instead of 3, 2 m/s at most.
+	var slow := FallSettings.new()
+	slow.gravity_scale = 0.5
+	slow.max_speed = 2.0
+	var down := gravity * slow.gravity_scale
+	_player.fall = slow
+	await _teleport(Vector3(-20, 0, 34))
+	touchdowns.clear()
+	landings.clear()
+	_player.jump()
+	var jump := await _watch_fall()
+	var soft := touchdowns.duplicate()
+	var soft_landings := landings.size()
+	var expected_rise := _player.get_jump_speed() / rise
+	# Down from the top: up to the limit with the weaker gravity, the rest of the height at the limit.
+	var to_limit := slow.max_speed / down
+	var expected_air := expected_rise + to_limit + (_player.jump_height - slow.max_speed * to_limit / 2.0) / slow.max_speed
+	var speeds: PackedFloat32Array = jump.speeds
+	var gains := PackedFloat32Array()
+	var at_limit := -1.0
+	for i in speeds.size():
+		if speeds[i] >= slow.max_speed - 0.0001:
+			if at_limit < 0.0:
+				at_limit = (i + 1) * DT
+		elif i > 0:
+			gains.append((speeds[i] - speeds[i - 1]) / DT)
+
+	# Thrown down at 12 m/s high above the ground: it slows down to the limit smoothly, by 95% of the excess in
+	# braking_time.
+	await _teleport(Vector3(-20, 8, 34))
+	var thrown := 12.0
+	_player.velocity.y = -thrown
+	var braking := PackedFloat32Array([thrown])
+	for i in roundi(slow.braking_time / DT):
+		await _tree.physics_frame
+		braking.append(-_player.velocity.y)
+	var largest_drop := 0.0
+	for i in range(1, braking.size()):
+		largest_drop = maxf(largest_drop, braking[i - 1] - braking[i])
+	var left_over := (braking[-1] - slow.max_speed) / (thrown - slow.max_speed)
+	# Thrown down 0.6 m above the ground: it touches the ground at the speed it has slowed down to.
+	await _teleport(Vector3(-20, 0.6, 34))
+	touchdowns.clear()
+	landings.clear()
+	_player.velocity.y = -thrown
+	await _wait_until(func() -> bool: return _player.is_on_floor(), 30)
+	var thrown_touch := touchdowns.duplicate()
+	var thrown_landings := landings.duplicate()
+	# Without braking: at the limit at once.
+	await _teleport(Vector3(-20, 8, 34))
+	slow.braking_time = 0.0
+	_player.velocity.y = -thrown
+	await _tree.physics_frame
+	var at_once := -_player.velocity.y
+
+	# A character falling fast, teleported onto the ground: no landing.
+	_player.fall = null
+	await _wait_until(func() -> bool: return -_player.velocity.y > 10.0, 60)
+	var falling := -_player.velocity.y
+	touchdowns.clear()
+	landings.clear()
+	await _teleport(Vector3(-20, 0, 34))
+	var teleported := touchdowns.duplicate()
+	var teleported_landings := landings.size()
+
+	# A limit of exactly landing_min_speed lands, and is not warned about.
+	var edge := FallSettings.new()
+	edge.max_speed = 2.3
+	_player.landing_min_speed = edge.max_speed
+	_player.fall = edge
+	var edge_warnings := _player.get_setup_warnings()
+	touchdowns.clear()
+	landings.clear()
+	_player.jump()
+	await _watch_fall()
+	var edge_touch := touchdowns.duplicate()
+	var edge_landings := landings.size()
+	_player.landing_min_speed = landing_speed
+
+	# Falls put in place of the own one.
+	var mine := FallSettings.new()
+	var first := FallSettings.new()
+	var second := FallSettings.new()
+	var source := Node.new()
+	var other := Node.new()
+	_player.fall = mine
+	var order := [_player.get_fall_settings() == mine]
+	_player.set_fall_override(source, first)
+	order.append(_player.get_fall_settings() == first)
+	_player.set_fall_override(other, second)
+	order.append(_player.get_fall_settings() == second)
+	# Only new settings: the source keeps its place behind the later one.
+	_player.set_fall_override(source, first.duplicate())
+	order.append(_player.get_fall_settings() == second)
+	# A higher priority counts whatever the order.
+	_player.set_fall_override(source, first, 1)
+	order.append(_player.get_fall_settings() == first)
+	_player.set_fall_override(source, null)
+	order.append(_player.get_fall_settings() == second)
+	other.free()
+	order.append(_player.get_fall_settings() == mine)
+	# A source that the game drops without letting go: the character does not keep it alive.
+	var dropped := [RefCounted.new()]
+	_player.set_fall_override(dropped[0], first)
+	order.append(_player.get_fall_settings() == first)
+	dropped.clear()
+	order.append(_player.get_fall_settings() == mine)
+	source.free()
+	_player.fall = own_fall
+	order.append(_player.get_fall_settings() == own_fall)
+	_player.touched_floor.disconnect(on_touched)
+	_player.landed.disconnect(on_landed)
+	await _teleport(Vector3.ZERO)
+
+	print("without fall settings: a jump of %d ticks, %.6f m/s off the formula at most; with a new resource %.6f m/s off" % [
+		plain.size(), off_formula, _largest_difference(plain, with_new)])
+	print(("a slower fall (gravity %.2f, limit %.1f m/s): top %.3f m, rising %.3f s (expected %.3f), %.3f s in the air " +
+			"(expected %.3f); down: speed gained %.2f m/s² (expected %.2f), the limit after %.3f s (expected %.3f), " +
+			"fastest %.3f m/s; touched the ground at %s, landings %d") % [slow.gravity_scale, slow.max_speed, jump.apex,
+		jump.rise_time, expected_rise, jump.air_time, expected_air, _median(gains), down, at_limit, to_limit,
+		_max(speeds), _fmt(soft), soft_landings])
+	print("thrown down at %.0f m/s: %s; the largest drop in a tick %.2f m/s, %.3f of the excess left after braking_time; 0.6 m above the ground: touched it at %s, landed at %s; without braking: %.3f m/s at once" % [
+		thrown, _fmt(_every(braking, 3)), largest_drop, left_over, _fmt(thrown_touch), _fmt(thrown_landings), at_once])
+	print("teleported onto the ground falling at %.2f m/s: touched it at %s, landings %d; a limit of exactly landing_min_speed %.1f m/s: touched at %s, landings %d, warnings %s; falls put in place: %s" % [
+		falling, _fmt(teleported), teleported_landings, edge.max_speed, _fmt(edge_touch), edge_landings, edge_warnings,
+		order])
+	_expect(off_formula < 0.0001 and _largest_difference(plain, with_new) < 0.0001,
+			"without fall settings, and with a new resource, a jump goes exactly as the physics says")
+	_expect(absf(jump.apex - _player.jump_height) < 0.02 and absf(jump.rise_time - expected_rise) < 2.0 * DT,
+			"a slower fall does not change the rise: as high and as long")
+	_expect(absf(_median(gains) - down) < 0.02 * down and _max(speeds) <= slow.max_speed + 0.0001
+			and absf(at_limit - to_limit) < 2.0 * DT,
+			"on the way down the speed grows with the fall's gravity up to the limit and stays at it")
+	_expect(soft.size() == 1 and absf(soft[0] - slow.max_speed) < 0.001 and soft_landings == 0,
+			"the ground is touched at the limit; slower than landing_min_speed, it is no landing")
+	_expect(absf(jump.air_time - expected_air) < 2.5 * DT, "stays in the air as long as the physics says")
+	_expect(largest_drop < 0.2 * (thrown - slow.max_speed) and _min(braking) > slow.max_speed
+			and absf(left_over - exp(-3.0)) < 0.005 and absf(at_once - slow.max_speed) < 0.0001,
+			"a fall faster than the limit slows down to it smoothly, by 95% in braking_time; with 0, at once")
+	_expect(thrown_touch.size() == 1 and thrown_touch[0] < 0.75 * thrown and thrown_touch[0] > slow.max_speed
+			and thrown_landings.size() == 1 and thrown_landings[0] == thrown_touch[0],
+			"thrown down near the ground, it touches the ground and lands at the speed it has slowed down to")
+	_expect(teleported.size() == 1 and teleported[0] < landing_speed and teleported_landings == 0,
+			"a falling character teleported onto the ground does not land")
+	_expect(edge_landings == 1 and absf(edge_touch[0] - edge.max_speed) < 0.001 and edge_warnings.is_empty(),
+			"a limit of exactly landing_min_speed lands and is not warned about")
+	_expect(order.all(func(right: bool) -> bool: return right),
+			"falls put in place: the highest priority, then the latest; new settings keep the place; a dropped source lets go")
+
+
+## Waits for the take-off and the landing, as [method _watch_flight] does, and also measures the time going up and the
+## fall speed at every tick of the way down.
+func _watch_fall() -> Dictionary:
+	var apex := _player.global_position.y
+	var air_time := 0.0
+	var rise_time := 0.0
+	var speeds := PackedFloat32Array()
+	for i in 600:
+		await _tree.physics_frame
+		apex = maxf(apex, _player.global_position.y)
+		if not _player.is_on_floor():
+			air_time += DT
+			if _player.velocity.y > 0.0:
+				rise_time += DT
+			else:
+				speeds.append(-_player.velocity.y)
+		elif air_time > 0.0:
+			break
+	return {apex = apex, air_time = air_time, rise_time = rise_time, speeds = speeds}
 
 
 ## Character signals: steps by the distance covered (more often while sprinting), jump and landing, the start and the

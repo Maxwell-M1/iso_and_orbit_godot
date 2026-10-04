@@ -1,8 +1,9 @@
 class_name CharacterHover
 extends Node3D
 ## Makes a [GroundCharacter] float: the model hangs [member height] above the ground, glides over stairs instead of
-## jumping onto them, sways gently up and down, leans toward the movement and into the acceleration, and sags on
-## landing. Only the model moves; the body walks as usual: slopes, stairs, jumps and the ledge guard work the same.
+## jumping onto them, sways gently up and down, leans toward the movement and into the acceleration, and sags as the
+## character touches the ground. Only the model moves; the body walks as usual: slopes, stairs, jumps and the ledge
+## guard work the same. Only its fall can change: a floating character may come down more slowly ([member fall]).
 ##
 ## The node goes between the node that the character turns ([member GroundCharacter.visual]) and the model:
 ## [code]Visual/Hover/Model[/code]. It moves itself (rises and tilts), and the model under it follows, so the character
@@ -13,6 +14,12 @@ extends Node3D
 ## ([method GroundCharacter.set_steps_suppressed]): no [signal GroundCharacter.stepped], no footstep sounds, no step
 ## swing of [HandSway]. Once the model has settled on the ground, the hover lets the steps go, and they are counted
 ## again if [member GroundCharacter.steps_enabled] is on. [member steps_while_floating] keeps the steps.
+##
+## The fall: with [member fall] set, the character falls by it while the model floats
+## ([method GroundCharacter.set_fall_override] with priority 0, put in place at the start of each rise): after the top
+## of a jump and off an edge it gains speed more slowly, up to a limit, and touches the ground softly. The rise of a
+## jump stays the same. Once the model has settled, the character falls by its own settings again. A fall that the
+## game puts in place with a higher priority wins over the hover's.
 ##
 ## The glide over stairs: the model floats over the ground a little ahead of the body, as far as the body runs in a
 ## third of [member glide_time], and settles at its height in that time. So it starts to rise before a stair, goes up
@@ -74,6 +81,14 @@ const _MOTION_SMOOTHING := 0.25
 		steps_while_floating = value
 		_update_steps()
 
+## How the character falls while it floats ([FallSettings]): more slowly, for example, with a weaker gravity and a
+## speed limit. It is put in place of the character's own fall ([member GroundCharacter.fall]) from the start of the
+## rise until the model has settled on the ground. Empty: the character falls as it does without floating.
+@export var fall: FallSettings:
+	set(value):
+		fall = value
+		_update_fall()
+
 @export_group("Glide")
 ## In how long the model settles at a new height of the ground (95% of the way): the longer, the smoother it glides
 ## over stairs. The ground is looked for ahead as far as the body runs in a third of this time, but not farther than
@@ -113,7 +128,8 @@ const _MOTION_SMOOTHING := 0.25
 @export_range(-5.0, 5.0, 0.01, "radians_as_degrees") var tilt_per_acceleration := deg_to_rad(-0.25)
 ## The acceleration does not tilt the model more than this, in any direction.
 @export_range(0.0, 60.0, 0.5, "radians_as_degrees") var max_inertia_tilt := deg_to_rad(15.0)
-## Downward push of the model on landing ([signal GroundCharacter.landed]), per 1 m/s of fall speed.
+## Downward push of the model when the character touches the ground ([signal GroundCharacter.touched_floor]), per
+## 1 m/s of fall speed: a slow touchdown sags the model a little, a hard landing more.
 @export_range(0.0, 0.5, 0.005) var landing_kick := 0.05
 ## Downward push of the model when the character pushes off for a jump.
 @export_range(0.0, 2.0, 0.01, "suffix:m/s") var jump_kick := 0.3
@@ -130,6 +146,8 @@ var _share := 0.0
 var _ticked := false
 var _floating := false
 var _suppressing_steps := false
+# The fall put in place of the character's own while floating (GroundCharacter.set_fall_override), or null.
+var _applied_fall: FallSettings
 # The height of the ground that the model floats over (smoothed, in the world); whether it still has to be found (after
 # a snap); the body a tick ago and whether it was in the air.
 var _base := 0.0
@@ -161,19 +179,21 @@ func _ready() -> void:
 		push_warning("%s: %s" % [name, warning])
 	_rest = transform
 	_bob_phase = randf() if random_bob_phase else 0.0
-	character.landed.connect(_on_landed)
+	character.touched_floor.connect(_on_touched_floor)
 	character.jumped.connect(_on_jumped)
 	snap()
 
 
 func _enter_tree() -> void:
-	# Back in the tree while floating: the steps stop again.
+	# Back in the tree while floating: the steps stop again, and the fall is put in place again.
 	_update_steps()
+	_update_fall()
 
 
 func _exit_tree() -> void:
-	# Out of the tree the hover does not move the model: it lets the steps go.
+	# Out of the tree the hover does not move the model: it lets the steps and the fall go.
 	_set_suppressing_steps(false)
+	_set_fall(null)
 
 
 func _notification(what: int) -> void:
@@ -257,7 +277,8 @@ func get_setup_warnings() -> PackedStringArray:
 	return warnings
 
 
-## At the start of the rise and once the model has settled: whether it floats, the steps, [signal floating_changed].
+## At the start of the rise and once the model has settled: whether it floats, the steps, the fall,
+## [signal floating_changed].
 func _update_floating() -> void:
 	var floating := enabled or _share > 0.0
 	if floating == _floating:
@@ -267,6 +288,7 @@ func _update_floating() -> void:
 		# The next rise starts from rest.
 		_reset_springs()
 	_update_steps()
+	_update_fall()
 	floating_changed.emit(floating)
 
 
@@ -279,6 +301,17 @@ func _set_suppressing_steps(suppress: bool) -> void:
 	if character != null and suppress != _suppressing_steps:
 		_suppressing_steps = suppress
 		character.set_steps_suppressed(self, suppress)
+
+
+## While the model floats in the tree, the character falls by [member fall].
+func _update_fall() -> void:
+	_set_fall(fall if _floating and is_inside_tree() else null)
+
+
+func _set_fall(settings: FallSettings) -> void:
+	if character != null and settings != _applied_fall:
+		_applied_fall = settings
+		character.set_fall_override(self, settings)
 
 
 ## The height of the ground that the model floats over. In the air, and on the tick of landing, it moves along with
@@ -395,9 +428,9 @@ func _find_character() -> GroundCharacter:
 	return node as GroundCharacter
 
 
-func _on_landed(impact_speed: float) -> void:
+func _on_touched_floor(fall_speed: float) -> void:
 	if _floating:
-		_drop.speed -= impact_speed * landing_kick
+		_drop.speed -= fall_speed * landing_kick
 
 
 func _on_jumped() -> void:

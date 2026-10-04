@@ -24,6 +24,7 @@
 [ext_resource type="Material" path="res://addons/iso_orbit/occluded_silhouette/silhouette_outline.tres" id="17_silhouette_outline"]
 [ext_resource type="Script" path="res://addons/iso_orbit/ground_character/hand_sway.gd" id="18_sway"]
 [ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_hover.gd" id="21_hover"]
+[ext_resource type="Resource" uid="uid://b1u52o82b6smg" path="res://gdscript/player/player_floating_fall.tres" id="22_floating_fall"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_1.wav" id="7_step1"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_2.wav" id="8_step2"]
 [ext_resource type="AudioStream" path="res://shared/audio/character/footstep_3.wav" id="9_step3"]
@@ -64,6 +65,8 @@ shape = SubResource("CapsuleShape3D_body")
 [node name="Hover" type="Node3D" parent="Visual"]
 script = ExtResource("21_hover")
 enabled = false
+fall = ExtResource("22_floating_fall")
+landing_kick = 0.2
 
 [node name="Model" parent="Visual/Hover" unique_id=170123621 instance=ExtResource("20_look_10")]
 

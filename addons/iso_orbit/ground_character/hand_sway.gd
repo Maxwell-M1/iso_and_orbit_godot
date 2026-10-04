@@ -10,7 +10,8 @@ extends Node
 ##   swing: the swing fades out, and comes back smoothly with the steps.
 ## - While running, the item leans forward.
 ## - Inertia: when accelerating, braking and turning ([method GroundCharacter.get_local_acceleration]), the item lags
-##   behind and sways on a spring ([DampedSpring]); on landing and on the jump push-off, the hand sags.
+##   behind and sways on a spring ([DampedSpring]); when the character touches the ground and on the jump push-off,
+##   the hand sags.
 ##
 ## Moves the hand node relative to its position in the model. Runs in the physics tick after the character (the node
 ## is its child or has a higher priority), so physics interpolation smooths the movement, just as it does for the body.
@@ -46,7 +47,8 @@ extends Node
 @export_range(-5.0, 5.0, 0.01, "radians_as_degrees") var tilt_per_acceleration := deg_to_rad(0.45)
 ## Inertia does not tilt the item more than this, in any direction.
 @export_range(0.0, 60.0, 0.5, "radians_as_degrees") var max_inertia_tilt := deg_to_rad(14.0)
-## Downward kick of the hand on landing, per 1 m/s of fall speed.
+## Downward kick of the hand when the character touches the ground ([signal GroundCharacter.touched_floor]), per
+## 1 m/s of fall speed: a slow touchdown gives a small kick, a hard landing a large one.
 @export_range(0.0, 0.5, 0.005) var landing_kick := 0.06
 ## Downward kick of the hand when the character pushes off for a jump.
 @export_range(0.0, 2.0, 0.01, "suffix:m/s") var jump_kick := 0.3
@@ -73,7 +75,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	assert(character != null, "HandSway needs the character property set.")
-	character.landed.connect(_on_landed)
+	character.touched_floor.connect(_on_touched_floor)
 	character.jumped.connect(_on_jumped)
 	_step_share = 1.0 if character.is_counting_steps() else 0.0
 
@@ -107,8 +109,8 @@ func _physics_process(delta: float) -> void:
 	hand.transform = Transform3D(tilt * _rest.basis, _rest.origin + offset)
 
 
-func _on_landed(impact_speed: float) -> void:
-	_drop.speed -= impact_speed * landing_kick
+func _on_touched_floor(fall_speed: float) -> void:
+	_drop.speed -= fall_speed * landing_kick
 
 
 func _on_jumped() -> void:

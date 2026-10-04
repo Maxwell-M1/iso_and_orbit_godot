@@ -4,7 +4,7 @@ extends "res://tests/check_suite.gd"
 ## gait cycle, the steps switch. Stairs and slopes: up and down a staircase without leaving the ground with the real
 ## height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a false take-off.
 ## Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without lag, a jump,
-## a ledge and a wall, turning it off and on. The monitor panel shows the state and the latest events. The demo's
+## a ledge and a wall, a slower fall, turning it off and on. The monitor panel shows the state and the latest events. The demo's
 ## character is set up without warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
@@ -24,13 +24,15 @@ func _checks() -> Array[Callable]:
 		_check_slopes_and_high_block,
 		_check_level_routes,
 		_check_hover,
+		_check_hover_fall,
 		_check_hover_toggle,
 		_check_monitor,
 	]
 
 
-## The demo's character, its ledge guard and its hover have no setup warnings, and mistakes in the setup give them.
-## The spring of the inertia stays calm at its stiffest settings, strongly and barely damped.
+## The demo's character, its ledge guard and its hover have no setup warnings, and mistakes in the setup give them,
+## also a fall limited below the landing speed and a jump with nothing to push off with. The spring of the inertia
+## stays calm at its stiffest settings, strongly and barely damped.
 func _check_setup() -> void:
 	print("\n== setup warnings and the spring")
 	var hover: CharacterHover = _player.get_node("Visual/Hover")
@@ -40,6 +42,18 @@ func _check_setup() -> void:
 	guard.max_drop = _player.max_step_height - 0.1
 	var low_guard := _player.get_setup_warnings()
 	guard.max_drop = max_drop
+	# A fall limited below the landing speed: a fall would never land.
+	var own_fall := _player.fall
+	var slow_fall := FallSettings.new()
+	slow_fall.max_speed = _player.landing_min_speed - 0.5
+	_player.fall = slow_fall
+	var never_lands := _player.get_setup_warnings()
+	_player.fall = own_fall
+	# A jump with nothing to push off with.
+	var jump_height := _player.jump_height
+	_player.jump_height = 0.0
+	var flat_jump := _player.get_setup_warnings()
+	_player.jump_height = jump_height
 	# The guard would count layer 3 as ground, and the body falls through it.
 	guard.floor_mask = _player.collision_mask | 0b100
 	var wide_mask := guard.get_setup_warnings()
@@ -58,14 +72,16 @@ func _check_setup() -> void:
 		for i in 600:
 			largest = maxf(largest, absf(spring.update(0.0, 10.0, damping, DT)))
 		springs.append([largest, absf(spring.value)])
-	print("demo: %s; a guard lower than a stair: %s; a guard's mask wider than the body's: %s; a stray hover: %s; a 10 Hz spring damped 2 and 0.05: largest %.3f and %.3f, at the end %.5f and %.5f" % [
-		clean, low_guard, wide_mask, misplaced.replace("\n", " / "), springs[0][0], springs[1][0], springs[0][1],
-		springs[1][1]])
+	print("demo: %s; a guard lower than a stair: %s; a guard's mask wider than the body's: %s; a fall limited below the landing speed: %s; jump_height 0: %s; a stray hover: %s; a 10 Hz spring damped 2 and 0.05: largest %.3f and %.3f, at the end %.5f and %.5f" % [
+		clean, low_guard, wide_mask, never_lands, flat_jump, misplaced.replace("\n", " / "), springs[0][0],
+		springs[1][0], springs[0][1], springs[1][1]])
 	_expect(clean.all(func(warnings: PackedStringArray) -> bool: return warnings.is_empty()),
 			"the demo's character, ledge guard and hover have no setup warnings")
-	_expect(low_guard.size() == 1 and wide_mask.size() == 1 and misplaced.contains("visual node")
+	_expect(low_guard.size() == 1 and wide_mask.size() == 1 and never_lands.size() == 1
+			and never_lands[0].contains("landing_min_speed") and flat_jump.size() == 1
+			and flat_jump[0].contains("jump_height") and misplaced.contains("visual node")
 			and misplaced.contains("Nothing to lift"),
-			"a guard lower than a stair, a guard's mask wider than the body's and a stray hover are warned about")
+			"a guard lower than a stair, a guard's mask wider than the body's, a fall that never lands, a jump with nothing to push off with and a stray hover are warned about")
 	_expect(springs[0][0] <= 1.0 and springs[1][0] < 1.1 and springs[0][1] < 0.001 and springs[1][1] < 0.001,
 			"the spring stays calm and settles at 10 Hz, strongly and barely damped")
 
@@ -205,7 +221,8 @@ func _check_feet() -> void:
 
 
 ## Without steps the character runs as usual, but there are no steps and the step rhythm stands still. Turned back on
-## mid-run, the steps start as from a standstill: the first one comes after first_step_distance.
+## mid-run, the steps start as from a standstill: the first one comes after first_step_distance. A source that stops
+## the steps and is dropped lets them go by itself.
 func _check_steps_switch() -> void:
 	print("\n== the steps switch")
 	await _teleport(Vector3(-30, 0, STRIP_Z))
@@ -225,13 +242,21 @@ func _check_steps_switch() -> void:
 	_mover.stop()
 	await _ticks_until_stopped(120)
 	_player.stepped.disconnect(on_step)
+	# A source that stops the steps and is dropped without letting them go: the character does not keep it alive.
+	var dropped := [RefCounted.new()]
+	_player.set_steps_suppressed(dropped[0], true)
+	var stopped_by_it := not _player.is_counting_steps()
+	dropped.clear()
+	await _ticks(1)
+	var let_go := _player.is_counting_steps()
 	var first := steps[0] - turned_on_at if not steps.is_empty() else -1.0
-	print("steps off: %d steps in 1 s at %.2f m/s, the rhythm stood still %s; turned on: the first step after %.2f m (first_step_distance %.2f)" % [
-		steps_off, speed, phase_still, first, _player.first_step_distance])
+	print("steps off: %d steps in 1 s at %.2f m/s, the rhythm stood still %s; turned on: the first step after %.2f m (first_step_distance %.2f); a dropped source stopped them %s and let them go %s" % [
+		steps_off, speed, phase_still, first, _player.first_step_distance, stopped_by_it, let_go])
 	_expect(steps_off == 0 and phase_still and speed > 0.95 * _mover.settings.max_speed,
 			"steps off: the character runs, with no steps and a still rhythm")
 	_expect(first >= _player.first_step_distance - 0.001 and first < _player.first_step_distance + speed * DT + 0.001,
 			"turned back on, the first step comes after first_step_distance")
+	_expect(stopped_by_it and let_go, "a source that stops the steps and is dropped lets them go by itself")
 
 
 ## A sidestep and backing up in the model's axes; the turn rate: positive to the left, no more than the model's turn
@@ -652,10 +677,122 @@ func _float_steering(hover: CharacterHover, direction: Vector3) -> Vector2:
 	return Vector2(_min(heights), _max(heights))
 
 
+## Floating with a slower fall (the demo's hover has one): a jump rises as on foot and comes down at the hover's
+## limit, touching the ground softly: no landing, a small sag of the model. Floating turned on mid-fall slows the fall
+## down smoothly; turned off mid-fall, the fall stays slow until the model has settled and then speeds up as on foot.
+## With an empty fall the floating character falls as it does on foot.
+func _check_hover_fall() -> void:
+	print("\n== floating: a slower fall")
+	var settings: GameSettings = _tree.root.get_node(^"Settings")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var slow := hover.fall
+	if slow == null:
+		_expect(false, "the demo's hover has a fall of its own")
+		return
+	var on_foot_jump := await _record_jump(Vector3(-20, 0, STRIP_Z))
+	var touchdowns := PackedFloat32Array()
+	var on_touched := func(speed: float) -> void: touchdowns.append(speed)
+	var landings := [0]
+	var on_landed := func(_speed: float) -> void: landings[0] += 1
+	_player.touched_floor.connect(on_touched)
+	_player.landed.connect(on_landed)
+	var bob := hover.bob_height
+	hover.bob_height = 0.0
+	var on_foot := _player.get_fall_settings() == _player.fall
+	settings.set_value(GameSettings.CHARACTER_HOVER, true)
+	var put_in_place := slow != null and _player.get_fall_settings() == slow
+	await _teleport(Vector3(-20, 0, STRIP_Z))
+	await _ticks(40)
+
+	# A jump in place: up as on foot, down at the limit, a soft touchdown.
+	_player.jump()
+	var apex := 0.0
+	for i in 180:
+		await _tree.physics_frame
+		apex = maxf(apex, _player.global_position.y)
+		if i > 5 and _player.is_on_floor():
+			break
+	var sag := 0.0
+	for i in 60:
+		await _tree.physics_frame
+		sag = minf(sag, hover.get_hover_height() - hover.height)
+	var soft := touchdowns.duplicate()
+	var soft_landings: int = landings[0]
+
+	# Turned on mid-fall, falling from 8 m at 6 m/s.
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	await _ticks(40)
+	await _teleport(Vector3(-20, 8, STRIP_Z))
+	await _wait_until(func() -> bool: return -_player.velocity.y > 6.0, 60)
+	var braking := PackedFloat32Array([-_player.velocity.y])
+	settings.set_value(GameSettings.CHARACTER_HOVER, true)
+	for i in roundi(2.0 * slow.braking_time / DT):
+		await _tree.physics_frame
+		braking.append(-_player.velocity.y)
+	var largest_drop := 0.0
+	for i in range(1, braking.size()):
+		largest_drop = maxf(largest_drop, braking[i - 1] - braking[i])
+
+	# Turned off mid-fall: slow while the model settles, then as on foot.
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	var settling := PackedFloat32Array()
+	var after := PackedFloat32Array()
+	for i in roundi(hover.rise_time / DT) + 10:
+		await _tree.physics_frame
+		if hover.is_floating():
+			settling.append(-_player.velocity.y)
+		else:
+			after.append(-_player.velocity.y)
+	var gain := (after[-1] - after[0]) / ((after.size() - 1) * DT) if after.size() > 1 else 0.0
+	var on_foot_gain := _player.get_gravity().length() * _player.gravity_scale
+
+	# An empty fall: the floating character falls as on foot, tick by tick.
+	await _teleport(Vector3(-20, 0, STRIP_Z))
+	settings.set_value(GameSettings.CHARACTER_HOVER, true)
+	await _ticks(40)
+	hover.fall = null
+	var own_again := _player.get_fall_settings() == _player.fall
+	var floating_jump := await _record_jump(Vector3(-20, 0, STRIP_Z))
+	hover.fall = slow
+	var slow_again := _player.get_fall_settings() == slow
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	await _ticks(60)
+	hover.bob_height = bob
+	_player.touched_floor.disconnect(on_touched)
+	_player.landed.disconnect(on_landed)
+	await _teleport(Vector3.ZERO)
+
+	print("on foot the own fall %s, floating the hover's %s (gravity %.2f, limit %.1f m/s, braking %.2f s)" % [
+		on_foot, put_in_place, slow.gravity_scale, slow.max_speed, slow.braking_time])
+	print("a jump: top %.3f m, touched the ground at %s, landings %d, the model sagged %.3f m" % [apex, _fmt(soft),
+		soft_landings, sag])
+	print("turned on mid-fall: %s (every 3rd tick), the largest drop in a tick %.2f m/s" % [_fmt(_every(braking, 3)),
+		largest_drop])
+	print("turned off mid-fall: %d ticks while settling at %.3f..%.3f m/s, then speeding up at %.1f m/s² (on foot %.1f)" % [
+		settling.size(), _min(settling), _max(settling), gain, on_foot_gain])
+	print("an empty fall: own settings %s; a jump of %d ticks, %.6f m/s off the one on foot (%d ticks) at most; the hover's fall back %s" % [
+		own_again, floating_jump.size(), _largest_difference(on_foot_jump, floating_jump), on_foot_jump.size(),
+		slow_again])
+	_expect(on_foot and put_in_place, "on foot the character falls by its own settings, floating by the hover's")
+	_expect(absf(apex - _player.jump_height) < 0.02 and soft.size() == 1
+			and absf(soft[0] - slow.max_speed) < 0.001 and soft_landings == 0,
+			"floating, a jump rises as on foot and comes down at the hover's limit: no landing")
+	# A spring pushed at v goes no deeper than about v / (2π·frequency); a quarter of that is surely a sag.
+	var sag_expected := hover.landing_kick * slow.max_speed / (TAU * hover.spring_frequency)
+	_expect(sag < -0.25 * sag_expected and sag > -hover.max_drop, "the model sags a little on the soft touchdown")
+	_expect(largest_drop < 0.2 * (braking[0] - slow.max_speed) and absf(braking[-1] - slow.max_speed) < 0.02,
+			"turned on mid-fall, floating slows the fall down smoothly to the limit")
+	_expect(absi(settling.size() - roundi(hover.rise_time / DT)) <= 1 and absf(_min(settling) - slow.max_speed) < 0.02
+			and absf(_max(settling) - slow.max_speed) < 0.02 and absf(gain - on_foot_gain) < 0.02 * on_foot_gain,
+			"turned off mid-fall, the fall stays slow until the model has settled, then speeds up as on foot")
+	_expect(own_again and _largest_difference(on_foot_jump, floating_jump) < 0.000001 and slow_again,
+			"with an empty fall the floating character falls exactly as on foot")
+
+
 ## Floating turned off mid-run: the model settles smoothly in rise_time, and then the steps come back; turned on again,
 ## it rises smoothly and the steps stop at once. The game's own switch of the steps is kept, and steps_while_floating
-## keeps the steps. A hover turned on before the first physics tick floats at once, and out of the tree it lets the
-## steps go.
+## keeps the steps. A hover turned on before the first physics tick floats at once and puts its fall in place, and out
+## of the tree it lets the steps and the fall go.
 func _check_hover_toggle() -> void:
 	print("\n== floating turned off and on mid-run, the steps, and at the start")
 	var hover: CharacterHover = _player.get_node("Visual/Hover")
@@ -714,13 +851,14 @@ func _check_hover_toggle() -> void:
 	var second_hover: CharacterHover = second.get_node("Visual/Hover")
 	second_hover.enabled = true
 	var at_once := second_hover.get_hover_height()
+	var fall_at_once := second.get_fall_settings() == second_hover.fall
 	await _ticks(1)
 	var after_tick := second_hover.get_hover_height()
 	var visual := second_hover.get_parent()
 	visual.remove_child(second_hover)
-	var let_go := second.is_counting_steps()
+	var let_go := second.is_counting_steps() and second.get_fall_settings() == second.fall
 	visual.add_child(second_hover)
-	var taken_back := not second.is_counting_steps()
+	var taken_back := not second.is_counting_steps() and second.get_fall_settings() == second_hover.fall
 	second.queue_free()
 	await _ticks(1)
 	await _teleport(Vector3.ZERO)
@@ -729,8 +867,8 @@ func _check_hover_toggle() -> void:
 		largest, settled, rise_ticks, steps_at_settle, stopped_at_once, changes])
 	print("the steps switched off while floating stay off %s, and back on %s; kept with steps_while_floating %s, stopped without it %s; back at the end %s" % [
 		switch_kept, switch_back, kept_while_floating, stopped_again, steps_back])
-	print("a hover on before its first tick: %.3f m at once, %.3f m after a tick; out of the tree the steps are let go %s, back in it stopped %s" % [
-		at_once, after_tick, let_go, taken_back])
+	print("a hover on before its first tick: %.3f m at once, %.3f m after a tick, its fall put in place %s; out of the tree the steps and the fall are let go %s, back in it taken again %s" % [
+		at_once, after_tick, fall_at_once, let_go, taken_back])
 	_expect(largest < 0.03 and absi(settled - rise_ticks) <= 1,
 			"turned off and on mid-run, the model moves smoothly in rise_time")
 	_expect(steps_at_settle and stopped_at_once and changes == [false, true, false, true, false] and steps_back,
@@ -739,8 +877,8 @@ func _check_hover_toggle() -> void:
 			"the game's steps switch is kept; steps_while_floating keeps the steps")
 	var height_range := hover.bob_height + 0.005
 	_expect(absf(at_once - hover.height) <= height_range and absf(after_tick - hover.height) <= height_range
-			and let_go and taken_back,
-			"a hover turned on before its first tick floats at once; out of the tree it lets the steps go")
+			and fall_at_once and let_go and taken_back,
+			"a hover turned on before its first tick floats at once; out of the tree it lets the steps and the fall go")
 
 
 ## The monitor panel: hidden by default, the setting shows it; it names the state and lists the latest events.

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FallSettings" format=3 uid="uid://b1u52o82b6smg"]
+
+[ext_resource type="Script" uid="uid://c38sgpsyuim65" path="res://addons/iso_orbit/ground_character/fall_settings.gd" id="1_fall"]
+
+[resource]
+script = ExtResource("1_fall")
+gravity_scale = 0.5
+max_speed = 2.0

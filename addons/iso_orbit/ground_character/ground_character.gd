@@ -22,6 +22,11 @@ extends CharacterBody3D
 ## steps up and down stairs up to [member max_step_height]. Up is +Y: [member CharacterBody3D.up_direction] must stay
 ## [code]Vector3.UP[/code].
 ##
+## Fall: the rise of a jump slows down with [member gravity_scale], and the way down follows the fall settings
+## ([member fall]): how fast the fall gains speed and the fastest fall. A component can put its own fall in their place
+## for a while ([method set_fall_override]), as [CharacterHover] does while the character floats;
+## [method get_fall_settings] tells which fall is in effect.
+##
 ## A mistake in the setup (a component in the wrong place, settings that contradict each other) is printed as a warning
 ## when the character enters the tree; [method get_setup_warnings] returns the same list.
 
@@ -40,7 +45,7 @@ signal jumped
 ## [member max_step_height]): the character stays on the ground.
 signal left_floor
 ## The character is back on the ground after any time in the air (every [signal left_floor] is followed by one).
-## [param fall_speed] is the speed it was falling at, m/s.
+## [param fall_speed] is the speed it was falling at as it touched the ground, m/s.
 signal touched_floor(fall_speed: float)
 ## A real landing: [signal touched_floor] at a fall speed of at least [member landing_min_speed]. [param impact_speed]
 ## is that speed, m/s. Stepping off a bump does not count as a landing.
@@ -112,9 +117,14 @@ const _SUPPORT_PROBE := 0.05
 @export_range(0.0, 0.5, 0.01, "suffix:s") var coyote_time := 0.1
 ## How long to remember a jump press in the air: a jump pressed slightly before landing fires on the ground.
 @export_range(0.0, 0.5, 0.01, "suffix:s") var jump_buffer_time := 0.12
-## How many times stronger gravity is for the character than in the world. The character in the game runs faster than
-## a human and with normal gravity falls "like a feather"; with 3 it drops from 1.6 m in 0.33 s instead of 0.57 s.
+## How many times stronger gravity is for the character than in the world: on the rise of a jump, and on the way down
+## too unless [member fall] sets another. The character in the game runs faster than a human and with normal gravity
+## falls "like a feather"; with 3 it drops from 1.6 m in 0.33 s instead of 0.57 s.
 @export_range(0.0, 10.0, 0.05) var gravity_scale := 3.0
+## How the character falls ([FallSettings]): how fast the fall gains speed and the fastest fall. Empty: it falls with
+## [member gravity_scale], without a limit. A component can put its own fall in its place for a while
+## ([method set_fall_override]), as [CharacterHover] does while the character floats.
+@export var fall: FallSettings
 ## A fall slower than this does not count as a landing ([signal landed]), only as [signal touched_floor].
 @export_range(0.0, 20.0, 0.1, "suffix:m/s") var landing_min_speed := 2.5
 
@@ -173,11 +183,14 @@ var _was_on_floor := true
 var _jumping := false
 var _air_time := 0.0
 var _fall_speed := 0.0
-# Steps: whether they are counted now and who stops them (set_steps_suppressed); the stretch of path to the next
-# step, its length (first_step_distance from a standstill, stride_length after that) and the step rhythm
+# The falls that components put in place of the character's own (set_fall_override), in the order they were put in
+# place: {source (a WeakRef: the character does not keep a source alive), settings, priority}.
+var _fall_overrides: Array[Dictionary] = []
+# Steps: whether they are counted now and who stops them (set_steps_suppressed, held weakly too); the stretch of path
+# to the next step, its length (first_step_distance from a standstill, stride_length after that) and the step rhythm
 # (get_step_phase) at its start and at its end; at the end it is always a whole number, the moment of the step.
 var _counting_steps := true
-var _step_suppressors: Array[Object] = []
+var _step_suppressors: Array[WeakRef] = []
 var _to_next_step := 0.0
 var _step_segment := 0.0
 var _phase_from := 0.0
@@ -206,15 +219,17 @@ func _physics_process(delta: float) -> void:
 	velocity.x = planar.x
 	velocity.z = planar.z
 	var jumping := _try_jump(delta)
-	if not is_on_floor():
-		velocity += get_gravity() * gravity_scale * delta
+	# The take-off tick already has its share of gravity (_try_jump), in coyote time too.
+	if not is_on_floor() and not jumping:
+		_apply_gravity(delta)
 	# A jump is a deliberate move, including off an edge: the ledge guard does not hold it back (it does not work in
 	# the air anyway).
 	if ledge_guard != null and not jumping:
 		velocity = ledge_guard.constrain(velocity, delta)
 	_measure_acceleration(delta)
-	# After move_and_slide() the floor has already canceled the fall speed, so remember it beforehand.
-	_fall_speed = maxf(_fall_speed, -velocity.y)
+	# After move_and_slide() the floor has already canceled the fall speed, so remember it beforehand: as it is now, so
+	# that a fall that slowed down before the ground (FallSettings.braking_time) counts at the speed it touched at.
+	_fall_speed = maxf(0.0, -velocity.y)
 	_move_body(delta, jumping)
 	_update_floor_contact(delta)
 	_report_stair()
@@ -238,6 +253,12 @@ func get_setup_warnings() -> PackedStringArray:
 	if max_step_height > 0.0 and floor_snap_length >= max_step_height:
 		warnings.append(("Floor → Snap Length (%.2f m) is not lower than max_step_height (%.2f m): the floor snap takes "
 				+ "stairs down by itself, without stair_taken.") % [floor_snap_length, max_step_height])
+	if can_jump and (jump_height <= 0.0 or gravity_scale <= 0.0):
+		warnings.append("can_jump is on, but jump_height or gravity_scale is 0: a jump would not leave the ground.")
+	if fall != null and fall.max_speed > 0.0 and not _is_landing_speed(fall.max_speed):
+		warnings.append(("fall.max_speed (%.2f m/s) is lower than landing_min_speed (%.2f m/s): a fall never gains "
+				+ "enough speed to land, and landed comes only if the character is thrown down faster.")
+				% [fall.max_speed, landing_min_speed])
 	if not up_direction.is_equal_approx(Vector3.UP):
 		warnings.append("Up Direction is not +Y: the character supports only +Y as up.")
 	return warnings
@@ -256,13 +277,38 @@ func jump() -> void:
 ## [param suppressed] is [code]true[/code], without touching [member steps_enabled]. Steps are counted when
 ## [member steps_enabled] is on and no source stops them ([method is_counting_steps]), so several sources and the
 ## game's own switch never undo each other. A source lets the steps go when it no longer needs to stop them, also when
-## it leaves the tree, as [CharacterHover] does.
+## it leaves the tree, as [CharacterHover] does. The character does not keep a source alive: a source that is freed
+## lets the steps go by itself, by the next physics tick.
 func set_steps_suppressed(source: Object, suppressed: bool) -> void:
-	if suppressed and not _step_suppressors.has(source):
-		_step_suppressors.append(source)
-	elif not suppressed:
-		_step_suppressors.erase(source)
+	assert(source != null, "set_steps_suppressed needs a source: the component that stops the steps.")
+	var held := _step_suppressors.any(func(ref: WeakRef) -> bool: return ref.get_ref() == source)
+	if suppressed and not held:
+		_step_suppressors.append(weakref(source))
+	elif not suppressed and held:
+		_step_suppressors = _step_suppressors.filter(func(ref: WeakRef) -> bool: return ref.get_ref() != source)
 	_update_counting_steps()
+
+
+## Makes the character fall by [param settings] in place of its own [member fall], for [param source] (a component,
+## such as [CharacterHover] while the character floats), until the source calls this again with [code]null[/code].
+## With several sources, the highest [param priority] counts, and of equal ones the source that put its fall in place
+## last; a source that only changes its settings or its priority keeps its place. [member fall] itself is not touched,
+## so the game's own settings come back once the sources let go. A source lets go when it no longer needs its fall,
+## also when it leaves the tree, as [CharacterHover] does (with priority 0). The character does not keep a source
+## alive: a source that is freed lets go by itself.
+func set_fall_override(source: Object, settings: FallSettings, priority := 0) -> void:
+	assert(source != null, "set_fall_override needs a source: the component that puts its fall in place.")
+	_fall_overrides = _fall_overrides.filter(func(entry: Dictionary) -> bool: return entry.source.get_ref() != null)
+	for i in _fall_overrides.size():
+		if _fall_overrides[i].source.get_ref() == source:
+			if settings == null:
+				_fall_overrides.remove_at(i)
+			else:
+				_fall_overrides[i].settings = settings
+				_fall_overrides[i].priority = priority
+			return
+	if settings != null:
+		_fall_overrides.append({source = weakref(source), settings = settings, priority = priority})
 
 #endregion
 
@@ -374,6 +420,17 @@ func get_jump_speed() -> float:
 	return sqrt(2.0 * get_gravity().length() * gravity_scale * jump_height)
 
 
+## The fall settings in effect: of the source that counts ([method set_fall_override]: the highest priority, of equal
+## ones the latest), otherwise [member fall]. [code]null[/code]: the character falls with [member gravity_scale],
+## without a limit.
+func get_fall_settings() -> FallSettings:
+	var top := {}
+	for entry: Dictionary in _fall_overrides:
+		if entry.source.get_ref() != null and (top.is_empty() or entry.priority >= top.priority):
+			top = entry
+	return top.settings if not top.is_empty() else fall
+
+
 ## The height of the ground under [param point]: of the first surface that a ray going down meets from [param above]
 ## meters above the point to [param below] meters below it. NAN if there is none, if it is too steep to stand on
 ## (steeper than [member CharacterBody3D.floor_max_angle]), or if the ray starts inside something (a wall higher than
@@ -393,7 +450,7 @@ func get_ground_height(point: Vector3, above: float, below: float) -> float:
 #endregion
 
 
-#region Sprint and jump
+#region Sprint, jump and fall
 
 func _update_sprint(delta: float) -> void:
 	var sprinting := sprint_requested and can_sprint and mover.is_moving() and not is_exhausted()
@@ -414,12 +471,40 @@ func _try_jump(delta: float) -> bool:
 		return false
 	_jump_buffer_left = 0.0
 	_coyote_left = 0.0
+	var speed := get_jump_speed()
+	if speed <= 0.0:
+		# Nothing to push off with: jump_height or gravity_scale is 0.
+		return false
 	# Within a tick the body moves at the speed it had at the start of the tick, so a jump at speed v would rise
 	# v·dt/2 higher. With v − g·dt/2 on the takeoff tick, the positions on every tick lie exactly on the jump parabola.
-	velocity.y = get_jump_speed() - get_gravity().length() * gravity_scale * delta / 2.0
+	velocity.y = speed - get_gravity().length() * gravity_scale * delta / 2.0
 	_jumping = true
 	jumped.emit()
 	return true
+
+
+## Gravity for a tick in the air. Without fall settings ([method get_fall_settings]) it is the gravity of the place
+## times [member gravity_scale], whichever way it pulls. With them the rise of a jump still slows down with
+## [member gravity_scale], and the way down follows the settings; gravity along the ground (an area's) pulls as
+## without them, and where gravity does not pull down at all, the settings have nothing to shape.
+func _apply_gravity(delta: float) -> void:
+	var gravity := get_gravity()
+	var settings := get_fall_settings()
+	var down := -gravity.dot(up_direction)
+	if settings == null or down <= 0.0:
+		velocity += gravity * gravity_scale * delta
+		return
+	velocity += (gravity + up_direction * down) * gravity_scale * delta
+	var time := delta
+	if velocity.y > 0.0:
+		var rise := down * gravity_scale
+		if velocity.y >= rise * delta:
+			velocity.y -= rise * delta
+			return
+		# The top of the jump comes within this tick: the rest of the tick is already the fall.
+		time -= velocity.y / rise
+		velocity.y = 0.0
+	velocity.y = -settings.get_next_speed(-velocity.y, down * settings.get_gravity_scale(gravity_scale), time)
 
 #endregion
 
@@ -546,18 +631,23 @@ func _update_floor_contact(delta: float) -> void:
 	if on_floor:
 		if not _was_on_floor:
 			touched_floor.emit(_fall_speed)
-			if _fall_speed >= landing_min_speed:
+			if _is_landing_speed(_fall_speed):
 				landed.emit(_fall_speed)
 				# The landing itself counts as a step: the next one comes after a full stride.
 				_start_step_segment(stride_length)
 		_air_time = 0.0
-		_fall_speed = 0.0
 		_jumping = false
 	else:
 		if _was_on_floor:
 			left_floor.emit()
 		_air_time += delta
 	_was_on_floor = on_floor
+
+
+## Whether touching the ground at [param speed] is a landing: at least [member landing_min_speed]. A fall limited to
+## exactly that speed lands: the body keeps its speed with less precision than the setting.
+func _is_landing_speed(speed: float) -> bool:
+	return speed >= landing_min_speed or is_equal_approx(speed, landing_min_speed)
 
 
 ## [signal stair_taken], if the body stepped onto a stair in this tick.
@@ -570,6 +660,8 @@ func _report_stair() -> void:
 ## Steps follow the distance traveled on the ground: while the character stands (or is pressed against a wall) there
 ## are no steps, and once it starts moving, the first step comes after [member first_step_distance].
 func _report_steps(delta: float) -> void:
+	# A source that stopped the steps and was freed lets them go by itself.
+	_update_counting_steps()
 	if not _counting_steps or not is_on_floor():
 		return
 	var speed := get_move_speed()
@@ -589,7 +681,7 @@ func _report_steps(delta: float) -> void:
 ## Whether steps are counted ([method is_counting_steps]). When they come back, the rhythm starts as from a
 ## standstill.
 func _update_counting_steps() -> void:
-	_step_suppressors = _step_suppressors.filter(func(source: Object) -> bool: return is_instance_valid(source))
+	_step_suppressors = _step_suppressors.filter(func(ref: WeakRef) -> bool: return ref.get_ref() != null)
 	var counting := steps_enabled and _step_suppressors.is_empty()
 	if counting and not _counting_steps and is_node_ready():
 		_start_step_segment(first_step_distance)
