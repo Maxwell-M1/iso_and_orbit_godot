@@ -194,24 +194,44 @@ msgid "Turn the camera to follow the run"
 msgstr "Kamerayı koşu yönüne çevir"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Align the camera tilt"
-msgstr "Kamera eğimini hizala"
+msgid "Align the camera tilt on the run"
+msgstr "Koşarken kamera eğimini hizala"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Tilt down"
 msgstr "Aşağı eğim"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the tilt in"
+msgstr "Eğim hizalama süresi"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 msgstr "Karakter koşarken kamera yavaşça bu eğime gelir. Tekerlek (ve kamerayı eğiyorsa sağ tuş) eğimi her zamanki gibi değiştirir; koşarken eğim yavaşça geri döner."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Catch up in"
-msgstr "Yetişme süresi"
+msgid "Turn in"
+msgstr "Dönme süresi"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "instant"
 msgstr "anında"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera height on the run"
+msgstr "Koşarken kamera yüksekliğini hizala"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Height"
+msgstr "Yükseklik"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the height in"
+msgstr "Yükseklik hizalama süresi"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "Karakter koşarken kamera yavaşça bu yüksekliğe gelir: %0 en alçak, %100 en yüksek konumdur. Tekerlek yüksekliği her zamanki gibi değiştirir; koşarken yükseklik yavaşça geri döner. Eğim de hizalanıyorsa eğim değişmez."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"

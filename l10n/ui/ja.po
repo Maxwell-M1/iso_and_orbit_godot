@@ -194,24 +194,44 @@ msgid "Turn the camera to follow the run"
 msgstr "走る方向へカメラを回す"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Align the camera tilt"
-msgstr "カメラの傾きを揃える"
+msgid "Align the camera tilt on the run"
+msgstr "走る間カメラの傾きを揃える"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Tilt down"
 msgstr "見下ろし角"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the tilt in"
+msgstr "傾きの調整時間"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 msgstr "キャラクターが走る間、カメラは徐々にこの傾きになります。ホイール（傾ける設定なら右ボタンも）でいつも通り傾きを変えられ、走るとまた徐々に戻ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Catch up in"
-msgstr "追従時間"
+msgid "Turn in"
+msgstr "回転時間"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "instant"
 msgstr "即時"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera height on the run"
+msgstr "走る間カメラの高さを揃える"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Height"
+msgstr "高さ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the height in"
+msgstr "高さの調整時間"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "キャラクターが走る間、カメラは徐々にこの高さになります。0%は一番下、100%は一番上です。ホイールでいつも通り高さを変えられ、走るとまた徐々に戻ります。傾きも揃える場合、傾きはそのまま保たれます。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"

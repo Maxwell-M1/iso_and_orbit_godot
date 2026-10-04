@@ -194,24 +194,44 @@ msgid "Turn the camera to follow the run"
 msgstr "Поворачивать камеру за бегом"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Align the camera tilt"
-msgstr "Выравнивать камеру по вертикали"
+msgid "Align the camera tilt on the run"
+msgstr "Выравнивать наклон камеры на бегу"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Tilt down"
 msgstr "Наклон вниз"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the tilt in"
+msgstr "Выравнивать наклон за"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 msgstr "Пока персонаж бежит, камера плавно приходит к этому наклону. Колесо (и ПКМ, если она наклоняет камеру) меняет наклон как обычно, а на бегу он снова выравнивается."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Catch up in"
+msgid "Turn in"
 msgstr "Доворачивать за"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "instant"
 msgstr "сразу"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera height on the run"
+msgstr "Выравнивать высоту камеры на бегу"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Height"
+msgstr "Высота"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the height in"
+msgstr "Выравнивать высоту за"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "Пока персонаж бежит, камера плавно приходит к этой высоте: 0% — опущена до конца, 100% — поднята до конца. Колесо меняет высоту как обычно, а на бегу она снова выравнивается. Если выравнивается и наклон, он при этом не меняется."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"

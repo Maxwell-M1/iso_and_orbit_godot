@@ -49,10 +49,13 @@ func _check_settings_window() -> void:
 	var follow_time_text := screen.find_child("FollowTimeValue") as Label
 	var slider_locked := not follow_time.editable
 	var pitch_angle := screen.find_child("AlignPitchAngle") as HSlider
-	var pitch_slider_locked := not pitch_angle.editable
+	var pitch_time := screen.find_child("AlignPitchTime") as HSlider
+	var pitch_slider_locked := not pitch_angle.editable and not pitch_time.editable
 	(screen.find_child("AlignPitch") as CheckButton).button_pressed = true
-	var speed_for_pitch := follow_time.editable
+	var pitch_unlocked := pitch_angle.editable and pitch_time.editable
+	var turn_speed_still_locked := not follow_time.editable
 	pitch_angle.value = 60.0
+	pitch_time.value = 2.0
 	var pitch_text := (screen.find_child("AlignPitchValue") as Label).text
 	(screen.find_child("CameraFollow") as CheckButton).button_pressed = true
 	follow_time.value = 0.0
@@ -70,16 +73,36 @@ func _check_settings_window() -> void:
 	_expect(not input.hide_cursor_while_held, "the hide-cursor switch reaches the input")
 	_expect(slider_locked and follow_time.editable and _rig.follow_movement and _rig.follow_time == 0.0
 			and follow_time_text.text == "instant", "camera follow and its speed reach the camera")
-	print(("pitch: slider locked while off %s, speed unlocked by it %s, follow_pitch %s at %.1f deg (\"%s\"), " +
-			"slider %.0f..%.0f, camera limits %.1f..%.1f") % [
-		pitch_slider_locked, speed_for_pitch, _rig.follow_pitch, rad_to_deg(_rig.follow_pitch_angle), pitch_text,
-		pitch_angle.min_value, pitch_angle.max_value, -rad_to_deg(_rig.max_pitch), -rad_to_deg(_rig.min_pitch)])
-	_expect(pitch_slider_locked and speed_for_pitch and _rig.follow_pitch
-			and is_equal_approx(_rig.follow_pitch_angle, deg_to_rad(-60.0)) and pitch_text == "60°",
-			"pitch alignment and its angle reach the camera, the speed slider serves it too")
+	print(("pitch: sliders locked while off %s, unlocked by it %s (the turn's speed still locked %s), follow_pitch %s " +
+			"at %.1f deg (\"%s\") in %.1f s, slider %.0f..%.0f, camera limits %.1f..%.1f") % [
+		pitch_slider_locked, pitch_unlocked, turn_speed_still_locked, _rig.follow_pitch,
+		rad_to_deg(_rig.follow_pitch_angle), pitch_text, _rig.follow_pitch_time, pitch_angle.min_value,
+		pitch_angle.max_value, -rad_to_deg(_rig.max_pitch), -rad_to_deg(_rig.min_pitch)])
+	_expect(pitch_slider_locked and pitch_unlocked and turn_speed_still_locked and _rig.follow_pitch
+			and is_equal_approx(_rig.follow_pitch_angle, deg_to_rad(-60.0)) and pitch_text == "60°"
+			and is_equal_approx(_rig.follow_pitch_time, 2.0),
+			"pitch alignment, its angle and its own speed reach the camera; the turn keeps its speed")
 	_expect(is_equal_approx(pitch_angle.min_value, -rad_to_deg(_rig.max_pitch))
 			and is_equal_approx(pitch_angle.max_value, -rad_to_deg(_rig.min_pitch)),
 			"the pitch slider spans the camera limits")
+
+	# The height: its level and its own speed, locked while it is off.
+	var height_level := screen.find_child("AlignHeightLevel") as HSlider
+	var height_time := screen.find_child("AlignHeightTime") as HSlider
+	var height_locked := not height_level.editable and not height_time.editable
+	(screen.find_child("AlignHeight") as CheckButton).button_pressed = true
+	var height_unlocked := height_level.editable and height_time.editable
+	height_level.value = 80.0
+	height_time.value = 2.5
+	var height_text := (screen.find_child("AlignHeightValue") as Label).text
+	var height_time_text := (screen.find_child("AlignHeightTimeValue") as Label).text
+	print("height: locked while off %s, unlocked by it %s, follow_zoom %s to %.2f (\"%s\") in %.1f s (\"%s\"), slider %.0f..%.0f" % [
+		height_locked, height_unlocked, _rig.follow_zoom, _rig.follow_zoom_level, height_text, _rig.follow_zoom_time,
+		height_time_text, height_level.min_value, height_level.max_value])
+	_expect(height_locked and height_unlocked and _rig.follow_zoom and is_equal_approx(_rig.follow_zoom_level, 0.8)
+			and height_text == "80%" and is_equal_approx(_rig.follow_zoom_time, 2.5) and height_time_text == "2.5 s"
+			and is_equal_approx(height_level.min_value, 0.0) and is_equal_approx(height_level.max_value, 100.0),
+			"height alignment, its level over the whole wheel range and its own speed reach the camera")
 
 	var keys_help: Control = _main.get_node("Hud/Panel/Lines/KeysHelp")
 	var strafe_help: Control = _main.get_node("Hud/Panel/Lines/StrafeHelp")
@@ -237,7 +260,12 @@ func _check_settings_window() -> void:
 			and _tree.physics_interpolation == interpolation_default
 			and fps_counter.visible
 			and not _rig.follow_movement and not _rig.follow_pitch and input.hide_cursor_while_held
-			and max_fps.get_selected_id() == 0 and not pitch_angle.editable
+			and max_fps.get_selected_id() == 0 and not pitch_angle.editable and not pitch_time.editable
+			and not follow_time.editable
+			and is_equal_approx(_rig.follow_pitch_time, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_PITCH_TIME])
+			and not _rig.follow_zoom and not height_level.editable and not height_time.editable
+			and is_equal_approx(_rig.follow_zoom_level, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_HEIGHT_LEVEL] / 100.0)
+			and is_equal_approx(_rig.follow_zoom_time, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_HEIGHT_TIME])
 			and is_equal_approx(_tree.root.content_scale_factor, expected_scale)
 			and _player.can_jump and _player.can_sprint and jump_help.visible and sprint_help.visible
 			and is_equal_approx(_mover.settings.sprint_speed_multiplier, 1.5) and sprint_bonus.editable

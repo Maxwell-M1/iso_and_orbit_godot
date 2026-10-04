@@ -121,6 +121,9 @@ func _apply(key: StringName, value: Variant) -> void:
 		GameSettings.CAMERA_FOLLOW_TIME:
 			if camera_rig != null:
 				camera_rig.follow_time = value
+		GameSettings.CAMERA_ALIGN_PITCH_TIME:
+			if camera_rig != null:
+				camera_rig.follow_pitch_time = value
 		GameSettings.CAMERA_ALIGN_PITCH:
 			if camera_rig != null:
 				camera_rig.follow_pitch = value
@@ -128,6 +131,16 @@ func _apply(key: StringName, value: Variant) -> void:
 			if camera_rig != null:
 				# The setting is how many degrees the camera looks down; on the camera, a downward pitch is negative.
 				camera_rig.follow_pitch_angle = -deg_to_rad(value)
+		GameSettings.CAMERA_ALIGN_HEIGHT:
+			if camera_rig != null:
+				camera_rig.follow_zoom = value
+		GameSettings.CAMERA_ALIGN_HEIGHT_LEVEL:
+			if camera_rig != null:
+				# The setting is in percent of the wheel's range; on the camera, the zoom goes from 0 to 1.
+				camera_rig.follow_zoom_level = value / 100.0
+		GameSettings.CAMERA_ALIGN_HEIGHT_TIME:
+			if camera_rig != null:
+				camera_rig.follow_zoom_time = value
 		GameSettings.SOUND_FOOTSTEPS:
 			if character_sounds != null:
 				character_sounds.footsteps_enabled = value

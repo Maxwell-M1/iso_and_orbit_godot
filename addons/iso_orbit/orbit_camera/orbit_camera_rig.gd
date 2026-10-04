@@ -7,8 +7,12 @@ extends Node3D
 ## - The wheel lowers the camera closer to the target or raises it higher and farther: the distance and the pitch
 ##   change together, and below the middle the camera flattens out faster so that what lies ahead is visible
 ##   ([member flatten_start_zoom]).
-## - If [member follow_movement] is on, the camera gradually moves behind the running target on its own, and with
-##   [member follow_pitch] it also adjusts the pitch. While the camera is rotated with the mouse, it does not do this.
+## - The follow: while the target runs, the camera on its own turns behind it ([member follow_movement]), brings its
+##   pitch to [member follow_pitch_angle] ([member follow_pitch]) and its height (the zoom) to
+##   [member follow_zoom_level] ([member follow_zoom]), each in its own time. Every one of these moves starts and ends
+##   smoothly, the turn is never faster than [member follow_max_turn_speed], and a run that comes at the camera within
+##   [member follow_toward_camera_angle] of straight does not turn it. While the camera is rotated with the mouse, it
+##   does not follow.
 ##
 ## The node is placed in the scene next to the target, not inside it. Its child is a [CameraArm] with a [Camera3D] at
 ## the end: the node sets the arm length from the zoom, and the arm shortens near obstacles. Without an arm, the child
@@ -17,8 +21,50 @@ extends Node3D
 ## smooth what is already smoothed and lag by a tick. The height can follow the target smoothly
 ## ([member height_follow_time]): on stairs the camera glides instead of jerking up with every stair.
 
-## The node to follow.
-@export var target: Node3D
+# The direction of the target's run is smoothed over about this time, s: on stairs the body is put onto every stair at
+# once, and the direction would shake the camera.
+const _HEADING_SMOOTHING := 0.1
+# (1 + x)·exp(−x) = 0.05 at x ≈ 4.74: a critically damped spring at rest settles 95% of the way in 4.74 / ω seconds.
+const _SETTLE := 4.74
+
+
+## One move of the follow (the turn, the pitch or the height) on a critically damped spring: it starts from rest,
+## speeds up, slows down and stops at its goal without going past it.
+class _FollowSpring:
+	## How fast the followed value moves now, per second.
+	var speed := 0.0
+
+	## One frame. The goal is [param error] away; at full pull the spring settles 95% of the way there in
+	## [param time] seconds from rest. It pulls with the share [param pull] of its stiffness. [param running] (0 to 1)
+	## blends its damping from [param brake] (how fast a move brakes when the target stops or the follow is paused,
+	## 1/s; INF stops it at once) to that of the running spring. The speed stays within [param max_speed] (0: no
+	## limit). Returns how far the value moves. The spring is computed in short steps, so it stays calm at any FPS.
+	func step(error: float, time: float, pull: float, running: float, brake: float, max_speed: float,
+			delta: float) -> float:
+		var omega := _SETTLE / time if time > 0.0 else INF
+		if omega * delta > 6.0:
+			# Instant, or so fast that it is the same: straight to the goal, or as far as max_speed lets.
+			speed = 0.0
+			if pull <= 0.0:
+				return 0.0
+			return clampf(error, -max_speed * delta, max_speed * delta) if max_speed > 0.0 else error
+		var steps := maxi(1, ceili(omega * delta / 0.2))
+		var h := delta / steps
+		var damping := lerpf(exp(-brake * h), exp(-2.0 * omega * h), running)
+		var moved := 0.0
+		for i in steps:
+			speed = speed * damping + pull * omega * omega * error * h
+			if max_speed > 0.0:
+				speed = clampf(speed, -max_speed, max_speed)
+			moved += speed * h
+			error -= speed * h
+		return moved
+
+## The node to follow. A new target starts the follow afresh: the jump to it is not a run.
+@export var target: Node3D:
+	set(value):
+		target = value
+		_forget_target_motion()
 
 ## The arm with the camera at its end: the node sets its length, and the arm places the camera. If not set, the child
 ## [CameraArm] is used.
@@ -37,11 +83,12 @@ extends Node3D
 ## How many degrees of rotation one pixel of mouse movement gives.
 @export_range(0.01, 2.0, 0.01, "suffix:°/px") var mouse_sensitivity := 0.25
 ## Change the camera pitch with vertical mouse movement. Without this, the mouse only rotates the camera around the
-## target, and the pitch is set by the wheel (zoom). Turning this off returns the camera to the pitch set by the wheel.
+## target, and the pitch is set by the wheel (zoom). Turning this off returns the camera to the pitch set by the wheel,
+## unless [member follow_pitch] holds the pitch.
 @export var mouse_pitch := false:
 	set(value):
 		mouse_pitch = value
-		if not value:
+		if not value and not follow_pitch:
 			_target_pitch_offset = 0.0
 ## Invert the vertical mouse axis (with [member mouse_pitch]).
 @export var invert_pitch := false
@@ -78,17 +125,45 @@ extends Node3D
 ## Turn on its own toward the target's running direction, gradually moving behind it. Does not turn while the camera
 ## is rotated with the mouse or the follow is paused ([method set_follow_paused]).
 @export var follow_movement := false
-## While the target runs, gradually bring the camera pitch to [member follow_pitch_angle], at the same rate and in the
-## same cases as the follow turn. Works without [member follow_movement] too. The wheel (and the mouse with
-## [member mouse_pitch]) changes the pitch as usual, and while running it is adjusted again.
-@export var follow_pitch := false
+## In how many seconds the camera almost finishes a turn behind the run (95% of the angle): the turn starts and ends
+## smoothly, without overshooting. 0 is instant.
+@export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_time := 1.5
+## The fastest the camera turns on its own: a long turn goes at this speed in the middle, and an instant one
+## ([member follow_time] 0) turns at this speed all the way. 0 is no limit.
+@export_range(0.0, 1440.0, 1.0, "radians_as_degrees") var follow_max_turn_speed := 0.0
+## A run that comes at the camera straight or within this angle of straight does not turn it: the camera does not whip
+## around when the target runs toward it. Within twice the angle the turn gains strength smoothly; a run farther from
+## straight at the camera turns it fully. 0 turns it behind any run.
+@export_range(0.0, 60.0, 0.5, "radians_as_degrees") var follow_toward_camera_angle := deg_to_rad(30.0)
+## A target that moves faster than this between two physics ticks is taken to have been teleported: the jump is not a
+## run, and the follow does not turn toward it.
+@export_range(1.0, 1000.0, 1.0, "or_greater", "suffix:m/s") var teleport_speed := 50.0
+## While the target runs, gradually bring the camera pitch to [member follow_pitch_angle], in
+## [member follow_pitch_time], in the same cases as the follow turn. Works without [member follow_movement] too. The
+## wheel (and the mouse with [member mouse_pitch]) changes the pitch as usual, and while running it is adjusted again.
+## Turning this off returns the camera to the pitch of the wheel, unless [member mouse_pitch] is on.
+@export var follow_pitch := false:
+	set(value):
+		follow_pitch = value
+		if not value and not mouse_pitch:
+			# Only the follow set the pitch offset: without it, the pitch is the wheel's again.
+			_target_pitch_offset = 0.0
 ## The pitch to adjust toward (down is negative, -90° is straight from above). The camera does not pitch beyond
 ## [member min_pitch] and [member max_pitch].
 @export_range(-90.0, 0.0, 0.1, "radians_as_degrees") var follow_pitch_angle := deg_to_rad(-40.0)
-## In how many seconds the camera almost finishes turning to follow the run (5% of the angle remains). 0 is instant.
-@export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_time := 1.5
-## Below this speed, the camera does not turn after the target: when standing, starting, or turning around, the
-## movement direction is unreliable. From this speed to twice that, the turn smoothly gains strength.
+## In how many seconds the camera almost reaches [member follow_pitch_angle] (95% of the way), smoothly. 0 is instant.
+@export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_pitch_time := 1.5
+## While the target runs, gradually bring the camera height (the zoom: the distance, and the pitch with it unless
+## [member follow_pitch] holds the pitch) to [member follow_zoom_level], in [member follow_zoom_time], in the same
+## cases as the follow turn. Works without the turn and the pitch too. The wheel changes the height as usual, and while
+## running it is adjusted again.
+@export var follow_zoom := false
+## The height to adjust toward, as the zoom: 0 is the camera lowered all the way, 1 raised all the way.
+@export_range(0.0, 1.0, 0.01) var follow_zoom_level := 0.55
+## In how many seconds the camera almost reaches [member follow_zoom_level] (95% of the way), smoothly. 0 is instant.
+@export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_zoom_time := 1.5
+## Below this speed, the camera does not follow the target: when standing, starting, or turning around, the movement
+## direction is unreliable. From this speed to twice that, the follow smoothly gains strength.
 @export_range(0.0, 10.0, 0.05, "suffix:m/s") var follow_min_speed := 1.0
 
 @export_group("Smoothing")
@@ -111,9 +186,16 @@ var _mouse_motion := Vector2.ZERO
 var _rotating := false
 var _cursor_before_rotate := Vector2.ZERO
 var _follow_paused := false
+# The target's velocity from its movement per physics tick, and the direction of its run, smoothed
+# (_HEADING_SMOOTHING).
 var _target_velocity := Vector3.ZERO
+var _heading := Vector2.ZERO
 var _last_target_position := Vector3.ZERO
 var _has_target_position := false
+# The three moves of the follow.
+var _turn := _FollowSpring.new()
+var _pitch_follow := _FollowSpring.new()
+var _zoom_follow := _FollowSpring.new()
 # The target's height that the camera follows (height_follow_time).
 var _follow_height := 0.0
 var _has_follow_height := false
@@ -173,16 +255,22 @@ func _process(delta: float) -> void:
 	_yaw = _smooth(_yaw, _target_yaw, rotation_sharpness, delta)
 	_pitch_offset = _smooth(_pitch_offset, _target_pitch_offset, rotation_sharpness, delta)
 	_zoom = _smooth(_zoom, _target_zoom, zoom_sharpness, delta)
+	# The yaw stays within one turn, so that it keeps its precision in a long game; both values move together.
+	var wrapped := wrapf(_target_yaw, -PI, PI)
+	_yaw += wrapped - _target_yaw
+	_target_yaw = wrapped
 	_follow_target_height(delta)
 	_apply_transform()
 
 
-## Turn the camera so that it looks along [param direction] (its horizontal part), without smoothing.
+## Turn the camera so that it looks along [param direction] (its horizontal part), without smoothing. A follow turn
+## under way stops there.
 func look_along(direction: Vector3) -> void:
 	if Vector2(direction.x, direction.z).is_zero_approx():
 		return
 	_target_yaw = atan2(-direction.x, -direction.z)
 	_yaw = _target_yaw
+	_turn.speed = 0.0
 
 
 ## Snap into place instantly, for example after the target teleports or [member target] changes.
@@ -190,9 +278,7 @@ func snap() -> void:
 	_yaw = _target_yaw
 	_pitch_offset = _target_pitch_offset
 	_zoom = _target_zoom
-	# A jump of the target is not running: do not turn toward it.
-	_has_target_position = false
-	_target_velocity = Vector3.ZERO
+	_forget_target_motion()
 	_has_follow_height = false
 	_apply_transform()
 	if arm != null:
@@ -204,9 +290,15 @@ func is_rotating() -> bool:
 	return _rotating
 
 
-## Pause or resume the follow turn and the pitch adjustment ([member follow_movement], [member follow_pitch]). For
-## example, while it is not yet clear whether this is a click or a hold of the mouse button
-## ([signal PointClickMoveInput.hold_pending_changed]).
+## The zoom (the camera height) now: 0 is the camera lowered all the way, 1 raised all the way.
+func get_zoom() -> float:
+	return _zoom
+
+
+## Pause or resume the follow: the turn, the pitch and the height ([member follow_movement], [member follow_pitch],
+## [member follow_zoom]). For example, while it is not yet clear whether this is a click or a hold of the mouse
+## button ([signal PointClickMoveInput.hold_pending_changed]). Paused, the follow does not pull, and a move under way
+## brakes as fast as the smoothing of the mouse and the wheel settles; resumed, it starts again smoothly.
 func set_follow_paused(paused: bool) -> void:
 	_follow_paused = paused
 
@@ -240,43 +332,83 @@ func _apply_mouse_motion() -> void:
 	if mouse_pitch:
 		# Mouse up: the camera lowers and looks at a shallower angle.
 		var pitch_direction := 1.0 if invert_pitch else -1.0
-		_target_pitch_offset += pitch_direction * _mouse_motion.y * radians_per_pixel
-		var base_pitch := _get_base_pitch(_target_zoom)
-		_target_pitch_offset = clampf(_target_pitch_offset, min_pitch - base_pitch, max_pitch - base_pitch)
+		_set_target_pitch_offset(_target_pitch_offset + pitch_direction * _mouse_motion.y * radians_per_pixel)
 	_mouse_motion = Vector2.ZERO
 
 
-## The target velocity, from its displacement per physics tick, so any [Node3D] works, not only a [CharacterBody3D].
+## The target velocity, from its displacement per physics tick, so any [Node3D] works, not only a [CharacterBody3D];
+## and the direction of the run, smoothed a little, so that it does not shake on a staircase. A move faster than
+## [member teleport_speed] is a teleport, not a run.
 func _track_target_motion(delta: float) -> void:
 	if target == null or delta <= 0.0:
-		_has_target_position = false
-		_target_velocity = Vector3.ZERO
+		_forget_target_motion()
 		return
 	var target_position := target.global_position
 	if _has_target_position:
-		_target_velocity = (target_position - _last_target_position) / delta
+		var velocity := (target_position - _last_target_position) / delta
+		var run := Vector2(velocity.x, velocity.z)
+		if run.length() > teleport_speed:
+			_forget_target_motion()
+		else:
+			_target_velocity = velocity
+			_heading = _heading.lerp(run, 1.0 - exp(-delta / _HEADING_SMOOTHING))
 	_last_target_position = target_position
 	_has_target_position = true
 
 
+## The follow forgets how the target moved, and its moves stop where they are: after a teleport, a new target or a
+## snap.
+func _forget_target_motion() -> void:
+	_has_target_position = false
+	_target_velocity = Vector3.ZERO
+	_heading = Vector2.ZERO
+	for spring: _FollowSpring in [_turn, _pitch_follow, _zoom_follow]:
+		spring.speed = 0.0
+
+
+## The follow: the height, the pitch and the turn move toward their goals, each on its spring ([_FollowSpring]),
+## pulled as strongly as the target runs ([method _get_follow_strength]). When the target stops, while the mouse turns
+## the camera and while the follow is paused, they do not pull, and a move under way brakes as fast as the smoothing
+## of the mouse and the wheel settles.
 func _follow_movement(delta: float) -> void:
-	if not (follow_movement or follow_pitch) or _rotating or _follow_paused:
-		return
-	var strength := _get_follow_strength()
-	if strength <= 0.0:
-		return
-	# exp(-3) ≈ 0.05: after follow_time, 5% of the angle remains, whatever the FPS.
-	var share := 1.0 if follow_time <= 0.0 else 1.0 - exp(-3.0 * strength * delta / follow_time)
-	if follow_movement:
-		var movement_yaw := atan2(-_target_velocity.x, -_target_velocity.z)
-		_target_yaw += angle_difference(_target_yaw, movement_yaw) * share
+	var strength := 0.0 if _rotating or _follow_paused else _get_follow_strength()
+	var rotation_brake := _get_brake(rotation_sharpness)
+	# A move that is turned off stops where it is; turned on again, it starts from rest.
+	if not follow_zoom:
+		_zoom_follow.speed = 0.0
+	if not follow_pitch:
+		_pitch_follow.speed = 0.0
+	if not follow_movement:
+		_turn.speed = 0.0
+	# The follow is smooth by itself: it moves the wanted values and the camera's own together, and the smoothing that
+	# follows (rotation_sharpness, zoom_sharpness) is left for the mouse and the wheel.
+	if follow_zoom:
+		var zoom_before := _target_zoom
+		var base_before := _get_base_pitch(_target_zoom)
+		_set_target_zoom(_target_zoom + _zoom_follow.step(follow_zoom_level - _target_zoom, follow_zoom_time, strength,
+				strength, _get_brake(zoom_sharpness), 0.0, delta))
+		_zoom = clampf(_zoom + _target_zoom - zoom_before, 0.0, 1.0)
+		if follow_pitch:
+			# The height changes the pitch of the zoom; the pitch that the follow holds stays where it is.
+			_move_pitch_offset(base_before - _get_base_pitch(_target_zoom))
 	if follow_pitch:
 		# The pitch is the zoom pitch plus an offset; adjust the offset.
-		var wanted_offset := clampf(follow_pitch_angle, min_pitch, max_pitch) - _get_base_pitch(_target_zoom)
-		_target_pitch_offset = lerpf(_target_pitch_offset, wanted_offset, share)
+		var wanted := clampf(follow_pitch_angle, min_pitch, max_pitch) - _get_base_pitch(_target_zoom)
+		_move_pitch_offset(_pitch_follow.step(wanted - _target_pitch_offset, follow_pitch_time, strength, strength,
+				rotation_brake, 0.0, delta))
+	if follow_movement:
+		var error := 0.0
+		var weight := 0.0
+		if not _heading.is_zero_approx():
+			error = angle_difference(_target_yaw, atan2(-_heading.x, -_heading.y))
+			weight = _get_turn_weight(absf(error))
+		var turn := _turn.step(error, follow_time, strength * weight, strength, rotation_brake, follow_max_turn_speed,
+				delta)
+		_target_yaw += turn
+		_yaw += turn
 
 
-## 0: the target stands or barely moves; 1: it runs. In between, the follow turn smoothly gains strength.
+## 0: the target stands or barely moves; 1: it runs. In between, the follow smoothly gains strength.
 func _get_follow_strength() -> float:
 	var speed := Vector2(_target_velocity.x, _target_velocity.z).length()
 	if follow_min_speed <= 0.0:
@@ -284,11 +416,41 @@ func _get_follow_strength() -> float:
 	return clampf(speed / follow_min_speed - 1.0, 0.0, 1.0)
 
 
+## How strongly the camera turns behind a run at [param angle] from where it looks: not at all for a run that comes
+## at the camera within [member follow_toward_camera_angle] of straight, fully for one farther than twice that, and
+## smoothly in between.
+func _get_turn_weight(angle: float) -> float:
+	if follow_toward_camera_angle <= 0.0:
+		return 1.0
+	return smoothstep(PI - follow_toward_camera_angle, PI - 2.0 * follow_toward_camera_angle, angle)
+
+
+## How fast a move of the follow brakes when nothing pulls it, 1/s: as fast as the smoothing of the input with
+## [param sharpness] settles; without that smoothing, at once.
+static func _get_brake(sharpness: float) -> float:
+	return sharpness if sharpness > 0.0 else INF
+
+
 func _add_zoom(amount: float) -> void:
-	_target_zoom = clampf(_target_zoom + amount, 0.0, 1.0)
-	# The mouse pitch offset must not take the camera beyond the limits at the new zoom.
+	_set_target_zoom(_target_zoom + amount)
+
+
+func _set_target_zoom(zoom: float) -> void:
+	_target_zoom = clampf(zoom, 0.0, 1.0)
+	# The pitch offset must not take the camera beyond the limits at the new zoom.
+	_set_target_pitch_offset(_target_pitch_offset)
+
+
+func _set_target_pitch_offset(offset: float) -> void:
 	var base_pitch := _get_base_pitch(_target_zoom)
-	_target_pitch_offset = clampf(_target_pitch_offset, min_pitch - base_pitch, max_pitch - base_pitch)
+	_target_pitch_offset = clampf(offset, min_pitch - base_pitch, max_pitch - base_pitch)
+
+
+## Moves the pitch offset by [param change] for the follow: the wanted one and the camera's own together.
+func _move_pitch_offset(change: float) -> void:
+	var before := _target_pitch_offset
+	_set_target_pitch_offset(_target_pitch_offset + change)
+	_pitch_offset += _target_pitch_offset - before
 
 
 ## Follows the height of the target smoothly ([member height_follow_time]), from its interpolated position.

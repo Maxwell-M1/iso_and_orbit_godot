@@ -194,24 +194,44 @@ msgid "Turn the camera to follow the run"
 msgstr "Girar la cámara siguiendo la carrera"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Align the camera tilt"
-msgstr "Alinear inclinación de cámara"
+msgid "Align the camera tilt on the run"
+msgstr "Alinear inclinación de cámara al correr"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Tilt down"
 msgstr "Inclinación hacia abajo"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the tilt in"
+msgstr "Alinear la inclinación en"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 msgstr "Mientras el personaje corre, la cámara pasa suavemente a esta inclinación. La rueda (y el clic der., si inclina la cámara) cambia la inclinación como siempre, y al correr vuelve suavemente."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Catch up in"
-msgstr "Alcanzar en"
+msgid "Turn in"
+msgstr "Girar en"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "instant"
 msgstr "al instante"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera height on the run"
+msgstr "Alinear altura de cámara al correr"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Height"
+msgstr "Altura"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the height in"
+msgstr "Alinear la altura en"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "Mientras el personaje corre, la cámara pasa suavemente a esta altura: 0% es bajada del todo, 100% subida del todo. La rueda cambia la altura como siempre, y al correr vuelve suavemente. Si también se alinea la inclinación, la inclinación no cambia."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"

@@ -427,9 +427,38 @@ text = "Turn the camera to follow the run"
 script = ExtResource("2_check")
 key = &"camera/follow"
 
+[node name="FollowTimeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FollowTimeLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Turn in"
+
+[node name="FollowTime" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 10.0
+step = 0.1
+value = 1.1
+script = ExtResource("4_slider")
+key = &"camera/follow_time"
+value_label = NodePath("../FollowTimeValue")
+value_format = "%.1f s"
+zero_text = "instant"
+
+[node name="FollowTimeValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "1.1 s"
+horizontal_alignment = 2
+
 [node name="AlignPitch" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 layout_mode = 2
-text = "Align the camera tilt"
+text = "Align the camera tilt on the run"
 script = ExtResource("2_check")
 key = &"camera/align_pitch"
 
@@ -461,23 +490,16 @@ layout_mode = 2
 text = "22°"
 horizontal_alignment = 2
 
-[node name="AlignPitchHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-theme_type_variation = &"HintLabel"
-text = "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
-autowrap_mode = 3
-
-[node name="FollowTimeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+[node name="AlignPitchTimeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="FollowTimeLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+[node name="AlignPitchTimeLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchTimeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Catch up in"
+text = "Align the tilt in"
 
-[node name="FollowTime" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow" node_paths=PackedStringArray("value_label")]
+[node name="AlignPitchTime" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchTimeRow" node_paths=PackedStringArray("value_label")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
@@ -486,16 +508,92 @@ max_value = 10.0
 step = 0.1
 value = 1.1
 script = ExtResource("4_slider")
-key = &"camera/follow_time"
-value_label = NodePath("../FollowTimeValue")
+key = &"camera/align_pitch_time"
+value_label = NodePath("../AlignPitchTimeValue")
 value_format = "%.1f s"
 zero_text = "instant"
 
-[node name="FollowTimeValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowTimeRow"]
+[node name="AlignPitchTimeValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignPitchTimeRow"]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "1.1 s"
 horizontal_alignment = 2
+
+[node name="AlignPitchHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+autowrap_mode = 3
+
+[node name="AlignHeight" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+layout_mode = 2
+text = "Align the camera height on the run"
+script = ExtResource("2_check")
+key = &"camera/align_height"
+
+[node name="AlignHeightRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="AlignHeightLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Height"
+
+[node name="AlignHeightLevel" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+step = 5.0
+value = 55.0
+script = ExtResource("4_slider")
+key = &"camera/align_height_level"
+value_label = NodePath("../AlignHeightValue")
+value_format = "%d%%"
+
+[node name="AlignHeightValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "55%"
+horizontal_alignment = 2
+
+[node name="AlignHeightTimeRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="AlignHeightTimeLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightTimeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Align the height in"
+
+[node name="AlignHeightTime" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightTimeRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 10.0
+step = 0.1
+value = 1.5
+script = ExtResource("4_slider")
+key = &"camera/align_height_time"
+value_label = NodePath("../AlignHeightTimeValue")
+value_format = "%.1f s"
+zero_text = "instant"
+
+[node name="AlignHeightTimeValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/AlignHeightTimeRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "1.5 s"
+horizontal_alignment = 2
+
+[node name="AlignHeightHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+autowrap_mode = 3
 
 [node name="KeepAim" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 layout_mode = 2

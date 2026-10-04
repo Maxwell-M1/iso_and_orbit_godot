@@ -40,10 +40,19 @@ const CHARACTER_HOVER := &"character/hover"
 ## RMB pitches the camera with vertical mouse movement (OrbitCameraRig.mouse_pitch).
 const CAMERA_MOUSE_PITCH := &"camera/mouse_pitch"
 const CAMERA_FOLLOW := &"camera/follow"
+## In how many seconds the camera turns behind the run (OrbitCameraRig.follow_time).
 const CAMERA_FOLLOW_TIME := &"camera/follow_time"
 const CAMERA_ALIGN_PITCH := &"camera/align_pitch"
 ## How far the camera looks down, in degrees: 0 is horizontal, 90 is straight from above.
 const CAMERA_ALIGN_PITCH_ANGLE := &"camera/align_pitch_angle"
+## In how many seconds the camera brings its pitch to that angle (OrbitCameraRig.follow_pitch_time).
+const CAMERA_ALIGN_PITCH_TIME := &"camera/align_pitch_time"
+## The camera brings its height (the zoom) to the set level on the run (OrbitCameraRig.follow_zoom).
+const CAMERA_ALIGN_HEIGHT := &"camera/align_height"
+## That height in percent of the wheel's range: 0 is the camera lowered all the way, 100 raised all the way.
+const CAMERA_ALIGN_HEIGHT_LEVEL := &"camera/align_height_level"
+## In how many seconds the camera reaches that height (OrbitCameraRig.follow_zoom_time).
+const CAMERA_ALIGN_HEIGHT_TIME := &"camera/align_height_time"
 const CAMERA_KEEP_AIM := &"camera/keep_aim"
 ## The camera stops against what is behind it instead of going inside (CameraArm.keep_out_of_geometry).
 const CAMERA_KEEP_OUT := &"camera/keep_out_of_geometry"
@@ -97,6 +106,10 @@ const DEFAULTS := {
 	CAMERA_FOLLOW_TIME: 1.1,
 	CAMERA_ALIGN_PITCH: false,
 	CAMERA_ALIGN_PITCH_ANGLE: 22.0,
+	CAMERA_ALIGN_PITCH_TIME: 1.1,
+	CAMERA_ALIGN_HEIGHT: false,
+	CAMERA_ALIGN_HEIGHT_LEVEL: 55.0,
+	CAMERA_ALIGN_HEIGHT_TIME: 1.5,
 	CAMERA_KEEP_AIM: true,
 	CAMERA_KEEP_OUT: true,
 	CAMERA_PULL_IN: false,

@@ -1,19 +1,26 @@
 extends "res://tests/check_suite.gd"
-## Camera: the follow and its pauses (while RMB is held and while it is not yet clear whether it is a click or a hold),
-## the cursor keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the
-## setting), leveling the pitch on the run, gliding up the stairs.
+## Camera: the follow (smooth, without going past the run, still for a run toward the camera, within the speed limit,
+## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held and while it is not yet clear
+## whether it is a click or a hold), the cursor keeping its aim while the camera turns, rotation and zoom with the mouse
+## (RMB pitch only with the setting), aligning the pitch and the height on the run, gliding up the stairs.
 
 
 func _checks() -> Array[Callable]:
 	return [
 		_check_camera_follow,
+		_check_camera_follow_toward,
+		_check_camera_follow_stairs,
 		_check_camera_follow_pauses,
 		_check_camera,
 		_check_camera_pitch_follow,
+		_check_camera_zoom_follow,
 		_check_height_follow,
 	]
 
 
+## The follow turn: off, the camera does not turn by itself; at 0 it turns at once; at the demo's time it turns 95% in
+## about that time, smoothly: it speeds up and slows down without jerks and never goes past the run; standing, it does
+## not drift; at 10 s it turns very slowly.
 func _check_camera_follow() -> void:
 	print("\n== camera follows the run: off, instant, default, very slow")
 	var default_time := _rig.follow_time
@@ -29,9 +36,13 @@ func _check_camera_follow() -> void:
 
 	var normal := await _watch_camera_on_run(true, default_time, 3.0)
 	var normal_at := _first_time_at_most(normal, 4.5)
-	print("follow_time %.1f: angle (every 15th tick) %s; 95%% of the turn in %.2f s" % [
-		default_time, _fmt(_every(normal, 15)), normal_at])
+	var motion := _turn_motion(normal)
+	print(("follow_time %.1f: angle (every 15th tick) %s; 95%% of the turn in %.2f s; turning up to %.0f deg/s, the " +
+			"turn speed changing by up to %.0f deg/s^2; back up to %.3f deg") % [default_time, _fmt(_every(normal, 15)),
+		normal_at, motion.fastest, motion.sharpest, motion.back])
 	_expect(absf(normal_at - default_time) <= 0.3, "follow_time %.1f turns 95%% in about that time" % default_time)
+	_expect(motion.sharpest < 2000.0 and motion.back < 0.05,
+			"the turn speeds up and slows down smoothly and never goes past the run")
 	for i in 600:
 		await _tree.physics_frame
 		if _mover.get_speed() == 0.0:
@@ -47,9 +58,116 @@ func _check_camera_follow() -> void:
 
 	var slow := await _watch_camera_on_run(true, 10.0, 2.0)
 	print("follow_time 10: angle after 1 s %.1f deg, after 2 s %.1f deg" % [slow[59], slow[-1]])
-	_expect(slow[-1] > 40.0 and slow[-1] < 70.0, "follow_time 10 turns very slowly")
+	_expect(slow[-1] > 60.0 and slow[-1] < 85.0, "follow_time 10 turns very slowly")
 	_rig.follow_movement = false
 	_rig.follow_time = default_time
+
+
+## How the camera turned, from its angle to the run on every tick ([param angles], degrees): the fastest turn, deg/s,
+## the sharpest change of the turn speed, deg/s², and the most it turned back, degrees (going past the run and back).
+func _turn_motion(angles: PackedFloat32Array) -> Dictionary:
+	var fastest := 0.0
+	var sharpest := 0.0
+	var back := 0.0
+	var rate := 0.0
+	for i in range(1, angles.size()):
+		var new_rate := (angles[i - 1] - angles[i]) / DT
+		fastest = maxf(fastest, new_rate)
+		back = maxf(back, angles[i] - angles[i - 1])
+		if i >= 2:
+			sharpest = maxf(sharpest, absf(new_rate - rate) / DT)
+		rate = new_rate
+	return {fastest = fastest, sharpest = sharpest, back = back}
+
+
+## A run toward the camera: straight at it, or within follow_toward_camera_angle of straight, it does not turn the
+## camera; farther off it turns it behind the run; with the angle 0 even a run straight at it does. With
+## follow_max_turn_speed the camera never turns faster, also when the turn is instant. A teleport is not a run: the
+## camera does not turn toward the jump.
+func _check_camera_follow_toward() -> void:
+	print("
+== the follow toward the camera, the speed limit, a teleport")
+	var angle := _rig.follow_toward_camera_angle
+	var straight := await _turn_toward_camera(0.0, 1.0)
+	var inside := await _turn_toward_camera(rad_to_deg(angle) * 0.6, 1.0)
+	var outside := await _turn_toward_camera(rad_to_deg(angle) * 2.0, 1.5)
+	_rig.follow_toward_camera_angle = 0.0
+	var any_run := await _turn_toward_camera(0.0, 1.0)
+	_rig.follow_toward_camera_angle = angle
+
+	var default_time := _rig.follow_time
+	_rig.follow_max_turn_speed = deg_to_rad(60.0)
+	var limited := await _watch_camera_on_run(true, 0.3, 3.0)
+	var limited_motion := _turn_motion(limited)
+	var instant_limited := await _watch_camera_on_run(true, 0.0, 3.0)
+	var instant_motion := _turn_motion(instant_limited)
+	_rig.follow_max_turn_speed = 0.0
+	_rig.follow_time = default_time
+
+	# A teleport 20 m to the north while the follow is on, without snap().
+	_rig.follow_movement = true
+	var view := _camera_forward()
+	await _teleport(_player.global_position + Vector3(0, 0, -20))
+	for i in 30:
+		await _tree.physics_frame
+	var teleport_turn := _flat_angle(view, _camera_forward())
+	_rig.follow_movement = false
+	print(("follow_toward_camera_angle %.0f deg: a run straight at the camera turned it %.1f deg in 1 s, %.0f deg off " +
+			"straight %.1f deg, %.0f deg off %.1f deg in 1.5 s; with 0, straight at it %.1f deg in 1 s") % [
+		rad_to_deg(angle), straight, rad_to_deg(angle) * 0.6, inside, rad_to_deg(angle) * 2.0, outside, any_run])
+	print(("follow_max_turn_speed 60 deg/s: follow_time 0.3 up to %.1f deg/s, 95%% in %.2f s; instant up to %.1f " +
+			"deg/s, 95%% in %.2f s; a teleport of 20 m turned the camera %.2f deg") % [limited_motion.fastest,
+		_first_time_at_most(limited, 4.5), instant_motion.fastest, _first_time_at_most(instant_limited, 4.5),
+		teleport_turn])
+	_expect(straight < 1.0 and inside < 1.0 and outside > 60.0 and any_run > 120.0,
+			"a run toward the camera within the angle does not turn it, a run farther off does, and 0 follows every run")
+	_expect(limited_motion.fastest <= 60.5 and _first_time_at_most(limited, 4.5) > 1.3
+			and instant_motion.fastest <= 60.5 and _first_time_at_most(instant_limited, 4.5) > 1.3,
+			"follow_max_turn_speed: the camera never turns faster, also when the turn is instant")
+	_expect(teleport_turn < 0.5, "a teleport is not a run: the camera does not turn toward the jump")
+
+
+## The character at the west end of the strip by the south fence runs east; the camera looks west, turned by
+## [param off_straight] degrees: 0 is straight at it. Returns how many degrees the camera turned in [param seconds].
+func _turn_toward_camera(off_straight: float, seconds: float) -> float:
+	_rig.follow_movement = false
+	await _teleport(Vector3(-30, 0, 34))
+	_rig.look_along(Vector3.LEFT.rotated(Vector3.UP, deg_to_rad(off_straight)))
+	await _settle_camera()
+	_rig.follow_movement = true
+	var view := _camera_forward()
+	_mover.steer(Vector3.RIGHT)
+	for i in roundi(seconds / DT):
+		await _tree.physics_frame
+	var turned := _flat_angle(view, _camera_forward())
+	_mover.stop()
+	_rig.follow_movement = false
+	await _ticks_until_stopped(120)
+	return turned
+
+
+## Up the stairs east of the platform with the follow on, the camera looking along the run: the body is put onto every
+## stair at once, and still the camera turns smoothly.
+func _check_camera_follow_stairs() -> void:
+	print("\n== the follow up the stairs")
+	await _teleport(Vector3(36, 0, 18))
+	_rig.look_along(Vector3.LEFT)
+	await _settle_camera()
+	_rig.follow_movement = true
+	_arrived = false
+	_mover.move_to(Vector3(26, 1.6, 18))
+	var yaws := PackedFloat32Array()
+	while not _arrived and yaws.size() < 300:
+		await _tree.physics_frame
+		yaws.append(rad_to_deg(_rig.rotation.y))
+	_rig.follow_movement = false
+	var sharpest := 0.0
+	for i in range(2, yaws.size()):
+		var rate := angle_difference(deg_to_rad(yaws[i - 1]), deg_to_rad(yaws[i])) / DT
+		var previous := angle_difference(deg_to_rad(yaws[i - 2]), deg_to_rad(yaws[i - 1])) / DT
+		sharpest = maxf(sharpest, rad_to_deg(absf(rate - previous)) / DT)
+	print("up the stairs: arrived %s; the camera's turn speed changing by up to %.0f deg/s^2" % [_arrived, sharpest])
+	_expect(_arrived and sharpest < 200.0, "up the stairs the camera turns smoothly")
 
 
 ## The character stands at (-8, 0, 0) with the camera looking north, then runs east. Returns the angle between the
@@ -78,14 +196,22 @@ func _check_camera_follow_pauses() -> void:
 	_rig.follow_movement = true
 	_rig.follow_time = 0.5
 	_mover.move_to(Vector3(8, 0, 0))
-	for i in 12:
+	for i in 18:
 		await _tree.physics_frame
 	var center := _tree.root.get_visible_rect().size / 2.0
 	_send_motion(center, Vector2.ZERO)
-	_send_button(MOUSE_BUTTON_RIGHT, true, center)
-	# The camera still finishes a turn it has started with its smoothing (rotation_sharpness): a couple of degrees.
-	for i in 10:
+	var angles := PackedFloat32Array()
+	for i in 2:
+		angles.append(_camera_angle_to(Vector3.RIGHT))
 		await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_RIGHT, true, center)
+	# A turn under way brakes as fast as the smoothing of the mouse settles (rotation_sharpness): a few degrees.
+	for i in 10:
+		angles.append(_camera_angle_to(Vector3.RIGHT))
+		await _tree.physics_frame
+	var turning := (angles[0] - angles[1]) / DT
+	var after_press := (angles[2] - angles[3]) / DT
+	var stopped := absf(angles[-2] - angles[-1]) / DT
 	var rotate_before := _camera_angle_to(Vector3.RIGHT)
 	for i in 20:
 		await _tree.physics_frame
@@ -94,10 +220,13 @@ func _check_camera_follow_pauses() -> void:
 	for i in 30:
 		await _tree.physics_frame
 	var rotate_after := _camera_angle_to(Vector3.RIGHT)
-	print("right button held: angle %.1f -> %.1f deg; 0.5 s after release %.1f deg" % [
+	print(("right button pressed while turning at %.0f deg/s: %.0f deg/s in the tick after the press, %.1f deg/s " +
+			"0.15 s later; held: angle %.1f -> %.1f deg; 0.5 s after release %.1f deg") % [turning, after_press, stopped,
 		rotate_before, rotate_during, rotate_after])
+	_expect(turning > 20.0 and after_press > 0.3 * turning and stopped < 0.05 * turning,
+			"pressed mid-turn, the camera brakes quickly but does not stop dead")
 	_expect(absf(rotate_during - rotate_before) < 0.3, "does not turn while the right button rotates the camera")
-	_expect(rotate_after < rotate_during - 20.0, "turns again after the right button is released")
+	_expect(rotate_during > 5.0 and rotate_after < 0.25 * rotate_during, "turns again after the right button is released")
 	for i in 600:
 		await _tree.physics_frame
 		if not _mover.has_destination():
@@ -164,6 +293,7 @@ func _hold_and_watch(follow_time: float, keep_aim: bool, nudge := Vector2.ZERO, 
 	if pitch > 0.0:
 		_rig.follow_pitch = true
 		_rig.follow_pitch_angle = -deg_to_rad(pitch)
+		_rig.follow_pitch_time = follow_time
 	var size := _tree.root.get_visible_rect().size
 	var screen := Vector2(size.x * 0.6, size.y * 0.45)
 	_send_motion(screen, Vector2.ZERO)
@@ -281,42 +411,50 @@ func _drag_camera(motion: Vector2) -> Vector2:
 			rad_to_deg(_rig.rotation.x - pitch_before))
 
 
-## Runs after [method _check_camera]: the pitch set by the wheel levels out on the run.
+## Runs after [method _check_camera]: the pitch set by the wheel levels out on the run, smoothly and without going
+## past the angle.
 func _check_camera_pitch_follow() -> void:
 	print("\n== camera levels its pitch on the run")
 	var default_time := _rig.follow_time
+	var default_pitch_time := _rig.follow_pitch_time
 	var run := await _watch_pitch_on_run(55.0, 0.5, 2.0)
-	print("to 55 deg, follow_time 0.5, turning off: pitch (every 6th tick) %s; camera angle to the run %.1f deg" % [
-		_fmt(_every(run.pitches, 6)), run.yaw_angle])
-	_expect(absf(run.pitches[-1] - 55.0) < 0.3, "levels the pitch set by the wheel to the chosen angle")
+	var past := _max(run.pitches) - 55.0
+	print(("to 55 deg, follow_pitch_time 0.5, turning off: pitch (every 6th tick) %s; past the angle by %.3f deg; " +
+			"camera angle to the run %.1f deg") % [_fmt(_every(run.pitches, 6)), past, run.yaw_angle])
+	_expect(absf(run.pitches[-1] - 55.0) < 0.3 and past < 0.05,
+			"levels the pitch set by the wheel to the chosen angle, without going past it")
 	_expect(absf(run.yaw_angle - 90.0) < 0.5, "follow_movement off: levels the pitch only, does not turn")
 	var limited := await _watch_pitch_on_run(89.0, 0.5, 2.0)
 	var limit := -rad_to_deg(_rig.min_pitch)
-	print("to 89 deg: pitch %.1f -> %.1f deg (camera limit %.1f)" % [limited.pitches[0], limited.pitches[-1], limit])
+	print("to 89 deg, starting from %.1f deg after the alignment was off: pitch -> %.1f deg (camera limit %.1f)" % [
+		limited.pitches[0], limited.pitches[-1], limit])
 	_expect(absf(limited.pitches[-1] - limit) < 0.3, "does not tilt past the camera limit")
+	_expect(absf(limited.pitches[0] - run.pitches[0]) < 0.1,
+			"turned off, the tilt alignment gives the camera back the pitch of the wheel")
 
-	var held := await _hold_and_watch(default_time, true, Vector2.ZERO, 20.0)
-	print(("hold, follow_time %.1f, pitch 20 deg: pitch %.1f -> %.1f deg in 1.25 s; camera %.1f deg behind the run; " +
+	var held := await _hold_and_watch(default_time, true, Vector2.ZERO, 60.0)
+	print(("hold, follow_time %.1f, pitch 60 deg: pitch %.1f -> %.1f deg in 1.25 s; camera %.1f deg behind the run; " +
 			"heading turned %.2f deg") % [
 		default_time, held.pitch_at_hold, held.pitch_after, held.camera_lag, held.heading_turn])
-	_expect(absf(held.pitch_after - 20.0) < 0.25 * absf(held.pitch_at_hold - 20.0)
+	_expect(absf(held.pitch_after - 60.0) < 0.25 * absf(held.pitch_at_hold - 60.0)
 			and held.camera_lag < 0.25 * held.initial_lag,
 			"on a left-button hold the camera turns behind the run and levels its pitch")
 	_expect(held.heading_turn < 1.0, "the cursor keeps the aim while the pitch changes")
 	_rig.follow_time = default_time
+	_rig.follow_pitch_time = default_pitch_time
 
 
 ## The character stands at (-8, 0, 0) with the camera looking north, then runs east; the camera levels its pitch to
-## [param angle] degrees down, with the follow off. Returns the camera pitch (degrees down) on every tick from the
-## start of the run and the angle between the camera's view and the run at the end.
-func _watch_pitch_on_run(angle: float, follow_time: float, seconds: float) -> Dictionary:
+## [param angle] degrees down in [param pitch_time], with the follow off. Returns the camera pitch (degrees down) on
+## every tick from the start of the run and the angle between the camera's view and the run at the end.
+func _watch_pitch_on_run(angle: float, pitch_time: float, seconds: float) -> Dictionary:
 	_rig.follow_pitch = false
 	await _teleport(Vector3(-8, 0, 0))
 	_rig.look_along(Vector3.FORWARD)
 	await _settle_camera()
 	_rig.follow_pitch = true
 	_rig.follow_pitch_angle = -deg_to_rad(angle)
-	_rig.follow_time = follow_time
+	_rig.follow_pitch_time = pitch_time
 	var pitches := PackedFloat32Array([_camera_pitch()])
 	_mover.move_to(Vector3(8, 0, 0))
 	for i in roundi(seconds / DT):
@@ -334,6 +472,100 @@ func _watch_pitch_on_run(angle: float, follow_time: float, seconds: float) -> Di
 ## How far down the camera looks, in degrees.
 func _camera_pitch() -> float:
 	return -rad_to_deg(_rig.rotation.x)
+
+
+## The height on the run: standing, the camera keeps the height the wheel set; running, it reaches follow_zoom_level
+## smoothly, 95% of the way in about follow_zoom_time, never past it. With the pitch aligned too, the pitch stays at
+## its angle while the height changes. The wheel changes the height as usual, and on the run it comes back; 0 is
+## instant.
+func _check_camera_zoom_follow() -> void:
+	print("\n== camera aligns its height on the run")
+	var defaults := [_rig.follow_zoom_level, _rig.follow_zoom_time, _rig.follow_pitch_angle, _rig.follow_pitch_time]
+	# The strip by the south fence.
+	await _teleport(Vector3(-30, 0, 34))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	var start := _rig.get_zoom()
+	_rig.follow_zoom = true
+	_rig.follow_zoom_level = 0.9
+	_rig.follow_zoom_time = 0.8
+	await _ticks(60)
+	var standing := absf(_rig.get_zoom() - start)
+	var raised := await _zooms_on_run(2.0)
+	var way := 0.9 - start
+	var reached_at := -1.0
+	for i in raised.size():
+		if reached_at < 0.0 and absf(0.9 - raised[i]) <= 0.05 * absf(way):
+			reached_at = (i + 1) * DT
+	var moved_at := -1.0
+	for i in raised.size():
+		if moved_at < 0.0 and absf(raised[i] - start) > 0.001:
+			moved_at = (i + 1) * DT
+	# In its first 0.1 s the height covers only a little of the way: it starts smoothly (a pull straight to the level,
+	# without the spring, would cover about a third of it).
+	var first := absf(raised[mini(roundi(moved_at / DT) + 5, raised.size() - 1)] - start) / absf(way)
+
+	# The pitch aligned too: it stays at 40° while the height goes down.
+	_rig.follow_pitch = true
+	_rig.follow_pitch_angle = -deg_to_rad(40.0)
+	_rig.follow_pitch_time = 0.3
+	await _zooms_on_run(1.0)
+	_rig.follow_zoom_level = 0.3
+	var pitches := PackedFloat32Array()
+	var lowered := PackedFloat32Array()
+	_mover.steer(Vector3.LEFT)
+	for i in 120:
+		await _tree.physics_frame
+		pitches.append(_camera_pitch())
+		lowered.append(_rig.get_zoom())
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	_rig.follow_pitch = false
+
+	# The wheel while standing: two clicks down; on the run the height comes back.
+	for i in 2:
+		_send_button(MOUSE_BUTTON_WHEEL_UP, true, Vector2(576, 400))
+		_send_button(MOUSE_BUTTON_WHEEL_UP, false, Vector2(576, 400))
+	await _settle_camera()
+	var wheeled := _rig.get_zoom()
+	var back := await _zooms_on_run(2.0)
+	# Instant.
+	_rig.follow_zoom_time = 0.0
+	_rig.follow_zoom_level = 0.6
+	var instant := await _zooms_on_run(0.5)
+	_rig.follow_zoom = false
+	_rig.follow_zoom_level = defaults[0]
+	_rig.follow_zoom_time = defaults[1]
+	_rig.follow_pitch_angle = defaults[2]
+	_rig.follow_pitch_time = defaults[3]
+	await _teleport(Vector3.ZERO)
+
+	print(("from %.2f, standing 1 s: changed by %.4f; on the run to 0.9 in follow_zoom_time 0.8: moved after %.2f s, " +
+			"%.0f%% of the way in its first 0.1 s, 95%% in %.2f s from the start of the run, highest %.3f; with the " +
+			"pitch at 40 deg, down to %.2f: pitch %.2f..%.2f deg; the wheel down to %.2f, after the run %.3f; " +
+			"follow_zoom_time 0: %.3f after %d ticks") % [start, standing, moved_at, first * 100.0, reached_at,
+		_max(raised), lowered[-1], _min(pitches), _max(pitches), wheeled, back[-1], instant[-1], instant.size()])
+	_expect(standing < 0.001, "standing, the camera keeps the height the wheel set")
+	_expect(absf(raised[-1] - 0.9) < 0.005 and _max(raised) <= 0.9001 and absf(reached_at - 0.8) < 0.35
+			and first < 0.2,
+			"on the run the height reaches the level smoothly, in about follow_zoom_time, never past it")
+	_expect(absf(lowered[-1] - 0.3) < 0.01 and _max(pitches) - _min(pitches) < 0.2,
+			"with the pitch aligned too, the pitch stays at its angle while the height changes")
+	_expect(wheeled < 0.25 and absf(back[-1] - 0.3) < 0.01,
+			"the wheel changes the height as usual, and on the run it comes back")
+	_expect(absf(instant[-1] - 0.6) < 0.001, "follow_zoom_time 0: the height is reached at once")
+
+
+## Runs east for [param seconds]: the zoom of the camera on every tick.
+func _zooms_on_run(seconds: float) -> PackedFloat32Array:
+	var zooms := PackedFloat32Array()
+	_mover.steer(Vector3.RIGHT)
+	for i in roundi(seconds / DT):
+		await _tree.physics_frame
+		zooms.append(_rig.get_zoom())
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	return zooms
 
 
 ## Up the staircase east of the platform: the character is put onto every stair at once, and with the demo's

@@ -194,24 +194,44 @@ msgid "Turn the camera to follow the run"
 msgstr "相机随奔跑方向转动"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Align the camera tilt"
-msgstr "对齐相机倾角"
+msgid "Align the camera tilt on the run"
+msgstr "奔跑时对齐相机倾角"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Tilt down"
 msgstr "向下倾角"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the tilt in"
+msgstr "倾角对齐用时"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 msgstr "角色奔跑时，相机平滑过渡到此倾角。滚轮（以及可倾斜相机时的右键）照常改变倾角，奔跑中又会平滑恢复。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Catch up in"
-msgstr "跟上用时"
+msgid "Turn in"
+msgstr "转动用时"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "instant"
 msgstr "立即"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the camera height on the run"
+msgstr "奔跑时对齐相机高度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Height"
+msgstr "高度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Align the height in"
+msgstr "高度对齐用时"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "角色奔跑时，相机平滑过渡到此高度：0% 为降到最低，100% 为升到最高。滚轮照常改变高度，奔跑中又会平滑恢复。若同时对齐倾角，倾角保持不变。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"
