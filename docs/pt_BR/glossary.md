@@ -27,7 +27,7 @@ Os termos como esta documentação e o código os usam.
 | **Marcador** (Marker) | `ClickMarker`: o anel no chão no ponto clicado |
 | **Movimentador** (Mover) | `NavigationMover`: transforma comandos (`move_to`, `steer`, `stop`) numa velocidade horizontal a cada tick. Nunca move o corpo |
 | **Malha de navegação** (Navigation mesh) | A área transitável gerada a partir das colisões do nível na camada 1, guardada em `world.tscn`. Os caminhos são buscados nela |
-| **Interpolação de física** (Physics interpolation) | Desenhar os corpos entre os ticks de física na taxa de quadros da tela. Desligada por padrão; uma configuração a liga |
+| **Interpolação de física** (Physics interpolation) | Desenhar os corpos entre os ticks de física na taxa de quadros da tela. Ligada por padrão; uma configuração a desliga |
 | **Inclinação** (Pitch, tilt) | O quanto a câmera olha para baixo. Ângulos negativos no código, graus para baixo nas configurações |
 | **Giro no lugar** (Pivot) | Girar instantaneamente a partir da parada, abaixo de `pivot_speed` (1 m/s) |
 | **Local** (Place) | Um `PointOfInterest`: uma área que mostra "Descoberto: …" na primeira vez que o jogador entra nela |

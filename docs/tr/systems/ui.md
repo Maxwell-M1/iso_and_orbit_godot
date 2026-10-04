@@ -43,8 +43,8 @@ tutar:
   durdurur; testler bunu ayarlar ve her şeyi varsayılanlara sıfırlar, böylece oyuncunun ayarlarını yok sayar ve
   hiçbir zaman üzerine yazmaz.
 - `_OBSOLETE_KEYS` içinde listelenen anahtarlar yüklemede dosyadan kaldırılır.
-- Motor düzeyindeki ayarları sınıfın kendisi uygular (`_apply_to_engine()`): kare hızı sınırı ve V-Sync, fizik
-  enterpolasyonu, arayüz ölçeği, dil, ses düzeyi. Sahne düğümlerinin ayarlarını sahne uygular: demoda
+- Motor düzeyindeki ayarları sınıfın kendisi uygular (`_apply_to_engine()`): tam ekran, kare hızı sınırı ve V-Sync,
+  fizik enterpolasyonu, arayüz ölçeği, dil, ses düzeyi. Sahne düğümlerinin ayarlarını sahne uygular: demoda
   `gdscript/demo/settings_applier.gd` başlangıçta `get_value()` okur ve `changed` sinyalini dinler.
 
 **Yeni bir ayar:**

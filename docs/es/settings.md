@@ -57,18 +57,24 @@ Personaje, así no se pierde una elección guardada.
 
 | Opción | Clave | Por defecto | Se aplica a |
 |---|---|---|---|
+| **Pantalla completa** | `display/fullscreen` | desactivado | `DisplayServer.window_set_mode()` |
 | **Límite de FPS**: 24, 30, 60, 120, 240, Sin límite | `display/max_fps` | Sin límite | `Engine.max_fps` |
 | **Sincronización vertical (V-Sync)** | `display/vsync` | desactivado | `DisplayServer.window_set_vsync_mode()` |
-| **Interpolación de física (personaje y cámara)** | `display/physics_interpolation` | desactivado | `SceneTree.physics_interpolation` |
+| **Interpolación de física (personaje y cámara)** | `display/physics_interpolation` | activado | `SceneTree.physics_interpolation` |
 | **Contorno de silueta tras obstáculos** | `display/silhouette_outline` | activado | `OccludedSilhouette.outline_enabled` |
+
+La pantalla completa no funciona mientras el juego se ejecuta dentro de la pestaña Juego (Game) del editor, donde la
+ventana pertenece al editor. Para probarla desde el editor, desactiva **Embed Game on Next Play** en el menú de la
+pestaña Juego.
 
 Con V-Sync nunca hay más fotogramas que la frecuencia de actualización del monitor, así que un límite de FPS igual o
 superior a esa frecuencia no se aplica en absoluto: competiría con V-Sync y daría menos fotogramas de los que muestra
 el monitor (un límite de 240 en un monitor de 240 Hz daba unos 220).
 
-Sin interpolación de física, el personaje y la cámara se mueven a saltos, tick a tick (60 por segundo): la cámara
-sigue `get_global_transform_interpolated()` del objetivo, que sin interpolación es simplemente su posición en el
-último tick.
+Sin interpolación de física, el personaje y la cámara se mueven a saltos, tick a tick (60 por segundo): la cámara sigue
+`get_global_transform_interpolated()` del objetivo, que sin interpolación es simplemente su posición en el último tick.
+En un monitor de más de 60 Hz se nota, y con la cámara siguiendo la carrera el personaje además se tambalea en los
+giros: la cámara gira cada fotograma, el personaje solo cada tick.
 
 ## Interfaz
 

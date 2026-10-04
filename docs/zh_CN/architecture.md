@@ -134,14 +134,14 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 
 ## 设置
 
-`Settings` 自动加载（`GameSettings`）存储设置值并发出 `changed(key, value)`。它自行应用引擎层面的设置：帧率上限、V-Sync、物理插值、界面缩放、语言和音量。其余设置由 `gdscript/demo/settings_applier.gd` 应用，它将每个键映射到一个节点属性。组件本身从不读取设置，见[设置](settings.md)。
+`Settings` 自动加载（`GameSettings`）存储设置值并发出 `changed(key, value)`。它自行应用引擎层面的设置：全屏、帧率上限、V-Sync、物理插值、界面缩放、语言和音量。其余设置由 `gdscript/demo/settings_applier.gd` 应用，它将每个键映射到一个节点属性。组件本身从不读取设置，见[设置](settings.md)。
 
 ## 为什么这样构建
 
 - **只有 `GroundCharacter` 移动身体。** 移动组件只返回速度，从不调用 `move_and_slide()`。重力、跳跃以及将来可能加入的击退都在同一处合并，不会相互冲突。
 - **`GroundMotion` 是不依赖节点的纯数学。** 加速和制动是状态的纯函数：便于单独测试，也便于逐行移植到其他语言。
 - **角色对鼠标一无所知。** 它之所以成为玩家角色，是因为主场景中的 `PlayerInput` 驱动着它的移动器。制作 NPC 时，实例化 `player.tscn`，去掉玩家专用的 `Silhouette` 和 `Appearance` 节点，然后在 AI 中调用 `NavigationMover.move_to()`。
-- **相机是角色的兄弟节点，而不是子节点。** 它在 `_process` 中移动到目标的插值位置，自身不参与插值，因此开启物理插值（设置 → 显示）后，在任何帧率下奔跑都很平滑。在跟随模式下，相机根据目标每个物理帧的移动计算其速度，因此任何 `Node3D` 都可以作为目标。
+- **相机是角色的兄弟节点，而不是子节点。** 它在 `_process` 中移动到目标的插值位置，自身不参与插值，因此开启物理插值（默认开启，设置 → 显示）后，在任何帧率下奔跑都很平滑。在跟随模式下，相机根据目标每个物理帧的移动计算其速度，因此任何 `Node3D` 都可以作为目标。
 - **组件对设置一无所知。** `LedgeGuard`、`PointClickMoveInput`、`OrbitCameraRig` 等组件只读取自己的属性；只有 `settings_applier.gd` 和设置窗口与 `Settings` 自动加载通信。组件可以不带设置系统移植到其他项目。
 - **窗口遵循 Godot 的惯例。** 布局只使用容器；外观来自项目主题及其类型变体，而不是每个节点上的覆盖项。窗口通过信号请求关闭，由 `UiRoot` 关闭它（调用沿树向下，信号沿树向上）。按键都是输入动作。窗口打开时设置键盘焦点，关闭时恢复。窗口打开期间游戏暂停（`UiRoot` 以 `PROCESS_MODE_ALWAYS` 运行），相机会释放已捕获的光标。
 

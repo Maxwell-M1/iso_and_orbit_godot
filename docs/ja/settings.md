@@ -50,14 +50,17 @@ F10で設定ウィンドウが開き、ゲームが一時停止します。Esc�
 
 | 設定 | キー | デフォルト | 適用先 |
 |---|---|---|---|
+| **フルスクリーン** | `display/fullscreen` | オフ | `DisplayServer.window_set_mode()` |
 | **FPS上限**：24、30、60、120、240、無制限 | `display/max_fps` | 無制限 | `Engine.max_fps` |
 | **垂直同期（V-Sync）** | `display/vsync` | オフ | `DisplayServer.window_set_vsync_mode()` |
-| **物理補間（キャラクターとカメラ）** | `display/physics_interpolation` | オフ | `SceneTree.physics_interpolation` |
+| **物理補間（キャラクターとカメラ）** | `display/physics_interpolation` | オン | `SceneTree.physics_interpolation` |
 | **障害物の裏のシルエット輪郭** | `display/silhouette_outline` | オン | `OccludedSilhouette.outline_enabled` |
+
+ゲームをエディターのゲームタブ（Game）内で実行している間は、ウィンドウがエディターのものなので、フルスクリーンは機能しません。エディターから試すには、ゲームタブのメニューで**Embed Game on Next Play**をオフにしてください。
 
 V-Syncでは、フレーム数がモニターのリフレッシュレートを超えることはありません。そのため、そのレート以上のFPS上限はまったく設定されません。設定するとV-Syncと競合し、モニターが表示するより少ないフレーム数になってしまいます（240 Hzのモニターで上限を240にすると約220でした）。
 
-物理補間がないと、キャラクターとカメラはティックごと（毎秒60回）に段階的に動きます。カメラはターゲットの`get_global_transform_interpolated()`を追いますが、これは補間なしでは単に最後のティックでの位置になるからです。
+物理補間がないと、キャラクターとカメラはティックごと（毎秒60回）に段階的に動きます。カメラはターゲットの`get_global_transform_interpolated()`を追いますが、これは補間なしでは単に最後のティックでの位置になるからです。60 Hzより高速なモニターではこれが目立ち、カメラが走りに追従していると、旋回時にキャラクターも揺れます。カメラは毎フレーム回転しますが、キャラクターはティックごとにしか回転しないためです。
 
 ## インターフェース
 

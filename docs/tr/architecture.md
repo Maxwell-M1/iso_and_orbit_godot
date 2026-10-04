@@ -156,8 +156,8 @@ içindeki sinyal bağlantıları:
 ## Ayarlar
 
 `Settings` otomatik yüklemesi (`GameSettings`) değerleri saklar ve `changed(key, value)` sinyalini yayar. Motor
-düzeyindeki ayarları kendisi uygular: kare hızı sınırı, V-Sync, fizik enterpolasyonu, arayüz ölçeği, dil ve ses
-düzeyi. Geri kalan her şeyi, her anahtarı bir düğüm özelliğine eşleyen `gdscript/demo/settings_applier.gd` uygular.
+düzeyindeki ayarları kendisi uygular: tam ekran, kare hızı sınırı, V-Sync, fizik enterpolasyonu, arayüz ölçeği, dil ve
+ses düzeyi. Geri kalan her şeyi, her anahtarı bir düğüm özelliğine eşleyen `gdscript/demo/settings_applier.gd` uygular.
 Bileşenlerin kendileri ayarları hiçbir zaman okumaz, bkz. [Ayarlar](settings.md).
 
 ## Neden bu şekilde kurulu
@@ -171,9 +171,9 @@ Bileşenlerin kendileri ayarları hiçbir zaman okumaz, bkz. [Ayarlar](settings.
   düğümünün onun hareketlendiricisini yönetmesidir. Bir NPC için `player.tscn` sahnesini yalnızca oyuncuya özgü
   `Silhouette` ve `Appearance` düğümleri olmadan örnekleyin ve yapay zekânızdan `NavigationMover.move_to()` çağırın.
 - **Kamera karakterin alt düğümü değil, kardeşidir.** `_process` içinde hedefin enterpole edilmiş konumuna gider ve
-  kendisi enterpole edilmez; böylece fizik enterpolasyonu açıkken (Ayarlar → Görüntü) koşu her kare hızında akıcıdır.
-  Takip modu için kamera hedefin hızını onun fizik tiki başına hareketinden hesaplar; bu yüzden herhangi bir `Node3D`
-  hedef olabilir.
+  kendisi enterpole edilmez; böylece fizik enterpolasyonuyla (varsayılan olarak açık, Ayarlar → Görüntü) koşu her kare
+  hızında akıcıdır. Takip modu için kamera hedefin hızını onun fizik tiki başına hareketinden hesaplar; bu yüzden
+  herhangi bir `Node3D` hedef olabilir.
 - **Bileşenler ayarlar hakkında hiçbir şey bilmez.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` ve
   diğerleri kendi özelliklerini okur; `Settings` otomatik yüklemesiyle yalnızca `settings_applier.gd` ve ayarlar
   penceresi konuşur. Bir bileşen ayarlar sistemi olmadan başka bir projeye taşınabilir.

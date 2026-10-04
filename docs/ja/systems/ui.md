@@ -29,7 +29,7 @@
 - `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`と、シグナル`changed(key, value)`。
 - 値はどのシーンノードの`_ready()`よりも前に`_init()`で読み込まれ、設定ウィンドウを閉じたときとゲームの終了時に`user://settings.cfg`へ保存されます。`persistent = false`で保存が止まります。テストはこれを設定してすべてをデフォルトに戻すので、プレイヤーの設定を無視し、上書きすることもありません。
 - `_OBSOLETE_KEYS`に挙げられたキーは、読み込み時にファイルから削除されます。
-- エンジンレベルの設定は、クラス自身が適用します（`_apply_to_engine()`）：フレームレート上限とV-Sync、物理補間、UIスケール、言語、音量。シーンノードの設定はシーン側で適用します。デモでは、`gdscript/demo/settings_applier.gd`が起動時に`get_value()`を読み、`changed`を受け取ります。
+- エンジンレベルの設定は、クラス自身が適用します（`_apply_to_engine()`）：フルスクリーン、フレームレート上限とV-Sync、物理補間、UIスケール、言語、音量。シーンノードの設定はシーン側で適用します。デモでは、`gdscript/demo/settings_applier.gd`が起動時に`get_value()`を読み、`changed`を受け取ります。
 
 **新しい設定**：
 

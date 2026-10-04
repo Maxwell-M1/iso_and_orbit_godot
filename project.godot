@@ -109,6 +109,7 @@ locale/translations=PackedStringArray("res://l10n/ui/es.po", "res://l10n/ui/ja.p
 [physics]
 
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 
 [rendering]
 

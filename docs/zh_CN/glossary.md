@@ -26,7 +26,7 @@
 | **标记（Marker）** | `ClickMarker`：点击位置地面上的圆环 |
 | **移动器（Mover）** | `NavigationMover`：每个物理帧把命令（`move_to`、`steer`、`stop`）转换为水平速度。它从不移动身体 |
 | **导航网格（Navigation mesh）** | 根据关卡中第 1 层的碰撞烘焙出的可行走区域，存储在 `world.tscn` 中。路径在其上搜索 |
-| **物理插值（Physics interpolation）** | 以显示帧率在物理帧之间绘制物体。默认关闭；可通过设置开启 |
+| **物理插值（Physics interpolation）** | 以显示帧率在物理帧之间绘制物体。默认开启；可通过设置关闭 |
 | **俯仰角、倾角（Pitch, tilt）** | 相机向下看的陡峭程度。代码中为负角度，设置中为向下的度数 |
 | **原地转身（Pivot）** | 静止时（低于 `pivot_speed`，即 1 米/秒）的瞬间转身 |
 | **地点（Place）** | `PointOfInterest`：玩家首次进入时显示“发现地点：…”的区域 |

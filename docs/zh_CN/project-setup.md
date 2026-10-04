@@ -60,7 +60,7 @@
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5（Ultra） | 柔和阴影；`world.tscn` 中的太阳还设置了 `shadow_blur = 1.25` 和 70 米的阴影距离 |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2（4×） | 多重采样抗锯齿 |
 
-物理以默认的每秒 60 帧运行。物理插值在 `project.godot` 中是关闭的，在运行时通过设置切换（设置 → 显示）。
+物理以默认的每秒 60 帧运行。物理插值在 `project.godot` 中是开启的（`physics/common/physics_interpolation`），在运行时通过设置切换（设置 → 显示）。
 
 ## 保存的数据
 

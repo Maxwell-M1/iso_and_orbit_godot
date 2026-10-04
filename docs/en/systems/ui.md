@@ -38,9 +38,9 @@ The `Settings` autoload (`gdscript/settings/game_settings.gd`, class `GameSettin
   settings window closes and when the game exits. `persistent = false` stops saving; the tests
   set it and reset everything to the defaults, so they ignore the player's settings and never overwrite them.
 - Keys listed in `_OBSOLETE_KEYS` are removed from the file on load.
-- Engine-level settings are applied by the class itself (`_apply_to_engine()`): frame rate cap and V-Sync, physics
-  interpolation, interface scale, language, volume. Settings of scene nodes are applied by the scene: in the demo,
-  `gdscript/demo/settings_applier.gd` reads `get_value()` at startup and listens to `changed`.
+- Engine-level settings are applied by the class itself (`_apply_to_engine()`): full screen, frame rate cap and V-Sync,
+  physics interpolation, interface scale, language, volume. Settings of scene nodes are applied by the scene: in the
+  demo, `gdscript/demo/settings_applier.gd` reads `get_value()` at startup and listens to `changed`.
 
 **A new setting:**
 

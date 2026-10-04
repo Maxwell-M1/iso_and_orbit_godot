@@ -57,17 +57,23 @@ uma escolha salva não se perca.
 
 | Configuração | Chave | Padrão | Aplicada a |
 |---|---|---|---|
+| **Tela cheia** | `display/fullscreen` | desligado | `DisplayServer.window_set_mode()` |
 | **Limite de FPS**: 24, 30, 60, 120, 240, Sem limite | `display/max_fps` | Sem limite | `Engine.max_fps` |
 | **Sincronização vertical (V-Sync)** | `display/vsync` | desligado | `DisplayServer.window_set_vsync_mode()` |
-| **Interpolação de física (personagem e câmera)** | `display/physics_interpolation` | desligado | `SceneTree.physics_interpolation` |
+| **Interpolação de física (personagem e câmera)** | `display/physics_interpolation` | ligado | `SceneTree.physics_interpolation` |
 | **Contorno da silhueta atrás de obstáculos** | `display/silhouette_outline` | ligado | `OccludedSilhouette.outline_enabled` |
+
+A tela cheia não funciona enquanto o jogo roda dentro da aba Jogo (Game) do editor, onde a janela pertence ao editor.
+Para testá-la pelo editor, desligue **Embed Game on Next Play** no menu da aba Jogo.
 
 Com V-Sync nunca há mais quadros que a taxa de atualização do monitor, então um limite de FPS igual ou acima dessa taxa
 nem é aplicado: ele brigaria com o V-Sync e daria menos quadros do que o monitor mostra (um limite de 240 num monitor
 de 240 Hz dava cerca de 220).
 
 Sem interpolação de física, o personagem e a câmera se movem aos saltos, tick a tick (60 por segundo): a câmera segue o
-`get_global_transform_interpolated()` do alvo, que sem interpolação é simplesmente a posição dele no último tick.
+`get_global_transform_interpolated()` do alvo, que sem interpolação é simplesmente a posição dele no último tick. Num
+monitor acima de 60 Hz isso aparece, e com a câmera seguindo a corrida o personagem também balança nas curvas: a câmera
+gira a cada quadro, o personagem só a cada tick.
 
 ## Interface
 

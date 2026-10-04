@@ -153,9 +153,9 @@ As referências a nós são propriedades exportadas definidas em `main.tscn` e `
 ## Configurações
 
 O autoload `Settings` (`GameSettings`) guarda os valores e emite `changed(key, value)`. Ele mesmo aplica as
-configurações no nível da engine: limite de taxa de quadros, V-Sync, interpolação de física, escala da interface,
-idioma e volume. Todo o resto é aplicado por `gdscript/demo/settings_applier.gd`, que associa cada chave a uma
-propriedade de nó. Os próprios componentes nunca leem configurações, veja [Configurações](settings.md).
+configurações no nível da engine: tela cheia, limite de taxa de quadros, V-Sync, interpolação de física, escala da
+interface, idioma e volume. Todo o resto é aplicado por `gdscript/demo/settings_applier.gd`, que associa cada chave a
+uma propriedade de nó. Os próprios componentes nunca leem configurações, veja [Configurações](settings.md).
 
 ## Por que é feito assim
 
@@ -167,9 +167,9 @@ propriedade de nó. Os próprios componentes nunca leem configurações, veja [C
 - **O personagem não sabe nada do mouse.** Ele vira o personagem do jogador porque o `PlayerInput` na cena principal
   comanda o movimentador dele. Para um NPC, instancie `player.tscn` sem os nós `Silhouette` e `Appearance`, que são só
   do jogador, e chame `NavigationMover.move_to()` da sua IA.
-- **A câmera é irmã do personagem, não filha dele.** Ela se move em `_process` para a posição interpolada do alvo e
-  não é interpolada ela mesma, então com a interpolação de física ligada (Configurações → Exibição) a corrida fica
-  suave em qualquer taxa de quadros. Para o modo de seguir, a câmera calcula a velocidade do alvo a partir do
+- **A câmera é irmã do personagem, não filha dele.** Ela se move em `_process` para a posição interpolada do alvo e não
+  é interpolada ela mesma, então com a interpolação de física (ligada por padrão, Configurações → Exibição) a corrida
+  fica suave em qualquer taxa de quadros. Para o modo de seguir, a câmera calcula a velocidade do alvo a partir do
   movimento dele por tick de física, então qualquer `Node3D` serve como alvo.
 - **Os componentes não sabem nada das configurações.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` e os
   outros leem as próprias propriedades; só o `settings_applier.gd` e a janela de configurações falam com o autoload

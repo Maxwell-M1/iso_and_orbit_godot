@@ -60,7 +60,7 @@
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5（Ultra） | ソフトシャドウ。`world.tscn`の太陽にも`shadow_blur = 1.25`と70 mの影の距離が設定されている |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2（4×） | マルチサンプル・アンチエイリアス |
 
-物理はデフォルトの毎秒60ティックで動作します。物理補間は`project.godot`ではオフになっており、実行時に設定（設定 → 表示）で切り替えます。
+物理はデフォルトの毎秒60ティックで動作します。物理補間は`project.godot`でオンになっており（`physics/common/physics_interpolation`）、実行時に設定（設定 → 表示）で切り替えます。
 
 ## 保存データ
 

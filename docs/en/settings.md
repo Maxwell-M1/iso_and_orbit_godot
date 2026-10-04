@@ -52,18 +52,23 @@ not lost.
 
 | Setting | Key | Default | Applied to |
 |---|---|---|---|
+| **Fullscreen** | `display/fullscreen` | off | `DisplayServer.window_set_mode()` |
 | **FPS limit**: 24, 30, 60, 120, 240, Unlimited | `display/max_fps` | Unlimited | `Engine.max_fps` |
 | **Vertical sync (V-Sync)** | `display/vsync` | off | `DisplayServer.window_set_vsync_mode()` |
-| **Physics interpolation (character and camera)** | `display/physics_interpolation` | off | `SceneTree.physics_interpolation` |
+| **Physics interpolation (character and camera)** | `display/physics_interpolation` | on | `SceneTree.physics_interpolation` |
 | **Silhouette outline behind obstacles** | `display/silhouette_outline` | on | `OccludedSilhouette.outline_enabled` |
+
+Full screen does not work while the game runs inside the editor's Game tab, where the window belongs to the editor. To
+try it from the editor, turn off **Embed Game on Next Play** in the Game tab's menu.
 
 With V-Sync there are never more frames than the monitor's refresh rate, so an FPS limit at or above that rate is not
 set at all: it would fight V-Sync and give fewer frames than the monitor shows (a 240 limit on a 240 Hz monitor gave
 about 220).
 
 Without physics interpolation the character and the camera move in steps, tick by tick (60 per second): the camera
-follows the target's `get_global_transform_interpolated()`, which without interpolation is simply its position at
-the last tick.
+follows the target's `get_global_transform_interpolated()`, which without interpolation is simply its position at the
+last tick. On a monitor faster than 60 Hz this shows, and with the camera following the run the character also wobbles
+on turns: the camera turns every frame, the character only every tick.
 
 ## Interface
 

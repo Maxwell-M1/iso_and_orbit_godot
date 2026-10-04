@@ -39,8 +39,9 @@ Limitations of the project and engine quirks it works around. Each entry says wh
   another body stands right behind the obstacle the camera is in (a fence with a cliff behind it), the arm looks for
   free space closer to the target instead. See
   [Camera](systems/camera.md#how-the-arm-tells-room-behind-an-obstacle-from-being-inside-a-body).
-- **Steps in the motion.** Physics interpolation is off by default. Without it the character and the camera move tick
-  by tick, 60 times a second, which looks uneven on a fast monitor. Turn it on in Settings → Display.
+- **Steps in the motion without physics interpolation.** Physics interpolation is on by default. Turned off (Settings →
+  Display), the character and the camera move tick by tick, 60 times a second: on a fast monitor this looks uneven, and
+  with the camera following the run the character wobbles on turns.
 
 ## Tests
 

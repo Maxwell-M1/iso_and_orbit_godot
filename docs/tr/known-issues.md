@@ -46,8 +46,9 @@ gerektiğini söyler.
   Kameranın içinde bulunduğu engelin hemen arkasında başka bir gövde varsa (arkasında uçurum olan bir çit), kol
   bunun yerine hedefe daha yakın boş alan arar. Bkz.
   [Kamera](systems/camera.md#kol-engelin-arkasındaki-boşluğu-bir-gövdenin-içinde-olmaktan-nasıl-ayırır).
-- **Harekette kesiklik.** Fizik enterpolasyonu varsayılan olarak kapalıdır. O olmadan karakter ve kamera tikten tike,
-  saniyede 60 kez hareket eder; bu da hızlı bir monitörde düzensiz görünür. Ayarlar → Görüntü'den açın.
+- **Fizik enterpolasyonu olmadan harekette kesiklik.** Fizik enterpolasyonu varsayılan olarak açıktır. Kapatılırsa
+  (Ayarlar → Görüntü) karakter ve kamera tikten tike, saniyede 60 kez hareket eder: hızlı bir monitörde bu düzensiz
+  görünür, kamera koşuyu takip ederken de karakter dönüşlerde sallanır.
 
 ## Testler
 

@@ -65,8 +65,8 @@ adını dışa aktarılmış bir özellik olarak alır; böylece onların yerine
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5 (Ultra) | Yumuşak gölgeler; `world.tscn` içindeki güneşte ayrıca `shadow_blur = 1.25` ve 70 m gölge mesafesi vardır |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2 (4×) | Çoklu örneklemeli kenar yumuşatma |
 
-Fizik, varsayılan olan saniyede 60 tikte çalışır. Fizik enterpolasyonu `project.godot` içinde kapalıdır ve çalışma
-anında bir ayarla açılıp kapatılır (Ayarlar → Görüntü).
+Fizik, varsayılan olan saniyede 60 tikte çalışır. Fizik enterpolasyonu `project.godot` içinde açıktır
+(`physics/common/physics_interpolation`) ve çalışma anında bir ayarla açılıp kapatılır (Ayarlar → Görüntü).
 
 ## Kaydedilen veriler
 

@@ -48,9 +48,9 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
   Cuando otro cuerpo está justo detrás del obstáculo en el que está la cámara (una cerca con un acantilado detrás),
   el brazo busca en su lugar espacio libre más cerca del objetivo. Ver
   [Cámara](systems/camera.md#cómo-distingue-el-brazo-el-espacio-detrás-de-un-obstáculo-de-estar-dentro-de-un-cuerpo).
-- **Saltos en el movimiento.** La interpolación de física está desactivada por defecto. Sin ella, el personaje y la
-  cámara se mueven tick a tick, 60 veces por segundo, lo que se ve irregular en un monitor rápido. Actívala en
-  Configuración → Pantalla.
+- **Saltos en el movimiento sin interpolación de física.** La interpolación de física está activada por defecto. Si la
+  desactivas (Configuración → Pantalla), el personaje y la cámara se mueven tick a tick, 60 veces por segundo: en un
+  monitor rápido se ve irregular, y con la cámara siguiendo la carrera el personaje se tambalea en los giros.
 
 ## Pruebas
 

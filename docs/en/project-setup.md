@@ -62,8 +62,8 @@ action name as an exported property, so you can use your own actions instead.
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5 (Ultra) | Soft shadows; the sun in `world.tscn` also has `shadow_blur = 1.25` and a 70 m shadow distance |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2 (4×) | Multisample anti-aliasing |
 
-Physics runs at the default 60 ticks per second. Physics interpolation is off in `project.godot` and switched at
-runtime by a setting (Settings → Display).
+Physics runs at the default 60 ticks per second. Physics interpolation is on in `project.godot`
+(`physics/common/physics_interpolation`) and switched at runtime by a setting (Settings → Display).
 
 ## Saved data
 

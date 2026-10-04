@@ -4,8 +4,8 @@ extends Node
 ## ([code]GameSettings.LEDGE_GUARD[/code]), so they can be used in [code]match[/code].
 ##
 ## Values are stored in [member path] (a [ConfigFile]; the section and the key are the parts of the name before and
-## after "/"). The class itself applies the engine settings (FPS, V-Sync, physics interpolation, UI scale, language,
-## volume); the scene applies the settings of scene nodes: it reads [method get_value] and listens to
+## after "/"). The class itself applies the engine settings (full screen, FPS, V-Sync, physics interpolation, UI scale,
+## language, volume); the scene applies the settings of scene nodes: it reads [method get_value] and listens to
 ## [signal changed]. This way the game components know nothing about settings.
 ##
 ## A new setting: a constant with the key, a default value in [constant DEFAULTS] and, if the engine applies it,
@@ -47,6 +47,8 @@ const CAMERA_KEEP_AIM := &"camera/keep_aim"
 const CAMERA_KEEP_OUT := &"camera/keep_out_of_geometry"
 ## The camera moves closer if an obstacle hides the character (CameraArm.pull_in_on_occlusion).
 const CAMERA_PULL_IN := &"camera/pull_in_on_occlusion"
+## The window takes the whole screen. Inside the editor's Game tab the window mode does not change.
+const FULLSCREEN := &"display/fullscreen"
 const MAX_FPS := &"display/max_fps"
 const VSYNC := &"display/vsync"
 const PHYSICS_INTERPOLATION := &"display/physics_interpolation"
@@ -92,9 +94,10 @@ const DEFAULTS := {
 	CAMERA_KEEP_AIM: true,
 	CAMERA_KEEP_OUT: true,
 	CAMERA_PULL_IN: false,
+	FULLSCREEN: false,
 	MAX_FPS: 0,  # 0 means no limit
 	VSYNC: false,
-	PHYSICS_INTERPOLATION: false,  # as physics/common/physics_interpolation in project.godot
+	PHYSICS_INTERPOLATION: true,  # as physics/common/physics_interpolation in project.godot
 	SILHOUETTE_OUTLINE: true,
 	UI_SCALE: 75.0,
 	FPS_COUNTER: true,
@@ -188,6 +191,8 @@ func save() -> void:
 
 func _apply_to_engine(key: StringName, value: Variant) -> void:
 	match key:
+		FULLSCREEN:
+			_apply_fullscreen(value)
 		MAX_FPS, VSYNC:
 			_apply_frame_rate()
 		PHYSICS_INTERPOLATION:
@@ -199,6 +204,14 @@ func _apply_to_engine(key: StringName, value: Variant) -> void:
 			_apply_volume(value)
 		LANGUAGE:
 			TranslationServer.set_locale(value)
+
+
+## Only switches between full screen and a window: a window that is already maximized stays so at startup.
+static func _apply_fullscreen(on: bool) -> void:
+	var mode := DisplayServer.window_get_mode()
+	var fullscreen := mode in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+	if on != fullscreen:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if on else DisplayServer.WINDOW_MODE_WINDOWED)
 
 
 ## With V-Sync, an FPS limit at the monitor's refresh rate or above only conflicts with V-Sync (240 on a 240 Hz monitor

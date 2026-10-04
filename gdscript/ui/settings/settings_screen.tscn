@@ -540,6 +540,19 @@ theme_type_variation = &"TabPage"
 layout_mode = 2
 theme_type_variation = &"SettingsList"
 
+[node name="Fullscreen" type="CheckButton" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+layout_mode = 2
+text = "Fullscreen"
+script = ExtResource("2_check")
+key = &"display/fullscreen"
+
+[node name="FullscreenHint" type="Label" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "The game takes the whole screen. It does not work while the game runs inside the editor's Game tab."
+autowrap_mode = 3
+
 [node name="MaxFpsRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Graphics/Page/List"]
 layout_mode = 2
 

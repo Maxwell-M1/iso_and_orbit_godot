@@ -234,6 +234,14 @@ msgid "Display"
 msgstr "Pantalla"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Fullscreen"
+msgstr "Pantalla completa"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "The game takes the whole screen. It does not work while the game runs inside the editor's Game tab."
+msgstr "El juego ocupa toda la pantalla. No funciona mientras el juego se ejecuta dentro de la pestaña Juego (Game) del editor."
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "FPS limit"
 msgstr "Límite de FPS"
 

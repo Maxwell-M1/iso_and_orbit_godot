@@ -148,9 +148,9 @@ Node references are exported properties set in `main.tscn` and `player.tscn`. Th
 ## Settings
 
 The `Settings` autoload (`GameSettings`) stores values and emits `changed(key, value)`. It applies the engine-level
-settings itself: frame rate cap, V-Sync, physics interpolation, interface scale, language and volume. Everything
-else is applied by `gdscript/demo/settings_applier.gd`, which maps each key to a node property. The components
-themselves never read settings, see [Settings](settings.md).
+settings itself: full screen, frame rate cap, V-Sync, physics interpolation, interface scale, language and volume.
+Everything else is applied by `gdscript/demo/settings_applier.gd`, which maps each key to a node property. The
+components themselves never read settings, see [Settings](settings.md).
 
 ## Why it is built this way
 
@@ -163,9 +163,9 @@ themselves never read settings, see [Settings](settings.md).
   main scene drives its mover. For an NPC, instance `player.tscn` without the player-only `Silhouette` and
   `Appearance` nodes and call `NavigationMover.move_to()` from your AI.
 - **The camera is a sibling of the character, not its child.** It moves in `_process` to the target's interpolated
-  position and is not interpolated itself, so with physics interpolation on (Settings → Display) running is smooth at
-  any frame rate. For follow mode the camera computes the target's speed from its movement per physics tick, so any
-  `Node3D` works as a target.
+  position and is not interpolated itself, so with physics interpolation (on by default, Settings → Display) running is
+  smooth at any frame rate. For follow mode the camera computes the target's speed from its movement per physics tick,
+  so any `Node3D` works as a target.
 - **Components know nothing about the settings.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` and the
   others read their own properties; only `settings_applier.gd` and the settings window talk to the `Settings`
   autoload. A component moves to another project without the settings system.

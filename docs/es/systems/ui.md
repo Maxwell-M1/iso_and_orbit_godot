@@ -43,9 +43,10 @@ El autoload `Settings` (`gdscript/settings/game_settings.gd`, clase `GameSetting
   detiene el guardado; las pruebas lo establecen y restablecen todo a los valores por defecto, así que ignoran la
   configuración del jugador y nunca la sobrescriben.
 - Las claves listadas en `_OBSOLETE_KEYS` se eliminan del archivo al cargarlo.
-- Los ajustes a nivel de motor los aplica la propia clase (`_apply_to_engine()`): límite de fotogramas y V-Sync,
-  interpolación de física, escala de la interfaz, idioma, volumen. Los ajustes de los nodos de la escena los aplica
-  la escena: en la demo, `gdscript/demo/settings_applier.gd` lee `get_value()` al iniciar y escucha `changed`.
+- Los ajustes a nivel de motor los aplica la propia clase (`_apply_to_engine()`): pantalla completa, límite de
+  fotogramas y V-Sync, interpolación de física, escala de la interfaz, idioma, volumen. Los ajustes de los nodos de la
+  escena los aplica la escena: en la demo, `gdscript/demo/settings_applier.gd` lee `get_value()` al iniciar y escucha
+  `changed`.
 
 **Una opción nueva:**
 

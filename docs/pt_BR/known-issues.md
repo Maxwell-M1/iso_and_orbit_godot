@@ -47,9 +47,9 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
   outro corpo está logo atrás do obstáculo em que a câmera está (uma cerca com um penhasco atrás), o braço procura
   espaço livre mais perto do alvo. Veja
   [Câmera](systems/camera.md#como-o-braço-distingue-espaço-atrás-de-um-obstáculo-de-estar-dentro-de-um-corpo).
-- **Saltos no movimento.** A interpolação de física está desligada por padrão. Sem ela, o personagem e a câmera se
-  movem tick a tick, 60 vezes por segundo, o que parece irregular num monitor rápido. Ligue-a em Configurações →
-  Exibição.
+- **Saltos no movimento sem interpolação de física.** A interpolação de física está ligada por padrão. Desligada
+  (Configurações → Exibição), o personagem e a câmera se movem tick a tick, 60 vezes por segundo: num monitor rápido
+  isso parece irregular, e com a câmera seguindo a corrida o personagem balança nas curvas.
 
 ## Testes
 

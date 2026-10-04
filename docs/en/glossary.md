@@ -23,7 +23,7 @@ Terms as this documentation and the code use them.
 | **Marker** | `ClickMarker`: the ring on the ground at a clicked point |
 | **Mover** | `NavigationMover`: turns commands (`move_to`, `steer`, `stop`) into a horizontal velocity each tick. It never moves the body |
 | **Navigation mesh** | The walkable area baked from the level's collisions on layer 1, stored in `world.tscn`. Paths are searched on it |
-| **Physics interpolation** | Drawing bodies between physics ticks at the display frame rate. Off by default; a setting turns it on |
+| **Physics interpolation** | Drawing bodies between physics ticks at the display frame rate. On by default; a setting turns it off |
 | **Pitch, tilt** | How steeply the camera looks down. Negative angles in code, degrees down in the settings |
 | **Pivot** | Turning instantly from a standstill, below `pivot_speed` (1 m/s) |
 | **Place** | A `PointOfInterest`: an area that shows "Discovered: …" the first time the player enters it |

@@ -154,10 +154,10 @@ señales en `main.tscn`:
 
 ## Configuración
 
-El autoload `Settings` (`GameSettings`) guarda los valores y emite `changed(key, value)`. Aplica él mismo los ajustes
-a nivel de motor: límite de fotogramas, V-Sync, interpolación de física, escala de la interfaz, idioma y volumen. Todo
-lo demás lo aplica `gdscript/demo/settings_applier.gd`, que asigna cada clave a una propiedad de nodo. Los propios
-componentes nunca leen la configuración, ver [Configuración](settings.md).
+El autoload `Settings` (`GameSettings`) guarda los valores y emite `changed(key, value)`. Aplica él mismo los ajustes a
+nivel de motor: pantalla completa, límite de fotogramas, V-Sync, interpolación de física, escala de la interfaz, idioma
+y volumen. Todo lo demás lo aplica `gdscript/demo/settings_applier.gd`, que asigna cada clave a una propiedad de nodo.
+Los propios componentes nunca leen la configuración, ver [Configuración](settings.md).
 
 ## Por qué está construido así
 
@@ -169,10 +169,10 @@ componentes nunca leen la configuración, ver [Configuración](settings.md).
 - **El personaje no sabe nada del mouse.** Se convierte en el personaje del jugador porque `PlayerInput`, en la escena
   principal, controla su movedor. Para un NPC, instancia `player.tscn` sin los nodos `Silhouette` y `Appearance`, que
   son solo del jugador, y llama a `NavigationMover.move_to()` desde tu IA.
-- **La cámara es hermana del personaje, no su hija.** Se mueve en `_process` a la posición interpolada del objetivo y
-  no se interpola ella misma, así que con la interpolación de física activada (Configuración → Pantalla) la carrera se
-  ve fluida a cualquier tasa de fotogramas. Para el modo de seguimiento, la cámara calcula la velocidad del objetivo a
-  partir de su movimiento por tick de física, así que cualquier `Node3D` sirve como objetivo.
+- **La cámara es hermana del personaje, no su hija.** Se mueve en `_process` a la posición interpolada del objetivo y no
+  se interpola ella misma, así que con la interpolación de física (activada por defecto, Configuración → Pantalla) la
+  carrera se ve fluida a cualquier tasa de fotogramas. Para el modo de seguimiento, la cámara calcula la velocidad del
+  objetivo a partir de su movimiento por tick de física, así que cualquier `Node3D` sirve como objetivo.
 - **Los componentes no saben nada de la configuración.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` y los
   demás leen sus propias propiedades; solo `settings_applier.gd` y la ventana de configuración hablan con el autoload
   `Settings`. Un componente pasa a otro proyecto sin el sistema de configuración.

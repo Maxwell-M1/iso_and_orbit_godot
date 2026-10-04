@@ -26,7 +26,7 @@ Terimler, bu belgelerde ve kodda kullanıldıkları anlamıyla.
 | **İşaretçi** (marker) | `ClickMarker`: tıklanan noktada zemindeki halka |
 | **Hareketlendirici** (mover) | `NavigationMover`: komutları (`move_to`, `steer`, `stop`) her tikte yatay bir hıza dönüştürür. Gövdeyi asla hareket ettirmez |
 | **Navigasyon örgüsü** (navigation mesh) | Seviyenin 1. katmandaki çarpışmalarından pişirilen ve `world.tscn` içinde saklanan yürünebilir alan. Yollar onun üzerinde aranır |
-| **Fizik enterpolasyonu** (physics interpolation) | Gövdeleri fizik tikleri arasında ekranın kare hızında çizme. Varsayılan olarak kapalıdır; bir ayar açar |
+| **Fizik enterpolasyonu** (physics interpolation) | Gövdeleri fizik tikleri arasında ekranın kare hızında çizme. Varsayılan olarak açıktır; bir ayar kapatır |
 | **Eğim** (pitch, tilt) | Kameranın aşağıya ne kadar dik baktığı. Kodda negatif açılar, ayarlarda aşağı doğru derece |
 | **Yerinde dönüş** (pivot) | Dururken, `pivot_speed` (1 m/sn) altında anında dönme |
 | **Yer** (place) | Bir `PointOfInterest`: oyuncu ilk kez girdiğinde "Keşfedildi: …" gösteren bir alan |

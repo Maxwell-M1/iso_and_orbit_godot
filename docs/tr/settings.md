@@ -56,10 +56,14 @@ kaydedilmiş bir seçim kaybolmaz.
 
 | Ayar | Anahtar | Varsayılan | Uygulandığı yer |
 |---|---|---|---|
+| **Tam ekran** | `display/fullscreen` | kapalı | `DisplayServer.window_set_mode()` |
 | **FPS sınırı**: 24, 30, 60, 120, 240, Sınırsız | `display/max_fps` | Sınırsız | `Engine.max_fps` |
 | **Dikey senkronizasyon (V-Sync)** | `display/vsync` | kapalı | `DisplayServer.window_set_vsync_mode()` |
-| **Fizik enterpolasyonu (karakter ve kamera)** | `display/physics_interpolation` | kapalı | `SceneTree.physics_interpolation` |
+| **Fizik enterpolasyonu (karakter ve kamera)** | `display/physics_interpolation` | açık | `SceneTree.physics_interpolation` |
 | **Engel arkasında siluet konturu** | `display/silhouette_outline` | açık | `OccludedSilhouette.outline_enabled` |
+
+Tam ekran, oyun editörün Oyun (Game) sekmesinde çalışırken işe yaramaz: orada pencere editöre aittir. Editörden denemek
+için Oyun sekmesinin menüsünde **Embed Game on Next Play** seçeneğini kapatın.
 
 V-Sync açıkken kare sayısı hiçbir zaman monitörün yenileme hızını aşmaz; bu yüzden bu hıza eşit veya daha yüksek bir
 FPS sınırı hiç uygulanmaz: V-Sync ile çakışır ve monitörün gösterdiğinden daha az kare verirdi (240 Hz monitörde 240
@@ -67,7 +71,8 @@ sınırı yaklaşık 220 kare veriyordu).
 
 Fizik enterpolasyonu olmadan karakter ve kamera tikten tike (saniyede 60) kesik kesik hareket eder: kamera hedefin
 `get_global_transform_interpolated()` değerini izler ve bu değer enterpolasyon olmadan yalnızca hedefin son tikteki
-konumudur.
+konumudur. 60 Hz'den hızlı bir monitörde bu fark edilir; kamera koşuyu takip ederken karakter dönüşlerde ayrıca
+sallanır: kamera her karede, karakter yalnızca her tikte döner.
 
 ## Arayüz
 

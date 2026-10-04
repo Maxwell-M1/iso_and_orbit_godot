@@ -66,8 +66,9 @@ componente recebe o nome da ação como propriedade exportada, então você pode
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5 (Ultra) | Sombras suaves; o sol em `world.tscn` também tem `shadow_blur = 1.25` e uma distância de sombra de 70 m |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2 (4×) | Antisserrilhamento por multiamostragem |
 
-A física roda no padrão de 60 ticks por segundo. A interpolação de física está desligada no `project.godot` e é
-alternada em tempo de execução por uma configuração (Configurações → Exibição).
+A física roda no padrão de 60 ticks por segundo. A interpolação de física está ligada no `project.godot`
+(`physics/common/physics_interpolation`) e é alternada em tempo de execução por uma configuração (Configurações →
+Exibição).
 
 ## Dados salvos
 

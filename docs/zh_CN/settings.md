@@ -50,14 +50,17 @@ F10 打开设置窗口并暂停游戏；按 Esc 或 F10 关闭。更改立即生
 
 | 设置项 | 键 | 默认值 | 应用到 |
 |---|---|---|---|
+| **全屏** | `display/fullscreen` | 关 | `DisplayServer.window_set_mode()` |
 | **FPS 上限**：24、30、60、120、240、不限 | `display/max_fps` | 不限 | `Engine.max_fps` |
 | **垂直同步（V-Sync）** | `display/vsync` | 关 | `DisplayServer.window_set_vsync_mode()` |
-| **物理插值（角色和相机）** | `display/physics_interpolation` | 关 | `SceneTree.physics_interpolation` |
+| **物理插值（角色和相机）** | `display/physics_interpolation` | 开 | `SceneTree.physics_interpolation` |
 | **障碍物后的剪影描边** | `display/silhouette_outline` | 开 | `OccludedSilhouette.outline_enabled` |
+
+游戏在编辑器的“游戏”选项卡（Game）中运行时，窗口归编辑器所有，因此全屏无效。要在编辑器中试用，请在“游戏”选项卡的菜单中关闭**Embed Game on Next Play**。
 
 开启 V-Sync 时，帧数永远不会超过显示器的刷新率，因此等于或高于该刷新率的 FPS 上限根本不会被设置：否则它会与 V-Sync 冲突，使帧数低于显示器能显示的帧数（在 240 Hz 显示器上设 240 的上限，实际约为 220）。
 
-不开启物理插值时，角色和相机逐个物理帧跳跃式移动（每秒 60 次）：相机跟随目标的 `get_global_transform_interpolated()`，而在没有插值时，它就是目标在上一个物理帧的位置。
+不开启物理插值时，角色和相机逐个物理帧跳跃式移动（每秒 60 次）：相机跟随目标的 `get_global_transform_interpolated()`，而在没有插值时，它就是目标在上一个物理帧的位置。在高于 60 Hz 的显示器上这会很明显；相机跟随奔跑转向时，角色在转弯时还会晃动：相机每一帧都在转，而角色只在每个物理帧转。
 
 ## 界面
 

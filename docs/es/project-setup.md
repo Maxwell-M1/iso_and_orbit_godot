@@ -67,8 +67,8 @@ y `gdscript/demo/settings_applier.gd`. Los componentes funcionan sin él. Ver [C
 | `rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality` | 5 (Ultra) | Sombras suaves; el sol en `world.tscn` también tiene `shadow_blur = 1.25` y una distancia de sombra de 70 m |
 | `rendering/anti_aliasing/quality/msaa_3d` | 2 (4×) | Antialiasing multimuestra |
 
-La física funciona a los 60 ticks por segundo por defecto. La interpolación de física está desactivada en
-`project.godot` y se activa en tiempo de ejecución con una opción (Configuración → Pantalla).
+La física funciona a los 60 ticks por segundo por defecto. La interpolación de física está activada en `project.godot`
+(`physics/common/physics_interpolation`) y se cambia en tiempo de ejecución con una opción (Configuración → Pantalla).
 
 ## Datos guardados
 

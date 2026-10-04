@@ -29,7 +29,7 @@
 - `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`，以及信号 `changed(key, value)`。
 - 设置值在 `_init()` 中加载，早于任何场景节点的 `_ready()`，并在设置窗口关闭和游戏退出时保存到 `user://settings.cfg`。`persistent = false` 会停止保存；测试会设置它并将所有设置重置为默认值，因此测试会忽略玩家的设置，也永远不会覆盖它们。
 - `_OBSOLETE_KEYS` 中列出的键会在加载时从文件中移除。
-- 引擎层面的设置由该类自行应用（`_apply_to_engine()`）：帧率上限和 V-Sync、物理插值、界面缩放、语言、音量。场景节点的设置由场景应用：在演示中，`gdscript/demo/settings_applier.gd` 在启动时读取 `get_value()`，并监听 `changed`。
+- 引擎层面的设置由该类自行应用（`_apply_to_engine()`）：全屏、帧率上限和 V-Sync、物理插值、界面缩放、语言、音量。场景节点的设置由场景应用：在演示中，`gdscript/demo/settings_applier.gd` 在启动时读取 `get_value()`，并监听 `changed`。
 
 **新建设置：**
 
