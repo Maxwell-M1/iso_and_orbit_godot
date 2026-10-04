@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ b40c280f0207 -->
+<!-- translation of docs/en/index.md @ de83e592921c -->
 # 文档
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · **简体中文**
@@ -23,7 +23,7 @@
 
 ## 系统
 
-- [移动](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`，冲刺与体力、跳跃、边缘防护。
+- [移动](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`，角色为动画和界面报告的信息、`CharacterMonitor`、台阶和斜坡，冲刺与体力、跳跃、边缘防护。
 - [相机](systems/camera.md)：`OrbitCameraRig`（环绕、缩放曲线、跟随）和 `CameraArm`（障碍物、拉近、淡化）。
 - [输入](systems/input.md)：`PointClickMoveInput`（点击、按住、按键、光标）和 `CharacterActionInput`。
 - [角色](systems/characters.md)：模型与装备、英雄外观、手部摆动、剪影。

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
+<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
 # Interfaz de usuario
 
 > Esta es una traducción del [original en inglés](../../en/systems/ui.md).
@@ -94,10 +94,12 @@ el control deslizante se alejaría de él. El teclado y la rueda cambian la esca
 |---|---|---|
 | `Hud`, `Hud/Panel` | `gdscript/demo/hud.gd` en `Hud` | La ayuda de controles y la velocidad. El script solo actualiza la velocidad; `settings_applier.gd` muestra u oculta el panel y oculta las líneas de las funciones desactivadas (las teclas con clic der., ambos botones + A/D, sprint, salto) |
 | `Hud/FpsCounter` | `FpsCounter` (Label) | Fotogramas por segundo en la esquina superior derecha; funciona en pausa |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Debajo del contador de FPS: lo que está haciendo el héroe (estado, velocidad y mezcla, movimiento, giro, suelo o aire, pasos y pies, resistencia) y los últimos eventos. Oculto por defecto. Ver [Locomoción](locomotion.md#charactermonitor-el-estado-como-texto) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | "Lugar descubierto: …" durante `show_time` (3,5 s) cuando el jugador entra por primera vez en un `PointOfInterest`. Encuentra todos los lugares a través del grupo `points_of_interest`; `show_discovery(title)` muestra uno manualmente |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Aparece cuando empieza a gastarse la resistencia, se pone roja mientras el personaje está agotado (variación `StaminaBarExhausted`) y se desvanece en 0,6 s cuando vuelve a estar llena |
 
-El panel de ayuda, el contador de FPS y la línea de ruta se activan y desactivan en Configuración → Interfaz.
+El panel de ayuda, el contador de FPS, la línea de ruta y el panel del estado del personaje se activan y desactivan en
+Configuración → Interfaz.
 
 ## Tema
 

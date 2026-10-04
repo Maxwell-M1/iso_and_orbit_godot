@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # Uso en tu proyecto
 
 > Esta es una traducción del [original en inglés](../en/integration.md).
@@ -99,8 +99,8 @@ func _physics_process(delta: float) -> void:
 
 `LedgeGuard` es opcional: un hijo del cuerpo, de `addons/iso_orbit/ground_character/`. Para esprintar, establece
 `mover.sprinting = true`: el límite de velocidad sube según `LocomotionSettings.sprint_speed_multiplier`. Todo lo
-demás de `GroundCharacter` (salto, resistencia, señales de pasos, el giro suave del modelo) queda entonces en tus
-manos.
+demás de `GroundCharacter` (salto, resistencia, escalones, el estado y sus señales, el giro suave del modelo) queda
+entonces en tus manos.
 
 ## Dar órdenes al movedor
 

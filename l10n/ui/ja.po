@@ -294,6 +294,10 @@ msgid "Character path line"
 msgstr "キャラクターの経路線"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Character state and events"
+msgstr "キャラクターの状態とイベント"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Sound"
 msgstr "サウンド"
 
@@ -412,6 +416,98 @@ msgstr "速度：%.1f m/s"
 #: addons/iso_orbit/points_of_interest/discovery_toast.gd
 msgid "Discovered: %s"
 msgstr "発見：%s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "jump"
+msgstr "ジャンプ"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left the ground"
+msgstr "地面を離れた"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Speed %.1f m/s · blend %.2f"
+msgstr "速度 %.1f m/s · ブレンド %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Forward %+.2f · right %+.2f"
+msgstr "前 %+.2f · 右 %+.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Turning %+.0f°/s"
+msgstr "旋回 %+.0f°/秒"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "On the ground · slope %.0f°"
+msgstr "接地 · 傾斜 %.0f°"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "In the air %.2f s · vertical %+.1f m/s"
+msgstr "空中 %.2f秒 · 垂直 %+.1f m/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Step %d · %s · cycle %.2f"
+msgstr "歩数 %d · %s · 周期 %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Stamina %d%%"
+msgstr "スタミナ %d%%"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "exhausted"
+msgstr "疲労"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Standing"
+msgstr "静止"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Running"
+msgstr "走行"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Sprinting"
+msgstr "ダッシュ"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Jumping"
+msgstr "ジャンプ"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Falling"
+msgstr "落下"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "step, %s"
+msgstr "一歩、%s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "touched the ground at %.1f m/s"
+msgstr "%.1f m/s で接地"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "landing at %.1f m/s"
+msgstr "%.1f m/s で着地"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint started"
+msgstr "ダッシュ開始"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint ended"
+msgstr "ダッシュ終了"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "%.2f s"
+msgstr "%.2f秒"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left foot"
+msgstr "左足"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "right foot"
+msgstr "右足"
 
 #: gdscript/ui/settings/settings_screen.gd
 msgid " (%d Hz)"

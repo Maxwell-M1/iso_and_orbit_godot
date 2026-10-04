@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # 在你的项目中使用
 
 > 本文是[英文原文](../en/integration.md)的翻译。两者不一致时，以英文版为准。
@@ -72,7 +72,7 @@ func _physics_process(delta: float) -> void:
 	$Visual.rotation.y = atan2(-facing.x, -facing.z)
 ```
 
-`LedgeGuard` 是可选的：它是身体的子节点，来自 `addons/iso_orbit/ground_character/`。要冲刺，设置 `mover.sprinting = true`：速度上限会乘以 `LocomotionSettings.sprint_speed_multiplier`。`GroundCharacter` 中的其他一切（跳跃、体力、脚步信号、模型的平滑转向）则需要你自己实现。
+`LedgeGuard` 是可选的：它是身体的子节点，来自 `addons/iso_orbit/ground_character/`。要冲刺，设置 `mover.sprinting = true`：速度上限会乘以 `LocomotionSettings.sprint_speed_multiplier`。`GroundCharacter` 中的其他一切（跳跃、体力、台阶、状态及其信号、模型的平滑转向）则需要你自己实现。
 
 ## 向移动器下达命令
 

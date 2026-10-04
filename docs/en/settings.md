@@ -80,6 +80,7 @@ on turns: the camera turns every frame, the character only every tick.
 | **FPS counter** | `interface/fps_counter` | on | `Hud/FpsCounter` visibility |
 | **Controls hint and speed** | `interface/help` | on | `Hud/Panel` visibility |
 | **Character path line** | `interface/path_line` | off | `PathView` visibility |
+| **Character state and events** | `interface/character_state` | off | `Hud/CharacterState` visibility (`CharacterMonitor`) |
 
 The interface scale changes the hint, the FPS counter, the stamina bar and the windows, not the 3D view. 100% is the
 size as authored in the scenes.

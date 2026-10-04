@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
+<!-- translation of docs/en/roadmap.md @ 6c3e4efdec59 -->
 # Hoja de ruta
 
 > Esta es una traducción del [original en inglés](../en/roadmap.md).
@@ -13,9 +13,10 @@ Trabajo planificado, sin un orden particular. Nada de esto está implementado to
 - **Un ejemplo en C#** en `csharp/`, con los mismos componentes y una escena principal sobre
   `shared/world/world.tscn`. Los nombres de clase globales de la versión en C# deben diferir de los de GDScript:
   `class_name` y `[GlobalClass]` comparten un mismo espacio de nombres.
-- **Animaciones.** Controlar una mezcla de reposo y carrera en un `AnimationTree` con
-  `NavigationMover.get_speed()`, y mantener el ciclo de caminata al paso de `GroundCharacter.get_step_phase()`, el
-  ritmo que ya siguen los sonidos de los pasos.
+- **Animaciones.** Un modelo con esqueleto y un `AnimationTree` controlado por lo que informa `GroundCharacter`:
+  `get_locomotion_blend()` o `get_local_movement()` para las mezclas de reposo, carrera y sprint, `get_gait_cycle()`
+  para mantener el ciclo de carrera acompasado con el suelo, el estado y las señales de contacto con el suelo para los
+  saltos y los aterrizajes.
 
 ---
 

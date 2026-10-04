@@ -8,8 +8,9 @@ Planned work, in no particular order. Nothing here is implemented yet.
 - **A C# example** in `csharp/`, with the same components and a main scene on top of `shared/world/world.tscn`.
   Global class names of the C# version must differ from the GDScript ones: `class_name` and `[GlobalClass]` share one
   namespace.
-- **Animations.** Drive an idle/run blend in an `AnimationTree` from `NavigationMover.get_speed()`, and keep the walk
-  cycle in step with `GroundCharacter.get_step_phase()`, the rhythm the footstep sounds already follow.
+- **Animations.** A rigged model and an `AnimationTree` driven by what `GroundCharacter` reports:
+  `get_locomotion_blend()` or `get_local_movement()` for the idle, run and sprint blends, `get_gait_cycle()` to keep
+  the run cycle in step with the ground, the state and the floor signals for jumps and landings.
 
 ---
 

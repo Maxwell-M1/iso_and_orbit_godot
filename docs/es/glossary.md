@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
+<!-- translation of docs/en/glossary.md @ 0821af632403 -->
 # Glosario
 
 > Esta es una traducción del [original en inglés](../en/glossary.md).
@@ -10,12 +10,15 @@ Términos tal como los usan esta documentación y el código.
 |---|---|
 | **Radio del agente** (agent radius) | Cuánto se aleja la malla de navegación de los obstáculos: 0,5 m, más que la cápsula de 0,35 m del personaje, así que las rutas dejan un margen respecto a las esquinas |
 | **Brazo** (arm) | `CameraArm`: el nodo que sostiene la cámara en el extremo de una línea que sale del objetivo. La rueda fija su longitud; los obstáculos la acortan |
+| **Mezcla** (blend) | `GroundCharacter.get_locomotion_blend()`: la velocidad como un número para las animaciones, 0 quieto, 1 corriendo, 2 en sprint |
 | **Cuerpo solo para la cámara** (camera-only body) | Un cuerpo en la capa de física 3 (`camera`): detiene el brazo de la cámara, pero los clics, la navegación y los personajes lo ignoran |
+| **Estado del personaje** (character state) | Lo que está haciendo el personaje: estar quieto, correr, esprintar, saltar o caer (`GroundCharacter.get_state()`, la señal `state_changed`) |
 | **Clic** (click) | Una pulsación del botón izquierdo que se suelta dentro del retardo de pulsación. El personaje corre por una ruta hasta el punto donde se presionó el botón |
 | **Tiempo de coyote** (coyote time) | Un breve lapso después de salir caminando de un borde en el que el salto todavía funciona (0,1 s) |
 | **Agotado** (exhausted) | El estado después de que se acaba la resistencia: no hay sprint hasta que la resistencia se recupere hasta `recover_ratio` (30%) |
 | **Orientación** (facing) | Hacia dónde mira el personaje, a diferencia de hacia dónde se mueve. Difieren al desplazarse de costado o retroceder. `NavigationMover.get_facing()` |
 | **Seguimiento** (follow) | La cámara que gira sola tras el personaje que corre y, opcionalmente, ajusta suavemente su inclinación (`follow_movement`, `follow_pitch`) |
+| **Ciclo de la marcha** (gait cycle) | Dos pasos, el izquierdo y el derecho, como un número de 0 a 1 (`GroundCharacter.get_gait_cycle()`). Sigue la distancia recorrida, no el tiempo |
 | **Rumbo** (heading) | La dirección en la que se mueve el personaje. `NavigationMover.get_heading()` |
 | **Aspecto del héroe** (hero look) | Uno de los diez modelos que puede llevar el personaje del jugador, elegido por número en la configuración (`CharacterAppearance`) |
 | **Pulsación mantenida** (hold) | El botón izquierdo mantenido más tiempo que el retardo de pulsación. El personaje corre tras el cursor |
@@ -35,6 +38,7 @@ Términos tal como los usan esta documentación y el código.
 | **Lateral** (sidestep) | Un modo de las teclas con el botón derecho: el personaje sigue mirando hacia donde mira la cámara mientras se mueve de costado o hacia atrás |
 | **Silueta** (silhouette) | El personaje dibujado como una forma plana con contorno donde algo lo oculta (`OccludedSilhouette`) |
 | **Sprint** (sprint) | Correr más rápido (×1,5) mientras Shift está mantenido o activado, gastando resistencia |
+| **Altura de escalón** (stair height) | El escalón más alto al que el personaje sube sin saltar: 0,3 m (`GroundCharacter.max_step_height`) |
 | **Resistencia** (stamina) | La reserva para el sprint (`Stamina`): se gasta al esprintar y se recupera tras una pausa |
 | **Dirigir** (steer) | Correr en una dirección sin ruta: `NavigationMover.steer()`. Mantener el botón dirige hacia el cursor por defecto |
 | **Tick** (tick) | Un paso de física; 60 por segundo |

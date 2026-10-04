@@ -1,4 +1,4 @@
-<!-- translation of README.md @ 6853806db277 -->
+<!-- translation of README.md @ 3b9935a89118 -->
 # Iso & Orbit - Plantilla de cámara y controlador de personaje
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -60,6 +60,8 @@ Todos los modos y sus opciones: [Controles](docs/es/controls.md).
   cualquier frecuencia de ticks de física.
 - Protección de bordes: al borde de un desnivel el héroe se detiene o se desliza a lo largo de él, como junto a una
   pared.
+- Los escalones de hasta 0,3 m se suben y se bajan sin despegar del suelo; las pendientes de hasta 45° se suben
+  caminando.
 
 **Cámara**
 
@@ -78,13 +80,17 @@ Todos los modos y sus opciones: [Controles](docs/es/controls.md).
 - Una ventana de configuración (F10) con pestañas de controles, personaje, cámara, pantalla, interfaz y sonido, que
   se guarda en `user://settings.cfg`. La interfaz está en inglés, español, japonés, portugués de Brasil, ruso, turco
   y chino simplificado, y el idioma se cambia al vuelo.
-- Señales del personaje para pasos, saltos, aterrizajes y sprint, con sonidos conectados a ellas.
+- El personaje informa de lo que está haciendo, para animaciones, efectos y la interfaz: el estado (quieto, corriendo,
+  en sprint, saltando, cayendo) con una señal para cada cambio, los pasos con el pie, los despegues y los aterrizajes,
+  la velocidad como valor de mezcla, el movimiento en los ejes del modelo, el giro y el ciclo de la marcha. Los sonidos
+  están conectados a las señales, y un panel (Configuración → Interfaz) lo muestra todo en vivo con los últimos
+  eventos.
 - Un nivel de demo: un claro cercado de 80 × 80 m con ruinas, un campamento, una granja, un laberinto de setos, una
-  rampa y una montaña con un sendero en espiral. Cuatro lugares por descubrir con cinco NPC apostados en ellos, y diez
-  aspectos de héroe para elegir.
-- Pruebas headless de movimiento, entrada, salto, sprint y sonidos, de la cámara y su brazo, de los aspectos del
-  héroe, de la ventana de configuración y de las traducciones, y un script que encuentra las advertencias de nodos
-  del editor en todas las escenas sin abrir el editor.
+  plataforma con una rampa y una escalera, y una montaña con un sendero en espiral. Cuatro lugares por descubrir con
+  cinco NPC apostados en ellos, y diez aspectos de héroe para elegir.
+- Pruebas headless de movimiento, entrada, salto, sprint y sonidos, del estado del personaje, de escalones y
+  pendientes, de la cámara y su brazo, de los aspectos del héroe, de la ventana de configuración y de las traducciones,
+  y un script que encuentra las advertencias de nodos del editor en todas las escenas sin abrir el editor.
 
 **No incluye:** soporte para gamepad (solo mouse y teclado) ni animaciones: los modelos son primitivas estáticas.
 

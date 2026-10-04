@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ b40c280f0207 -->
+<!-- translation of docs/en/index.md @ de83e592921c -->
 # Документация
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · **Русский** · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -28,8 +28,9 @@ Godot 4.7, с демо-уровнем. Общий обзор — в [README](../
 
 ## Системы
 
-- [Передвижение](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  ускорение и запас сил, прыжок, защита от обрывов.
+- [Передвижение](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`, что
+  персонаж сообщает для анимаций и интерфейса, `CharacterMonitor`, ступени и склоны, ускорение и запас сил, прыжок,
+  защита от обрывов.
 - [Камера](systems/camera.md): `OrbitCameraRig` (вращение, кривая зума, следование) и `CameraArm` (препятствия,
   приближение, полупрозрачность).
 - [Ввод](systems/input.md): `PointClickMoveInput` (щелчок, удержание, клавиши, курсор) и `CharacterActionInput`.

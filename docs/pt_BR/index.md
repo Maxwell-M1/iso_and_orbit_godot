@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ b40c280f0207 -->
+<!-- translation of docs/en/index.md @ de83e592921c -->
 # Documentação
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · **Português (Brasil)** · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -29,7 +29,8 @@ em inglês é a correta.
 ## Sistemas
 
 - [Locomoção](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  corrida rápida e fôlego, o pulo, a proteção de bordas.
+  o que o personagem informa para animações e a interface, `CharacterMonitor`, degraus e encostas, corrida rápida e
+  fôlego, o pulo, a proteção de bordas.
 - [Câmera](systems/camera.md): `OrbitCameraRig` (órbita, curva de zoom, seguir) e `CameraArm` (obstáculos,
   aproximação, esmaecimento).
 - [Entrada](systems/input.md): `PointClickMoveInput` (clique, segurar, teclas, o cursor) e `CharacterActionInput`.

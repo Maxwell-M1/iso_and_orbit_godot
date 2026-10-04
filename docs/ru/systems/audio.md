@@ -1,11 +1,11 @@
-<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
+<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
 # Звук
 
 > Это перевод [английского оригинала](../../en/systems/audio.md). При расхождениях верен оригинал.
 
-`GroundCharacter` сообщает о том, что с ним происходит, сигналами: `stepped(sprinting)`, `jumped`,
-`landed(impact_speed)`, `sprint_changed(sprinting)` (см. [Передвижение](locomotion.md#сигналы)). К ним подключаются
-звуки, пыль из-под ног или анимации; сам персонаж о них ничего не знает. Демо подключает звуки.
+`GroundCharacter` сообщает о том, что с ним происходит, сигналами; звуки используют `stepped(sprinting)`, `jumped`,
+`landed(impact_speed)` и `sprint_changed(sprinting)` (все сигналы: [Передвижение](locomotion.md#что-сообщает-персонаж)).
+К ним подключаются звуки, пыль из-под ног или анимации; сам персонаж о них ничего не знает. Демо подключает звуки.
 
 ## CharacterSounds
 

@@ -1,4 +1,4 @@
-<!-- translation of README.md @ 6853806db277 -->
+<!-- translation of README.md @ 3b9935a89118 -->
 # Iso & Orbit - Template de câmera e controlador de personagem
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · **Português (Brasil)** · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
@@ -59,6 +59,7 @@ Todos os modos e suas configurações: [Controles](docs/pt_BR/controls.md).
 - Corrida rápida com fôlego. Pulo com coyote time e buffer de entrada; a altura do pulo é a mesma em qualquer taxa de
   ticks de física.
 - Proteção de bordas: na beira de um desnível o herói para ou desliza ao longo dela, como numa parede.
+- Degraus de até 0,3 m são subidos e descidos sem sair do chão; encostas de até 45° são subidas andando.
 
 **Câmera**
 
@@ -77,13 +78,16 @@ Todos os modos e suas configurações: [Controles](docs/pt_BR/controls.md).
 - Uma janela de configurações (F10) com abas de controles, personagem, câmera, exibição, interface e som, salvas em
   `user://settings.cfg`. A interface está em inglês, espanhol, japonês, português do Brasil, russo, turco e chinês
   simplificado, com troca em tempo real.
-- Sinais do personagem para passos, pulos, aterrissagens e corrida rápida, com sons conectados a eles.
+- O personagem informa o que está fazendo, para animações, efeitos e a interface: o estado (parado, correndo, em
+  corrida rápida, pulando, caindo) com um sinal a cada mudança, os passos com o pé, as saídas do chão e as
+  aterrissagens, a velocidade como valor de mistura, o movimento nos eixos do modelo, o giro e o ciclo da passada. Os
+  sons estão conectados aos sinais, e um painel (Configurações → Interface) mostra tudo ao vivo com os últimos eventos.
 - Um nível de demonstração: uma clareira cercada de 80 × 80 m com ruínas, um acampamento, um sítio, um labirinto de
-  sebes, uma rampa e uma montanha com uma trilha em espiral. Quatro locais para descobrir, com cinco NPCs posicionados
-  neles, e dez aparências de herói para escolher.
-- Testes headless de movimento, entrada, pulo, corrida rápida e sons, da câmera e seu braço, das aparências do herói,
-  da janela de configurações e das traduções, e um script que encontra os avisos de nós do editor em todas as cenas
-  sem abrir o editor.
+  sebes, uma plataforma com rampa e escada e uma montanha com uma trilha em espiral. Quatro locais para descobrir, com
+  cinco NPCs posicionados neles, e dez aparências de herói para escolher.
+- Testes headless de movimento, entrada, pulo, corrida rápida e sons, do estado do personagem, de degraus e encostas,
+  da câmera e seu braço, das aparências do herói, da janela de configurações e das traduções, e um script que encontra
+  os avisos de nós do editor em todas as cenas sem abrir o editor.
 
 **Não incluído:** suporte a gamepad (apenas mouse e teclado) e animações: os modelos são primitivas estáticas.
 

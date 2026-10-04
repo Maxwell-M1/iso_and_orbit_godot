@@ -1,9 +1,9 @@
-<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
+<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
 # オーディオ
 
 > これは[英語の原文](../../en/systems/audio.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
 
-`GroundCharacter`は、自身に起きたことをシグナルで通知します：`stepped(sprinting)`、`jumped`、`landed(impact_speed)`、`sprint_changed(sprinting)`（[ロコモーション](locomotion.md#シグナル)を参照）。サウンド、足元の土ぼこり、アニメーションはこれらに接続し、キャラクター自身はそれらについて何も知りません。デモではサウンドを接続しています。
+`GroundCharacter`は、自身に起きたことをシグナルで通知します。サウンドが使うのは`stepped(sprinting)`、`jumped`、`landed(impact_speed)`、`sprint_changed(sprinting)`です（シグナルの一覧：[ロコモーション](locomotion.md#キャラクターが通知すること)）。サウンド、足元の土ぼこり、アニメーションはこれらに接続し、キャラクター自身はそれらについて何も知りません。デモではサウンドを接続しています。
 
 ## CharacterSounds
 

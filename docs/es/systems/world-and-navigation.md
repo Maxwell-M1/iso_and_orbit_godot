@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
 # Mundo y navegación
 
 > Esta es una traducción del [original en inglés](../../en/systems/world-and-navigation.md).
@@ -11,8 +11,8 @@ está construido con primitivas y shaders; los patrones finos de las superficies
 
 - **El centro** es el punto de aparición. A su alrededor: un anillo de columnas en ruinas, una trampa en forma de U
   abierta hacia el punto de aparición, un muro largo con un hueco, cajas, una arboleda, un laberinto de setos y una
-  plataforma de 1,6 m a la que solo se puede llegar por su rampa. Las pruebas usan todo esto, así que se queda donde
-  está.
+  plataforma de 1,6 m con una rampa en su lado oeste y una escalera en su lado este (siete escalones de 0,2 m con
+  huellas de 0,4 m). Las pruebas usan todo esto, así que se queda donde está.
 - **Los caminos** son franjas de tierra desde la cerca sur, a través del hueco del muro, hasta el punto de aparición
   y de ahí hacia la montaña, las ruinas, el campamento y la rampa; el camino de la granja se desvía al sur del muro.
   Son solo un patrón (los segmentos `ROADS` en `shared/world/terrain.gdshaderinc`) y no afectan al movimiento. Tanto
@@ -65,7 +65,7 @@ abajo.
 
 | Superficie | Shader | Cómo se ve |
 |---|---|---|
-| Muros, plataforma, rampa | `stone_masonry` | Bloques en hiladas desplazadas con juntas, cada bloque con su propio tono, grano y desconchones, relieve mediante la normal, suciedad y musgo cerca del suelo. La parte superior es una hilada de piedras a lo ancho del lado corto |
+| Muros, plataforma, rampa, escalera | `stone_masonry` | Bloques en hiladas desplazadas con juntas, cada bloque con su propio tono, grano y desconchones, relieve mediante la normal, suciedad y musgo cerca del suelo. La parte superior es una hilada de piedras a lo ancho del lado corto |
 | Laberinto de setos | `hedge_foliage` | Dos capas de hojas, cada una con su propia rotación, tamaño, tono e inclinación; la sombra de la profundidad del arbusto en los huecos; lados irregulares como los de un arbusto podado |
 | Cajas, cerca | `wood_planks` | Tablones con anillos de crecimiento, fibras, nudos y rendijas. Las cajas tienen un marco de tablones en cada cara, un refuerzo diagonal y clavos; la cerca tiene tablas largas desgastadas sobre postes cada 2,5 m |
 | Columnas, pozo | `stone_column` | Estrías alrededor de la circunferencia mediante la normal, tambores de 0,8 m con juntas desde el suelo, una base lisa, vetas, grietas escasas, líquenes, musgo cerca del suelo. El pozo usa mampostería de bloques en círculo (`blocks_around`) |
@@ -174,17 +174,19 @@ personaje es de 0,35 m, así que las rutas dejan un margen respecto a las esquin
 | `agent_height` | 1,75 m | |
 | `agent_max_slope` | 40° | Las laderas de la montaña quedan fuera de la malla |
 | `cell_height` | 0,025 m | Lo bastante fina para medir la escalada de abajo |
-| `agent_max_climb` | 0,075 m (3 celdas) | Por debajo de la cornisa de 0,1 m a la que el cuerpo puede subir |
+| `agent_max_climb` | 0,3 m (12 celdas) | Los escalones a los que sube el personaje (`GroundCharacter.max_step_height`) |
 | `geometry_collision_mask` | capa 1 | Solo cuentan los obstáculos |
 
-**Una ruta nunca lleva a una cornisa más alta de lo que el cuerpo puede subir.** La cápsula del `CharacterBody3D`
-sube a una cornisa de no más de `r·(1 − cos floor_max_angle)` = 0,35 × (1 − cos 45°) ≈ 0,1 m. La malla se horneaba
-antes con `agent_max_climb` = 0,25 m y `cell_height` = 0,25 m, y Recast mide las alturas en celdas enteras, así que
-trataba como transitable una cornisa de casi 0,5 m: la ruta a la plataforma entraba en la rampa por el costado, donde
-su borde está a 0,4 m sobre el suelo, y el personaje chocaba contra ella. Ahora una cornisa de más de 0,075 m no se
-une, y la rampa (una subida de 0,067 m por celda de 0,25 m) queda entera. La altura de celda del mapa de navegación
+**Una ruta nunca lleva a una cornisa más alta de lo que el cuerpo puede subir.** `GroundCharacter` sube escalones de
+hasta `max_step_height` (0,3 m), así que la malla une cornisas de hasta 0,3 m (`agent_max_climb`) y no más altas: la
+escalera al este de la plataforma queda unida; el borde de 1,6 m de la plataforma y los costados de la rampa de más de
+0,3 m, no. Recast mide las alturas en celdas enteras, así que las celdas deben ser finas. La malla se horneaba antes con
+`agent_max_climb` = 0,25 m y `cell_height` = 0,25 m, y trataba como transitable una cornisa de casi 0,5 m: la ruta a la
+plataforma entraba en la rampa por el costado, donde su borde está a 0,4 m sobre el suelo, y el personaje chocaba contra
+ella. Con celdas de 0,025 m la escalada se mide con una precisión de 2,5 cm. La altura de celda del mapa de navegación
 no debe superar la de la malla (o el motor emite una advertencia), así que `project.godot` fija
-`navigation/3d/default_cell_height` en 0,025.
+`navigation/3d/default_cell_height` en 0,025. Si cambias `max_step_height`, pon `agent_max_climb` al mismo valor y
+vuelve a hornear la malla.
 
 Una malla de Recast queda suspendida unas dos alturas de celda sobre el suelo (0,05 m aquí; era 0,5 m con las
 antiguas celdas de 0,25 m). Por eso `NavigationMover` compara los puntos de la ruta en el plano horizontal, ver

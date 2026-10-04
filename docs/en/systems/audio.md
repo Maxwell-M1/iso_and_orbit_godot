@@ -1,8 +1,9 @@
 # Audio
 
-`GroundCharacter` reports what happens to it with signals: `stepped(sprinting)`, `jumped`, `landed(impact_speed)`,
-`sprint_changed(sprinting)` (see [Locomotion](locomotion.md#signals)). Sounds, dust under the feet or animations
-connect to them; the character itself knows nothing about them. The demo connects sounds.
+`GroundCharacter` reports what happens to it with signals; the sounds use `stepped(sprinting)`, `jumped`,
+`landed(impact_speed)` and `sprint_changed(sprinting)` (all of them:
+[Locomotion](locomotion.md#what-the-character-reports)). Sounds, dust under the feet or animations connect to them; the
+character itself knows nothing about them. The demo connects sounds.
 
 ## CharacterSounds
 

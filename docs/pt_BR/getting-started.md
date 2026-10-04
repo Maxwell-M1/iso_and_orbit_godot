@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
+<!-- translation of docs/en/getting-started.md @ e13fbe9f2ef5 -->
 # Primeiros passos
 
 > Esta é uma tradução do [original em inglês](../en/getting-started.md).
@@ -36,8 +36,8 @@ Locais para visitar:
   atrás delas.
 - **Acampamento dos Viajantes** no leste e **Sítio do Poço** no sudoeste, com NPCs.
 - **Pico dos Ventos**, a montanha no nordeste: clique no topo e o herói pega a trilha em espiral.
-- O labirinto de sebes, a plataforma com sua rampa e a armadilha em forma de U perto do spawn, para testar a busca de
-  caminhos.
+- O labirinto de sebes, a plataforma com sua rampa e sua escada e a armadilha em forma de U perto do spawn, para
+  testar a busca de caminhos.
 - As dez aparências do herói em fila junto ao muro sul. Escolha uma em Configurações → Personagem → **Aparência do
   herói**.
 

@@ -1,4 +1,4 @@
-<!-- translation of README.md @ 6853806db277 -->
+<!-- translation of README.md @ 3b9935a89118 -->
 # Iso & Orbit - Kamera ve Karakter Kontrolcüsü Şablonu
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
@@ -58,6 +58,7 @@ Tüm modlar ve ayarları: [Kontroller](docs/tr/controls.md).
 - Dayanıklılıkla depar. Çakal süresi (coyote time) ve girdi tamponlamalı zıplama; zıplama yüksekliği her fizik tik
   hızında aynıdır.
 - Kenar koruması: bir uçurumun kenarında kahraman durur ya da duvar boyunca olduğu gibi kenar boyunca kayar.
+- 0,3 m'ye kadar basamaklar yerden kesilmeden çıkılır ve inilir; 45°'ye kadar eğimlerde yukarı yürünür.
 
 **Kamera**
 
@@ -75,13 +76,16 @@ Tüm modlar ve ayarları: [Kontroller](docs/tr/controls.md).
 - Kontroller, karakter, kamera, görüntü, arayüz ve ses sekmelerine sahip, `user://settings.cfg` dosyasına kaydedilen
   bir ayarlar penceresi (F10). Arayüz İngilizce, İspanyolca, Japonca, Brezilya Portekizcesi, Rusça, Türkçe ve
   Basitleştirilmiş Çince dillerindedir ve anında değiştirilebilir.
-- Adımlar, zıplamalar, inişler ve depar için karakter sinyalleri ve bunlara bağlı sesler.
-- Bir demo seviyesi: harabeler, bir kamp, bir çiftlik, bir çalı labirenti, bir rampa ve sarmal patikalı bir dağ
-  içeren, çitle çevrili 80 × 80 m'lik bir açıklık. Beş NPC'nin beklediği dört keşfedilecek yer ve seçilebilecek on
-  kahraman görünümü.
-- Hareket, girdi, zıplama, depar ve sesler, kamera ve kolu, kahraman görünümleri, ayarlar penceresi ve çeviriler için
-  headless (pencere açmadan çalışan) testler; ayrıca editörü açmadan tüm sahnelerdeki editör düğüm uyarılarını bulan
-  bir betik.
+- Karakter animasyonlar, efektler ve arayüz için ne yaptığını bildirir: durum (duruyor, koşuyor, depar atıyor, zıplıyor,
+  düşüyor) ve her değişikliği için bir sinyal, hangi ayakla atıldığıyla birlikte adımlar, kalkışlar ve inişler, karışım
+  değeri olarak hız, modelin eksenlerinde hareket, dönüş ve yürüyüş döngüsü. Sesler sinyallere bağlıdır; bir panel
+  (Ayarlar → Arayüz) hepsini son olaylarla birlikte canlı olarak gösterir.
+- Bir demo seviyesi: harabeler, bir kamp, bir çiftlik, bir çalı labirenti, rampalı ve merdivenli bir platform ile sarmal
+  patikalı bir dağ içeren, çitle çevrili 80 × 80 m'lik bir açıklık. Beş NPC'nin beklediği dört keşfedilecek yer ve
+  seçilebilecek on kahraman görünümü.
+- Hareket, girdi, zıplama, depar ve sesler, karakterin durumu, basamaklar ve eğimler, kamera ve kolu, kahraman
+  görünümleri, ayarlar penceresi ve çeviriler için headless (pencere açmadan çalışan) testler; ayrıca editörü açmadan
+  tüm sahnelerdeki editör düğüm uyarılarını bulan bir betik.
 
 **Dahil olmayanlar:** oyun kumandası desteği (yalnızca fare ve klavye) ve animasyonlar: modeller durağan ilkel
 şekillerdir.

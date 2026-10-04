@@ -294,6 +294,10 @@ msgid "Character path line"
 msgstr "Linha do caminho do personagem"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Character state and events"
+msgstr "Estado do personagem e eventos"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Sound"
 msgstr "Som"
 
@@ -412,6 +416,98 @@ msgstr "Velocidade: %.1f m/s"
 #: addons/iso_orbit/points_of_interest/discovery_toast.gd
 msgid "Discovered: %s"
 msgstr "Descoberto: %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "jump"
+msgstr "pulo"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left the ground"
+msgstr "saiu do chão"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Speed %.1f m/s · blend %.2f"
+msgstr "Velocidade %.1f m/s · mistura %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Forward %+.2f · right %+.2f"
+msgstr "Frente %+.2f · direita %+.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Turning %+.0f°/s"
+msgstr "Giro %+.0f°/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "On the ground · slope %.0f°"
+msgstr "No chão · inclinação %.0f°"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "In the air %.2f s · vertical %+.1f m/s"
+msgstr "No ar %.2f s · vertical %+.1f m/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Step %d · %s · cycle %.2f"
+msgstr "Passo %d · %s · ciclo %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Stamina %d%%"
+msgstr "Fôlego %d%%"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "exhausted"
+msgstr "exausto"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Standing"
+msgstr "Parado"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Running"
+msgstr "Correndo"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Sprinting"
+msgstr "Corrida rápida"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Jumping"
+msgstr "Pulando"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Falling"
+msgstr "Caindo"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "step, %s"
+msgstr "passo, %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "touched the ground at %.1f m/s"
+msgstr "tocou o chão a %.1f m/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "landing at %.1f m/s"
+msgstr "aterrissagem a %.1f m/s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint started"
+msgstr "corrida rápida começou"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint ended"
+msgstr "corrida rápida terminou"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "%.2f s"
+msgstr "%.2f s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left foot"
+msgstr "pé esquerdo"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "right foot"
+msgstr "pé direito"
 
 #: gdscript/ui/settings/settings_screen.gd
 msgid " (%d Hz)"

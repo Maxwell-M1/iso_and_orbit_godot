@@ -9,6 +9,12 @@ const SCRIPT_STRINGS: Array[String] = [
 	" (%d Hz)",
 	"With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no "
 			+ "effect. The smoothest limits are those that divide this rate evenly.",
+	# CharacterMonitor: the character's state and events.
+	"jump", "left the ground", "Speed %.1f m/s · blend %.2f", "Forward %+.2f · right %+.2f", "Turning %+.0f°/s",
+	"On the ground · slope %.0f°", "In the air %.2f s · vertical %+.1f m/s", "Step %d · %s · cycle %.2f",
+	"Stamina %d%%", "exhausted", "Standing", "Running", "Sprinting", "Jumping", "Falling", "step, %s",
+	"touched the ground at %.1f m/s", "landing at %.1f m/s", "sprint started", "sprint ended", "%.2f s", "left foot",
+	"right foot",
 ]
 
 ## Strings without letters (numbers, percentages, degrees) need no translation; the letters in "%d", "%.1f" do not

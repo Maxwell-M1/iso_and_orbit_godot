@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
+<!-- translation of docs/en/architecture.md @ 566cc270b5a0 -->
 # Arquitetura
 
 > Esta é uma tradução do [original em inglês](../en/architecture.md).
@@ -33,7 +33,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        o anel no chão no ponto clicado
 ├── PathView           NavigationPathView: a linha de depuração do caminho, oculta por padrão
-├── Hud                dica de controles e velocidade, FpsCounter, DiscoveryToast, StaminaBar
+├── Hud                dica de controles e velocidade, FpsCounter, CharacterState, DiscoveryToast, StaminaBar
 ├── SettingsApplier    configurações → propriedades dos nós (só na demo)
 └── UiRoot             janelas sobre o jogo: a janela de configurações
 ```
@@ -53,9 +53,9 @@ mouse, WASD ──► PointClickMoveInput ──move_to(point)────► Na
 Shift, Space ──► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                     sinais: stepped, jumped, landed, sprint_changed
+                 sinais: state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway, qualquer outra coisa
+                          CharacterSounds, HandSway, CharacterMonitor, animações, qualquer outra coisa
 
 mouse ──► OrbitCameraRig ──► CameraArm ──► Camera3D
           (segue a posição interpolada do alvo, órbita, zoom, seguir opcional)
@@ -75,8 +75,9 @@ retorna uma velocidade quando o corpo pede. A câmera e a entrada não sabem uma
    4. no ar, soma a gravidade vezes `gravity_scale`;
    5. deixa `LedgeGuard.constrain()` virar a velocidade ao longo de uma borda, a não ser que o personagem esteja
       pulando;
-   6. chama `move_and_slide()`;
-   7. emite `landed` e `stepped` e vira `Visual` para `mover.get_facing()`.
+   6. chama `move_and_slide()`, subindo num degrau antes dele e descendo um degrau depois dele (`max_step_height`);
+   7. emite `left_floor`, `touched_floor`, `landed` e `stepped`, vira `Visual` para `mover.get_facing()` e, se o
+      estado mudou, emite `state_changed`.
 3. `HandSway` roda depois do corpo (`process_physics_priority = 1`) e move a mão a partir do novo estado do corpo.
 
 `PointClickMoveInput._physics_process` decide num só lugar quem controla o personagem: um botão do mouse segurado ou,
@@ -102,12 +103,13 @@ tem o nome da sua classe em snake case: `OrbitCameraRig` é `addons/iso_orbit/or
 | | `PointClickMoveInput` (Node) | Mouse e BDM + WASD → comandos ao movimentador; oculta o cursor e corrige a mira dele |
 | | `ClickMarker` (Node3D) | O marcador no ponto clicado (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Desenha o caminho restante do movimentador |
-| `ground_character` | `GroundCharacter` (CharacterBody3D) | Gravidade, pulo, corrida rápida com fôlego, `move_and_slide()`, giro do modelo; sinais para passos, pulos, aterrissagens e corrida rápida |
+| `ground_character` | `GroundCharacter` (CharacterBody3D) | Gravidade, pulo, corrida rápida com fôlego, degraus, `move_and_slide()`, giro do modelo; informa seu estado, passos, saídas do chão e aterrissagens para animações, sons e a interface |
 | | `LedgeGuard` (Node) | Para o corpo num desnível ou o faz deslizar ao longo da borda |
 | | `Stamina` (Node) | Uma reserva que é gasta e se recupera; não sabe nada sobre o que a gasta |
 | | `CharacterActionInput` (Node) | Teclas de corrida rápida e pulo → o personagem |
 | | `CharacterSounds` (Node3D) | Toca sons a partir dos sinais do personagem |
 | | `HandSway` (Node) | Balança um nó de mão com os passos, com inércia em arrancadas, paradas, curvas e aterrissagens |
+| | `CharacterMonitor` (Label) | Mostra o estado do personagem e os últimos eventos como texto; pode registrar os eventos na saída |
 | | `CharacterAppearance` (Node) | Troca o modelo do personagem em tempo de execução |
 | | `StaminaBar` (ProgressBar) | A barra de fôlego do HUD (`stamina_bar.tscn`) |
 | `occluded_silhouette` | `OccludedSilhouette` (Node) | Desenha o personagem como silhueta onde algo o esconde; seus shaders e materiais estão na mesma pasta |

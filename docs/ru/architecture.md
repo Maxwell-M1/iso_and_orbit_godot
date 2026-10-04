@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
+<!-- translation of docs/en/architecture.md @ 566cc270b5a0 -->
 # Архитектура
 
 > Это перевод [английского оригинала](../en/architecture.md). При расхождениях верен оригинал.
@@ -32,7 +32,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        кольцо на земле в точке щелчка
 ├── PathView           NavigationPathView: отладочная линия пути, по умолчанию скрыта
-├── Hud                подсказка по управлению и скорость, FpsCounter, DiscoveryToast, StaminaBar
+├── Hud                подсказка по управлению и скорость, FpsCounter, CharacterState, DiscoveryToast, StaminaBar
 ├── SettingsApplier    настройки → свойства узлов (только в демо)
 └── UiRoot             окна поверх игры: окно настроек
 ```
@@ -52,9 +52,9 @@ Main (Node3D)
 Shift, Space ──► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                     сигналы: stepped, jumped, landed, sprint_changed
+                сигналы: state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway и всё остальное
+                              CharacterSounds, HandSway, CharacterMonitor, анимации и всё остальное
 
 мышь ───► OrbitCameraRig ──► CameraArm ──► Camera3D
           (идёт за интерполированной позицией цели; вращение, зум, следование по выбору)
@@ -73,8 +73,9 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
    3. начинает прыжок, если он в буфере, а тело стоит на полу или только что сошло с него (время койота, coyote time);
    4. в воздухе добавляет гравитацию, умноженную на `gravity_scale`;
    5. даёт `LedgeGuard.constrain()` повернуть скорость вдоль края, если персонаж не прыгает;
-   6. вызывает `move_and_slide()`;
-   7. испускает `landed` и `stepped` и поворачивает `Visual` к `mover.get_facing()`.
+   6. вызывает `move_and_slide()`, перед ним шагая на ступень вверх, а после него — на ступень вниз (`max_step_height`);
+   7. испускает `left_floor`, `touched_floor`, `landed` и `stepped`, поворачивает `Visual` к `mover.get_facing()` и,
+      если состояние изменилось, испускает `state_changed`.
 3. `HandSway` выполняется после тела (`process_physics_priority = 1`) и двигает руку по новому состоянию тела.
 
 `PointClickMoveInput._physics_process` в одном месте решает, кто ведёт персонажа: зажатая кнопка мыши, а если её нет —
@@ -101,12 +102,13 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 | | `PointClickMoveInput` (Node) | Мышь и ПКМ + WASD → команды контроллеру перемещения; прячет курсор и удерживает его на цели |
 | | `ClickMarker` (Node3D) | Метка в точке щелчка (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Рисует оставшийся путь контроллера перемещения |
-| `ground_character` | `GroundCharacter` (CharacterBody3D) | Гравитация, прыжок, ускорение с запасом сил, `move_and_slide()`, поворот модели; сигналы шагов, прыжков, приземлений и ускорения |
+| `ground_character` | `GroundCharacter` (CharacterBody3D) | Гравитация, прыжок, ускорение с запасом сил, ступени, `move_and_slide()`, поворот модели; сообщает о своём состоянии, шагах, отрывах от земли и приземлениях для анимаций, звуков и интерфейса |
 | | `LedgeGuard` (Node) | Останавливает тело у обрыва или ведёт его вдоль края |
 | | `Stamina` (Node) | Запас, который тратится и восстанавливается; ничего не знает о том, кто его тратит |
 | | `CharacterActionInput` (Node) | Клавиши ускорения и прыжка → персонаж |
 | | `CharacterSounds` (Node3D) | Проигрывает звуки по сигналам персонажа |
 | | `HandSway` (Node) | Покачивает узел руки в такт шагам, с инерцией при старте, остановке, поворотах и приземлении |
+| | `CharacterMonitor` (Label) | Показывает текстом состояние персонажа и последние события; может выводить события в панель вывода |
 | | `CharacterAppearance` (Node) | Меняет модель персонажа во время игры |
 | | `StaminaBar` (ProgressBar) | Полоса сил в HUD (`stamina_bar.tscn`) |
 | `occluded_silhouette` | `OccludedSilhouette` (Node) | Рисует персонажа силуэтом там, где его что-то закрывает; его шейдеры и материалы лежат в той же папке |

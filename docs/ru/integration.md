@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # Использование в своём проекте
 
 > Это перевод [английского оригинала](../en/integration.md). При расхождениях верен оригинал.
@@ -94,7 +94,8 @@ func _physics_process(delta: float) -> void:
 
 `LedgeGuard` необязателен: это дочерний узел тела из `addons/iso_orbit/ground_character/`. Для ускорения выставьте
 `mover.sprinting = true`: предел скорости вырастет в `LocomotionSettings.sprint_speed_multiplier` раз. Всё остальное,
-что есть в `GroundCharacter` (прыжок, запас сил, сигналы шагов, плавный поворот модели), тогда остаётся на вас.
+что есть в `GroundCharacter` (прыжок, запас сил, ступени, состояние и его сигналы, плавный поворот модели), тогда
+остаётся на вас.
 
 ## Управление контроллером перемещения
 

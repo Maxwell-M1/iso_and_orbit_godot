@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
+<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
 # Ayarlar
 
 > Bu, [İngilizce orijinalin](../en/settings.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -84,6 +84,7 @@ sallanır: kamera her karede, karakter yalnızca her tikte döner.
 | **FPS sayacı** | `interface/fps_counter` | açık | `Hud/FpsCounter` görünürlüğü |
 | **Kontrol ipuçları ve hız** | `interface/help` | açık | `Hud/Panel` görünürlüğü |
 | **Karakter yol çizgisi** | `interface/path_line` | kapalı | `PathView` görünürlüğü |
+| **Karakter durumu ve olaylar** | `interface/character_state` | kapalı | `Hud/CharacterState` görünürlüğü (`CharacterMonitor`) |
 
 Arayüz ölçeği 3B görünümü değil; ipucu panelini, FPS sayacını, dayanıklılık çubuğunu ve pencereleri değiştirir. %100,
 sahnelerde tasarlandığı hâliyle boyuttur.

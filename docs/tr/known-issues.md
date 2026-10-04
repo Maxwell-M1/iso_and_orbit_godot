@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
+<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
 # Bilinen sorunlar
 
 > Bu, [İngilizce orijinalin](../en/known-issues.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -9,8 +9,13 @@ gerektiğini söyler.
 ## Sınırlamalar
 
 - **Yalnızca fare ve klavye.** Oyun kumandası desteği yoktur.
-- **Animasyon yok.** Modeller durağan ilkel şekillerdir; yalnızca eldeki nesne adımlarla sallanır (`HandSway`). Bir
-  `AnimationTree` yönetmek için `NavigationMover.get_speed()` ve `GroundCharacter.get_step_phase()` hazırdır.
+- **Animasyon yok.** Modeller durağan ilkel şekillerdir; yalnızca eldeki nesne adımlarla sallanır (`HandSway`).
+  `GroundCharacter` bir `AnimationTree` için gerekenleri bildirir: durum, karışım değeri olarak hız, modelin
+  eksenlerinde hareket ve yürüyüş döngüsü, bkz. [Hareket](systems/locomotion.md#karakterin-bildirdikleri).
+- **Basamaklarda bir kapsül.** Kapsülün yuvarlak tabanı her basamak kenarının üzerinden yuvarlanır: basamaklarda yatay
+  hız her basamak için bir tik boyunca yaklaşık %70'e düşer ve gövde basamağın üzerine birkaç santimetreye kadar ileriye
+  konur. Uzun bir merdiven için görünmez bir rampa çarpışma şekli daha akıcıdır, bkz.
+  [Hareket](systems/locomotion.md#basamaklar-ve-eğimler).
 - **Karakterler arasında kaçınma yok.** `NavigationMover` bir yolu izler ve navigasyon kaçınmasını (avoidance)
   kullanmaz; bu yüzden hareket eden karakterler birbirlerinin etrafından dolaşmaz. Oyuncunun gövdesi 2. katmandadır
   ve yalnızca 1. katmanla çarpışır; bu yüzden `player.tscn` ile yapılmış iki karakter birbirinin içinden geçer;

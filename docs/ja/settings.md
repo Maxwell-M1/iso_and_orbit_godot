@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
+<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
 # 設定
 
 > これは[英語の原文](../en/settings.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -71,6 +71,7 @@ V-Syncでは、フレーム数がモニターのリフレッシュレートを�
 | **FPSカウンター** | `interface/fps_counter` | オン | `Hud/FpsCounter`の表示 |
 | **操作ヒントと速度** | `interface/help` | オン | `Hud/Panel`の表示 |
 | **キャラクターの経路線** | `interface/path_line` | オフ | `PathView`の表示 |
+| **キャラクターの状態とイベント** | `interface/character_state` | オフ | `Hud/CharacterState`の表示（`CharacterMonitor`） |
 
 UIスケールは、ヒント、FPSカウンター、スタミナバー、ウィンドウの大きさを変えますが、3Dビューは変えません。100%はシーンで作成したときのサイズです。
 

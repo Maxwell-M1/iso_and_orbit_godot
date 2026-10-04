@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
+<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
 # 已知问题
 
 > 本文是[英文原文](../en/known-issues.md)的翻译。两者不一致时，以英文版为准。
@@ -8,7 +8,8 @@
 ## 局限
 
 - **仅支持鼠标和键盘。** 不支持手柄。
-- **没有动画。** 模型是静态的基本几何体；只有手持物品会随脚步摆动（`HandSway`）。`NavigationMover.get_speed()` 和 `GroundCharacter.get_step_phase()` 可用于驱动 `AnimationTree`。
+- **没有动画。** 模型是静态的基本几何体；只有手持物品会随脚步摆动（`HandSway`）。`GroundCharacter` 会报告 `AnimationTree` 所需的信息：状态、作为混合值的速度、模型坐标轴下的移动和步态周期，见[移动](systems/locomotion.md#角色报告的信息)。
+- **台阶上的胶囊体。** 胶囊体的圆形底部会滚过每一级台阶的边缘：在台阶上，每级台阶会有一个物理帧的水平速度降到约 70%，身体会被放到台阶上、最多比原位置靠前几厘米。对于很长的楼梯，用一个不可见的坡道碰撞体会更平滑，见[移动](systems/locomotion.md#台阶和斜坡)。
 - **角色之间没有避让。** `NavigationMover` 沿路径移动，不使用导航避障，因此移动中的角色不会互相绕开。玩家身体位于第 2 层，只与第 1 层碰撞，因此由 `player.tscn` 制作的两个角色会互相穿过；如果它们应当互相阻挡，请将第 2 层加入它们的 `collision_mask`。演示中的 NPC 站着不动，作为障碍物烘焙进了导航网格。
 - **导航网格是预先烘焙的。** 在运行时移动障碍物不会改变路径。编辑关卡后，请重新烘焙网格（[世界与导航](systems/world-and-navigation.md#重新烘焙导航网格)）。
 - **仅支持 Godot 4.7。** 项目在 4.7.2 上测试。剪影需要模板缓冲区（4.5+），而场景警告检查复现的是 4.7.2 的判定条件。

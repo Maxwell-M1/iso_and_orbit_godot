@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
+<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
 # UI
 
 > Esta é uma tradução do [original em inglês](../../en/systems/ui.md).
@@ -92,10 +92,12 @@ senão a janela se redimensionaria sob o mouse e o slider fugiria dele. O teclad
 |---|---|---|
 | `Hud`, `Hud/Panel` | `gdscript/demo/hud.gd` em `Hud` | A dica de controles e a velocidade. O script só atualiza a velocidade; `settings_applier.gd` mostra ou oculta o painel e oculta as linhas dos recursos desativados (as teclas com o BDM, os dois botões + A/D, corrida rápida, pulo) |
 | `Hud/FpsCounter` | `FpsCounter` (Label) | Quadros por segundo no canto superior direito; funciona com o jogo pausado |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Sob o contador de FPS: o que o herói está fazendo (estado, velocidade e mistura, movimento, giro, chão ou ar, passos e pés, fôlego) e os últimos eventos. Oculto por padrão. Veja [Locomoção](locomotion.md#charactermonitor-o-estado-como-texto) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | "Descoberto: …" por `show_time` (3,5 s) quando o jogador entra pela primeira vez num `PointOfInterest`. Encontra todos os locais pelo grupo `points_of_interest`; `show_discovery(title)` mostra um manualmente |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Aparece quando o fôlego começa a ser gasto, fica vermelha enquanto o personagem está exausto (variação `StaminaBarExhausted`) e some em 0,6 s quando fica cheia de novo |
 
-O painel de dica, o contador de FPS e a linha do caminho são ligados e desligados em Configurações → Interface.
+O painel de dica, o contador de FPS, a linha do caminho e o painel do estado do personagem são ligados e desligados em
+Configurações → Interface.
 
 ## Tema
 

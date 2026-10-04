@@ -1,11 +1,11 @@
-<!-- translation of docs/en/systems/locomotion.md @ f90a0207f4e9 -->
+<!-- translation of docs/en/systems/locomotion.md @ 5c06aa020dad -->
 # Locomoción
 
 > Esta es una traducción del [original en inglés](../../en/systems/locomotion.md).
 > Si hay diferencias, la versión en inglés es la correcta.
 
-Cómo un personaje corre, se detiene, gira, esprinta, salta y se mantiene alejado de los desniveles. Cuatro clases, de
-abajo hacia arriba:
+Cómo un personaje corre, se detiene, gira, esprinta, salta, sube escalones y se mantiene alejado de los desniveles, y
+cómo informa de lo que está haciendo. Cuatro clases, de abajo hacia arriba:
 
 | Clase | Tipo | Tarea |
 |---|---|---|
@@ -14,8 +14,8 @@ abajo hacia arriba:
 | `NavigationMover` | Node, hijo del cuerpo | Rutas y órdenes; devuelve una velocidad, nunca mueve el cuerpo |
 | `GroundCharacter` | CharacterBody3D | Gravedad, salto, sprint, `move_and_slide()`, giro del modelo |
 
-Dos auxiliares se conectan al cuerpo: `Stamina` (la reserva para el sprint) y `LedgeGuard` (nada de salir caminando
-por un desnivel).
+Dos auxiliares se conectan al cuerpo: `Stamina` (la reserva para el sprint) y `LedgeGuard` (nada de salir caminando por
+un desnivel). `CharacterMonitor` muestra como texto lo que informa el cuerpo.
 
 ## Cómo se siente la carrera
 
@@ -95,42 +95,166 @@ en el modo lateral de las teclas, ver [Entrada](input.md).
 
 El único lugar donde se mueve el cuerpo. En cada tick de física actualiza el estado del sprint, toma la velocidad
 horizontal del movedor, gestiona el salto y la gravedad, deja que `LedgeGuard` corrija la velocidad, llama a
-`move_and_slide()`, informa pasos y aterrizajes y gira `visual` hacia `mover.get_facing()`.
+`move_and_slide()` con una subida de escalón antes y una bajada de escalón después, y luego informa de lo que cambió en
+el tick: el contacto con el suelo, los pasos, el giro del modelo hacia `mover.get_facing()` y el estado.
+
+El Inspector agrupa las propiedades: primero las partes y el giro, luego Ground (suelo), Jump and fall (salto y caída),
+Sprint y Steps (pasos).
 
 | Propiedad | Por defecto | Significado |
 |---|---|---|
 | `mover` | — | El `NavigationMover`; obligatorio |
 | `visual` | — | El nodo que gira hacia donde va el personaje; su frente es −Z |
 | `visual_turn_speed` | 1080 °/s | Qué tan rápido gira el modelo |
-| `gravity_scale` | 3 | Multiplicador de la gravedad. El personaje corre más rápido que una persona y con la gravedad normal parecería flotar al caer: una caída de 1,6 m tarda 0,33 s en lugar de 0,57 s |
+| `max_step_height` | 0,3 m | El escalón más alto al que el personaje sube sin saltar, y el más profundo que baja sin despegar del suelo. Con 0 no sube ni baja escalones |
 | `ledge_guard` | — | `LedgeGuard` opcional; sin él, el personaje cae desde cualquier altura |
-| `can_sprint` | activado | Sprint permitido. Si se desactiva durante la carrera, la velocidad extra se frena |
-| `stamina` | — | `Stamina` opcional; sin ella, el sprint nunca cansa |
-| `sprint_tires` | activado | El sprint gasta resistencia |
-| `sprint_duration` | 5 s | Cuánto dura una reserva llena: gasta `max_value / sprint_duration` por segundo |
 | `can_jump` | activado | Salto permitido; desactivado, `jump()` no hace nada |
 | `jump_height` | 1 m | Altura de los pies en la cima del salto |
 | `coyote_time` | 0,1 s | Un salto todavía funciona durante este tiempo después de salir caminando de un borde |
 | `jump_buffer_time` | 0,12 s | Un salto presionado este tiempo antes de aterrizar se ejecuta al aterrizar |
-| `landing_min_speed` | 2,5 m/s | Las caídas más lentas (un escalón hacia abajo, una rampa) no cuentan como aterrizajes |
+| `gravity_scale` | 3 | Multiplicador de la gravedad. El personaje corre más rápido que una persona y con la gravedad normal parecería flotar al caer: una caída de 1,6 m tarda 0,33 s en lugar de 0,57 s |
+| `landing_min_speed` | 2,5 m/s | Una caída más lenta (un pequeño desnivel, una rampa) es solo `touched_floor`, no `landed` |
+| `can_sprint` | activado | Sprint permitido. Si se desactiva durante la carrera, la velocidad extra se frena |
+| `stamina` | — | `Stamina` opcional; sin ella, el sprint nunca cansa |
+| `sprint_tires` | activado | El sprint gasta resistencia |
+| `sprint_duration` | 5 s | Cuánto dura una reserva llena: gasta `max_value / sprint_duration` por segundo |
 | `stride_length` | 1,5 m | Distancia sobre el suelo entre pasos |
 | `first_step_distance` | 0,3 m | Distancia desde parado hasta el primer paso |
+
+El límite de pendiente es el propio `floor_max_angle` del cuerpo, 45° por defecto (en el Inspector: Suelo → Ángulo
+Máximo, Floor → Max Angle). Una superficie más empinada es una pared para el cuerpo, para los escalones y para la
+protección de bordes por igual.
 
 Establece `sprint_requested` para pedir un sprint y llama a `jump()` para saltar. `CharacterActionInput` hace ambas
 cosas para el jugador; una IA puede hacer lo mismo.
 
-### Señales
+### Lo que informa el personaje
+
+Las animaciones, los efectos, los sonidos y la interfaz no tienen que deducir de la velocidad lo que está haciendo el
+personaje. Los momentos llegan como señales; lo que cambia todo el tiempo se lee con consultas, en cada fotograma o
+tick.
 
 | Señal | Cuándo |
 |---|---|
-| `stepped(sprinting)` | Un pie tocó el suelo: cada `stride_length` recorrida sobre el suelo, el primero a `first_step_distance` desde parado. Los pasos siguen la distancia, no el tiempo: unos 3,7 por segundo corriendo, 5,5 en sprint, ninguno parado contra una pared o en el aire |
-| `jumped` | El personaje se impulsó desde el suelo |
-| `landed(impact_speed)` | El personaje aterrizó; `impact_speed` es la velocidad de caída en m/s |
+| `state_changed(state, previous)` | El estado cambió. Al final del tick, después de las demás señales del tick |
+| `stepped(sprinting)` | Un pie tocó el suelo (`get_step_foot()` dice cuál): cada `stride_length` recorrida sobre el suelo, el primero a `first_step_distance` desde parado. Los pasos siguen la distancia, no el tiempo: unos 3,7 por segundo corriendo, 5,5 en sprint, ninguno parado contra una pared o en el aire |
+| `jumped` | El personaje se impulsó desde el suelo; `left_floor` llega en el mismo tick |
+| `left_floor` | El personaje despegó del suelo: con un salto o al salir de un borde. Bajar un escalón no cuenta |
+| `touched_floor(fall_speed)` | De vuelta en el suelo después de cualquier tiempo en el aire; una por cada `left_floor` |
+| `landed(impact_speed)` | Un `touched_floor` a `landing_min_speed` o más rápido: un aterrizaje real, no un pequeño desnivel |
 | `sprint_changed(sprinting)` | El sprint empezó o terminó |
 
-`get_step_phase()` devuelve el ritmo de los pasos como un número de pasos dados: un entero en cada paso, y la parte
-fraccionaria crece de 0 a 1 con la distancia entre pasos. `HandSway` lo usa; una animación también puede usarlo.
-Otras consultas: `is_sprinting()`, `is_exhausted()`, `get_jump_speed()`.
+| Estado (`GroundCharacter.State`) | Cuándo |
+|---|---|
+| `IDLE` | En el suelo, más lento que `IDLE_SPEED` (0,1 m/s), también al correr contra una pared |
+| `RUNNING` | En el suelo, moviéndose a cualquier velocidad, sin esprintar |
+| `SPRINTING` | En el suelo, esprintando |
+| `JUMPING` | En el aire después de un salto, hasta la cima |
+| `FALLING` | En el aire, bajando: después de la cima de un salto o al salir de un borde |
+
+| Consulta | Devuelve |
+|---|---|
+| `get_state()` | El estado |
+| `get_move_velocity()`, `get_move_speed()` | La velocidad horizontal real y su módulo, m/s: lo que el cuerpo recorre de verdad. A diferencia de `get_real_velocity()`, también cuenta la subida de un escalón |
+| `get_locomotion_blend()` | Para una mezcla 1D: 0 parado, 1 a `max_speed`, 2 a toda la velocidad de sprint, sean cuales sean los valores de las velocidades |
+| `get_local_movement()` | Para una mezcla 2D: x hacia la derecha del modelo, y hacia delante, la longitud es la mezcla. Una carrera es (0, 1), un sprint (0, 2), un desplazamiento lateral a la derecha (1, 0), retroceder (0; −0,7) |
+| `get_turn_rate()` | Qué tan rápido gira el modelo, rad/s: positivo hacia la izquierda, negativo hacia la derecha |
+| `get_air_time()` | Segundos en el aire; 0 en el suelo |
+| `get_step_phase()` | Los pasos dados como número: entero en cada paso, la parte fraccionaria crece con la distancia entre pasos |
+| `get_gait_cycle()` | El ciclo de dos pasos, de 0 a 1: 0 cuando el pie izquierdo toca el suelo, 0,5 el derecho |
+| `get_step_foot()` | El pie del último paso, `Foot.LEFT` o `Foot.RIGHT`. Los pies se alternan, también después de una parada |
+| `is_sprinting()`, `is_exhausted()`, `get_jump_speed()` | Si esprinta ahora; si está agotado; la velocidad de despegue del salto |
+| `is_on_floor()`, `get_floor_angle()`, `velocity.y` | Del propio `CharacterBody3D`: en el suelo, la pendiente bajo los pies, la velocidad vertical |
+
+`HandSway` sigue la fase de los pasos; una animación puede hacer lo mismo. La forma habitual de controlar un
+`AnimationTree` es fijar sus mezclas a partir de las consultas en cada fotograma y cambiar la máquina de estados con las
+señales:
+
+```gdscript
+@export var character: GroundCharacter
+@export var tree: AnimationTree
+
+
+func _ready() -> void:
+	character.state_changed.connect(_on_state_changed)
+	character.landed.connect(func(_speed: float) -> void:
+		tree.set("parameters/land/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE))
+
+
+func _process(_delta: float) -> void:
+	# A BlendSpace1D with idle at 0, run at 1 and sprint at 2; for sidesteps, a BlendSpace2D and get_local_movement().
+	tree.set("parameters/ground/blend_position", character.get_locomotion_blend())
+
+
+func _on_state_changed(state: GroundCharacter.State, _previous: GroundCharacter.State) -> void:
+	var in_air := state == GroundCharacter.State.JUMPING or state == GroundCharacter.State.FALLING
+	var playback: AnimationNodeStateMachinePlayback = tree.get("parameters/playback")
+	playback.travel("air" if in_air else "ground")
+```
+
+Para que los pies vayan acompasados con el suelo, reproduce el ciclo de carrera según la distancia y no según el tiempo:
+fija su posición en `get_gait_cycle()` multiplicado por su duración (un nodo `TimeSeek`, o un `AnimationPlayer` en pausa
+con `seek()`). El ciclo debe empezar con el pie izquierdo tocando el suelo.
+
+### CharacterMonitor: el estado como texto
+
+Un `Label` que muestra lo que está haciendo un `GroundCharacter` y sus últimos eventos, para ajustar animaciones o como
+superposición de depuración. En la demo es `Hud/CharacterState/Monitor`, y lo muestra Configuración (F10) → Interfaz →
+**Estado del personaje y eventos**. El texto sale solo de las señales y consultas de arriba, así que el script también
+es un ejemplo de cómo usarlas.
+
+```
+Running
+Speed 5.5 m/s · blend 1.00
+Forward +1.00 · right +0.00
+Turning +0°/s
+On the ground · slope 0°
+Step 37 · left foot · cycle 0.03
+Stamina 100%
+
+12.35 s  step, right foot
+12.62 s  step, left foot
+12.80 s  jump
+12.80 s  left the ground
+12.80 s  Running → Jumping
+```
+
+| Propiedad | Por defecto | Significado |
+|---|---|---|
+| `character` | — | El `GroundCharacter`; si está vacío, el padre |
+| `history_size` | 6 | Cuántos eventos recientes mostrar bajo el estado; 0 muestra solo el estado |
+| `log_events` | desactivado | Además, imprimir cada evento en la salida con su tiempo y el nombre del personaje |
+| `include_steps` | activado | Mostrar y registrar también los pasos: hay varios por segundo |
+
+Métodos: `get_text_now()`, `get_state_lines()`, `get_event_lines()`, `get_state_name(state, translated)`. Las frases
+pasan por `tr()`, así que el panel habla el idioma de la interfaz; el registro en la salida se queda en inglés.
+
+### Escalones y pendientes
+
+**Las pendientes** son tarea del propio `move_and_slide()`: el cuerpo sube caminando por una superficie no más empinada
+que `floor_max_angle` y se detiene ante una más empinada. Con `floor_constant_speed`, que el cuerpo de la demo tiene
+activado, conserva su velocidad en una rampa.
+
+**Los escalones.** Una cápsula sube por sí sola a una cornisa solo hasta `radius × (1 − cos floor_max_angle)`, 0,1 m
+para la cápsula de 0,35 m. Los escalones más altos, hasta `max_step_height`, los sube el propio cuerpo:
+
+- **Subida.** Si el movimiento del tick, mirado 5 cm más allá, choca con algo demasiado empinado para pararse encima, el
+  cuerpo prueba un escalón: sube `max_step_height` (o lo que permita un techo), avanza el movimiento del tick y baja
+  hasta el suelo. Un rayo comprueba la parte de arriba: debe ser suelo a no más de `max_step_height` sobre los pies, así
+  que un bloque de 0,4 m o una pendiente empinada no son un escalón. El cuerpo se coloca sobre el escalón, y
+  `move_and_slide()` solo lo asienta ahí.
+- **Bajada.** Si el cuerpo estaba en el suelo antes del tick y está en el aire después sin haber saltado, y hay suelo a
+  no más de `max_step_height` por debajo, el cuerpo se coloca sobre ese suelo: sin `left_floor` y sin caída.
+- La parte inferior redonda de la cápsula se apoya en ángulo sobre el borde de un escalón, demasiado empinado para
+  pararse mientras el cuerpo está lejos del borde. Por eso el lugar sobre el escalón se busca un poco más allá, en pasos
+  de 2 cm: el cuerpo termina hasta unos centímetros más adelante de donde lo llevaría el tick.
+
+Cada escalón cuesta cerca de un tick rodando sobre su borde, en el que la velocidad horizontal baja a cerca del 70%
+(`get_move_speed()` lo muestra; el bastón en la mano apenas se mueve). Para una escalera larga, lo más suave es un
+colisionador de rampa invisible.
+
+La malla de navegación debe unir lo que el cuerpo puede subir: en la demo `agent_max_climb` es 0,3 m, igual que
+`max_step_height` (ver [Mundo y navegación](world-and-navigation.md#capas-de-física-y-navegación)).
 
 ### El salto
 
@@ -183,9 +307,9 @@ baja de la plataforma sigue la rampa, y la protección no le estorba.
 
 ## Comportamiento medido
 
-Las pruebas (`tests/movement_checks.gd`, `tests/character_actions_checks.gd`, `tests/camera_checks.gd`) miden la
-configuración de la demo a 60 ticks de física. Sus límites se calculan a partir de la configuración, así que puedes
-cambiarla.
+Las pruebas (`tests/movement_checks.gd`, `tests/character_actions_checks.gd`, `tests/character_state_checks.gd`,
+`tests/camera_checks.gd`) miden la configuración de la demo a 60 ticks de física. Sus límites se calculan a partir de la
+configuración, así que puedes cambiarla.
 
 - 95% de la velocidad máxima en 0,33 s; del 95% a detenerse en 0,35 s; la parada es exactamente en el punto del
   clic.
@@ -202,6 +326,16 @@ cambiarla.
 - Salto: cima a 1,000 m, 0,517 s en el aire (0,522 según la fórmula). Presionado 0,4 m sobre el suelo, el salto se
   ejecuta en el tick posterior al aterrizaje; presionado en la cima, se olvida. Espacio 3 ticks después de salir
   caminando de un borde salta, 9 ticks después no.
+- Lo que informa el personaje: una carrera a toda velocidad da la mezcla 1,00, un sprint completo 2,00; un
+  desplazamiento lateral (1,00; 0,00), retroceder (0,00; −0,70). Los estados en una carrera: `RUNNING`, `SPRINTING`,
+  `RUNNING`, `IDLE`. Un salto: `jumped`, `left_floor`, `JUMPING` durante 0,27 s (0,26 s hasta la cima según la fórmula),
+  `FALLING`, `touched_floor`, `landed`, `IDLE`; 0,52 s en el aire. Al salir del borde de la plataforma: `left_floor` y
+  directamente `FALLING`. Los pies se alternan, también después de una parada.
+- La escalera al este de la plataforma (escalones de 0,2 m, huellas de 0,4 m) con un clic: subida y bajada sin despegar
+  del suelo, con una mediana de 5,4 m/s al subir y 5,5 m/s al bajar, la mínima de 3,9 y 5,0 m/s. Con `max_step_height`
+  en 0 el personaje se detiene en el primer escalón. Un bloque de 0,4 m lo detiene, una pendiente de 30° se sube
+  caminando, una de 50° no.
+- En el sendero de la montaña, la rampa, la pradera y el laberinto el personaje nunca despega del suelo sin un salto.
 
 ---
 

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ b40c280f0207 -->
+<!-- translation of docs/en/index.md @ de83e592921c -->
 # ドキュメント
 
 [English](../en/index.md) · [Español](../es/index.md) · **日本語** · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -23,7 +23,7 @@ Godot 4.7でアイソメトリックやトップダウンのRPGを作るため�
 
 ## システム
 
-- [ロコモーション](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`、ダッシュとスタミナ、ジャンプ、落下防止。
+- [ロコモーション](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`、アニメーションとインターフェースのためにキャラクターが通知すること、`CharacterMonitor`、階段と斜面、ダッシュとスタミナ、ジャンプ、落下防止。
 - [カメラ](systems/camera.md)：`OrbitCameraRig`（回転、ズームカーブ、追従）と`CameraArm`（障害物、接近、フェード）。
 - [入力](systems/input.md)：`PointClickMoveInput`（クリック、長押し、キー、カーソル）と`CharacterActionInput`。
 - [キャラクター](systems/characters.md)：モデルと装備、主人公の外見、手の振り、シルエット。

@@ -87,10 +87,11 @@ keyboard and the wheel change the scale at once.
 |---|---|---|
 | `Hud`, `Hud/Panel` | `gdscript/demo/hud.gd` on `Hud` | The controls hint and the speed. The script only updates the speed; `settings_applier.gd` shows or hides the panel and hides the lines for disabled features (the keys with RMB, both buttons + A/D, sprint, jump) |
 | `Hud/FpsCounter` | `FpsCounter` (Label) | Frames per second in the top-right corner; works while paused |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Under the FPS counter: what the hero is doing (state, speed and blend, movement, turning, ground or air, steps and feet, stamina) and the latest events. Hidden by default. See [Locomotion](locomotion.md#charactermonitor-the-state-as-text) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | "Discovered: …" for `show_time` (3.5 s) when the player first enters a `PointOfInterest`. Finds all places through the `points_of_interest` group; `show_discovery(title)` shows one by hand |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Appears when stamina starts to be spent, turns red while the character is exhausted (`StaminaBarExhausted` variation) and fades over 0.6 s when full again |
 
-The hint panel, the FPS counter and the path line are switched in Settings → Interface.
+The hint panel, the FPS counter, the path line and the character state panel are switched in Settings → Interface.
 
 ## Theme
 

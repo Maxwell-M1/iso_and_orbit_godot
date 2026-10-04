@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
+<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
 # UI
 
 > 本文是[英文原文](../../en/systems/ui.md)的翻译。两者不一致时，以英文版为准。
@@ -62,10 +62,11 @@
 |---|---|---|
 | `Hud`、`Hud/Panel` | `Hud` 上的 `gdscript/demo/hud.gd` | 操作提示和速度。脚本只更新速度；`settings_applier.gd` 负责显示或隐藏面板，并隐藏已禁用功能对应的行（配合右键的按键、两键 + A/D、冲刺、跳跃） |
 | `Hud/FpsCounter` | `FpsCounter`（Label） | 右上角的每秒帧数；暂停时也工作 |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor`（Label） | 位于 FPS 计数器下方：英雄在做什么（状态、速度和混合值、移动、转向、在地面还是空中、脚步和左右脚、体力）以及最近的事件。默认隐藏。见[移动](locomotion.md#charactermonitor以文本显示状态) |
 | `Hud/DiscoveryToast` | `DiscoveryToast`（Label） | 玩家首次进入 `PointOfInterest` 时显示“发现地点：…”，持续 `show_time`（3.5 秒）。通过 `points_of_interest` 分组找到所有地点；`show_discovery(title)` 可手动显示一条 |
 | `Hud/StaminaBar` | `StaminaBar`（ProgressBar） | 开始消耗体力时出现，角色力竭期间变红（`StaminaBarExhausted` 变体），重新充满后在 0.6 秒内淡出 |
 
-提示面板、FPS 计数器和路径线在设置 → 界面中开关。
+提示面板、FPS 计数器、路径线和角色状态面板在设置 → 界面中开关。
 
 ## 主题
 

@@ -1,11 +1,11 @@
-<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
+<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
 # Ses
 
 > Bu, [İngilizce orijinalin](../../en/systems/audio.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
-`GroundCharacter` başına gelenleri sinyallerle bildirir: `stepped(sprinting)`, `jumped`, `landed(impact_speed)`,
-`sprint_changed(sprinting)` (bkz. [Hareket](locomotion.md#sinyaller)). Sesler, ayak altındaki toz veya animasyonlar
-bunlara bağlanır; karakterin kendisi bunlardan habersizdir. Demo sesleri bağlar.
+`GroundCharacter` başına gelenleri sinyallerle bildirir; sesler `stepped(sprinting)`, `jumped`, `landed(impact_speed)`
+ve `sprint_changed(sprinting)` sinyallerini kullanır (hepsi: [Hareket](locomotion.md#karakterin-bildirdikleri)). Sesler,
+ayak altındaki toz veya animasyonlar bunlara bağlanır; karakterin kendisi bunlardan habersizdir. Demo sesleri bağlar.
 
 ## CharacterSounds
 

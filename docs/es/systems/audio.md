@@ -1,12 +1,13 @@
-<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
+<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
 # Audio
 
 > Esta es una traducción del [original en inglés](../../en/systems/audio.md).
 > Si hay diferencias, la versión en inglés es la correcta.
 
-`GroundCharacter` informa con señales lo que le pasa: `stepped(sprinting)`, `jumped`, `landed(impact_speed)`,
-`sprint_changed(sprinting)` (ver [Locomoción](locomotion.md#señales)). Los sonidos, el polvo bajo los pies o las
-animaciones se conectan a ellas; el personaje en sí no sabe nada de ellos. La demo conecta sonidos.
+`GroundCharacter` informa con señales lo que le pasa; los sonidos usan `stepped(sprinting)`, `jumped`,
+`landed(impact_speed)` y `sprint_changed(sprinting)` (todas las señales:
+[Locomoción](locomotion.md#lo-que-informa-el-personaje)). Los sonidos, el polvo bajo los pies o las animaciones se
+conectan a ellas; el personaje en sí no sabe nada de ellos. La demo conecta sonidos.
 
 ## CharacterSounds
 

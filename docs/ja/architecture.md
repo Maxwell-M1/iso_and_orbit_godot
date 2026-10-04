@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
+<!-- translation of docs/en/architecture.md @ 566cc270b5a0 -->
 # アーキテクチャ
 
 > これは[英語の原文](../en/architecture.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -28,7 +28,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        クリックした地点の地面に出るリング
 ├── PathView           NavigationPathView：デバッグ用の経路線、デフォルトでは非表示
-├── Hud                操作ヒントと速度、FpsCounter、DiscoveryToast、StaminaBar
+├── Hud                操作ヒントと速度、FpsCounter、CharacterState、DiscoveryToast、StaminaBar
 ├── SettingsApplier    設定 → ノードのプロパティ（デモのみ）
 └── UiRoot             ゲームの上に重なるウィンドウ：設定ウィンドウ
 ```
@@ -47,9 +47,9 @@ Main (Node3D)
 Shift, Space ──► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                     シグナル：stepped, jumped, landed, sprint_changed
+                シグナル：state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway, その他何でも
+                              CharacterSounds, HandSway, CharacterMonitor, アニメーション, その他何でも
 
 マウス ──► OrbitCameraRig ──► CameraArm ──► Camera3D
           (ターゲットの補間された位置への追従、回転、ズーム、オプションの自動追従)
@@ -66,8 +66,8 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
    3. ジャンプがバッファされていて、ボディが床の上にいるか床を離れた直後なら（コヨーテタイム）、ジャンプを開始します。
    4. 空中では、重力に`gravity_scale`を掛けたものを加えます。
    5. キャラクターがジャンプ中でなければ、`LedgeGuard.constrain()`に速度を縁に沿った向きへ変えさせます。
-   6. `move_and_slide()`を呼びます。
-   7. `landed`と`stepped`を発信し、`Visual`を`mover.get_facing()`の方へ向けます。
+   6. `move_and_slide()`を呼びます。呼ぶ前に段を上り、呼んだ後に段を下ります（`max_step_height`）。
+   7. `left_floor`、`touched_floor`、`landed`、`stepped`を発信し、`Visual`を`mover.get_facing()`の方へ向け、状態が変わっていれば`state_changed`を発信します。
 3. `HandSway`はボディの後に実行され（`process_physics_priority = 1`）、ボディの新しい状態に基づいて手を動かします。
 
 `PointClickMoveInput._physics_process`は、誰がキャラクターを動かすか（押されたマウスボタン、そうでなければ右ボタンと組み合わせたキー）を1か所で決め、`move_to()`、`steer()`、`stop()`のいずれかを呼びます。ムーバーは最後のコマンドを保持し、ボディは次に`compute_velocity()`を呼んだときにそれを受け取ります。
@@ -88,12 +88,13 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 | | `PointClickMoveInput`（Node） | マウスと右ボタン + WASD → ムーバーへのコマンド。カーソルを隠し、狙いを補正する |
 | | `ClickMarker`（Node3D） | クリックした地点のマーカー（`click_marker.tscn`） |
 | | `NavigationPathView`（MeshInstance3D） | ムーバーの残りの経路を描画する |
-| `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、ジャンプ、スタミナ付きダッシュ、`move_and_slide()`、モデルの回転。ステップ、ジャンプ、着地、ダッシュのシグナル |
+| `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、ジャンプ、スタミナ付きダッシュ、階段、`move_and_slide()`、モデルの回転。アニメーション、サウンド、インターフェースのために状態、ステップ、踏み切り、着地を通知する |
 | | `LedgeGuard`（Node） | 段差でボディを止めるか、縁に沿って滑らせる |
 | | `Stamina`（Node） | 消費されては回復する蓄え。何がそれを消費するかは知らない |
 | | `CharacterActionInput`（Node） | ダッシュとジャンプのキー → キャラクター |
 | | `CharacterSounds`（Node3D） | キャラクターのシグナルに応じてサウンドを再生する |
 | | `HandSway`（Node） | 歩みに合わせて手のノードを振る。動き出し、停止、旋回、着地では慣性が働く |
+| | `CharacterMonitor`（Label） | キャラクターの状態と最新のイベントをテキストで表示する。イベントを出力に記録することもできる |
 | | `CharacterAppearance`（Node） | 実行時にキャラクターのモデルを差し替える |
 | | `StaminaBar`（ProgressBar） | HUDのスタミナバー（`stamina_bar.tscn`） |
 | `occluded_silhouette` | `OccludedSilhouette`（Node） | 何かに隠れた部分のキャラクターをシルエットとして描画する。そのシェーダーとマテリアルは同じフォルダにある |

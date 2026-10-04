@@ -56,6 +56,7 @@ All modes and their settings: [Controls](docs/en/controls.md).
 - Sprint with stamina. Jump with coyote time and input buffering; the jump height is the same at any physics
   tick rate.
 - A ledge guard: at the edge of a drop the hero stops or slides along it, as along a wall.
+- Stairs up to 0.3 m are climbed and descended without leaving the ground; slopes up to 45° are walked up.
 
 **Camera**
 
@@ -73,12 +74,16 @@ All modes and their settings: [Controls](docs/en/controls.md).
 - A settings window (F10) with tabs for controls, character, camera, display, interface and sound, saved to
   `user://settings.cfg`. The interface is in English, Spanish, Japanese, Brazilian Portuguese, Russian, Turkish and
   Simplified Chinese, switchable on the fly.
-- Character signals for steps, jumps, landings and sprinting, with sounds connected to them.
-- A demo level: an 80 × 80 m fenced glade with ruins, a camp, a farmstead, a hedge maze, a ramp and a mountain with
-  a spiral trail. Four places to discover with five NPCs posted at them, and ten hero looks to choose from.
-- Headless tests of movement, input, jump, sprint and sounds, the camera and its arm, hero looks, the settings
-  window and translations, and a script that finds the editor's node warnings in all scenes without opening the
-  editor.
+- The character reports what it is doing, for animations, effects and the interface: the state (standing, running,
+  sprinting, jumping, falling) with a signal for each change, steps with the foot, take-offs and landings, the speed
+  as a blend value, the movement in the model's axes, turning and the gait cycle. Sounds are connected to the
+  signals, and a panel (Settings → Interface) shows it all live with the latest events.
+- A demo level: an 80 × 80 m fenced glade with ruins, a camp, a farmstead, a hedge maze, a platform with a ramp and
+  stairs, and a mountain with a spiral trail. Four places to discover with five NPCs posted at them, and ten hero looks
+  to choose from.
+- Headless tests of movement, input, jump, sprint and sounds, the character's state, stairs and slopes, the camera and
+  its arm, hero looks, the settings window and translations, and a script that finds the editor's node warnings in all
+  scenes without opening the editor.
 
 **Not included:** gamepad support (mouse and keyboard only) and animations: the models are static primitives.
 

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # Kendi projenizde kullanma
 
 > Bu, [İngilizce orijinalin](../en/integration.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -99,8 +99,8 @@ func _physics_process(delta: float) -> void:
 
 `LedgeGuard` isteğe bağlıdır: `addons/iso_orbit/ground_character/` içinden, gövdenin bir alt düğümü. Depar için
 `mover.sprinting = true` ayarlayın: hız sınırı `LocomotionSettings.sprint_speed_multiplier` katına çıkar.
-`GroundCharacter` içindeki geri kalan her şey (zıplama, dayanıklılık, adım sinyalleri, modelin yumuşak dönüşü) bu
-durumda size kalır.
+`GroundCharacter` içindeki geri kalan her şey (zıplama, dayanıklılık, basamaklar, durum ve sinyalleri, modelin yumuşak
+dönüşü) bu durumda size kalır.
 
 ## Hareketlendiriciye komut verme
 

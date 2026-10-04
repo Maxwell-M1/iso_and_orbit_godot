@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_action_input.gd" id="11_actions"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/ground_character/stamina_bar.tscn" id="12_stamina_bar"]
 [ext_resource type="Script" path="res://addons/iso_orbit/orbit_camera/camera_arm.gd" id="14_arm"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
 
 [node name="Main" type="Node3D"]
 
@@ -101,12 +102,30 @@ text = "Speed: 0.0 m/s"
 
 [node name="FpsCounter" parent="Hud" instance=ExtResource("8_fps")]
 
+[node name="CharacterState" type="PanelContainer" parent="Hud"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -396.0
+offset_top = 44.0
+offset_right = -16.0
+offset_bottom = 44.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="Monitor" type="Label" parent="Hud/CharacterState" node_paths=PackedStringArray("character")]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+script = ExtResource("15_monitor")
+character = NodePath("../../../Player")
+
 [node name="DiscoveryToast" parent="Hud" instance=ExtResource("13_toast")]
 
 [node name="StaminaBar" parent="Hud" node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
 stamina = NodePath("../../Player/Stamina")
 
-[node name="SettingsApplier" type="Node" parent="." node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "path_view", "help_panel", "fps_counter", "keys_help", "strafe_help", "sprint_help", "jump_help", "player_appearance", "player_silhouette")]
+[node name="SettingsApplier" type="Node" parent="." node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "path_view", "help_panel", "fps_counter", "character_state", "keys_help", "strafe_help", "sprint_help", "jump_help", "player_appearance", "player_silhouette")]
 script = ExtResource("9_applier")
 player_appearance = NodePath("../Player/Appearance")
 player_silhouette = NodePath("../Player/Silhouette")
@@ -120,6 +139,7 @@ character_sounds = NodePath("../Player/Sounds")
 path_view = NodePath("../PathView")
 help_panel = NodePath("../Hud/Panel")
 fps_counter = NodePath("../Hud/FpsCounter")
+character_state = NodePath("../Hud/CharacterState")
 keys_help = NodePath("../Hud/Panel/Lines/KeysHelp")
 strafe_help = NodePath("../Hud/Panel/Lines/StrafeHelp")
 sprint_help = NodePath("../Hud/Panel/Lines/SprintHelp")

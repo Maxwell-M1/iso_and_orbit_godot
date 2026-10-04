@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # プロジェクトへの組み込み
 
 > これは[英語の原文](../en/integration.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -72,7 +72,7 @@ func _physics_process(delta: float) -> void:
 	$Visual.rotation.y = atan2(-facing.x, -facing.z)
 ```
 
-`LedgeGuard`は任意です。`addons/iso_orbit/ground_character/`にあり、ボディの子として置きます。ダッシュするには`mover.sprinting = true`を設定します。速度上限が`LocomotionSettings.sprint_speed_multiplier`倍に上がります。`GroundCharacter`のそれ以外の機能（ジャンプ、スタミナ、ステップシグナル、モデルの滑らかな回転）は、自分で用意することになります。
+`LedgeGuard`は任意です。`addons/iso_orbit/ground_character/`にあり、ボディの子として置きます。ダッシュするには`mover.sprinting = true`を設定します。速度上限が`LocomotionSettings.sprint_speed_multiplier`倍に上がります。`GroundCharacter`のそれ以外の機能（ジャンプ、スタミナ、階段、状態とそのシグナル、モデルの滑らかな回転）は、自分で用意することになります。
 
 ## ムーバーへの命令
 

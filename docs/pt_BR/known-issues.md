@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
+<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
 # Problemas conhecidos
 
 > Esta é uma tradução do [original em inglês](../en/known-issues.md).
@@ -10,7 +10,13 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
 
 - **Só mouse e teclado.** Não há suporte a gamepad.
 - **Sem animações.** Os modelos são primitivas estáticas; só o item na mão balança com os passos (`HandSway`).
-  `NavigationMover.get_speed()` e `GroundCharacter.get_step_phase()` existem para controlar um `AnimationTree`.
+  `GroundCharacter` informa o que um `AnimationTree` precisa: o estado, a velocidade como valor de mistura, o
+  movimento nos eixos do modelo e o ciclo da passada, veja
+  [Locomoção](systems/locomotion.md#o-que-o-personagem-informa).
+- **Uma cápsula em degraus.** A base redonda da cápsula rola sobre a quina de cada degrau: em degraus, a velocidade
+  horizontal cai para cerca de 70% durante um tick por degrau, e o corpo é colocado sobre o degrau até alguns
+  centímetros à frente. Para uma escada longa, um colisor de rampa invisível é mais suave, veja
+  [Locomoção](systems/locomotion.md#degraus-e-encostas).
 - **Sem desvio entre personagens.** `NavigationMover` segue um caminho e não usa o desvio da navegação (avoidance),
   então personagens em movimento não desviam uns dos outros. O corpo do jogador está na camada 2 e só colide com a
   camada 1, então dois personagens feitos a partir de `player.tscn` se atravessam; adicione a camada 2 à

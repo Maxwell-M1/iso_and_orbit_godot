@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
+<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
 # Настройки
 
 > Это перевод [английского оригинала](../en/settings.md). При расхождениях верен оригинал.
@@ -85,6 +85,7 @@ F10 открывает окно настроек и ставит игру на �
 | **Счётчик FPS** | `interface/fps_counter` | вкл | Видимость `Hud/FpsCounter` |
 | **Подсказка по управлению и скорость** | `interface/help` | вкл | Видимость `Hud/Panel` |
 | **Линия пути персонажа** | `interface/path_line` | выкл | Видимость `PathView` |
+| **Состояние персонажа и события** | `interface/character_state` | выкл | Видимость `Hud/CharacterState` (`CharacterMonitor`) |
 
 Масштаб интерфейса меняет подсказку, счётчик FPS, полосу сил и окна, но не 3D-вид. 100% — размер, заданный в
 сценах.

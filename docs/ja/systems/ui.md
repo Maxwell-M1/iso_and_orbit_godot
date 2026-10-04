@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
+<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
 # UI
 
 > これは[英語の原文](../../en/systems/ui.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
@@ -62,10 +62,11 @@ UIスケールはルートウィンドウの`content_scale_factor`です。ス�
 |---|---|---|
 | `Hud`、`Hud/Panel` | `Hud`に付いた`gdscript/demo/hud.gd` | 操作ヒントと速度。スクリプトは速度を更新するだけで、パネルの表示・非表示と、無効になった機能（右ボタンと組み合わせるキー、両ボタン + A/D、ダッシュ、ジャンプ）の行を隠す処理は`settings_applier.gd`が行う |
 | `Hud/FpsCounter` | `FpsCounter`（Label） | 右上の毎秒フレーム数。一時停止中も動作する |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor`（Label） | FPSカウンターの下に、主人公が何をしているか（状態、速度とブレンド、移動、旋回、地上か空中か、ステップと足、スタミナ）と最新のイベントを表示する。デフォルトでは非表示。[ロコモーション](locomotion.md#charactermonitor状態をテキストで)を参照 |
 | `Hud/DiscoveryToast` | `DiscoveryToast`（Label） | プレイヤーが初めて`PointOfInterest`に入ったとき、「発見：…」を`show_time`（3.5秒）の間表示する。`points_of_interest`グループを通じてすべての場所を見つける。`show_discovery(title)`で手動で表示できる |
 | `Hud/StaminaBar` | `StaminaBar`（ProgressBar） | スタミナの消費が始まると現れ、キャラクターが疲労困憊の間は赤くなり（`StaminaBarExhausted`バリエーション）、再び満タンになると0.6秒かけて消える |
 
-ヒントのパネル、FPSカウンター、経路線は、設定 → インターフェースで切り替えます。
+ヒントのパネル、FPSカウンター、経路線、キャラクターの状態パネルは、設定 → インターフェースで切り替えます。
 
 ## テーマ
 

@@ -88,9 +88,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(hand):
 		return
-	var velocity := character.get_real_velocity()
 	var on_floor := character.is_on_floor()
-	var planar := Vector3(velocity.x, 0.0, velocity.z)
+	var planar := character.get_move_velocity()
 	var full_speed := character.mover.settings.max_speed
 	var target_scale := clampf(planar.length() / full_speed, 0.0, max_swing_scale) if on_floor else 0.0
 	_swing_scale = lerpf(_swing_scale, target_scale, 1.0 - exp(-swing_response * delta))

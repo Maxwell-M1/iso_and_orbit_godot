@@ -32,7 +32,7 @@ Places to walk to:
   silhouette behind them.
 - **Travelers' Camp** in the east and **Farmstead by the Well** in the south-west, with NPCs.
 - **Windswept Peak**, the mountain in the north-east: click its top and the hero takes the spiral trail.
-- The hedge maze, the platform with its ramp, and the U-shaped trap near the spawn, for testing pathfinding.
+- The hedge maze, the platform with its ramp and stairs, and the U-shaped trap near the spawn, for testing pathfinding.
 - The ten hero looks in a row by the south wall. Pick one in Settings → Character → **Hero look**.
 
 ## Settings

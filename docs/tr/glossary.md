@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ baab36cb2064 -->
+<!-- translation of docs/en/glossary.md @ 0821af632403 -->
 # Sözlük
 
 > Bu, [İngilizce orijinalin](../en/glossary.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -9,12 +9,15 @@ Terimler, bu belgelerde ve kodda kullanıldıkları anlamıyla.
 |---|---|
 | **Ajan yarıçapı** (agent radius) | Navigasyon örgüsünün engellerden ne kadar uzak durduğu: 0,5 m, karakterin 0,35 m'lik kapsülünden fazla; böylece yollar köşelerden pay bırakır |
 | **Kol** (arm) | `CameraArm`: kamerayı hedeften çıkan bir çizginin ucunda tutan düğüm. Uzunluğunu tekerlek belirler; engeller onu kısaltır |
+| **Karışım** (blend) | `GroundCharacter.get_locomotion_blend()`: animasyonlar için sayı olarak hız; dururken 0, koşarken 1, deparda 2 |
 | **Yalnızca kamera için gövde** (camera-only body) | 3. fizik katmanındaki (`camera`) bir gövde: kamera kolunu durdurur, ancak tıklamalar, navigasyon ve karakterler onu yok sayar |
+| **Karakter durumu** (character state) | Karakterin ne yaptığı: duruyor, koşuyor, depar atıyor, zıplıyor veya düşüyor (`GroundCharacter.get_state()`, `state_changed` sinyali) |
 | **Tıklama** (click) | Sol tuşa basılıp basılı tutma gecikmesi içinde bırakılması. Karakter, tuşa basıldığı noktaya bir yol boyunca koşar |
 | **Çakal süresi** (coyote time) | Bir kenardan yürüyerek çıktıktan sonra zıplamanın hâlâ çalıştığı kısa süre (0,1 sn) |
 | **Bitkin** (exhausted) | Dayanıklılık bittikten sonraki durum: dayanıklılık `recover_ratio` (%30) değerine dolana kadar depar yok |
 | **Bakış yönü** (facing) | Karakterin nereye baktığı; nereye hareket ettiğinin aksine. Yana adımda veya geri geri yürürken ikisi farklıdır. `NavigationMover.get_facing()` |
 | **Takip** (follow) | Kameranın koşan karakterin arkasına kendiliğinden dönmesi ve isteğe bağlı olarak eğimini yavaşça ayarlaması (`follow_movement`, `follow_pitch`) |
+| **Yürüyüş döngüsü** (gait cycle) | Sol ve sağ olmak üzere iki adım, 0 ile 1 arasında bir sayı olarak (`GroundCharacter.get_gait_cycle()`). Zamanı değil, kat edilen mesafeyi izler |
 | **Gidiş yönü** (heading) | Karakterin hareket ettiği yön. `NavigationMover.get_heading()` |
 | **Kahraman görünümü** (hero look) | Oyuncunun karakterinin giyebileceği on modelden biri; ayarlarda numarayla seçilir (`CharacterAppearance`) |
 | **Basılı tutma** (hold) | Sol tuşun basılı tutma gecikmesinden uzun süre basılı tutulması. Karakter imlecin peşinden koşar |
@@ -34,6 +37,7 @@ Terimler, bu belgelerde ve kodda kullanıldıkları anlamıyla.
 | **Yana adım** (sidestep) | Sağ tuşla kullanılan bir tuş modu: karakter yana veya geriye hareket ederken kameranın baktığı yöne bakmayı sürdürür |
 | **Siluet** (silhouette) | Bir şey karakteri gizlediğinde onun konturlu düz bir şekil olarak çizilmesi (`OccludedSilhouette`) |
 | **Depar** (sprint) | Shift basılıyken veya açık konumdayken dayanıklılık harcayarak daha hızlı (×1,5) koşma |
+| **Basamak yüksekliği** (stair height) | Karakterin zıplamadan çıktığı en yüksek basamak: 0,3 m (`GroundCharacter.max_step_height`) |
 | **Dayanıklılık** (stamina) | Depar rezervi (`Stamina`): deparda harcanır, bir duraklamadan sonra yenilenir |
 | **Yönlendirme** (steer) | Yolsuz olarak bir yöne koşma: `NavigationMover.steer()`. Tuşu basılı tutmak varsayılan olarak imlece doğru yönlendirir |
 | **Tik** (tick) | Bir fizik adımı; saniyede 60 |

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
+<!-- translation of docs/en/getting-started.md @ e13fbe9f2ef5 -->
 # Primeros pasos
 
 > Esta es una traducción del [original en inglés](../en/getting-started.md).
@@ -36,8 +36,8 @@ Lugares a los que ir:
   se verá como una silueta detrás de ellas.
 - **Campamento de Viajeros** al este y **Granja del Pozo** al suroeste, con NPC.
 - **Cumbre de los Vientos**, la montaña del noreste: haz clic en la cima y el héroe toma el sendero en espiral.
-- El laberinto de setos, la plataforma con su rampa y la trampa en forma de U cerca del punto de aparición, para
-  probar la búsqueda de rutas.
+- El laberinto de setos, la plataforma con su rampa y su escalera, y la trampa en forma de U cerca del punto de
+  aparición, para probar la búsqueda de rutas.
 - Los diez aspectos del héroe en fila junto al muro sur. Elige uno en Configuración → Personaje → **Aspecto del
   héroe**.
 

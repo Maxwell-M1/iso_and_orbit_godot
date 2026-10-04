@@ -25,6 +25,9 @@ extends Node
 
 @export var fps_counter: Control
 
+## The panel with the character's state and events.
+@export var character_state: Control
+
 ## Hint lines about the keys with RMB, sprint and jump: they hide when these are turned off.
 @export var keys_help: Control
 @export var strafe_help: Control
@@ -137,3 +140,6 @@ func _apply(key: StringName, value: Variant) -> void:
 		GameSettings.FPS_COUNTER:
 			if fps_counter != null:
 				fps_counter.visible = value
+		GameSettings.CHARACTER_STATE:
+			if character_state != null:
+				character_state.visible = value

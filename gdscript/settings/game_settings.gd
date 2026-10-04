@@ -70,6 +70,8 @@ const SOUND_JUMP := &"sound/jump"
 const SOUND_SPRINT := &"sound/sprint"
 const HELP := &"interface/help"
 const PATH_LINE := &"interface/path_line"
+## The panel with what the character is doing and its latest events ([CharacterMonitor]).
+const CHARACTER_STATE := &"interface/character_state"
 
 ## Default values; their type is the type of the setting.
 const DEFAULTS := {
@@ -109,6 +111,7 @@ const DEFAULTS := {
 	SOUND_SPRINT: false,
 	HELP: true,
 	PATH_LINE: false,
+	CHARACTER_STATE: false,
 }
 
 ## Keys that no longer exist: they are removed from the file on load.

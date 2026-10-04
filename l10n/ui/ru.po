@@ -294,6 +294,10 @@ msgid "Character path line"
 msgstr "Линия пути персонажа"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Character state and events"
+msgstr "Состояние персонажа и события"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Sound"
 msgstr "Звук"
 
@@ -412,6 +416,98 @@ msgstr "Скорость: %.1f м/с"
 #: addons/iso_orbit/points_of_interest/discovery_toast.gd
 msgid "Discovered: %s"
 msgstr "Открыто место: %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "jump"
+msgstr "прыжок"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left the ground"
+msgstr "оторвался от земли"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Speed %.1f m/s · blend %.2f"
+msgstr "Скорость %.1f м/с · смешивание %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Forward %+.2f · right %+.2f"
+msgstr "Вперёд %+.2f · вправо %+.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Turning %+.0f°/s"
+msgstr "Поворот %+.0f°/с"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "On the ground · slope %.0f°"
+msgstr "На земле · уклон %.0f°"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "In the air %.2f s · vertical %+.1f m/s"
+msgstr "В воздухе %.2f с · по вертикали %+.1f м/с"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Step %d · %s · cycle %.2f"
+msgstr "Шаг %d · %s · цикл %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Stamina %d%%"
+msgstr "Силы %d%%"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "exhausted"
+msgstr "выдохся"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Standing"
+msgstr "На месте"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Running"
+msgstr "Бег"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Sprinting"
+msgstr "Бег с ускорением"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Jumping"
+msgstr "Прыжок"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Falling"
+msgstr "Падение"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "step, %s"
+msgstr "шаг, %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "touched the ground at %.1f m/s"
+msgstr "коснулся земли на %.1f м/с"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "landing at %.1f m/s"
+msgstr "приземление на %.1f м/с"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint started"
+msgstr "ускорение началось"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint ended"
+msgstr "ускорение закончилось"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "%.2f s"
+msgstr "%.2f с"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left foot"
+msgstr "левая нога"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "right foot"
+msgstr "правая нога"
 
 #: gdscript/ui/settings/settings_screen.gd
 msgid " (%d Hz)"

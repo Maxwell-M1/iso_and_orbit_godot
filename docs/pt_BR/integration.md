@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 69adeef2aab9 -->
+<!-- translation of docs/en/integration.md @ 15ab3be62c8a -->
 # Usando no seu projeto
 
 > Esta é uma tradução do [original em inglês](../en/integration.md).
@@ -97,7 +97,8 @@ func _physics_process(delta: float) -> void:
 
 `LedgeGuard` é opcional: um filho do corpo, de `addons/iso_orbit/ground_character/`. Para a corrida rápida, defina
 `mover.sprinting = true`: o limite de velocidade é multiplicado por `LocomotionSettings.sprint_speed_multiplier`. Todo
-o resto do `GroundCharacter` (pulo, fôlego, sinais de passos, o giro suave do modelo) fica então por sua conta.
+o resto do `GroundCharacter` (pulo, fôlego, degraus, o estado e seus sinais, o giro suave do modelo) fica então por
+sua conta.
 
 ## Comandando o movimentador
 

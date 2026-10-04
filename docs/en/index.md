@@ -26,7 +26,8 @@ English page is correct.
 ## Systems
 
 - [Locomotion](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  sprint and stamina, the jump, the ledge guard.
+  what the character reports for animations and the interface, `CharacterMonitor`, stairs and slopes, sprint and
+  stamina, the jump, the ledge guard.
 - [Camera](systems/camera.md): `OrbitCameraRig` (orbit, zoom curve, follow) and `CameraArm` (obstacles, pull-in,
   fading).
 - [Input](systems/input.md): `PointClickMoveInput` (click, hold, keys, the cursor) and `CharacterActionInput`.

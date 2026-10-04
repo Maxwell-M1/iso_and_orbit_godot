@@ -89,7 +89,7 @@ func _physics_process(delta: float) -> void:
 
 `LedgeGuard` is optional: a child of the body, from `addons/iso_orbit/ground_character/`. To sprint, set
 `mover.sprinting = true`: the speed limit rises by `LocomotionSettings.sprint_speed_multiplier`. Everything else in
-`GroundCharacter` (jump, stamina, step signals, the smooth model turn) is then up to you.
+`GroundCharacter` (jump, stamina, stairs, the state and its signals, the smooth model turn) is then up to you.
 
 ## Commanding the mover
 

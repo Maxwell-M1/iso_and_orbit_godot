@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
+<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
 # Configuración
 
 > Esta es una traducción del [original en inglés](../en/settings.md).
@@ -86,6 +86,7 @@ giros: la cámara gira cada fotograma, el personaje solo cada tick.
 | **Contador de FPS** | `interface/fps_counter` | activado | Visibilidad de `Hud/FpsCounter` |
 | **Ayuda de controles y velocidad** | `interface/help` | activado | Visibilidad de `Hud/Panel` |
 | **Línea de ruta del personaje** | `interface/path_line` | desactivado | Visibilidad de `PathView` |
+| **Estado del personaje y eventos** | `interface/character_state` | desactivado | Visibilidad de `Hud/CharacterState` (`CharacterMonitor`) |
 
 La escala de la interfaz cambia la ayuda, el contador de FPS, la barra de resistencia y las ventanas, no la vista 3D.
 100% es el tamaño tal como está diseñado en las escenas.

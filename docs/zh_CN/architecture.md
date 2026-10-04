@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
+<!-- translation of docs/en/architecture.md @ 566cc270b5a0 -->
 # 架构
 
 > 本文是[英文原文](../en/architecture.md)的翻译。两者不一致时，以英文版为准。
@@ -28,7 +28,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        点击位置地面上的圆环
 ├── PathView           NavigationPathView：调试用路径线，默认隐藏
-├── Hud                操作提示和速度、FpsCounter、DiscoveryToast、StaminaBar
+├── Hud                操作提示和速度、FpsCounter、CharacterState、DiscoveryToast、StaminaBar
 ├── SettingsApplier    设置 → 节点属性（仅限演示）
 └── UiRoot             游戏上层的窗口：设置窗口
 ```
@@ -47,9 +47,9 @@ Main (Node3D)
 Shift, Space ──► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                     信号：stepped, jumped, landed, sprint_changed
+                信号：state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway, 以及其他任何对象
+                              CharacterSounds, HandSway, CharacterMonitor, 动画, 以及其他任何对象
 
 鼠标 ──► OrbitCameraRig ──► CameraArm ──► Camera3D
          (跟随目标的插值位置、环绕、缩放、可选的跟随模式)
@@ -66,8 +66,8 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
    3. 如果缓冲了跳跃，且身体在地面上或刚离开地面（土狼时间），则开始跳跃；
    4. 在空中时加上重力乘以 `gravity_scale`；
    5. 除非角色正在跳跃，否则让 `LedgeGuard.constrain()` 将速度转为沿边缘方向；
-   6. 调用 `move_and_slide()`；
-   7. 发出 `landed` 和 `stepped`，并将 `Visual` 转向 `mover.get_facing()`。
+   6. 调用 `move_and_slide()`，在它之前走上台阶，在它之后走下台阶（`max_step_height`）；
+   7. 发出 `left_floor`、`touched_floor`、`landed` 和 `stepped`，将 `Visual` 转向 `mover.get_facing()`，如果状态发生了变化，再发出 `state_changed`。
 3. `HandSway` 在身体之后运行（`process_physics_priority = 1`），根据身体的新状态移动手部。
 
 `PointClickMoveInput._physics_process` 在一处决定由谁驱动角色：按住的鼠标按键，否则是配合右键的按键。它调用 `move_to()`、`steer()` 或 `stop()`。移动器保存最后一条命令，身体在下次调用 `compute_velocity()` 时取用。
@@ -88,12 +88,13 @@ Shift, Space ──► CharacterActionInput ──sprint_requested──► Grou
 | | `PointClickMoveInput`（Node） | 鼠标和右键 + WASD → 移动器命令；隐藏光标并修正其瞄准 |
 | | `ClickMarker`（Node3D） | 点击位置的标记（`click_marker.tscn`） |
 | | `NavigationPathView`（MeshInstance3D） | 绘制移动器的剩余路径 |
-| `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、跳跃、带体力的冲刺、`move_and_slide()`、转动模型；脚步、跳跃、落地和冲刺信号 |
+| `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、跳跃、带体力的冲刺、台阶、`move_and_slide()`、转动模型；报告自身的状态、脚步、起跳和落地，供动画、声音和界面使用 |
 | | `LedgeGuard`（Node） | 在落差处让身体停下，或让它沿边缘滑行 |
 | | `Stamina`（Node） | 会消耗和恢复的储备值；不关心是什么在消耗它 |
 | | `CharacterActionInput`（Node） | 冲刺和跳跃按键 → 角色 |
 | | `CharacterSounds`（Node3D） | 根据角色的信号播放声音 |
 | | `HandSway`（Node） | 随脚步摆动手部节点，起步、停下、转向和落地时带有惯性 |
+| | `CharacterMonitor`（Label） | 以文本显示角色的状态和最近的事件；可以把事件记录到输出中 |
 | | `CharacterAppearance`（Node） | 在运行时替换角色模型 |
 | | `StaminaBar`（ProgressBar） | HUD 上的体力条（`stamina_bar.tscn`） |
 | `occluded_silhouette` | `OccludedSilhouette`（Node） | 在角色被遮挡处将其绘制为剪影；其着色器和材质位于同一文件夹 |

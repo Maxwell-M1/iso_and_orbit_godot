@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 958e422b4a78 -->
+<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
 # Problemas conocidos
 
 > Esta es una traducción del [original en inglés](../en/known-issues.md).
@@ -10,8 +10,13 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 
 - **Solo mouse y teclado.** No hay soporte para gamepad.
 - **Sin animaciones.** Los modelos son primitivas estáticas; solo el objeto en la mano se balancea con los pasos
-  (`HandSway`). `NavigationMover.get_speed()` y `GroundCharacter.get_step_phase()` están ahí para controlar un
-  `AnimationTree`.
+  (`HandSway`). `GroundCharacter` informa de lo que necesita un `AnimationTree`: el estado, la velocidad como valor de
+  mezcla, el movimiento en los ejes del modelo y el ciclo de la marcha, ver
+  [Locomoción](systems/locomotion.md#lo-que-informa-el-personaje).
+- **Una cápsula en una escalera.** La parte inferior redonda de la cápsula rueda sobre el borde de cada escalón: en una
+  escalera la velocidad horizontal baja a cerca del 70% durante un tick por escalón, y el cuerpo se coloca sobre el
+  escalón hasta unos centímetros más adelante. Para una escalera larga, un colisionador de rampa invisible es más suave,
+  ver [Locomoción](systems/locomotion.md#escalones-y-pendientes).
 - **Sin evasión entre personajes.** `NavigationMover` sigue una ruta y no usa la evasión de navegación, así que los
   personajes en movimiento no se esquivan entre sí. El cuerpo del jugador está en la capa 2 y solo colisiona con la
   capa 1, así que dos personajes creados a partir de `player.tscn` se atraviesan; agrega la capa 2 a su

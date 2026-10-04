@@ -1,8 +1,8 @@
 extends SceneTree
 ## Windowless checks of the demo: running and navigation, the world and the characters in it, the hero look, sprint
-## and jump, mouse and keys, the camera and its arm, the settings window, interface languages. The check suites are
-## [code]tests/*_checks.gd[/code] (the base is [code]tests/check_suite.gd[/code]); they run in the order of
-## [constant SUITES] on the same main scene.
+## and jump, what the character reports, stairs and slopes, mouse and keys, the camera and its arm, the settings
+## window, interface languages. The check suites are [code]tests/*_checks.gd[/code] (the base is
+## [code]tests/check_suite.gd[/code]); they run in the order of [constant SUITES] on the same main scene.
 ##
 ## Run from the project folder (saves nothing, exit code 1 on failure):
 ##   godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd
@@ -18,6 +18,7 @@ const SUITES := [
 	preload("res://tests/world_checks.gd"),
 	preload("res://tests/hero_look_checks.gd"),
 	preload("res://tests/character_actions_checks.gd"),
+	preload("res://tests/character_state_checks.gd"),
 	preload("res://tests/input_checks.gd"),
 	preload("res://tests/camera_checks.gd"),
 	preload("res://tests/camera_arm_checks.gd"),

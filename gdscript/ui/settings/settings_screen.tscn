@@ -702,6 +702,12 @@ text = "Character path line"
 script = ExtResource("2_check")
 key = &"interface/path_line"
 
+[node name="CharacterState" type="CheckButton" parent="Center/Window/Layout/Tabs/Interface/Page/List"]
+layout_mode = 2
+text = "Character state and events"
+script = ExtResource("2_check")
+key = &"interface/character_state"
+
 [node name="Sound" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
 visible = false
 layout_mode = 2

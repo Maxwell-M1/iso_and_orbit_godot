@@ -29,7 +29,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        the ring on the ground at a clicked point
 ├── PathView           NavigationPathView: the debug path line, hidden by default
-├── Hud                controls hint and speed, FpsCounter, DiscoveryToast, StaminaBar
+├── Hud                controls hint and speed, FpsCounter, CharacterState, DiscoveryToast, StaminaBar
 ├── SettingsApplier    settings → node properties (demo only)
 └── UiRoot             windows over the game: the settings window
 ```
@@ -49,9 +49,9 @@ mouse, WASD ──► PointClickMoveInput ──move_to(point)────► Na
 Shift, Space ──► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                     signals: stepped, jumped, landed, sprint_changed
+                signals: state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway, anything else
+                              CharacterSounds, HandSway, CharacterMonitor, animations, anything else
 
 mouse ──► OrbitCameraRig ──► CameraArm ──► Camera3D
           (follows the target's interpolated position, orbit, zoom, optional follow)
@@ -70,8 +70,9 @@ it returns a velocity when the body asks for one. The camera and the input do no
    3. starts a jump if one is buffered and the body is on the floor or just left it (coyote time);
    4. adds gravity times `gravity_scale` in the air;
    5. lets `LedgeGuard.constrain()` turn the velocity along an edge, unless the character is jumping;
-   6. calls `move_and_slide()`;
-   7. emits `landed` and `stepped`, and turns `Visual` toward `mover.get_facing()`.
+   6. calls `move_and_slide()`, stepping onto a stair before it and down a stair after it (`max_step_height`);
+   7. emits `left_floor`, `touched_floor`, `landed` and `stepped`, turns `Visual` toward `mover.get_facing()` and, if
+      the state changed, emits `state_changed`.
 3. `HandSway` runs after the body (`process_physics_priority = 1`) and moves the hand from the body's new state.
 
 `PointClickMoveInput._physics_process` decides in one place who drives the character: a held mouse button, or else
@@ -97,12 +98,13 @@ named after its class in snake case: `OrbitCameraRig` is `addons/iso_orbit/orbit
 | | `PointClickMoveInput` (Node) | Mouse and RMB + WASD → mover commands; hides and re-aims the cursor |
 | | `ClickMarker` (Node3D) | The marker at a clicked point (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Draws the mover's remaining path |
-| `ground_character` | `GroundCharacter` (CharacterBody3D) | Gravity, jump, sprint with stamina, `move_and_slide()`, turning the model; signals for steps, jumps, landings and sprinting |
+| `ground_character` | `GroundCharacter` (CharacterBody3D) | Gravity, jump, sprint with stamina, stairs, `move_and_slide()`, turning the model; reports its state, steps, take-offs and landings for animations, sounds and the interface |
 | | `LedgeGuard` (Node) | Stops the body at a drop or slides it along the edge |
 | | `Stamina` (Node) | A reserve that is spent and recovers; knows nothing about what spends it |
 | | `CharacterActionInput` (Node) | Sprint and jump keys → the character |
 | | `CharacterSounds` (Node3D) | Plays sounds from the character's signals |
 | | `HandSway` (Node) | Swings a hand node with the steps, with inertia on starts, stops, turns and landings |
+| | `CharacterMonitor` (Label) | Shows the character's state and latest events as text; can log the events to the output |
 | | `CharacterAppearance` (Node) | Swaps the character model at runtime |
 | | `StaminaBar` (ProgressBar) | The stamina bar of the HUD (`stamina_bar.tscn`) |
 | `occluded_silhouette` | `OccludedSilhouette` (Node) | Draws the character as a silhouette where something hides it; its shaders and materials are in the same folder |

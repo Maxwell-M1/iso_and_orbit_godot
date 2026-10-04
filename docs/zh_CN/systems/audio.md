@@ -1,9 +1,9 @@
-<!-- translation of docs/en/systems/audio.md @ 161d8d8fc450 -->
+<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
 # 音频
 
 > 本文是[英文原文](../../en/systems/audio.md)的翻译。两者不一致时，以英文版为准。
 
-`GroundCharacter` 通过信号报告自身发生的事情：`stepped(sprinting)`、`jumped`、`landed(impact_speed)`、`sprint_changed(sprinting)`（见[移动](locomotion.md#信号)）。声音、脚下扬尘或动画连接到这些信号；角色本身对它们一无所知。演示连接的是声音。
+`GroundCharacter` 通过信号报告自身发生的事情；声音使用其中的 `stepped(sprinting)`、`jumped`、`landed(impact_speed)` 和 `sprint_changed(sprinting)`（全部信号见[移动](locomotion.md#角色报告的信息)）。声音、脚下扬尘或动画连接到这些信号；角色本身对它们一无所知。演示连接的是声音。
 
 ## CharacterSounds
 

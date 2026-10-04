@@ -6,12 +6,15 @@ Terms as this documentation and the code use them.
 |---|---|
 | **Agent radius** | How far the navigation mesh keeps from obstacles: 0.5 m, more than the character's 0.35 m capsule, so paths keep a margin from corners |
 | **Arm** | `CameraArm`: the node holding the camera at the end of a line from the target. The wheel sets its length; obstacles shorten it |
+| **Blend** | `GroundCharacter.get_locomotion_blend()`: the speed as a number for animations, 0 standing, 1 running, 2 sprinting |
 | **Camera-only body** | A body on physics layer 3 (`camera`): it stops the camera arm, but clicks, navigation and characters ignore it |
+| **Character state** | What the character is doing: standing, running, sprinting, jumping or falling (`GroundCharacter.get_state()`, the signal `state_changed`) |
 | **Click** | A press of the left button released within the hold delay. The character runs along a path to the point where the button was pressed |
 | **Coyote time** | A short time after walking off an edge when a jump still works (0.1 s) |
 | **Exhausted** | The state after stamina runs out: no sprinting until stamina recovers to `recover_ratio` (30%) |
 | **Facing** | Where the character looks, as opposed to where it moves. They differ when sidestepping or backing up. `NavigationMover.get_facing()` |
 | **Follow** | The camera turning behind the running character by itself, and optionally easing its tilt (`follow_movement`, `follow_pitch`) |
+| **Gait cycle** | Two steps, the left and the right, as a number from 0 to 1 (`GroundCharacter.get_gait_cycle()`). It follows the distance covered, not time |
 | **Heading** | The direction the character moves. `NavigationMover.get_heading()` |
 | **Hero look** | One of the ten models the player's character can wear, chosen by number in the settings (`CharacterAppearance`) |
 | **Hold** | The left button held longer than the hold delay. The character runs after the cursor |
@@ -31,6 +34,7 @@ Terms as this documentation and the code use them.
 | **Sidestep** | A keys mode with the right button: the character keeps facing where the camera looks while moving sideways or backward |
 | **Silhouette** | The character drawn as a flat shape with an outline where something hides it (`OccludedSilhouette`) |
 | **Sprint** | Running faster (×1.5) while Shift is held or toggled, spending stamina |
+| **Stair height** | The highest stair the character steps onto without a jump: 0.3 m (`GroundCharacter.max_step_height`) |
 | **Stamina** | The sprint reserve (`Stamina`): spent while sprinting, recovers after a pause |
 | **Steer** | Running in a direction without a path: `NavigationMover.steer()`. Holding the button steers toward the cursor by default |
 | **Tick** | One physics step; 60 per second |

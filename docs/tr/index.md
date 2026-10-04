@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ b40c280f0207 -->
+<!-- translation of docs/en/index.md @ de83e592921c -->
 # Belgeler
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · **Türkçe** · [简体中文](../zh_CN/index.md)
@@ -29,7 +29,8 @@ doğrudur.
 ## Sistemler
 
 - [Hareket](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  depar ve dayanıklılık, zıplama, kenar koruması.
+  karakterin animasyonlar ve arayüz için bildirdikleri, `CharacterMonitor`, basamaklar ve eğimler, depar ve
+  dayanıklılık, zıplama, kenar koruması.
 - [Kamera](systems/camera.md): `OrbitCameraRig` (yörünge, yakınlaştırma eğrisi, takip) ve `CameraArm` (engeller,
   yaklaşma, saydamlaşma).
 - [Girdi](systems/input.md): `PointClickMoveInput` (tıklama, basılı tutma, tuşlar, imleç) ve `CharacterActionInput`.

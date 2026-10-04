@@ -6,7 +6,12 @@ Limitations of the project and engine quirks it works around. Each entry says wh
 
 - **Mouse and keyboard only.** There is no gamepad support.
 - **No animations.** The models are static primitives; only the held item swings with the steps (`HandSway`).
-  `NavigationMover.get_speed()` and `GroundCharacter.get_step_phase()` are there to drive an `AnimationTree`.
+  `GroundCharacter` reports what an `AnimationTree` needs: the state, the speed as a blend value, the movement in the
+  model's axes and the gait cycle, see [Locomotion](systems/locomotion.md#what-the-character-reports).
+- **A capsule on stairs.** The round bottom of the capsule rolls over each stair edge: on stairs the horizontal speed
+  drops to about 70% for one tick per stair, and the body is put up to a few centimeters ahead onto the stair. For a
+  long flight of stairs an invisible ramp collider is smoother, see
+  [Locomotion](systems/locomotion.md#stairs-and-slopes).
 - **No avoidance between characters.** `NavigationMover` follows a path and does not use navigation avoidance, so
   moving characters do not steer around each other. The player's body is on layer 2 and collides only with layer 1,
   so two characters made from `player.tscn` pass through each other; add layer 2 to their `collision_mask` if they

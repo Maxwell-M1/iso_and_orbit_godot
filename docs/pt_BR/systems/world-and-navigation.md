@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
 # Mundo e navegação
 
 > Esta é uma tradução do [original em inglês](../../en/systems/world-and-navigation.md).
@@ -9,9 +9,10 @@ de primitivas e shaders; os padrões finos das superfícies vêm de texturas pr�
 
 ## O nível
 
-- **O centro** é o ponto de spawn. Em volta dele: um anel de colunas em ruínas, uma armadilha em forma de U aberta
-  para o spawn, um muro longo com uma abertura, caixotes, um bosque, um labirinto de sebes e uma plataforma de 1,6 m
-  que só pode ser alcançada pela rampa. Os testes usam tudo isso, então essas coisas ficam onde estão.
+- **O centro** é o ponto de spawn. Em volta dele: um anel de colunas em ruínas, uma armadilha em forma de U aberta para
+  o spawn, um muro longo com uma abertura, caixotes, um bosque, um labirinto de sebes e uma plataforma de 1,6 m com uma
+  rampa no lado oeste e uma escada no lado leste (sete degraus de 0,2 m com pisos de 0,4 m). Os testes usam tudo isso,
+  então essas coisas ficam onde estão.
 - **As estradas** são faixas de terra da cerca sul, pela abertura no muro, até o spawn e daí até a montanha, as ruínas,
   o acampamento e a rampa; a estrada do sítio se ramifica ao sul do muro. Elas são só um padrão (os segmentos `ROADS`
   em `shared/world/terrain.gdshaderinc`) e não afetam o movimento. O chão e a grama suave no pé da montanha as
@@ -61,7 +62,7 @@ folhas, casca, grão da pedra) vem de texturas pré-calculadas, veja abaixo.
 
 | Superfície | Shader | Aparência |
 |---|---|---|
-| Muros, plataforma, rampa | `stone_masonry` | Blocos em fiadas desencontradas com juntas, cada bloco com tom, grão e lascas próprios, relevo pela normal, sujeira e musgo perto do chão. O topo é uma fiada de pedras atravessadas no lado curto |
+| Muros, plataforma, rampa, escada | `stone_masonry` | Blocos em fiadas desencontradas com juntas, cada bloco com tom, grão e lascas próprios, relevo pela normal, sujeira e musgo perto do chão. O topo é uma fiada de pedras atravessadas no lado curto |
 | Labirinto de sebes | `hedge_foliage` | Duas camadas de folhas, cada uma com rotação, tamanho, tom e inclinação próprios; a sombra da profundidade do arbusto nas falhas; laterais irregulares como um arbusto podado |
 | Caixotes, cerca | `wood_planks` | Tábuas com anéis de crescimento, fibras, nós e frestas. Os caixotes têm uma moldura de tábuas em cada face, uma travessa diagonal e pregos; a cerca tem tábuas longas desgastadas sobre postes a cada 2,5 m |
 | Colunas, poço | `stone_column` | Caneluras em volta da circunferência pela normal, tambores de 0,8 m com juntas a partir do chão, uma base lisa, manchas escorridas, rachaduras raras, líquen, musgo perto do chão. O poço usa alvenaria de blocos em círculo (`blocks_around`) |
@@ -165,16 +166,18 @@ navegação é gerada a partir das colisões da camada 1 com um raio do agente d
 | `agent_height` | 1,75 m | |
 | `agent_max_slope` | 40° | As encostas da montanha ficam fora da malha |
 | `cell_height` | 0,025 m | Fina o bastante para medir a escalada abaixo |
-| `agent_max_climb` | 0,075 m (3 células) | Abaixo da borda de 0,1 m em que o corpo consegue subir |
+| `agent_max_climb` | 0,3 m (12 células) | Os degraus em que o personagem sobe (`GroundCharacter.max_step_height`) |
 | `geometry_collision_mask` | camada 1 | Só os obstáculos contam |
 
-**Um caminho nunca leva a uma borda mais alta do que o corpo consegue subir.** A cápsula do `CharacterBody3D` sobe numa
-borda de no máximo `r·(1 − cos floor_max_angle)` = 0,35 × (1 − cos 45°) ≈ 0,1 m. A malha era gerada com
-`agent_max_climb` = 0,25 m e `cell_height` = 0,25 m, e o Recast mede alturas em células inteiras, então tratava uma
-borda de quase 0,5 m como transitável: o caminho até a plataforma entrava na rampa pela lateral, onde a borda dela fica
-0,4 m acima do chão, e o personagem batia nela. Agora uma borda acima de 0,075 m não é ligada, e a rampa (uma subida de
-0,067 m por célula de 0,25 m) fica inteira. A altura de célula do mapa de navegação não pode passar da altura de célula
-da malha (senão a engine avisa), então o `project.godot` define `navigation/3d/default_cell_height` como 0,025.
+**Um caminho nunca leva a uma borda mais alta do que o corpo consegue subir.** `GroundCharacter` sobe degraus de até
+`max_step_height` (0,3 m), então a malha liga bordas de até 0,3 m (`agent_max_climb`) e não mais altas: os degraus a
+leste da plataforma são ligados, a borda de 1,6 m da plataforma e as laterais da rampa acima de 0,3 m não. O Recast mede
+alturas em células inteiras, então as células precisam ser finas. A malha era gerada com `agent_max_climb` = 0,25 m e
+`cell_height` = 0,25 m, e tratava uma borda de quase 0,5 m como transitável: o caminho até a plataforma entrava na rampa
+pela lateral, onde a borda dela fica 0,4 m acima do chão, e o personagem batia nela. Com células de 0,025 m, a escalada
+é medida com precisão de 2,5 cm. A altura de célula do mapa de navegação não pode passar da altura de célula da malha
+(senão a engine avisa), então o `project.godot` define `navigation/3d/default_cell_height` como 0,025. Se você mudar
+`max_step_height`, defina `agent_max_climb` com o mesmo valor e gere a malha de novo.
 
 Uma malha do Recast fica suspensa cerca de duas alturas de célula acima do chão (0,05 m aqui; era 0,5 m com as antigas
 células de 0,25 m). É por isso que o `NavigationMover` compara os pontos do caminho no plano horizontal, veja

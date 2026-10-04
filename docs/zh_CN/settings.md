@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 60ac8a94fbe7 -->
+<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
 # 设置
 
 > 本文是[英文原文](../en/settings.md)的翻译。两者不一致时，以英文版为准。
@@ -71,6 +71,7 @@ F10 打开设置窗口并暂停游戏；按 Esc 或 F10 关闭。更改立即生
 | **FPS 计数器** | `interface/fps_counter` | 开 | `Hud/FpsCounter` 的可见性 |
 | **操作提示和速度** | `interface/help` | 开 | `Hud/Panel` 的可见性 |
 | **角色路径线** | `interface/path_line` | 关 | `PathView` 的可见性 |
+| **角色状态和事件** | `interface/character_state` | 关 | `Hud/CharacterState` 的可见性（`CharacterMonitor`） |
 
 界面缩放会改变提示、FPS 计数器、体力条和窗口的大小，不影响 3D 视图。100% 即场景中制作时的原始尺寸。
 

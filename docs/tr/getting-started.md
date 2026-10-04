@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ 8829e557c2f0 -->
+<!-- translation of docs/en/getting-started.md @ e13fbe9f2ef5 -->
 # Başlarken
 
 > Bu, [İngilizce orijinalin](../en/getting-started.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -35,7 +35,8 @@ Gidilecek yerler:
   onların arkasında siluet olarak görünür.
 - Doğuda **Yolcular Kampı** ve güneybatıda **Kuyu Başındaki Çiftlik**, NPC'lerle birlikte.
 - **Rüzgârlı Doruk**, kuzeydoğudaki dağ: zirvesine tıklayın, kahraman sarmal patikayı izler.
-- Yol bulmayı denemek için çalı labirenti, rampalı platform ve başlangıç noktasının yakınındaki U biçimli tuzak.
+- Yol bulmayı denemek için çalı labirenti, rampalı ve merdivenli platform ile başlangıç noktasının yakınındaki U biçimli
+  tuzak.
 - Güney duvarının yanında sıralanmış on kahraman görünümü. Birini Ayarlar → Karakter → **Kahraman görünümü** ile
   seçin.
 

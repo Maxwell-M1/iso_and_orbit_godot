@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ a8fe33886a8e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
 # Dünya ve navigasyon
 
 > Bu, [İngilizce orijinalin](../../en/systems/world-and-navigation.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -8,9 +8,10 @@ Demo seviyesi `shared/world/world.tscn` dosyasıdır: ahşap bir çitin ardında
 
 ## Seviye
 
-- **Merkez** başlangıç noktasıdır. Çevresinde: yıkık sütunlardan bir halka, başlangıç noktasına doğru açık U biçimli
-  bir tuzak, boşluklu uzun bir duvar, sandıklar, bir koru, bir çalı labirenti ve yalnızca rampasından çıkılabilen
-  1,6 m'lik bir platform. Testler bunların hepsini kullanır, bu yüzden yerlerinde kalırlar.
+- **Merkez** başlangıç noktasıdır. Çevresinde: yıkık sütunlardan bir halka, başlangıç noktasına doğru açık U biçimli bir
+  tuzak, boşluklu uzun bir duvar, sandıklar, bir koru, bir çalı labirenti ve batı yanında bir rampası, doğu yanında bir
+  merdiveni (0,2 m yüksekliğinde ve 0,4 m derinliğinde yedi basamak) olan 1,6 m'lik bir platform. Testler bunların
+  hepsini kullanır, bu yüzden yerlerinde kalırlar.
 - **Yollar**, güney çitinden duvardaki boşluktan geçerek başlangıç noktasına ve oradan dağa, harabelere, kampa ve
   rampaya uzanan toprak şeritlerdir; çiftliğin yolu duvarın güneyinden ayrılır. Yalnızca bir desendirler
   (`shared/world/terrain.gdshaderinc` içindeki `ROADS` segmentleri) ve hareketi etkilemezler. Zemin ve dağın
@@ -58,7 +59,7 @@ sıraları, tahtalar, çerçeveler ve direkler, ahşap iskelet, fıçı çıtala
 
 | Yüzey | Gölgelendirici | Görünümü |
 |---|---|---|
-| Duvarlar, platform, rampa | `stone_masonry` | Derzli, şaşırtmalı sıralarda bloklar; her bloğun kendi tonu, dokusu ve kırıkları, normal ile kabartma, zemine yakın kir ve yosun. Üstte kısa kenar boyunca dizilmiş bir sıra taş |
+| Duvarlar, platform, rampa, merdiven | `stone_masonry` | Derzli, şaşırtmalı sıralarda bloklar; her bloğun kendi tonu, dokusu ve kırıkları, normal ile kabartma, zemine yakın kir ve yosun. Üstte kısa kenar boyunca dizilmiş bir sıra taş |
 | Çalı labirenti | `hedge_foliage` | Her biri kendi dönüşü, boyutu, tonu ve eğimiyle iki yaprak katmanı; boşluklarda çalının derinliğinin gölgesi; budanmış bir çalı gibi düzensiz yanlar |
 | Sandıklar, çit | `wood_planks` | Yıllık halkalı, lifli, budaklı ve aralıklı tahtalar. Sandıkların her yüzünde bir tahta çerçeve, çapraz bir destek ve çiviler var; çitte her 2,5 m'de bir direkler üzerinde yıpranmış uzun tahtalar |
 | Sütunlar, kuyu | `stone_column` | Normal ile çevre boyunca yivler, zeminden itibaren derzli 0,8 m'lik tamburlar, düz bir kaide, akıntı izleri, seyrek çatlaklar, liken, zemine yakın yosun. Kuyu, daire boyunca dizilmiş bloklardan bir taş duvar deseni kullanır (`blocks_around`) |
@@ -160,17 +161,19 @@ köşelerden pay bırakır.
 | `agent_height` | 1,75 m | |
 | `agent_max_slope` | 40° | Dağın yamaçları örgünün dışında kalır |
 | `cell_height` | 0,025 m | Aşağıdaki tırmanmayı ölçecek kadar ince |
-| `agent_max_climb` | 0,075 m (3 hücre) | Gövdenin üzerine çıkabildiği 0,1 m'lik çıkıntının altında |
+| `agent_max_climb` | 0,3 m (12 hücre) | Karakterin çıkabildiği basamaklar (`GroundCharacter.max_step_height`) |
 | `geometry_collision_mask` | 1. katman | Yalnızca engeller sayılır |
 
-**Bir yol hiçbir zaman gövdenin tırmanabileceğinden yüksek bir çıkıntıya çıkmaz.** `CharacterBody3D` kapsülü en fazla
-`r·(1 − cos floor_max_angle)` = 0,35 × (1 − cos 45°) ≈ 0,1 m yüksekliğindeki bir çıkıntıya adım atabilir. Örgü
-önceden `cell_height` = 0,25 m ile `agent_max_climb` = 0,25 m olarak pişiriliyordu ve Recast yükseklikleri tam
-hücrelerle ölçtüğünden neredeyse 0,5 m'lik bir çıkıntıyı yürünebilir sayıyordu: platforma giden yol rampaya,
-kenarının zeminden 0,4 m yüksekte olduğu yandan giriyordu ve karakter ona çarpıyordu. Artık 0,075 m'nin üzerindeki
-bir çıkıntı birleştirilmez ve rampa (0,25 m'lik hücre başına 0,067 m yükselme) bütün kalır. Navigasyon haritasının
-hücre yüksekliği örgününkini aşmamalıdır (aksi hâlde motor uyarır), bu yüzden `project.godot`,
-`navigation/3d/default_cell_height` değerini 0,025 yapar.
+**Bir yol hiçbir zaman gövdenin tırmanabileceğinden yüksek bir çıkıntıya çıkmaz.** `GroundCharacter` en fazla
+`max_step_height` (0,3 m) yüksekliğindeki basamaklara çıkar, bu yüzden örgü 0,3 m'ye kadar olan çıkıntıları birleştirir
+(`agent_max_climb`), daha yükseklerini birleştirmez: platformun doğusundaki merdiven birleştirilir, platformun 1,6 m'lik
+kenarı ve rampanın 0,3 m'den yüksek yanları birleştirilmez. Recast yükseklikleri tam hücrelerle ölçer, bu yüzden
+hücreler ince olmalıdır. Örgü önceden `cell_height` = 0,25 m ile `agent_max_climb` = 0,25 m olarak pişiriliyordu ve
+neredeyse 0,5 m'lik bir çıkıntıyı yürünebilir sayıyordu: platforma giden yol rampaya, kenarının zeminden 0,4 m yüksekte
+olduğu yandan giriyordu ve karakter ona çarpıyordu. 0,025 m'lik hücrelerle tırmanma 2,5 cm hassasiyetle ölçülür.
+Navigasyon haritasının hücre yüksekliği örgününkini aşmamalıdır (aksi hâlde motor uyarır), bu yüzden `project.godot`,
+`navigation/3d/default_cell_height` değerini 0,025 yapar. `max_step_height` değerini değiştirirseniz `agent_max_climb`
+değerini de aynı değere ayarlayın ve örgüyü yeniden pişirin.
 
 Bir Recast örgüsü zeminin yaklaşık iki hücre yüksekliği üstünde durur (burada 0,05 m; eski 0,25 m'lik hücrelerle
 0,5 m idi). `NavigationMover` yol noktalarını bu yüzden yatay düzlemde karşılaştırır, bkz.

@@ -294,6 +294,10 @@ msgid "Character path line"
 msgstr "Karakter yol çizgisi"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Character state and events"
+msgstr "Karakter durumu ve olaylar"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Sound"
 msgstr "Ses"
 
@@ -412,6 +416,98 @@ msgstr "Hız: %.1f m/sn"
 #: addons/iso_orbit/points_of_interest/discovery_toast.gd
 msgid "Discovered: %s"
 msgstr "Keşfedildi: %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "jump"
+msgstr "zıplama"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left the ground"
+msgstr "yerden kesildi"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Speed %.1f m/s · blend %.2f"
+msgstr "Hız %.1f m/sn · karışım %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Forward %+.2f · right %+.2f"
+msgstr "İleri %+.2f · sağa %+.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Turning %+.0f°/s"
+msgstr "Dönüş %+.0f°/sn"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "On the ground · slope %.0f°"
+msgstr "Yerde · eğim %.0f°"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "In the air %.2f s · vertical %+.1f m/s"
+msgstr "Havada %.2f sn · dikey %+.1f m/sn"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Step %d · %s · cycle %.2f"
+msgstr "Adım %d · %s · döngü %.2f"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Stamina %d%%"
+msgstr "Dayanıklılık %%%d"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "exhausted"
+msgstr "tükendi"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Standing"
+msgstr "Duruyor"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Running"
+msgstr "Koşuyor"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Sprinting"
+msgstr "Depar atıyor"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Jumping"
+msgstr "Zıplıyor"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "Falling"
+msgstr "Düşüyor"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "step, %s"
+msgstr "adım, %s"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "touched the ground at %.1f m/s"
+msgstr "%.1f m/sn hızla yere değdi"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "landing at %.1f m/s"
+msgstr "%.1f m/sn hızla iniş"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint started"
+msgstr "depar başladı"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "sprint ended"
+msgstr "depar bitti"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "%.2f s"
+msgstr "%.2f sn"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "left foot"
+msgstr "sol ayak"
+
+#: addons/iso_orbit/ground_character/character_monitor.gd
+msgid "right foot"
+msgstr "sağ ayak"
 
 #: gdscript/ui/settings/settings_screen.gd
 msgid " (%d Hz)"

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 4e0c524b4d04 -->
+<!-- translation of docs/en/roadmap.md @ 6c3e4efdec59 -->
 # Roteiro
 
 > Esta é uma tradução do [original em inglês](../en/roadmap.md). Onde houver diferenças, a versão em inglês é a correta.
@@ -11,9 +11,10 @@ Trabalho planejado, sem ordem específica. Nada aqui foi implementado ainda.
 - **Um exemplo em C#** em `csharp/`, com os mesmos componentes e uma cena principal sobre `shared/world/world.tscn`.
   Os nomes de classes globais da versão em C# precisam ser diferentes dos de GDScript: `class_name` e `[GlobalClass]`
   compartilham um único namespace.
-- **Animações.** Controlar uma mistura parado/corrida (idle/run) num `AnimationTree` a partir de
-  `NavigationMover.get_speed()` e manter o ciclo de caminhada no ritmo de `GroundCharacter.get_step_phase()`, o ritmo
-  que os sons de passos já seguem.
+- **Animações.** Um modelo com rig e um `AnimationTree` controlado pelo que o `GroundCharacter` informa:
+  `get_locomotion_blend()` ou `get_local_movement()` para as misturas de parado, corrida e corrida rápida,
+  `get_gait_cycle()` para manter o ciclo da corrida em sincronia com o chão, o estado e os sinais de contato com o chão
+  para pulos e aterrissagens.
 
 ---
 

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ 38b9342d8085 -->
+<!-- translation of docs/en/architecture.md @ 566cc270b5a0 -->
 # Mimari
 
 > Bu, [İngilizce orijinalin](../en/architecture.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -32,7 +32,7 @@ Main (Node3D)
 │       └── Camera3D
 ├── ClickMarker        tıklanan noktada zemindeki halka
 ├── PathView           NavigationPathView: hata ayıklama yol çizgisi, varsayılan olarak gizli
-├── Hud                kontrol ipuçları ve hız, FpsCounter, DiscoveryToast, StaminaBar
+├── Hud                kontrol ipuçları ve hız, FpsCounter, CharacterState, DiscoveryToast, StaminaBar
 ├── SettingsApplier    ayarlar → düğüm özellikleri (yalnızca demo)
 └── UiRoot             oyunun üstündeki pencereler: ayarlar penceresi
 ```
@@ -52,9 +52,9 @@ fare, WASD ───► PointClickMoveInput ──move_to(point)────► 
 Shift, Boşluk ─► CharacterActionInput ──sprint_requested──► GroundCharacter ──► LedgeGuard.constrain()
                                       ──jump()────────────►  (CharacterBody3D)  ──► move_and_slide()
                                                                    │
-                                    sinyaller: stepped, jumped, landed, sprint_changed
+               sinyaller: state_changed, stepped, jumped, left_floor, touched_floor, landed, sprint_changed
                                                                    ▼
-                                                   CharacterSounds, HandSway, başka herhangi bir şey
+                         CharacterSounds, HandSway, CharacterMonitor, animasyonlar, başka herhangi bir şey
 
 fare ───► OrbitCameraRig ──► CameraArm ──► Camera3D
           (hedefin enterpole edilmiş konumunu izler, yörünge, yakınlaştırma, isteğe bağlı takip)
@@ -76,8 +76,9 @@ dokunmaz: gövde istediğinde bir hız döndürür. Kamera ve girdi birbirinden 
       zıplamayı başlatır;
    4. havadayken `gravity_scale` ile çarpılmış yerçekimini ekler;
    5. karakter zıplamıyorsa, hızı bir kenar boyunca çevirmesi için `LedgeGuard.constrain()` metodunu çağırır;
-   6. `move_and_slide()` çağırır;
-   7. `landed` ve `stepped` sinyallerini yayar ve `Visual` düğümünü `mover.get_facing()` yönüne çevirir.
+   6. `move_and_slide()` çağırır; ondan önce bir basamağa çıkar, ondan sonra bir basamak iner (`max_step_height`);
+   7. `left_floor`, `touched_floor`, `landed` ve `stepped` sinyallerini yayar, `Visual` düğümünü `mover.get_facing()`
+      yönüne çevirir ve durum değiştiyse `state_changed` sinyalini yayar.
 3. `HandSway` gövdeden sonra çalışır (`process_physics_priority = 1`) ve eli gövdenin yeni durumuna göre hareket
    ettirir.
 
@@ -105,12 +106,13 @@ betik, sınıfının snake case biçimindeki adını taşır: `OrbitCameraRig` i
 | | `PointClickMoveInput` (Node) | Fare ve sağ tuş + WASD → hareketlendirici komutları; imleci gizler ve yeniden hedefler |
 | | `ClickMarker` (Node3D) | Tıklanan noktadaki işaretçi (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Hareketlendiricinin kalan yolunu çizer |
-| `ground_character` | `GroundCharacter` (CharacterBody3D) | Yerçekimi, zıplama, dayanıklılıkla depar, `move_and_slide()`, modeli döndürme; adımlar, zıplamalar, inişler ve depar için sinyaller |
+| `ground_character` | `GroundCharacter` (CharacterBody3D) | Yerçekimi, zıplama, dayanıklılıkla depar, basamaklar, `move_and_slide()`, modeli döndürme; animasyonlar, sesler ve arayüz için durumunu, adımlarını, kalkışlarını ve inişlerini bildirir |
 | | `LedgeGuard` (Node) | Gövdeyi bir uçurumda durdurur ya da kenar boyunca kaydırır |
 | | `Stamina` (Node) | Harcanan ve yenilenen bir rezerv; onu neyin harcadığını bilmez |
 | | `CharacterActionInput` (Node) | Depar ve zıplama tuşları → karakter |
 | | `CharacterSounds` (Node3D) | Karakterin sinyallerine göre sesler çalar |
 | | `HandSway` (Node) | Bir el düğümünü adımlarla sallar; kalkışlarda, duruşlarda, dönüşlerde ve inişlerde ataletle |
+| | `CharacterMonitor` (Label) | Karakterin durumunu ve son olaylarını metin olarak gösterir; olayları çıktıya yazdırabilir |
 | | `CharacterAppearance` (Node) | Karakter modelini çalışma anında değiştirir |
 | | `StaminaBar` (ProgressBar) | HUD'un dayanıklılık çubuğu (`stamina_bar.tscn`) |
 | `occluded_silhouette` | `OccludedSilhouette` (Node) | Bir şey karakteri gizlediğinde onu siluet olarak çizer; gölgelendiricileri ve malzemeleri aynı klasördedir |

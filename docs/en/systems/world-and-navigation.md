@@ -6,8 +6,8 @@ from primitives and shaders; the fine surface patterns come from baked textures.
 ## The level
 
 - **The center** is the spawn point. Around it: a ring of ruined columns, a U-shaped trap open toward the spawn, a
-  long wall with a gap, crates, a grove, a hedge maze and a 1.6 m platform that can only be reached by its ramp. The
-  tests use all of these, so they stay where they are.
+  long wall with a gap, crates, a grove, a hedge maze and a 1.6 m platform with a ramp on its west side and stairs on
+  its east side (seven 0.2 m stairs with 0.4 m treads). The tests use all of these, so they stay where they are.
 - **Roads** are dirt strips from the south fence through the gap in the wall to the spawn and on to the mountain, the
   ruins, the camp and the ramp; the farmstead's road branches off south of the wall. They are only a pattern (the
   segments `ROADS` in `shared/world/terrain.gdshaderinc`) and do not affect movement. The ground and the gentle grass
@@ -56,7 +56,7 @@ grain) comes from baked textures, see below.
 
 | Surface | Shader | What it looks like |
 |---|---|---|
-| Walls, platform, ramp | `stone_masonry` | Blocks in offset courses with joints, each block with its own tint, grain and chips, relief through the normal, dirt and moss near the ground. The top is a course of stones across the short side |
+| Walls, platform, ramp, stairs | `stone_masonry` | Blocks in offset courses with joints, each block with its own tint, grain and chips, relief through the normal, dirt and moss near the ground. The top is a course of stones across the short side |
 | Hedge maze | `hedge_foliage` | Two layers of leaves, each with its own rotation, size, tint and tilt; the shadow of the bush's depth in the gaps; uneven sides like a trimmed bush |
 | Crates, fence | `wood_planks` | Planks with growth rings, fibers, knots and gaps. Crates have a plank frame on each face, a diagonal brace and nails; the fence has long weathered boards on posts every 2.5 m |
 | Columns, well | `stone_column` | Flutes around the circumference through the normal, 0.8 m drums with joints from the ground, a smooth base, streaks, rare cracks, lichen, moss near the ground. The well uses round block masonry (`blocks_around`) |
@@ -152,16 +152,18 @@ collisions with a 0.5 m agent radius; the character's capsule is 0.35 m, so path
 | `agent_height` | 1.75 m | |
 | `agent_max_slope` | 40° | The mountain's slopes stay off the mesh |
 | `cell_height` | 0.025 m | Fine enough to measure the climb below |
-| `agent_max_climb` | 0.075 m (3 cells) | Below the 0.1 m ledge the body can step onto |
+| `agent_max_climb` | 0.3 m (12 cells) | The stairs the character steps onto (`GroundCharacter.max_step_height`) |
 | `geometry_collision_mask` | layer 1 | Only obstacles count |
 
-**A path never leads onto a ledge higher than the body can climb.** The `CharacterBody3D` capsule steps onto a ledge
-no higher than `r·(1 − cos floor_max_angle)` = 0.35 × (1 − cos 45°) ≈ 0.1 m. The mesh used to be baked with
-`agent_max_climb` = 0.25 m at `cell_height` = 0.25 m, and Recast measures heights in whole cells, so it treated a
-ledge of almost 0.5 m as walkable: the path to the platform entered the ramp from the side, where its edge is 0.4 m
-above the ground, and the character ran into it. Now a ledge above 0.075 m is not joined, and the ramp (a rise of
-0.067 m per 0.25 m cell) stays whole. The navigation map's cell height must not exceed the mesh's (or the engine
-warns), so `project.godot` sets `navigation/3d/default_cell_height` to 0.025.
+**A path never leads onto a ledge higher than the body can climb.** `GroundCharacter` steps onto stairs up to
+`max_step_height` (0.3 m), so the mesh joins ledges up to 0.3 m (`agent_max_climb`) and no higher: the stairs east of
+the platform are joined, the platform's 1.6 m edge and the ramp's sides higher than 0.3 m are not. Recast measures
+heights in whole cells, so the cells must be fine. The mesh used to be baked with `agent_max_climb` = 0.25 m at
+`cell_height` = 0.25 m, and it treated a ledge of almost 0.5 m as walkable: the path to the platform entered the ramp
+from the side, where its edge is 0.4 m above the ground, and the character ran into it. With 0.025 m cells the climb
+is measured to 2.5 cm. The navigation map's cell height must not exceed the mesh's (or the engine warns), so
+`project.godot` sets `navigation/3d/default_cell_height` to 0.025. If you change `max_step_height`, set
+`agent_max_climb` to the same value and rebake.
 
 A Recast mesh hangs about two cell heights above the ground (0.05 m here; it was 0.5 m with the old 0.25 m cells).
 That is why `NavigationMover` compares path points in the horizontal plane, see

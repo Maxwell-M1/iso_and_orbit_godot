@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 64e56dbf9718 -->
+<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
 # Arayüz
 
 > Bu, [İngilizce orijinalin](../../en/systems/ui.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -91,10 +91,11 @@ Klavye ve tekerlek ölçeği hemen değiştirir.
 |---|---|---|
 | `Hud`, `Hud/Panel` | `Hud` üzerinde `gdscript/demo/hud.gd` | Kontrol ipuçları ve hız. Betik yalnızca hızı günceller; paneli `settings_applier.gd` gösterir veya gizler ve devre dışı özelliklerin satırlarını (sağ tuşla tuşlar, iki tuş + A/D, depar, zıplama) gizler |
 | `Hud/FpsCounter` | `FpsCounter` (Label) | Sağ üst köşede saniyedeki kare sayısı; duraklatılmışken de çalışır |
+| `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | FPS sayacının altında: kahramanın ne yaptığı (durum, hız ve karışım, hareket, dönüş, yerde veya havada, adımlar ve ayaklar, dayanıklılık) ve son olaylar. Varsayılan olarak gizlidir. Bkz. [Hareket](locomotion.md#charactermonitor-metin-olarak-durum) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | Oyuncu bir `PointOfInterest` alanına ilk kez girdiğinde `show_time` (3,5 sn) süresince "Keşfedildi: …". Tüm yerleri `points_of_interest` grubu üzerinden bulur; `show_discovery(title)` birini elle gösterir |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Dayanıklılık harcanmaya başladığında belirir, karakter bitkinken kırmızıya döner (`StaminaBarExhausted` varyasyonu) ve yeniden dolunca 0,6 sn içinde solar |
 
-İpucu paneli, FPS sayacı ve yol çizgisi Ayarlar → Arayüz içinde açılıp kapatılır.
+İpucu paneli, FPS sayacı, yol çizgisi ve karakter durumu paneli Ayarlar → Arayüz içinde açılıp kapatılır.
 
 ## Tema
 
