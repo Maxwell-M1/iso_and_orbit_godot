@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
+<!-- translation of docs/en/systems/camera.md @ 1850159bc3c5 -->
 # Kamera
 
 > Bu, [İngilizce orijinalin](../../en/systems/camera.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
@@ -96,10 +96,12 @@ atlar, örneğin hedef ışınlandıktan sonra; `is_rotating()`; `set_follow_pau
 
 Kol uzunluğunu tekerlek belirler; kol engellerde kısalır ve yer açıldığında o uzunluğa geri döner.
 
-- **Arkadakinde durma** (`keep_out_of_geometry`, varsayılan olarak açık). Kameranın arkasında dağ, duvar veya çatı
-  varsa kamera içine girmez, hedefe doğru yaklaşır. Dağa doğru yürüyün, kamera yamaca girmeden hedefe yaklaşır;
-  uzaklaşın, arkasında yer açılınca geri gider. Kol yalnızca kamera kolun ucunda duramıyorsa kısalır. Kamera ile
-  hedef arasında, arkasında yer olan bir sütun veya çit kamerayı oynatmaz: karakter siluet olarak görünür.
+- **Arkadakinde durma** (`keep_out_of_geometry`, varsayılan olarak açık). Kameranın arkasında dağ, duvar veya çatı varsa
+  kamera içine girmez, hedefe doğru yaklaşır. Dağa doğru yürüyün, kamera yamaca girmeden hedefe yaklaşır; uzaklaşın,
+  arkasında yer açılınca geri gider. Kol yalnızca kamera kolun ucunda duramıyorsa kısalır. Kamera ile hedef arasında,
+  arkasında yer olan bir sütun veya çit kamerayı oynatmaz: karakter siluet olarak görünür. Kamera böyle bir engelin
+  hemen arkasında, `probe_radius` değerinden daha yakında duracak olsaydı, orada ona yer yoktur ve kamera engelin önüne
+  geçer.
 - **Hedef gizlenince yaklaşma** (`pull_in_on_occlusion`, varsayılan olarak kapalı). Bir çit veya duvar hedefi
   neredeyse tamamen gizlerse kamera yumuşakça engelin önüne geçer, ancak hedefe hiçbir zaman `min_pull_in_length`
   (2,5 m) değerinden daha fazla yaklaşmaz. Karakter duvarın hemen dibinde duruyorsa kamera karakterin sırtına
@@ -120,7 +122,7 @@ Kol uzunluğunu tekerlek belirler; kol engellerde kısalır ve yer açıldığı
 | `occlusion_points` | göğüs, baş, dizler, yanlar | Görünürlüğü denetlenen hedef noktaları, kolun başlangıcına göre: sağ, yukarı, kameraya doğru |
 | `occlusion_share` | 0,75 | Noktaların bu payı gizlendiğinde hedef gizlenmiş sayılır. İnce bir direk veya ağaç gövdesi beşten üçünü gizler ve sayılmaz |
 | `occlusion_delay` | 0,25 sn | Kameranın yaklaşması için hedefin ne kadar süre gizli, geri çekilmesi için ne kadar süre görünür kalması gerektiği |
-| `return_delay`, `return_sharpness` | 0,3 sn; 4 | Kol anında kısalır ama bir duraklamadan sonra ve yumuşakça uzar; böylece kamera sütunlar arasında seğirmez |
+| `return_delay`, `return_sharpness` | 0,3 sn; 4 | Kol anında kısalır ama bir duraklamadan sonra ve yumuşakça uzar; böylece kamera sütunlar arasında seğirmez. Dönüş yolundaki bir gövdenin içinden geçilmez, üstünden atlanır |
 | `fade_target` | — | Yakında neyin yarı saydam olacağı (demoda `Player/Visual`) |
 | `fade_start_length`, `fade_end_length`, `fade_transparency` | 1,5 m; 0,7 m; 0,75 | Hedef ilk uzunlukta saydamlaşmaya başlar ve ikincisinde %75 saydamdır |
 | `debug_draw` | kapalı | Kolu (gri: tekerlek uzunluğu, yeşil: mevcut uzunluk), kamera küresini ve hedefin noktalarına giden ışınları (kırmızı: gizli) çiz. Başka bir kameradan görünür |
@@ -141,14 +143,21 @@ gövdeleri (2,4 m'ye kadar) en yakın yakınlaştırmada bile (zeminden 3 m yuka
 
 ### Kol, engelin arkasındaki boşluğu bir gövdenin içinde olmaktan nasıl ayırır
 
-Kol önce kameranın kolun ucunda durup duramayacağını denetler: küre orada hiçbir şeye değmemeli ve uç bir gövdenin
-içinde olmamalıdır. Kameradan hedefe giden bir ışın, içinden başladığı bir gövdenin yüzeylerini görmez; bu yüzden
-kameranın önündeki engelin uzak yüzeyini bulur. O yüzeyden kolun ucuna giden bir ışın, kameranın içinde bulunduğu
-gövdeye girer ve oradan hiç çıkmaz. Yolda bir şey varsa küre o yüzeyden kameraya doğru atılır ve diğerlerini geçerek
-yoldaki gövdenin önünde durur. Kolun yalnızca sıyırdığı bir sütun kamerayı oynatmaz.
+Kol önce kameranın kolun ucunda durup duramayacağını denetler: küre orada kameranın önündeki engel de dahil hiçbir şeye
+değmemeli ve uç bir gövdenin içinde olmamalıdır. Kameradan hedefe giden bir ışın, içinden başladığı bir gövdenin
+yüzeylerini görmez; bu yüzden kameranın önündeki engelin uzak yüzeyini bulur. O yüzeyden kolun ucuna giden bir ışın,
+kameranın içinde bulunduğu gövdeye girer ve oradan hiç çıkmaz. Yolda bir şey varsa küre o yüzeyden kameraya doğru atılır
+ve diğerlerini geçerek yoldaki gövdenin önünde durur. Kolun yalnızca sıyırdığı bir sütun kamerayı oynatmaz.
 
-Jolt, kürenin bir atımın başlangıcında temas ettiği gövdeleri bildirmez. Bu yüzden yüzeyin hemen arkasında başka bir
-gövde varsa (arkasında uçurum olan bir çit), boş alan hedefe daha yakında aranır.
+Jolt, kürenin bir atımın başlangıcında temas ettiği gövdeleri ve atımın içinden başladığı bir ağ gövdesini (dağ gibi)
+bildirmez. Bu yüzden yüzeyin hemen arkasında başka bir gövde varsa (arkasında uçurum olan bir çit) ya da atım başka bir
+gövdenin içinden başlayacaksa (birbirine yakın iki ince kaya çıkıntısı, kol neredeyse onlar boyunca uzanıyor), boş alan
+hedefe daha yakında aranır.
+
+Dönüş yolu da denetlenir. Kol yeniden uzamayı beklerken dönebilir ve koruduğu uzunlukta kamera bir duvarın içine
+düşebilir: o zaman kamera hemen boş uzunluğa geçer. Kamera ile döneceği yer arasında bir gövde varsa (kamera bir çitin
+önündeydi ve artık arkasında yer var), kamera duraklamadan sonra gövdenin içinden uçarak geçmek yerine onun üstünden
+atlar.
 
 ## Ölçülen davranış
 
@@ -166,11 +175,14 @@ gövde varsa (arkasında uçurum olan bir çit), boş alan hedefe daha yakında 
   Takip ve 20° eğimle sol tuşu basılı tutma: eğim 20°'ye giderken 1,25 sn'de 80°'den 22,5°'ye iner ve koşu yönü
   0,01° değişir.
 - Kol: açık alanda tam uzunluk; arkadaki bir uçurum onu anında durdurur; uçuruma doğru yürürken kamera yaklaşır ve
-  uçurumun dışında kalır; uçurum kalkınca kol bir duraklamadan sonra yumuşakça geri döner. Hemen arkasında uçurum
-  olan bir çit: kamera çitin önünde durur. Kamera ile karakter arasında yarı yolda bir çit: varsayılan olarak kamera
-  çitin arkasında kalır; yaklaşma açıkken yumuşakça önüne geçer ve kısa bir örtülme sayılmaz. Karakterin dibinde bir
-  çit: kamera karakterin sırtına sıçramaz. İnce bir direk sayılmaz, kolu sıyıran bir sütun kamerayı oynatmaz,
-  `camera_ignore` içindeki gövdeler onu durdurmaz ve çok yakında karakter yarı saydamdır.
+  uçurumun dışında kalır; uçurum kalkınca kol bir duraklamadan sonra yumuşakça geri döner. Hemen arkasında uçurum olan
+  bir çit: kamera çitin önünde durur. Kameranın hemen arkasındaki bir çit: kamera çitin önüne geçer. Kameranın dönmeyi
+  beklediği yerde beliren bir çit: kamera hemen çitin arkasına geçer. Kamera ile karakter arasında yarı yolda bir çit:
+  varsayılan olarak kamera çitin arkasında kalır; yaklaşma açıkken yumuşakça önüne geçer ve kısa bir örtülme sayılmaz.
+  Karakterin dibinde bir çit: kamera karakterin sırtına sıçramaz. İnce bir direk sayılmaz, kolu sıyıran bir sütun
+  kamerayı oynatmaz, `camera_ignore` içindeki gövdeler onu durdurmaz ve çok yakında karakter yarı saydamdır. Seviyede,
+  labirentin çalılarında, dağın yamacında ve ince kaya çıkıntılarında, bir çadırda ve zirvedeki taşlarda kamera bunların
+  içine girmez.
 
 ---
 

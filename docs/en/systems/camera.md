@@ -96,7 +96,8 @@ The wheel sets the arm length; the arm shortens at obstacles and returns to that
   the camera does not go inside but moves toward the target. Walk toward the mountain and the camera comes closer to the
   target without entering the slope; walk away, and it goes back once there is room behind it. The arm shortens only if
   the camera cannot stand at its end. A column or a fence between the camera and the target, with room behind it, does
-  not move the camera: the character shows through as a silhouette.
+  not move the camera: the character shows through as a silhouette. If the camera would stand right at the back of
+  such an obstacle, closer than `probe_radius`, there is no room for it there, and it moves in front of the obstacle.
 - **Move in when the target is hidden** (`pull_in_on_occlusion`, off by default). A fence or a wall hides the target
   almost entirely: the camera smoothly moves in front of the obstacle, but never closer than `min_pull_in_length`
   (2.5 m) to the target. If the character stands right at the wall, the camera stays put instead of jumping to the
@@ -117,7 +118,7 @@ The wheel sets the arm length; the arm shortens at obstacles and returns to that
 | `occlusion_points` | chest, head, knees, sides | Points of the target checked for visibility, relative to the arm's start: right, up, toward the camera |
 | `occlusion_share` | 0.75 | The target is hidden when this share of the points is hidden. A thin post or a trunk hides three of five and does not count |
 | `occlusion_delay` | 0.25 s | How long the target must stay hidden for the camera to move in, and visible for it to move back |
-| `return_delay`, `return_sharpness` | 0.3 s, 4 | The arm shortens at once but grows back after a pause and smoothly, so the camera does not twitch among columns |
+| `return_delay`, `return_sharpness` | 0.3 s, 4 | The arm shortens at once but grows back after a pause and smoothly, so the camera does not twitch among columns. A body on the way back is jumped over, not passed through |
 | `fade_target` | — | What turns translucent up close (`Player/Visual` in the demo) |
 | `fade_start_length`, `fade_end_length`, `fade_transparency` | 1.5 m, 0.7 m, 0.75 | The target starts fading at the first length and is 75% transparent at the second |
 | `debug_draw` | off | Draw the arm (gray: the wheel length, green: the current one), the camera sphere and the rays to the target's points (red: hidden). Visible from another camera |
@@ -138,15 +139,22 @@ even at the closest zoom (3 m above the ground).
 
 ### How the arm tells room behind an obstacle from being inside a body
 
-First the arm checks whether the camera can stand at the arm's end: the sphere touches nothing there, and the end
-is not inside a body. A ray from the camera to the target does not see the faces of a body it starts inside, so it
-finds the far face of the obstacle in front of the camera. A ray from that face to the arm's end enters the body the
-camera is in and never leaves it. If something is in the way, the sphere is cast from that face toward the camera and
-stops in front of the body that is in the way, passing others by. A column that the arm only grazes does not move the
-camera.
+First the arm checks whether the camera can stand at the arm's end: the sphere touches nothing there, the obstacle in
+front of the camera included, and the end is not inside a body. A ray from the camera to the target does not see the
+faces of a body it starts inside, so it finds the far face of the obstacle in front of the camera. A ray from that face
+to the arm's end enters the body the camera is in and never leaves it. If something is in the way, the sphere is cast
+from that face toward the camera and stops in front of the body that is in the way, passing others by. A column that the
+arm only grazes does not move the camera.
 
-Jolt does not report bodies that the sphere touches at the start of a cast. So if another body stands right behind
-the face (a fence with a cliff behind it), free space is searched closer to the target.
+Jolt does not report bodies that the sphere touches at the start of a cast, nor a mesh body (such as the mountain)
+that the cast starts inside. So if another body stands right behind the face (a fence with a cliff behind it), or the
+cast would start inside another body (two rock blades close together, the arm running almost along them), free space
+is searched closer to the target.
+
+The way back is checked too. While the arm waits to grow back, it can turn, and at the length it keeps, the camera
+can end up in a wall: then the camera goes to the free length at once. If a body stands between the camera and where
+it returns to (the camera stood in front of a fence, and now there is room behind it), the camera jumps over the body
+after the pause instead of flying through it.
 
 ## Measured behavior
 
@@ -165,10 +173,13 @@ From `tests/camera_checks.gd` and `tests/camera_arm_checks.gd`:
   running direction changes by 0.01°.
 - The arm: full length in the open; a cliff behind stops it at once; walking toward the cliff, the camera moves closer
   and stays out of it; with the cliff gone, the arm returns after a pause, smoothly. A fence with a cliff right behind
-  it: the camera stops in front of the fence. A fence halfway between the camera and the character: by default the
-  camera stays behind it; with pull-in it moves in front of it smoothly, and a short occlusion does not count. A fence
-  right at the character: the camera does not jump to the character's back. A thin post does not count, a column grazing
-  the arm does not move the camera, bodies in `camera_ignore` do not stop it, and up close the character is translucent.
+  it: the camera stops in front of the fence. A fence right at the camera's back: the camera comes in front of it. A
+  fence that appears where the camera waits to go back: the camera goes behind it at once. A fence halfway between the
+  camera and the character: by default the camera stays behind it; with pull-in it moves in front of it smoothly, and a
+  short occlusion does not count. A fence right at the character: the camera does not jump to the character's back. A
+  thin post does not count, a column grazing the arm does not move the camera, bodies in `camera_ignore` do not stop it,
+  and up close the character is translucent. On the level, at the maze hedges, the mountain slope and its rock blades, a
+  tent and the summit stones, the camera does not cut into them.
 
 ---
 

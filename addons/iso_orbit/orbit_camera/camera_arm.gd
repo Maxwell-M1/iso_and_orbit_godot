@@ -5,15 +5,17 @@ extends Node3D
 ## [OrbitCameraRig] with the wheel), and the arm shortens near obstacles:
 ##
 ## - [member keep_out_of_geometry]: the camera does not go inside bodies; it rests against a hill or wall behind it
-##   and moves toward the start of the arm while there is no room behind it;
+##   and moves toward the start of the arm while there is no room behind it. Right behind an obstacle between the
+##   camera and the target, closer than [member probe_radius], there is no room either: the camera comes in front of
+##   the obstacle;
 ## - [member pull_in_on_occlusion]: if an obstacle hides the target but the camera has enough room behind it (a tall
 ##   fence), the camera moves closer than the obstacle, but not closer to the target than [member min_pull_in_length].
 ##
 ## The camera is a sphere of radius [member probe_radius]: it does not come right up against a wall. The arm rests
 ## against a body behind it instantly, approaches an obstacle that hides the target quickly and smoothly
 ## ([member pull_in_sharpness]), and lengthens back smoothly and with a delay ([member return_delay],
-## [member return_sharpness]), so the camera does not jerk back and forth. When the camera comes very close, the
-## target becomes semi-transparent ([member fade_target]).
+## [member return_sharpness]), so the camera does not jerk back and forth; it jumps over a body on the way back instead
+## of passing through it. When the camera comes very close, the target becomes semi-transparent ([member fade_target]).
 ##
 ## The node is placed as a child of whatever rotates and moves it, and the camera as a child of the node. The arm is
 ## blocked by bodies on the [member collision_mask] layers; bodies in the [member ignored_groups] groups (or under a
@@ -99,6 +101,7 @@ var _ray_query := PhysicsRayQueryParameters3D.new()
 var _shape_query := PhysicsShapeQueryParameters3D.new()
 var _sphere := SphereShape3D.new()
 var _touch_sphere := SphereShape3D.new()
+var _inner_sphere := SphereShape3D.new()
 # Bodies from ignored_groups found this frame: all queries of the frame skip them.
 var _ignored: Array[RID] = []
 # How much the obstacles allow the arm (INF: no limit). Toward an obstacle: instantly; back: smoothly.
@@ -157,6 +160,7 @@ func _update(delta: float, instant: bool) -> void:
 	_debug_colors.clear()
 	_sphere.radius = probe_radius
 	_touch_sphere.radius = probe_radius + 0.05
+	_inner_sphere.radius = probe_radius * 0.5
 	var origin := global_position
 	var direction := global_basis.z.normalized()
 	var free := length
@@ -177,7 +181,7 @@ func _update(delta: float, instant: bool) -> void:
 	else:
 		_occluded = false
 		_occlusion_timer = 0.0
-	_update_limit(wanted if wanted < length else INF, free if free < length else INF, delta, instant)
+	_update_limit(wanted if wanted < length else INF, free if free < length else INF, delta, instant, origin, direction)
 	_current_length = maxf(minf(length, _limit), 0.0)
 	_place_camera()
 	_update_fade()
@@ -191,8 +195,8 @@ func _update(delta: float, instant: bool) -> void:
 ## Where the free space for the camera ends on an arm of length [param full]. The arm shortens only if the camera
 ## cannot stand at the very end of the arm: the sphere there touches a body, or the end of the arm is inside a body.
 ## Then the camera moves toward the start of the arm and stands in front of that body. Bodies that the arm only passes
-## by (a column or a fence between the camera and the target) do not shorten the arm: that is the job of
-## [member pull_in_on_occlusion].
+## by (a column or a fence between the camera and the target) do not shorten the arm while the camera sphere does not
+## touch them: that is the job of [member pull_in_on_occlusion].
 func _get_free_length(origin: Vector3, direction: Vector3, full: float) -> float:
 	if full <= 0.0:
 		return full
@@ -204,12 +208,11 @@ func _get_free_length(origin: Vector3, direction: Vector3, full: float) -> float
 	var behind_at := 0.0
 	if not behind.is_empty():
 		behind_at = (behind.position as Vector3 - origin).dot(direction)
-	# What keeps the camera from standing at the end of the arm: the bodies that the sphere touches there (except the
-	# obstacle in front of the camera), and the body that contains the end of the arm (a ray from that wall to the end
-	# of the arm enters it and never exits).
+	# What keeps the camera from standing at the end of the arm: the bodies that the sphere touches there, and the body
+	# that contains the end of the arm (a ray from that wall to the end of the arm enters it and never exits). The
+	# obstacle in front of the camera counts too: right behind it, the camera would cut into it (or into another part of
+	# the same body, such as a mountain), so there is no room for the camera behind it.
 	var blockers := _touching(end)
-	if not behind.is_empty():
-		blockers.erase(behind.rid)
 	var containing := _cast_ray(origin + direction * minf(behind_at + 0.01, full), end)
 	if not containing.is_empty() and not blockers.has(containing.rid):
 		blockers.append(containing.rid)
@@ -228,10 +231,13 @@ func _get_free_length(origin: Vector3, direction: Vector3, full: float) -> float
 		# very start.
 		var facing := maxf((wall.normal as Vector3).dot(direction), 0.25)
 		start = minf(wall_at + probe_radius * 1.05 / facing, full)
-		# Physics does not see the bodies that the sphere touches at the start of its path. If a blocking body is
-		# already there (it stands right behind the wall), there is no room behind this wall: look for room behind an
-		# obstacle closer to the start of the arm.
-		if not _touches_any(origin + direction * start, blockers):
+		# Physics does not see the bodies that the sphere touches at the start of its path, nor a hollow body (a mesh)
+		# that the path starts inside. If a blocking body is already there (it stands right behind the wall), or the
+		# offset passes into another body (two close walls, the arm almost along them), there is no room behind this
+		# wall: look for room behind an obstacle closer to the start of the arm.
+		var start_point := origin + direction * start
+		var past_wall := origin + direction * minf(wall_at + 0.01, start)
+		if not _touches_any(start_point, blockers) and _cast_ray(past_wall, start_point).is_empty():
 			break
 		wall = _cast_ray(origin + direction * maxf(wall_at - 0.01, 0.0), origin)
 	var from := origin + direction * start
@@ -277,8 +283,12 @@ func _update_occlusion(hidden: bool, delta: float, instant: bool) -> void:
 
 ## How much the obstacles allow the arm: [param wanted] includes moving in toward a hidden target, [param hard] is
 ## resting against what is behind. Against a body behind, the arm shortens instantly; toward an obstacle that hides
-## the target, by [member pull_in_sharpness]; back, smoothly after [member return_delay].
-func _update_limit(wanted: float, hard: float, delta: float, instant: bool) -> void:
+## the target, by [member pull_in_sharpness]; back, smoothly after [member return_delay]. If a body lies on the way
+## back (the camera stood in front of a fence and now has room behind it), the camera jumps over it instead of passing
+## through it; if the camera at the length it keeps cuts into a body (the arm has turned), it goes back at once.
+## [param origin] and [param direction] are the start and the direction of the arm.
+func _update_limit(wanted: float, hard: float, delta: float, instant: bool, origin: Vector3,
+		direction: Vector3) -> void:
 	if instant:
 		_limit = wanted
 		_return_wait = 0.0
@@ -292,11 +302,25 @@ func _update_limit(wanted: float, hard: float, delta: float, instant: bool) -> v
 		_limit = minf(_limit, hard)
 		_return_wait = return_delay
 		return
-	if _return_wait > 0.0:
+	var target := minf(wanted, length)
+	var current := minf(_limit, length)
+	var current_point := origin + direction * current
+	# The arm turned while it waited or lengthened: at the old length the camera may now cut into a body. Then it goes
+	# straight to where there is room.
+	if _cuts_into_body(current_point, origin, direction):
+		_return_wait = 0.0
+		_limit = target
+	elif _return_wait > 0.0:
 		_return_wait -= delta
 		return
-	var target := minf(wanted, length)
-	_limit = target if return_sharpness <= 0.0 else lerpf(_limit, target, 1.0 - exp(-return_sharpness * delta))
+	else:
+		var blocked := false
+		if target > current + 0.01:
+			blocked = not _cast_ray(current_point, origin + direction * target).is_empty()
+		if return_sharpness <= 0.0 or blocked:
+			_limit = target
+		else:
+			_limit = lerpf(_limit, target, 1.0 - exp(-return_sharpness * delta))
 	if _limit >= length - 0.001 and wanted >= length:
 		_limit = INF
 
@@ -395,6 +419,24 @@ func _touches_any(center: Vector3, bodies: Array[RID]) -> bool:
 		if bodies.has(rid):
 			return true
 	return false
+
+
+## The camera at [param point] cuts into a body: it is closer to it than half of [member probe_radius], or it is inside
+## it. Inside means that a ray from the arm toward the point enters a body and does not leave it before the point (it
+## does not see the walls of a body from inside); the ray starts from the last wall in front of the point, so a fence
+## that the camera stands behind does not count. [param origin] and [param direction] are the start and the direction
+## of the arm.
+func _cuts_into_body(point: Vector3, origin: Vector3, direction: Vector3) -> bool:
+	_shape_query.shape = _inner_sphere
+	var near := not _touching(point).is_empty()
+	_shape_query.shape = _sphere
+	if near:
+		return true
+	var behind := _cast_ray(point, origin)
+	var from := origin
+	if not behind.is_empty():
+		from = behind.position as Vector3 + direction * 0.01
+	return not _cast_ray(from, point).is_empty()
 
 
 ## The body [param collider] or a node above it is in one of the [member ignored_groups] groups.

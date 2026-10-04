@@ -1,8 +1,8 @@
 extends "res://tests/check_suite.gd"
 ## Camera arm: it rests against what is behind the camera and returns smoothly; it comes closer than a fence that
-## hides the character only when this is enabled; a thin pole and bodies in the camera_ignore group do not get in the
-## arm's way; up close the character is semi-transparent; the settings reach the arm. The check places the obstacles
-## itself, on open ground.
+## hides the character only when this is enabled, or when the camera would cut into the fence; a thin pole and bodies
+## in the camera_ignore group do not get in the arm's way; up close the character is semi-transparent; the settings
+## reach the arm. The checks place the obstacles themselves, on open ground; one more checks walls on the level.
 
 ## Where the character stands; the camera looks north, that is, it hangs to the south, over open ground.
 const SPOT := Vector3(-8, 0, 0)
@@ -19,9 +19,11 @@ func _checks() -> Array[Callable]:
 	return [
 		_check_open_ground,
 		_check_keep_out,
+		_check_wall_at_camera,
 		_check_occlusion,
 		_check_ignored_groups,
 		_check_fade,
+		_check_level_walls,
 		_check_arm_settings,
 	]
 
@@ -115,6 +117,43 @@ func _check_keep_out() -> void:
 	_expect(absf(camera_layer - expected) < 0.03, "a body on the camera layer stops the camera")
 	_expect(absf(character_layer - full) < 0.001, "a body on the characters layer does not")
 	await _frames(3)
+
+
+## A fence right at the camera's back: behind it the camera would cut into it, so the camera comes in front of it. A
+## fence where the camera stands while it waits to go back (the arm has turned): the camera does not wait inside it.
+func _check_wall_at_camera() -> void:
+	print("\n== camera arm and a fence right at the camera")
+	await _stand()
+	var full := _arm.length
+	var end := _arm_point(full).z
+	# The fence face toward the camera is 0.1 m from it, closer than the camera sphere radius.
+	var fence := await _add_box(Vector3(SPOT.x, 10.0, end - 0.25), Vector3(12, 20, 0.3))
+	await _frames(3)
+	var in_front := _length_to_plane(end - 0.4 - _arm.probe_radius)
+	print("fence 0.1 m in front of the camera: arm %.2f of %.2f (expected %.2f)" % [_arm.get_current_length(), full,
+		in_front])
+	_expect(absf(_arm.get_current_length() - in_front) < 0.03,
+			"a fence right at the camera: the camera comes in front of it, not into it")
+	_free(fence)
+	await _settle_arm()
+
+	# The camera rests against a cliff; the cliff goes, and while the camera waits to go back, a fence appears where
+	# it stands.
+	var cliff := await _add_box(Vector3(SPOT.x, 10.0, _arm_point(full * 0.6).z + 4.0), Vector3(30, 20, 8))
+	await _frames(3)
+	var resting := _camera.global_position.z
+	_free(cliff)
+	await _ticks(1)
+	fence = await _add_box(Vector3(SPOT.x, 10.0, resting), Vector3(12, 20, 0.6))
+	var lengths := PackedFloat32Array()
+	for i in 3:
+		await _tree.process_frame
+		lengths.append(_arm.get_current_length())
+	print("cliff replaced by a fence at the camera (z %.2f): arm %s of %.2f" % [resting, _fmt(lengths), full])
+	_expect(absf(lengths[-1] - full) < 0.01,
+			"a fence where the camera waits: the camera goes behind it at once, without waiting inside it")
+	_free(fence)
+	await _settle_arm()
 
 
 ## A tall fence halfway between the camera and the character, with enough room for the camera behind the fence; then
@@ -225,6 +264,55 @@ func _check_fade() -> void:
 	_expect(close_up < _arm.fade_end_length and absf(faded.x - _arm.fade_transparency) < 0.001
 			and absf(faded.y - _arm.fade_transparency) < 0.001, "the camera at the player's back: the player is see-through")
 	_expect(back == Vector2.ZERO, "the camera is back: the player is solid again")
+
+
+## On the level, where the camera used to stand right behind a wall and cut into it: hedges of the maze, the mountain
+## slope and rock blades, a tent, a stone at the summit. The arm length and the pitch are fixed through the rig limits.
+func _check_level_walls() -> void:
+	print("\n== camera arm at walls on the level")
+	var distances := [_rig.near_distance, _rig.far_distance]
+	var pitches := [_rig.min_pitch, _rig.max_pitch]
+	var query := PhysicsShapeQueryParameters3D.new()
+	var sphere := SphereShape3D.new()
+	sphere.radius = _arm.probe_radius * 0.5
+	query.shape = sphere
+	query.collision_mask = _arm.collision_mask
+	query.exclude = [_player.get_rid()]
+	var space := _main.get_world_3d().direct_space_state
+	var cut := PackedStringArray()
+	# The character position, the yaw of the camera (degrees, 0: the camera is to the south), the arm length and the
+	# pitch (degrees).
+	for spot: Array in [
+		[Vector3(-18, 0, 16), 300.0, 5.0, -8.0],
+		[Vector3(-14, 0, 20), 120.0, 5.0, -8.0],
+		[Vector3(25, 0, -12), 170.0, 5.0, -22.0],
+		[Vector3(12, 0, -29), 120.0, 8.0, -15.0],
+		[Vector3(38, 1, -17), 180.0, 11.0, -15.0],
+		[Vector3(32, 0, -9), 60.0, 5.0, -8.0],
+		[Vector3(34, 7.76, -29), 260.0, 5.0, -22.0],
+	]:
+		await _teleport(spot[0])
+		_rig.near_distance = spot[2]
+		_rig.far_distance = spot[2]
+		_rig.min_pitch = deg_to_rad(spot[3])
+		_rig.max_pitch = deg_to_rad(spot[3])
+		var yaw := deg_to_rad(spot[1] as float)
+		_rig.look_along(Vector3(-sin(yaw), 0.0, -cos(yaw)))
+		_rig.snap()
+		for i in 10:
+			await _tree.process_frame
+			query.transform = Transform3D(Basis.IDENTITY, _camera.global_position)
+			var touches := space.intersect_shape(query, 1)
+			if not touches.is_empty():
+				cut.append("%s at %s: %s" % [spot[0], spot[1], (touches[0].collider as Node).name])
+				break
+	_rig.near_distance = distances[0]
+	_rig.far_distance = distances[1]
+	_rig.min_pitch = pitches[0]
+	_rig.max_pitch = pitches[1]
+	await _stand()
+	print("the camera cuts into a body: %s" % ("nowhere" if cut.is_empty() else ", ".join(cut)))
+	_expect(cut.is_empty(), "at the maze hedges, the mountain, a tent and the summit stones the camera stays out of them")
 
 
 func _check_arm_settings() -> void:

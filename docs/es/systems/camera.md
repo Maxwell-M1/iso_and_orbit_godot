@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ 2985993ef79c -->
+<!-- translation of docs/en/systems/camera.md @ 1850159bc3c5 -->
 # Cámara
 
 > Esta es una traducción del [original en inglés](../../en/systems/camera.md).
@@ -102,11 +102,12 @@ posición deseada, por ejemplo tras teletransportar al objetivo; `is_rotating()`
 La rueda fija la longitud del brazo; el brazo se acorta ante los obstáculos y vuelve a esa longitud cuando hay
 espacio.
 
-- **Detenerse ante lo que hay detrás** (`keep_out_of_geometry`, activado por defecto). Una montaña, una pared o un
-  techo detrás de la cámara: la cámara no entra, sino que se acerca al objetivo. Camina hacia la montaña y la cámara
-  se acerca al objetivo sin entrar en la ladera; aléjate y la cámara vuelve atrás en cuanto tiene espacio detrás. El
-  brazo solo se acorta si la cámara no puede estar en su extremo. Una columna o una cerca entre la cámara y el
-  objetivo, con espacio detrás, no mueve la cámara: el personaje se ve a través como silueta.
+- **Detenerse ante lo que hay detrás** (`keep_out_of_geometry`, activado por defecto). Una montaña, una pared o un techo
+  detrás de la cámara: la cámara no entra, sino que se acerca al objetivo. Camina hacia la montaña y la cámara se acerca
+  al objetivo sin entrar en la ladera; aléjate y la cámara vuelve atrás en cuanto tiene espacio detrás. El brazo solo se
+  acorta si la cámara no puede estar en su extremo. Una columna o una cerca entre la cámara y el objetivo, con espacio
+  detrás, no mueve la cámara: el personaje se ve a través como silueta. Si la cámara fuera a quedar pegada a la parte de
+  atrás de ese obstáculo, más cerca que `probe_radius`, no hay sitio para ella ahí, y se coloca delante del obstáculo.
 - **Acercarse cuando el objetivo queda oculto** (`pull_in_on_occlusion`, desactivado por defecto). Una cerca o una
   pared oculta casi por completo al objetivo: la cámara se coloca suavemente delante del obstáculo, pero nunca más
   cerca del objetivo que `min_pull_in_length` (2,5 m). Si el personaje está justo junto a la pared, la cámara se
@@ -127,7 +128,7 @@ espacio.
 | `occlusion_points` | pecho, cabeza, rodillas, costados | Puntos del objetivo cuya visibilidad se comprueba, relativos al inicio del brazo: derecha, arriba, hacia la cámara |
 | `occlusion_share` | 0,75 | El objetivo está oculto cuando esta fracción de los puntos está oculta. Un poste delgado o un tronco oculta tres de cinco y no cuenta |
 | `occlusion_delay` | 0,25 s | Cuánto tiempo debe seguir oculto el objetivo para que la cámara se acerque, y visible para que vuelva |
-| `return_delay`, `return_sharpness` | 0,3 s; 4 | El brazo se acorta de inmediato, pero vuelve a crecer tras una pausa y con suavidad, para que la cámara no tiemble entre columnas |
+| `return_delay`, `return_sharpness` | 0,3 s; 4 | El brazo se acorta de inmediato, pero vuelve a crecer tras una pausa y con suavidad, para que la cámara no tiemble entre columnas. Un cuerpo en el camino de vuelta se salta, no se atraviesa |
 | `fade_target` | — | Lo que se vuelve translúcido de cerca (`Player/Visual` en la demo) |
 | `fade_start_length`, `fade_end_length`, `fade_transparency` | 1,5 m; 0,7 m; 0,75 | El objetivo empieza a desvanecerse en la primera longitud y es 75% transparente en la segunda |
 | `debug_draw` | desactivado | Dibujar el brazo (gris: la longitud de la rueda; verde: la actual), la esfera de la cámara y los rayos hacia los puntos del objetivo (rojo: oculto). Visible desde otra cámara |
@@ -149,15 +150,22 @@ suelo).
 
 ### Cómo distingue el brazo el espacio detrás de un obstáculo de estar dentro de un cuerpo
 
-Primero el brazo comprueba si la cámara puede estar en el extremo del brazo: allí la esfera no toca nada y el extremo
-no está dentro de un cuerpo. Un rayo desde la cámara hacia el objetivo no ve las caras de un cuerpo dentro del cual
-empieza, así que encuentra la cara lejana del obstáculo que hay delante de la cámara. Un rayo desde esa cara hasta el
-extremo del brazo entra en el cuerpo en el que está la cámara y nunca sale de él. Si algo estorba, la esfera se
-lanza desde esa cara hacia la cámara y se detiene delante del cuerpo que estorba, pasando de largo los demás. Una
-columna que el brazo solo roza no mueve la cámara.
+Primero el brazo comprueba si la cámara puede estar en el extremo del brazo: allí la esfera no toca nada, tampoco el
+obstáculo que hay delante de la cámara, y el extremo no está dentro de un cuerpo. Un rayo desde la cámara hacia el
+objetivo no ve las caras de un cuerpo dentro del cual empieza, así que encuentra la cara lejana del obstáculo que hay
+delante de la cámara. Un rayo desde esa cara hasta el extremo del brazo entra en el cuerpo en el que está la cámara y
+nunca sale de él. Si algo estorba, la esfera se lanza desde esa cara hacia la cámara y se detiene delante del cuerpo que
+estorba, pasando de largo los demás. Una columna que el brazo solo roza no mueve la cámara.
 
-Jolt no informa los cuerpos que la esfera toca al inicio de un lanzamiento. Así que, si otro cuerpo está justo detrás
-de la cara (una cerca con un acantilado detrás), se busca espacio libre más cerca del objetivo.
+Jolt no informa los cuerpos que la esfera toca al inicio de un lanzamiento, ni un cuerpo de malla (como la montaña)
+dentro del cual empieza el lanzamiento. Así que, si otro cuerpo está justo detrás de la cara (una cerca con un
+acantilado detrás), o el lanzamiento empezaría dentro de otro cuerpo (dos láminas de roca muy juntas, con el brazo casi
+a lo largo de ellas), se busca espacio libre más cerca del objetivo.
+
+El camino de vuelta también se comprueba. Mientras el brazo espera para volver a crecer, puede girar, y con la longitud
+que conserva la cámara puede acabar dentro de una pared: entonces la cámara pasa de inmediato a la longitud libre. Si
+hay un cuerpo entre la cámara y el lugar al que vuelve (la cámara estaba delante de una cerca y ahora hay espacio detrás
+de ella), tras la pausa la cámara salta por encima del cuerpo en lugar de atravesarlo.
 
 ## Comportamiento medido
 
@@ -176,12 +184,15 @@ De `tests/camera_checks.gd` y `tests/camera_arm_checks.gd`:
   limita al tope de 80° de la cámara. Mantener el botón izquierdo con seguimiento y una inclinación de 20°: la
   inclinación va de 80° a 22,5° en 1,25 s, camino de los 20°, y la dirección de carrera cambia 0,01°.
 - El brazo: longitud completa en campo abierto; un acantilado detrás lo detiene de inmediato; al caminar hacia el
-  acantilado, la cámara se acerca y queda fuera de él; sin el acantilado, el brazo vuelve tras una pausa, con
-  suavidad. Una cerca con un acantilado justo detrás: la cámara se detiene delante de la cerca. Una cerca a mitad de
-  camino entre la cámara y el personaje: por defecto la cámara se queda detrás de ella; con el acercamiento se coloca
-  delante con suavidad, y una oclusión breve no cuenta. Una cerca justo junto al personaje: la cámara no salta a la
-  espalda del personaje. Un poste delgado no cuenta, una columna que roza el brazo no mueve la cámara, los cuerpos en
-  `camera_ignore` no la detienen y, de cerca, el personaje es translúcido.
+  acantilado, la cámara se acerca y queda fuera de él; sin el acantilado, el brazo vuelve tras una pausa, con suavidad.
+  Una cerca con un acantilado justo detrás: la cámara se detiene delante de la cerca. Una cerca pegada a la espalda de
+  la cámara: la cámara se coloca delante de ella. Una cerca que aparece donde la cámara espera para volver: la cámara
+  pasa detrás de ella de inmediato. Una cerca a mitad de camino entre la cámara y el personaje: por defecto la cámara se
+  queda detrás de ella; con el acercamiento se coloca delante con suavidad, y una oclusión breve no cuenta. Una cerca
+  justo junto al personaje: la cámara no salta a la espalda del personaje. Un poste delgado no cuenta, una columna que
+  roza el brazo no mueve la cámara, los cuerpos en `camera_ignore` no la detienen y, de cerca, el personaje es
+  translúcido. En el nivel, junto a los setos del laberinto, la ladera de la montaña y sus láminas de roca, una tienda y
+  las piedras de la cima, la cámara no se mete en ellos.
 
 ---
 
