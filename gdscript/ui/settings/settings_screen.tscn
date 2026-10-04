@@ -595,6 +595,13 @@ theme_type_variation = &"HintLabel"
 text = "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
 autowrap_mode = 3
 
+[node name="FollowWaitHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
+autowrap_mode = 3
+
 [node name="KeepAim" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 layout_mode = 2
 text = "The cursor keeps its aim while the camera turns"

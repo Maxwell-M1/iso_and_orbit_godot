@@ -1,8 +1,9 @@
 extends "res://tests/check_suite.gd"
 ## Camera: the follow (smooth, without going past the run, still for a run toward the camera, within the speed limit,
-## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held and while it is not yet clear
-## whether it is a click or a hold), the cursor keeping its aim while the camera turns, rotation and zoom with the mouse
-## (RMB pitch only with the setting), aligning the pitch and the height on the run, gliding up the stairs.
+## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
+## run, and while it is not yet clear whether it is a click or a hold), the cursor keeping its aim while the camera
+## turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning the pitch and the height on the
+## run, gliding up the stairs.
 
 
 func _checks() -> Array[Callable]:
@@ -11,6 +12,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_follow_toward,
 		_check_camera_follow_stairs,
 		_check_camera_follow_pauses,
+		_check_camera_waits_after_rotate,
 		_check_camera,
 		_check_camera_pitch_follow,
 		_check_camera_zoom_follow,
@@ -219,14 +221,28 @@ func _check_camera_follow_pauses() -> void:
 	_send_button(MOUSE_BUTTON_RIGHT, false, center)
 	for i in 30:
 		await _tree.physics_frame
+	var waited := _rig.is_follow_waiting()
+	var rotate_waiting := _camera_angle_to(Vector3.RIGHT)
+	# A click on the ground ahead starts a new run, and the camera turns behind it again.
+	var ahead := _camera.unproject_position(_player.global_position + Vector3(6, 0, 0))
+	_send_motion(ahead, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, ahead)
+	await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_LEFT, false, ahead)
+	for i in 30:
+		await _tree.physics_frame
 	var rotate_after := _camera_angle_to(Vector3.RIGHT)
 	print(("right button pressed while turning at %.0f deg/s: %.0f deg/s in the tick after the press, %.1f deg/s " +
-			"0.15 s later; held: angle %.1f -> %.1f deg; 0.5 s after release %.1f deg") % [turning, after_press, stopped,
-		rotate_before, rotate_during, rotate_after])
+			"0.15 s later; held: angle %.1f -> %.1f deg; 0.5 s after release, the run going on: %.1f deg, waiting %s; " +
+			"0.5 s after a click ahead: %.1f deg") % [turning, after_press, stopped, rotate_before, rotate_during,
+		rotate_waiting, waited, rotate_after])
 	_expect(turning > 20.0 and after_press > 0.3 * turning and stopped < 0.05 * turning,
 			"pressed mid-turn, the camera brakes quickly but does not stop dead")
 	_expect(absf(rotate_during - rotate_before) < 0.3, "does not turn while the right button rotates the camera")
-	_expect(rotate_during > 5.0 and rotate_after < 0.25 * rotate_during, "turns again after the right button is released")
+	_expect(waited and absf(rotate_waiting - rotate_during) < 0.3,
+			"after the right button is released, the camera waits while the run goes on")
+	_expect(rotate_during > 5.0 and rotate_after < 0.25 * rotate_during,
+			"a click starts a new run, and the camera turns behind it again")
 	for i in 600:
 		await _tree.physics_frame
 		if not _mover.has_destination():
@@ -353,6 +369,129 @@ func _heading_turn_over(ticks: int) -> float:
 		turn += _flat_angle(previous, heading)
 		previous = heading
 	return turn
+
+
+## After the camera has been rotated with the right button, the follow waits. RMB + D walks to the camera's right with
+## the turn and the tilt alignment on; RMB released a moment before D: while the character brakes, the camera neither
+## turns nor tilts, and after the stop the wait is over. With follow_wait_after_rotate off, the camera swings behind
+## the braking run and tilts. A tap of the button does not start the wait; turning the setting off, snap() and a
+## teleport end it. A hold that goes on after RMB, steered by the mouse, is not a new run: the wait lasts until the stop.
+func _check_camera_waits_after_rotate() -> void:
+	print("\n== the follow waits after the camera has been rotated with the right button")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var keys_before := input.keys_with_camera
+	var pitch_angle := _rig.follow_pitch_angle
+	input.keys_with_camera = PointClickMoveInput.KeysMode.TURN
+	_rig.follow_movement = true
+	_rig.follow_pitch = true
+	# Not the pitch of the wheel at the start (about 40°): the alignment has work to do.
+	_rig.follow_pitch_angle = -deg_to_rad(20.0)
+	var waiting := await _brake_after_rotate()
+	_rig.follow_wait_after_rotate = false
+	var resumed := await _brake_after_rotate()
+	_rig.follow_wait_after_rotate = true
+
+	# A run to the east; the teleport below jumps 3 m back along it, where the ground is clear.
+	_mover.steer(Vector3.RIGHT)
+	await _ticks(30)
+	var after_tap := await _press_right(1)
+	var after_press := await _press_right(15)
+	_rig.follow_wait_after_rotate = false
+	var off_ends := not _rig.is_follow_waiting()
+	_rig.follow_wait_after_rotate = true
+	await _press_right(15)
+	_rig.snap()
+	var snap_ends := not _rig.is_follow_waiting()
+	await _press_right(15)
+	_player.global_position += Vector3(-3, 0, 0)
+	await _ticks(2)
+	var teleport_ends := not _rig.is_follow_waiting()
+	_mover.stop()
+	await _ticks_until_stopped(60)
+
+	# LMB + RMB, then RMB released and LMB held on, the mouse steering: the same run goes on.
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	var size := _tree.root.get_visible_rect().size
+	var screen := Vector2(size.x * 0.5, size.y * 0.3)
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(30)
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	await _ticks(20)
+	_send_motion(screen + Vector2(60, 0), Vector2(60, 0))
+	await _ticks(30)
+	var waits_on_hold := _rig.is_follow_waiting()
+	_send_button(MOUSE_BUTTON_LEFT, false, screen + Vector2(60, 0))
+	await _ticks_until_stopped(60)
+	await _ticks(2)
+	var ends_at_stop := not _rig.is_follow_waiting()
+	input.keys_with_camera = keys_before
+	_rig.follow_movement = false
+	_rig.follow_pitch = false
+	_rig.follow_pitch_angle = pitch_angle
+
+	print(("RMB + D, RMB released 0.1 s before D: while braking the camera turned %.2f deg and tilted %.2f deg, " +
+			"waiting %s, after the stop %s; with follow_wait_after_rotate off: turned %.1f deg, tilted %.1f deg. " +
+			"Waiting after a tap %s, after 0.25 s %s; ended by turning the setting off %s, by snap() %s, by a teleport " +
+			"%s. LMB held on after RMB, the mouse steering: waiting %s, over at the stop %s") % [waiting.turned,
+		waiting.tilted, waiting.waited, waiting.waiting_after_stop, resumed.turned, resumed.tilted, after_tap,
+		after_press, off_ends, snap_ends, teleport_ends, waits_on_hold, ends_at_stop])
+	_expect(waiting.waited and waiting.turned < 0.3 and waiting.tilted < 0.3,
+			"the camera neither turns nor tilts while the character brakes after the right button is released")
+	_expect(not waiting.waiting_after_stop, "the wait is over when the character stops")
+	_expect(not resumed.waited and resumed.turned > 10.0 and resumed.tilted > 2.0,
+			"follow_wait_after_rotate off: the camera swings behind the braking run and tilts")
+	_expect(not after_tap and after_press, "a tap of the right button does not start the wait, a press does")
+	_expect(off_ends and snap_ends and teleport_ends, "turning the setting off, snap() and a teleport end the wait")
+	_expect(waits_on_hold and ends_at_stop,
+			"a hold that goes on after the right button is not a new run: the wait lasts until the stop")
+
+
+## Presses the right button for [param ticks] ticks without moving the mouse. Returns whether the follow waits after
+## the release.
+func _press_right(ticks: int) -> bool:
+	var center := _tree.root.get_visible_rect().size / 2.0
+	_send_button(MOUSE_BUTTON_RIGHT, true, center)
+	await _ticks(ticks)
+	_send_button(MOUSE_BUTTON_RIGHT, false, center)
+	await _tree.physics_frame
+	return _rig.is_follow_waiting()
+
+
+## From (-8, 0, 0), the camera looking north: RMB + D walk to the east for 1 s, the mouse turning the camera a little at
+## first; then RMB is released, and D 0.1 s later. Returns how far the camera turned and tilted from the release until
+## the character has stood for 0.2 s (degrees), and whether the follow waited after the release and after the stop.
+func _brake_after_rotate() -> Dictionary:
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	var center := _tree.root.get_visible_rect().size / 2.0
+	_send_motion(center, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_RIGHT, true, center)
+	Input.action_press(&"move_right")
+	for i in 20:
+		_send_motion(center, Vector2(2, 0))
+		await _tree.physics_frame
+	# The mouse smoothing settles before the release: whatever the camera does after it is the follow's.
+	await _ticks(40)
+	var yaw := _rig.rotation.y
+	var pitch := _rig.rotation.x
+	_send_button(MOUSE_BUTTON_RIGHT, false, center)
+	await _ticks(6)
+	Input.action_release(&"move_right")
+	var waited := _rig.is_follow_waiting()
+	await _ticks_until_stopped(60)
+	await _ticks(12)
+	return {
+		turned = rad_to_deg(absf(angle_difference(yaw, _rig.rotation.y))),
+		tilted = rad_to_deg(absf(_rig.rotation.x - pitch)),
+		waited = waited,
+		waiting_after_stop = _rig.is_follow_waiting(),
+	}
 
 
 ## The horizontal angle between the camera's view and [param direction], in degrees.

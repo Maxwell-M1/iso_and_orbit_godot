@@ -1,6 +1,7 @@
 extends "res://tests/check_suite.gd"
-## Mouse and keys with real input events: a click, an LMB hold in both modes, LMB + RMB, RMB + WASD and
-## LMB + RMB + A/D in all modes, keys dropping the run to a click point, the cursor hiding while running with LMB held.
+## Mouse and keys with real input events: a click, an LMB hold in both modes, LMB + RMB (and RMB released a moment
+## before LMB), RMB + WASD and LMB + RMB + A/D in all modes, keys dropping the run to a click point, the signal of a new
+## run, the cursor hiding while running with LMB held.
 
 
 func _checks() -> Array[Callable]:
@@ -11,8 +12,10 @@ func _checks() -> Array[Callable]:
 		_check_hold_follow_point.bind(true),
 		_check_camera_steer_up_the_ramp,
 		_check_camera_steer_turn,
+		_check_camera_steer_release,
 		_check_camera_keys,
 		_check_keys_drop_click_point,
+		_check_run_requested,
 		_check_hold_hides_cursor,
 	]
 
@@ -214,6 +217,71 @@ func _check_camera_steer_turn() -> void:
 	_expect(alignment > 0.99 and speed_after_turn > 0.9 * _mover.settings.max_speed,
 			"turns with the camera at full speed")
 	_expect(after * DT <= _mover.settings.stop_time + 0.1, "releasing the left button stops the run")
+
+
+## LMB + RMB drive the run where the camera looks. Released one after the other, RMB first, with any gap and without
+## the mouse moving, they stop the character on its course: no turn toward the cursor left where it was before and, in
+## FOLLOW_POINT, no run on to the point under it. LMB held on keeps the course until the mouse moves; then the cursor
+## steers from straight ahead, and a small movement turns the run a little. Without keep_camera_course the cursor takes
+## the run over at once from where it was.
+func _check_camera_steer_release() -> void:
+	print("\n== both buttons released one after the other, the right one first")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var stop_time := _mover.settings.stop_time + 0.1
+	var report := PackedStringArray()
+	var on_course := true
+	for mode: int in [PointClickMoveInput.HoldMode.STEER, PointClickMoveInput.HoldMode.FOLLOW_POINT]:
+		input.hold_mode = mode as PointClickMoveInput.HoldMode
+		for ticks: int in [6, 18, 45]:
+			var run := await _release_camera_steer_first(ticks)
+			on_course = on_course and run.turn < 2.0 and run.stop >= 0.0 and run.stop <= stop_time
+			report.append("%s, LMB %.2f s later: turned %.2f deg, stopped %.2f s after LMB" % [
+				PointClickMoveInput.HoldMode.keys()[mode], ticks * DT, run.turn, run.stop])
+	input.hold_mode = PointClickMoveInput.HoldMode.STEER
+	var nudged := await _release_camera_steer_first(45, Vector2(40, 0))
+	input.keep_camera_course = false
+	var at_once := await _release_camera_steer_first(6)
+	input.keep_camera_course = true
+	print("%s; LMB held on, the mouse 40 px to the right after 0.33 s: turned %.1f deg; keep_camera_course off: " % [
+		"; ".join(report), nudged.turn] + "turned %.1f deg" % at_once.turn)
+	_expect(on_course, "released one after the other with any gap, the buttons stop the run on its course, in both modes")
+	_expect(nudged.turn > 3.0 and nudged.turn < 30.0,
+			"LMB held on: the mouse takes the run over, from straight ahead and not from the old cursor")
+	_expect(at_once.turn > 10.0, "keep_camera_course off: the cursor takes the run over at once, from where it was")
+
+
+## From (-8, 0, 0), the camera looking east, the cursor low on the left of the window: RMB, then LMB too, so the run
+## goes where the camera looks; RMB is released, and LMB [param ticks] ticks later. With [param nudge], the mouse moves
+## by it 20 ticks after the RMB release. Returns the largest turn of the run from its direction at the RMB release
+## (degrees) and how soon the character stopped after the LMB release (s; −1: it did not).
+func _release_camera_steer_first(ticks: int, nudge := Vector2.ZERO) -> Dictionary:
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	var size := _tree.root.get_visible_rect().size
+	var screen := Vector2(size.x * 0.3, size.y * 0.8)
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(40)
+	var heading := _mover.get_heading()
+	var turn := 0.0
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	for i in ticks:
+		if i == 20 and nudge != Vector2.ZERO:
+			_send_motion(screen + nudge, nudge)
+		await _tree.physics_frame
+		turn = maxf(turn, _flat_angle(heading, _mover.get_heading()))
+	_send_button(MOUSE_BUTTON_LEFT, false, screen + nudge)
+	var stop := -1.0
+	for i in 600:
+		await _tree.physics_frame
+		turn = maxf(turn, _flat_angle(heading, _mover.get_heading()))
+		if not _mover.is_moving() and _mover.get_speed() == 0.0:
+			stop = (i + 1) * DT
+			break
+	return {turn = turn, stop = stop}
 
 
 ## RMB + WASD and LMB + RMB + A/D in both modes (sidestep and turn). The keys go through input actions.
@@ -434,6 +502,65 @@ func _check_keys_drop_click_point() -> void:
 	_expect(kept_by_right_only, "the right button alone (to turn the camera) keeps the run and the marker")
 	_expect(by_keys and faded, "right button + A: walking by keys, the click point is dropped and its marker fades out")
 	input.keys_with_camera = keys_before
+
+
+## run_requested: once for a click that sends the character to a point, once for a press that becomes a hold, once
+## for a walk with the keys and RMB, once for a hold over that walk; not for a click at the point the character is
+## already running to, not for RMB alone, and not when the keys carry on a hold that has just ended.
+func _check_run_requested() -> void:
+	print("\n== the signal of a new run: a click, a hold, the keys with the right button")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var keys_before := input.keys_with_camera
+	input.keys_with_camera = PointClickMoveInput.KeysMode.TURN
+	var counts := [0]
+	var count := func() -> void: counts[0] += 1
+	input.run_requested.connect(count)
+	await _teleport(Vector3.ZERO)
+	await _settle_camera()
+	var target := Vector3(3, 0, 3)
+	var steps := PackedInt32Array()
+	for again: bool in [false, true]:
+		# A click, and while the character runs there, a click at the same point.
+		var screen := _camera.unproject_position(target)
+		_send_motion(screen, Vector2.ZERO)
+		_send_button(MOUSE_BUTTON_LEFT, true, screen)
+		await _tree.physics_frame
+		_send_button(MOUSE_BUTTON_LEFT, false, screen)
+		# The release is noticed in the next tick.
+		await _ticks(3)
+		steps.append(counts[0])
+	await _ticks_until_stopped(240)
+	var screen := _camera.unproject_position(target)
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(30)
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(3)
+	await _ticks_until_stopped(120)
+	steps.append(counts[0])
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _ticks(10)
+	steps.append(counts[0])
+	Input.action_press(&"move_forward")
+	await _ticks(20)
+	steps.append(counts[0])
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(20)
+	steps.append(counts[0])
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(20)
+	steps.append(counts[0])
+	Input.action_release(&"move_forward")
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	await _ticks_until_stopped(60)
+	input.run_requested.disconnect(count)
+	input.keys_with_camera = keys_before
+	var each := PackedInt32Array([steps[0]])
+	for i in range(1, steps.size()):
+		each.append(steps[i] - steps[i - 1])
+	print(("run_requested: a click %d, the same point again %d, a hold %d, the right button alone %d, the keys %d, a " +
+			"hold over the keys %d, the keys carrying on after it %d") % Array(each))
+	_expect(each == PackedInt32Array([1, 0, 1, 0, 1, 1, 0]),
+			"run_requested: once for every new run; not for the same point, the right button alone or the keys carrying on")
 
 
 ## A headless window does not change the mouse mode (it is always "visible"), so the check looks at what the component

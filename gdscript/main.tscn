@@ -35,6 +35,7 @@ character = NodePath("../Player")
 script = ExtResource("4_camera")
 target = NodePath("../Player")
 arm = NodePath("CameraArm")
+follow_wait_after_rotate = true
 height_follow_time = 0.15
 
 [node name="CameraArm" type="Node3D" parent="CameraRig" unique_id=253517607 node_paths=PackedStringArray("fade_target")]
@@ -151,6 +152,7 @@ jump_help = NodePath("../Hud/Panel/Lines/JumpHelp")
 
 [connection signal="destination_picked" from="PlayerInput" to="ClickMarker" method="show_at"]
 [connection signal="hold_pending_changed" from="PlayerInput" to="CameraRig" method="set_follow_paused"]
+[connection signal="run_requested" from="PlayerInput" to="CameraRig" method="end_follow_wait"]
 [connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
 [connection signal="arrived" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]
 [connection signal="destination_cancelled" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]

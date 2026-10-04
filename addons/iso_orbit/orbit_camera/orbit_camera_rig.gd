@@ -12,7 +12,8 @@ extends Node3D
 ##   [member follow_zoom_level] ([member follow_zoom]), each in its own time. Every one of these moves starts and ends
 ##   smoothly, the turn is never faster than [member follow_max_turn_speed], and a run that comes at the camera within
 ##   [member follow_toward_camera_angle] of straight does not turn it. While the camera is rotated with the mouse, it
-##   does not follow.
+##   does not follow, and afterwards it waits until the target stops or a new run starts
+##   ([member follow_wait_after_rotate]).
 ##
 ## The node is placed in the scene next to the target, not inside it. Its child is a [CameraArm] with a [Camera3D] at
 ## the end: the node sets the arm length from the zoom, and the arm shortens near obstacles. Without an arm, the child
@@ -26,6 +27,10 @@ extends Node3D
 const _HEADING_SMOOTHING := 0.1
 # (1 + x)·exp(−x) = 0.05 at x ≈ 4.74: a critically damped spring at rest settles 95% of the way in 4.74 / ω seconds.
 const _SETTLE := 4.74
+# A press of the rotate button shorter than this, s, during which the mouse moved less than _TAP_MOTION, px, is a tap:
+# the camera was not rotated, and the follow does not wait after it (follow_wait_after_rotate).
+const _TAP_TIME := 0.2
+const _TAP_MOTION := 2.0
 
 
 ## One move of the follow (the turn, the pitch or the height) on a critically damped spring: it starts from rest,
@@ -123,7 +128,8 @@ class _FollowSpring:
 
 @export_group("Follow")
 ## Turn on its own toward the target's running direction, gradually moving behind it. Does not turn while the camera
-## is rotated with the mouse or the follow is paused ([method set_follow_paused]).
+## is rotated with the mouse, after that until the target stops or runs anew ([member follow_wait_after_rotate]), and
+## while the follow is paused ([method set_follow_paused]).
 @export var follow_movement := false
 ## In how many seconds the camera almost finishes a turn behind the run (95% of the angle): the turn starts and ends
 ## smoothly, without overshooting. 0 is instant.
@@ -165,6 +171,18 @@ class _FollowSpring:
 ## Below this speed, the camera does not follow the target: when standing, starting, or turning around, the movement
 ## direction is unreliable. From this speed to twice that, the follow smoothly gains strength.
 @export_range(0.0, 10.0, 0.05, "suffix:m/s") var follow_min_speed := 1.0
+## After the camera has been rotated with the mouse, the follow (the turn, the pitch and the height) waits: the camera
+## stays where the mouse left it until the target stops (slows below [member follow_min_speed]) or a new run starts
+## ([method end_follow_wait]). This way the camera does not swing around while the target brakes after the button is
+## released, nor while it runs on to a clicked point. A short tap of the button that does not turn the camera does
+## not count; a teleport, [method snap] and a new [member target] end the wait. Whoever drives the target reports new
+## runs; without that the follow waits until the target stops, so for a target that never stops, leave this off. Off:
+## the follow resumes as soon as the button is released.
+@export var follow_wait_after_rotate := false:
+	set(value):
+		follow_wait_after_rotate = value
+		if not value:
+			_follow_waiting = false
 
 @export_group("Smoothing")
 ## How fast the camera catches up with mouse rotation. Higher is sharper; 0 means no smoothing.
@@ -186,6 +204,11 @@ var _mouse_motion := Vector2.ZERO
 var _rotating := false
 var _cursor_before_rotate := Vector2.ZERO
 var _follow_paused := false
+# The follow waits after a mouse rotation (follow_wait_after_rotate); how long the rotate button has been held, s, and
+# how far the mouse has moved meanwhile, px.
+var _follow_waiting := false
+var _rotate_time := 0.0
+var _rotate_motion := 0.0
 # The target's velocity from its movement per physics tick, and the direction of its run, smoothed
 # (_HEADING_SMOOTHING).
 var _target_velocity := Vector3.ZERO
@@ -229,6 +252,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and _rotating:
 		# Accumulate: several events can arrive per frame; they are applied at once in _process.
 		_mouse_motion += (event as InputEventMouseMotion).screen_relative
+		_rotate_motion += (event as InputEventMouseMotion).screen_relative.length()
 	elif event.is_action_pressed(zoom_in_action):
 		_add_zoom(-zoom_step * _get_wheel_factor(event))
 	elif event.is_action_pressed(zoom_out_action):
@@ -250,6 +274,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	if _rotating:
+		_rotate_time += delta
 	_apply_mouse_motion()
 	_follow_movement(delta)
 	_yaw = _smooth(_yaw, _target_yaw, rotation_sharpness, delta)
@@ -307,8 +333,21 @@ func is_follow_paused() -> bool:
 	return _follow_paused
 
 
+## Ends the wait after a mouse rotation ([member follow_wait_after_rotate]): the follow works again. Call it when a new
+## run starts, for example from [signal PointClickMoveInput.run_requested].
+func end_follow_wait() -> void:
+	_follow_waiting = false
+
+
+## The follow waits after a mouse rotation ([member follow_wait_after_rotate]).
+func is_follow_waiting() -> bool:
+	return _follow_waiting
+
+
 func _begin_rotate() -> void:
 	_rotating = true
+	_rotate_time = 0.0
+	_rotate_motion = 0.0
 	_mouse_motion = Vector2.ZERO
 	_cursor_before_rotate = get_viewport().get_mouse_position()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -318,6 +357,8 @@ func _end_rotate() -> void:
 	if not _rotating:
 		return
 	_rotating = false
+	if follow_wait_after_rotate and (_rotate_time >= _TAP_TIME or _rotate_motion >= _TAP_MOTION):
+		_follow_waiting = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	# On capture, the cursor moves to the center of the window; return it to where it was.
 	get_viewport().warp_mouse(_cursor_before_rotate)
@@ -357,21 +398,26 @@ func _track_target_motion(delta: float) -> void:
 
 
 ## The follow forgets how the target moved, and its moves stop where they are: after a teleport, a new target or a
-## snap.
+## snap. It starts afresh, so a wait after a mouse rotation is over too.
 func _forget_target_motion() -> void:
 	_has_target_position = false
 	_target_velocity = Vector3.ZERO
 	_heading = Vector2.ZERO
+	_follow_waiting = false
 	for spring: _FollowSpring in [_turn, _pitch_follow, _zoom_follow]:
 		spring.speed = 0.0
 
 
 ## The follow: the height, the pitch and the turn move toward their goals, each on its spring ([_FollowSpring]),
 ## pulled as strongly as the target runs ([method _get_follow_strength]). When the target stops, while the mouse turns
-## the camera and while the follow is paused, they do not pull, and a move under way brakes as fast as the smoothing
-## of the mouse and the wheel settles.
+## the camera, while the follow waits after that and while it is paused, they do not pull, and a move under way brakes
+## as fast as the smoothing of the mouse and the wheel settles.
 func _follow_movement(delta: float) -> void:
-	var strength := 0.0 if _rotating or _follow_paused else _get_follow_strength()
+	var running := _get_follow_strength()
+	if running <= 0.0:
+		# The target stands (or barely moves): the wait after a mouse rotation is over.
+		_follow_waiting = false
+	var strength := 0.0 if _rotating or _follow_waiting or _follow_paused else running
 	var rotation_brake := _get_brake(rotation_sharpness)
 	# A move that is turned off stops where it is; turned on again, it starts from rest.
 	if not follow_zoom:
