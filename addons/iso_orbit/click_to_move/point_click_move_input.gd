@@ -158,9 +158,9 @@ var _cursor_hidden := false
 # aim would drift further in the direction of the turn until the cursor got stuck at the window edge. So there the
 # cursor is only hidden, and the component keeps it in the window (see _is_cursor_roaming()).
 var _hidden_mouse_mode := Input.MOUSE_MODE_HIDDEN if OS.has_feature("macos") else Input.MOUSE_MODE_CONFINED_HIDDEN
-# After _recenter_system_cursor(): where the system cursor was before the move, relative to where it was moved, and
-# until when mouse positions from before the move may still arrive (see _mouse_moved()).
-var _late_offset := Vector2.ZERO
+# After _recenter_system_cursor(): where the system cursor was before the move (and has gone since, by late positions),
+# and until when mouse positions from before the move may still arrive (see _mouse_moved()).
+var _late_position := Vector2.ZERO
 var _late_until_msec := 0
 # The keys with RMB drive the character: when they are released, stopping it is also up to us.
 var _keys_steering := false
@@ -367,22 +367,23 @@ func _keep_aim(mouse: Vector2) -> void:
 
 
 ## The mouse movement since the previous frame. After [method _recenter_system_cursor], a position closer to where the
-## system cursor was before the move is a late one, and its movement is counted from there.
+## system cursor was before the move is a late one. Its movement is not counted: the move puts the cursor in the center
+## anyway, and that movement is lost; counted, it would turn the aim there and back.
 func _mouse_moved(mouse: Vector2) -> Vector2:
+	if Time.get_ticks_msec() < _late_until_msec and mouse.distance_to(_late_position) < mouse.distance_to(_mouse_seen):
+		_late_position = mouse
+		return Vector2.ZERO
 	var moved := mouse - _mouse_seen
-	if Time.get_ticks_msec() < _late_until_msec and (moved - _late_offset).length() < moved.length():
-		moved -= _late_offset
-	_mouse_seen += moved
+	_mouse_seen = mouse
 	return moved
 
 
 ## The hidden system cursor goes to the center of the window, as far from its edges as possible.
 func _recenter_system_cursor() -> void:
-	get_viewport().warp_mouse((get_viewport().get_visible_rect().size / 2.0).floor())
-	var landed := get_viewport().get_mouse_position()
-	_late_offset = _mouse_seen - landed
+	_late_position = _mouse_seen
 	_late_until_msec = Time.get_ticks_msec() + _LATE_POSITIONS_MSEC
-	_mouse_seen = landed
+	get_viewport().warp_mouse((get_viewport().get_visible_rect().size / 2.0).floor())
+	_mouse_seen = get_viewport().get_mouse_position()
 
 
 ## On macOS the hidden system cursor does not follow the aim every frame. In the editor's Game view the engine moves
