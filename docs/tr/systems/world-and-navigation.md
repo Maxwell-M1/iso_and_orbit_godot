@@ -1,10 +1,89 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
 # Dünya ve navigasyon
+
+[← Belge dizini](../index.md)
 
 > Bu, [İngilizce orijinalin](../../en/systems/world-and-navigation.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
-Demo seviyesi `shared/world/world.tscn` dosyasıdır: ahşap bir çitin ardında 80 × 80 m'lik bir açıklık. İçindeki her
-şey ilkel şekillerden ve gölgelendiricilerden oluşturulmuştur; ince yüzey desenleri pişirilmiş dokulardan gelir.
+Demonun başlangıç seviyesi `shared/world/world.tscn` içindeki çayırdır: ahşap çitin ardında 80 × 80 m açıklık.
+İçindeki her şey ilkel şekillerden ve gölgelendiricilerden yapılmıştır; ince yüzey desenleri pişirilmiş dokulardan
+gelir. Kadim Çember'in yanındaki ışınlanma platformu ikinci seviye Issız Ada'ya götürür; ikisi de
+[Seviyeler](levels.md#demonun-seviyeleri) sayfasında açıklanır.
+
+## Fizik katmanları ve navigasyon
+
+Engeller 1. katmanda (`world`) `StaticBody3D`, karakterler 2. katmanda (`characters`), yalnız kamerayı durduran
+gövdeler 3. katmanda (`camera`), seviye kenarındaki görünmez duvarlar 4. katmandadır (`bounds`); bkz.
+[Proje yapılandırması](../project-setup.md#fizik-katmanları). Navigasyon örgüsü 1. katman çarpışmalarından,
+adada ayrıca 4. katmandaki kenar duvarlarından, 0.5 m etmen yarıçapıyla pişirilir. Karakter kapsülünün yarıçapı
+0.35 m olduğundan yollar köşelerden pay bırakır.
+
+| `NavigationMesh` parametresi | Değer | Neden |
+|---|---|---|
+| `agent_radius` | 0.5 m | Yollar köşelerden uzak durur |
+| `agent_height` | 1.75 m | Mevcut demo pişirme değeri; tavanlı yeni seviyede çarpışma yüksekliğinin tamamını kullanın (kahraman kapsülü 1.8 m) |
+| `agent_max_slope` | 40° | Dağın yamaçları örgünün dışında kalır |
+| `cell_height` | 0.025 m | Aşağıdaki çıkış yüksekliğini ölçecek kadar ince |
+| `cell_size` | 0.25 m | Yatay pişirme çözünürlüğü; navigasyon haritasıyla eşleşmeli |
+| `agent_max_climb` | 0.3 m (12 hücre) | Karakterin çıktığı basamaklar (`GroundCharacter.max_step_height`) |
+| `geometry_parsed_geometry_type` | Static Colliders | Örgü görünür örgüleri değil çarpışma şekillerini izler. Aşağıdaki maske çarpışmalara uygulanır; görünür örgüsü olmayan duvarlar ancak böyle sayılır |
+| `geometry_collision_mask` | 1. katman; adada 1 ve 4 | Engeller ve görünmez duvarlar sayılır |
+| `filter_walkable_low_height_spans` | demoda kapalı | Tavanlı yeni seviyede `agent_height` altı boşlukları dışlamak için açın |
+
+**Navigasyonu çarpışma gövdesiyle eşleştirin.** `agent_max_climb`, `GroundCharacter.max_step_height` değerini
+(burada 0.3 m) aşmasın; navigasyon eğim sınırı da gövdenin zemin sınırını aşmasın (burada 40° ve 45°). İkisinden
+biri değişirse yeniden pişirin. Navigasyon hücrelere bölünür; aynı sayılar her kenarda garanti vermez: geçilmesi
+istenen en yüksek basamağı ve yasaklanacak en alçak çıkıntıyı deneyin. Demo 0.2 m basamakları geçer, 0.4 m bloğu
+reddeder. İnce 0.025 m dikey hücreler bu küçük yükseklik farklarını ayırır.
+
+Yeni seviyede etmen yüksekliğini kapsülün tam boyuna eşit veya daha yüksek seçin ve
+`filter_walkable_low_height_spans` açın; yükseklik tek başına boşluk filtresini açmaz. Tavan çarpışmalarını
+pişirmeye katın. Süzülen model gövdenin üstüne uzanır; görsel boşluğu ayrıca denetleyin. Yarıçap duvar
+çevresindeki yol payını belirler; kapsül yarıçapı değişirse dar koridorları denetleyip yeniden pişirin.
+
+Harita ile örgünün `cell_height` ve `cell_size` değerleri eşit olsun. Demo dikeyde 0.025 m, yatayda 0.25 m
+kullanır; karşılık gelen proje ayarları `navigation/3d/default_cell_height` ve
+`navigation/3d/default_cell_size` alanlarıdır. Godot'un
+[NavigationMesh başvurusu](https://docs.godotengine.org/en/stable/classes/class_navigationmesh.html) pişirme
+çözünürlüğünü, yuvarlamayı ve boşluk filtresini açıklar.
+
+Pişirilmiş yüzey çarpışma zemininden biraz yüksek olabilir. `NavigationMover` yol ilerlemesini XZ düzleminde
+karşılaştırır; gövdenin gerçek yüksekliğini fizik belirler. Pişirme geometrisini fizik katmanları, kullanılabilir
+yolları ise bölgenin navigasyon katmanları ve `NavigationMover.navigation_layers` seçer.
+
+Boş navigasyon sonucu doğrudan harekete döner; kısmi yol erişilemeyen hedefin önünde bitebilir. Kötü rotayı
+hareket ayarlarıyla telafi etmeden önce **Debug → Visible Navigation** ve demodaki **Karakter yol çizgisi**
+panelini kullanın. Bkz. [Hareket](locomotion.md#navigationmover).
+
+## Navigasyon örgüsünü yeniden pişirme
+
+Örgü önceden pişirilir ve her seviyenin kendi sahnesinde, `shared/world/world.tscn` ve
+`shared/world/island/island.tscn` içinde (`NavigationRegion3D` düğümünün `NavigationMesh` kaynağı) saklanır;
+oyun yeniden hesaplamaz. Seviye düzenlenince yeniden pişirin. İki seviye aynı parametreleri kullanır; yalnız
+çarpışma maskesi farklıdır: adada 1 ve 4. katmanlar pişirilir.
+
+**Ne zaman:** 1. katmanda (`world`) çarpışma şekli olan herhangi bir şeyi taşıdığınızda, eklediğinizde,
+kaldırdığınızda veya yeniden boyutlandırdığınızda: bir kaya, bir sandık, bir duvar, bir ağaç, bir dekor nesnesi, bir
+NPC, dağ; adada 4. katmandaki (`bounds`) görünmez duvarlar da. Yalnızca görünüm değiştiğinde (bir örgü, malzeme)
+ya da 3. katmandaki (`camera`) gövdeler, oyuncunun
+karakteri (2. katman) ve alanlar (`Area3D`) için gerekmez. Unutursanız yollar taşınmış bir nesnenin içinden (karakter
+ona çarpar ve boyunca kayar) ya da eskiden durduğu boş yerin etrafından geçer.
+
+**Editörde:**
+
+1. Seviyenin sahnesini açın.
+2. Sahne ağacında `NavigationRegion3D` düğümünü seçin.
+3. 3B görünümün üstündeki araç çubuğunda **NavigationMesh Pişir** (Bake NavigationMesh) düğmesine basın. Birkaç saniye
+   sonra görünümdeki mavi örgü güncellenir: nesnenin çevresinde ajan yarıçapı (0,5 m) kadar bir delik, eskiden
+   durduğu yerde kesintisiz örgü.
+4. Sahneyi kaydedin (Ctrl+S): örgü sahneye gömülüdür.
+
+Pişirme parametreleri kaynağın kendisindedir: `NavigationRegion3D` düğümünü seçin ve Denetçi'de (Inspector)
+`Navigation Mesh` özelliğini genişletin.
+
+Yeniden pişirdikten sonra testleri çalıştırın ([Testler](../testing.md)): rotaları örgüyü izler. Çalışan oyunda
+editördeki Hata Ayıklama → Görünür Navigasyon (Debug → Visible Navigation) örgüyü, Ayarlar (F10) → Arayüz →
+**Karakter yol çizgisi** de karakterin yolunu gösterir.
 
 ## Seviye
 
@@ -23,9 +102,9 @@ Demo seviyesi `shared/world/world.tscn` dosyasıdır: ahşap bir çitin ardında
 - Güney duvarına sırtlarını dönmüş, boşluğun doğusunda sıra hâlinde **on kahraman görünümü** (bkz.
   [Karakterler](characters.md#kahraman-görünümleri)).
 
-Orman, çalılar ve kayalar, testlerin kullandığı yerleri (rotalar, güney şeridi boyunca koşu, platformdan zıplama,
-başlangıç noktasının çevresindeki her şey) boş bırakarak, sabit tohumlu tek kullanımlık bir betikle bir kez
-yerleştirilmiştir. Betik projede yoktur; yerleşim artık editörde düzenlenir. Ağaçları taşırken bu yerleri boş tutun.
+Yerleşimi değiştirmek için seviye sahnesindeki nesne örneklerini düzenleyin, sonra navigasyonu yeniden pişirin.
+Regresyon testleri demoda belirli rotaları ve engel konumlarını kullanır; kendi düzeniniz için ayrı seviye açın
+veya test geometrisiyle birlikte testleri de güncelleyin.
 
 ### Yerler ve NPC'ler
 
@@ -46,7 +125,8 @@ doruk `mountain.tscn` içindedir.
 
 **Yeni bir yer:** herhangi bir dünya sahnesine bir çarpışma şekli ve bir `title` ile birlikte bir `PointOfInterest`
 (`collision_mask` özelliği karakterlerin 2. katmanını içeren bir `Area3D`) ekleyin. Bildirim her yeri grubu üzerinden
-bulur; bağlantı gerekmez. Başlığı çevirilere ekleyin ([Arayüz](ui.md#çeviriler)).
+bulur; sonradan yüklenen seviyelerde de bağlantı gerekmez. Başlığı çevirilere ekleyin
+([Arayüz](ui.md#çeviriler)). Issız Ada'daki beşinci yer Münzevinin Kampı'dır.
 
 ## Yüzeyler
 
@@ -70,12 +150,15 @@ sıraları, tahtalar, çerçeveler ve direkler, ahşap iskelet, fıçı çıtala
 | Fıçılar | `barrel` | Aralıklı çıtalar, paslı demir çemberler, tahta bir kapak |
 | Kütükler, ağaç gövdeleri, sancak direği | `bark` | Zemine yakın ve kuzey tarafında yosunlu, oluklu ağaç kabuğu; kamp ateşinde kömürleşmiş ve için için yanan kütükler |
 | Ağaç tepeleri, çalılar | `foliage` | Üç eksen düzleminde iki katman yaprak, öbekler, daha açık bir tepe; çamlarda iğne yapraklar, sonbahar meşesinde turuncu ve kırmızı |
-| Zemin | `ground_grid` | Aşağıya bakın |
+| Zemin | `ground_grid` | Aşağıya bakın. Adanın çimi, yolları kapalı (`roads`) aynı zemin olan `island_ground.tres` kaynağıdır |
 | Dağ | `mountain` | Yüz rengine göre seçilen çimen, patika ve kaya katmanları |
-| Kuyudaki su | `water` | Yavaş dalgacıklar |
+| Kuyudaki su ve ada gölü | `water` | Yavaş dalgacıklar. Göl (`lake_water.tres`) daha açık mavi, daha güçlü dalgalıdır (`ripple` 0.55; kuyuda 0.35) |
 
 Taş duvar deseni örgünün yüzlerini izler ve kutunun boyutunu bilir: yüz alt bölümleri olmayan bir `BoxMesh` yalnızca
-her köşede bir köşe noktasına sahiptir, bu yüzden `abs(VERTEX)` yarı boyutları verir. Yanlardaki sıralar yüksekliğe
+her köşede bir köşe noktasına sahiptir, bu yüzden `abs(VERTEX)` yarı boyutları verir. Bu değerler piksele değişmeden
+(`flat` değişkenle) ulaşır. Enterpolasyon son basamakları pikselden piksele farklılaştırırdı; yarı değere denk gelen
+sıra sayısı (0.4 m sıralı 1.4 m basamak) bazı piksellerde aşağı, bazılarında yukarı yuvarlanıp titrerdi. Sıva,
+tahta ve kumaş gölgelendiricileri kutu boyunu aynı biçimde aktarır. Yanlardaki sıralar yüksekliğe
 uyar ve bir yanın en üst sırası üst taşların kenarıdır; böylece derzleri, üst yüzün derzlerini kenarda sürdürür.
 Rampa (ince bir levha) böyle tek bir sıradır ve uçlarının derzleri üst yüzle eşleşir. Labirent kutularında ise her
 25 cm'de bir yüz alt bölümü vardır (`subdivide_*`), çünkü yanları dünya konumundan gelen gürültüyle kaydırılır: bir
@@ -103,10 +186,8 @@ lifleri, saman, dokuma kumaş) gürültü gölgelendiricileri olarak tasarlanmı
 hesaplamaz: `shared/world/textures/` içinde bir kez dikişsiz dokulara pişirilmişlerdir ve dünya gölgelendiricileri
 onları döşer.
 
-Nedeni kare süresidir. 2560 × 1511'lik bir pencerede yalnızca zemin GPU'ya kare başına yaklaşık 2,5 ms'ye mal
-oluyordu: her piksel, sinüsler ve karmalarla (hash) 18 çimen yaprağı hücresi üzerinde döngü yapıyordu. Dokularla GPU
-tüm kare için 4,5 ms yerine yaklaşık 2 ms'ye ihtiyaç duyar ve kare hızı 160–230'dan 300–470'e çıktı (seviyenin 12
-görünümü, V-Sync yok, bir RTX 4090 Laptop GPU; bunun ötesinde sınır CPU'dur).
+Pişirme, her pikselde tekrarlanan gürültü hesaplarını doku örnekleriyle değiştirir. Bu dokuları yenilerken aşağıdaki
+içe aktarma ayarlarını koruyun; bazı kanallar sıradan renk değil gölgelendirici verisi taşır.
 
 - **Dikişsiz.** Desenlerin gürültüsü, döşeme başına tam sayıda öğeyle döşemeyle birlikte tekrarlanır; bu yüzden dikiş
   görünmez. İstisna `ground_mask` dokusudur: tüm 96 m'lik zemini kaplayan büyük alanlar ve yollar, döşenmeden.
@@ -148,64 +229,6 @@ Kamera varsayılan olarak güneydoğudan bakar; bu yüzden patikanın uzak taraf
 zaman siluet olarak görünür (bkz.
 [Karakterler](characters.md#occludedsilhouette-tek-şekil-hatları-belirgin-silah-kontur)).
 
-## Fizik katmanları ve navigasyon
-
-Engeller 1. katmanda (`world`) `StaticBody3D` gövdeleri, karakterler 2. katmanda (`characters`), yalnızca kamera için
-gövdeler 3. katmandadır (`camera`), bkz. [Proje yapılandırması](../project-setup.md#fizik-katmanları). Navigasyon
-örgüsü 1. katman çarpışmalarından 0,5 m ajan yarıçapıyla pişirilir; karakterin kapsülü 0,35 m'dir, bu yüzden yollar
-köşelerden pay bırakır.
-
-| `NavigationMesh` parametresi | Değer | Neden |
-|---|---|---|
-| `agent_radius` | 0,5 m | Yollar köşelerden uzak durur |
-| `agent_height` | 1,75 m | |
-| `agent_max_slope` | 40° | Dağın yamaçları örgünün dışında kalır |
-| `cell_height` | 0,025 m | Aşağıdaki tırmanmayı ölçecek kadar ince |
-| `agent_max_climb` | 0,3 m (12 hücre) | Karakterin çıkabildiği basamaklar (`GroundCharacter.max_step_height`) |
-| `geometry_collision_mask` | 1. katman | Yalnızca engeller sayılır |
-
-**Bir yol hiçbir zaman gövdenin tırmanabileceğinden yüksek bir çıkıntıya çıkmaz.** `GroundCharacter` en fazla
-`max_step_height` (0,3 m) yüksekliğindeki basamaklara çıkar, bu yüzden örgü 0,3 m'ye kadar olan çıkıntıları birleştirir
-(`agent_max_climb`), daha yükseklerini birleştirmez: platformun doğusundaki merdiven birleştirilir, platformun 1,6 m'lik
-kenarı ve rampanın 0,3 m'den yüksek yanları birleştirilmez. Recast yükseklikleri tam hücrelerle ölçer, bu yüzden
-hücreler ince olmalıdır. Örgü önceden `cell_height` = 0,25 m ile `agent_max_climb` = 0,25 m olarak pişiriliyordu ve
-neredeyse 0,5 m'lik bir çıkıntıyı yürünebilir sayıyordu: platforma giden yol rampaya, kenarının zeminden 0,4 m yüksekte
-olduğu yandan giriyordu ve karakter ona çarpıyordu. 0,025 m'lik hücrelerle tırmanma 2,5 cm hassasiyetle ölçülür.
-Navigasyon haritasının hücre yüksekliği örgününkini aşmamalıdır (aksi hâlde motor uyarır), bu yüzden `project.godot`,
-`navigation/3d/default_cell_height` değerini 0,025 yapar. `max_step_height` değerini değiştirirseniz `agent_max_climb`
-değerini de aynı değere ayarlayın ve örgüyü yeniden pişirin.
-
-Bir Recast örgüsü zeminin yaklaşık iki hücre yüksekliği üstünde durur (burada 0,05 m; eski 0,25 m'lik hücrelerle
-0,5 m idi). `NavigationMover` yol noktalarını bu yüzden yatay düzlemde karşılaştırır, bkz.
-[Hareket](locomotion.md#navigationmover).
-
-## Navigasyon örgüsünü yeniden pişirme
-
-Örgü önceden pişirilir ve doğrudan `shared/world/world.tscn` içinde saklanır (`NavigationRegion3D` düğümünün
-`NavigationMesh` kaynağı); oyun onu yeniden hesaplamaz. Seviyeyi düzenledikten sonra yeniden pişirin.
-
-**Ne zaman:** 1. katmanda (`world`) çarpışma şekli olan herhangi bir şeyi taşıdığınızda, eklediğinizde,
-kaldırdığınızda veya yeniden boyutlandırdığınızda: bir kaya, bir sandık, bir duvar, bir ağaç, bir dekor nesnesi, bir
-NPC, dağ. Yalnızca görünüm değiştiğinde (bir örgü, bir malzeme) ya da 3. katmandaki (`camera`) gövdeler, oyuncunun
-karakteri (2. katman) ve alanlar (`Area3D`) için gerekmez. Unutursanız yollar taşınmış bir nesnenin içinden (karakter
-ona çarpar ve boyunca kayar) ya da eskiden durduğu boş yerin etrafından geçer.
-
-**Editörde:**
-
-1. `shared/world/world.tscn` sahnesini açın.
-2. Sahne ağacında `NavigationRegion3D` düğümünü seçin.
-3. 3B görünümün üstündeki araç çubuğunda **NavigationMesh Pişir** (Bake NavigationMesh) düğmesine basın. Birkaç saniye
-   sonra görünümdeki mavi örgü güncellenir: nesnenin çevresinde ajan yarıçapı (0,5 m) kadar bir delik, eskiden
-   durduğu yerde kesintisiz örgü.
-4. Sahneyi kaydedin (Ctrl+S): örgü sahneye gömülüdür.
-
-Pişirme parametreleri kaynağın kendisindedir: `NavigationRegion3D` düğümünü seçin ve Denetçi'de (Inspector)
-`Navigation Mesh` özelliğini genişletin.
-
-Yeniden pişirdikten sonra testleri çalıştırın ([Testler](../testing.md)): rotaları örgüyü izler. Çalışan oyunda
-editördeki Hata Ayıklama → Görünür Navigasyon (Debug → Visible Navigation) örgüyü, Ayarlar (F10) → Arayüz →
-**Karakter yol çizgisi** de karakterin yolunu gösterir.
-
 ---
 
-*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*

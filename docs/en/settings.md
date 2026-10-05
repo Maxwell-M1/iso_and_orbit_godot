@@ -1,39 +1,46 @@
 # Settings
 
-F10 opens the settings window and pauses the game; Esc or F10 closes it. Changes apply at once and are saved to
-`user://settings.cfg` when the window closes and when the game exits. **Reset all** returns every setting to its
-default.
+[← Documentation index](index.md)
+
+F10 opens the settings window and pauses the game; Esc or F10 closes it. Changes apply at once (only the interface
+scale, dragged with the mouse, waits for the release) and are saved to `user://settings.cfg` when the window closes
+and when the game exits. **Reset all** returns every setting to its default.
 
 The defaults are in `DEFAULTS` in `gdscript/settings/game_settings.gd`. The demo applies them to node properties in
 `gdscript/demo/settings_applier.gd`; the components' own property defaults can differ, as noted below. How the
 settings system works and how to add a setting: [UI](systems/ui.md#settings).
+
+For a standalone copied hero, use [Configurations](configurations.md) to find the Inspector properties and choose
+a coherent setup. This page describes the **demo menu**. Labels below use the original bindings; the running menu
+substitutes the current keys from `InputMap`.
 
 ## Controls
 
 | Setting | Key | Default | Applied to |
 |---|---|---|---|
 | **Held LMB**: Straight to the cursor / To the point along a path | `gameplay/hold_mode` | Straight to the cursor | `PointClickMoveInput.hold_mode` |
-| **RMB + WASD**: Off / Sidestep / Turn | `gameplay/camera_keys_mode` | Turn | `PointClickMoveInput.keys_with_camera` (component default: sidestep) |
-| **LMB + RMB + A/D**: Off / Sidestep / Diagonal | `gameplay/camera_steer_keys_mode` | Diagonal | `PointClickMoveInput.keys_with_camera_steer` (component default: sidestep) |
-| **Backing up (S) slower by** 0…80%, only with sidestep | `gameplay/backward_slowdown` | 30% | `LocomotionSettings.backward_speed_multiplier` = 1 − value |
+| **RMB + WASD**: Off / Sidestep / Turn | `gameplay/camera_keys_mode` | Turn | `PointClickMoveInput.keys_with_camera` (component default: sidestep); Off also hides the hint line about RMB + WASD |
+| **LMB + RMB + A/D**: Off / Sidestep / Diagonal | `gameplay/camera_steer_keys_mode` | Diagonal | `PointClickMoveInput.keys_with_camera_steer` (component default: sidestep); Off also hides the hint line about LMB + RMB + A/D |
+| **Backing up (S) slower by** 0…80%, only with sidestep | `gameplay/backward_slowdown` | 30% | `LocomotionSettings.backward_speed_multiplier` = 1 − value / 100 |
 | **Hide the cursor while running with LMB held** | `gameplay/hide_cursor_on_hold` | on | `PointClickMoveInput.hide_cursor_while_held` |
+| **RMB while running with LMB only turns the camera** | `gameplay/look_around` | on | `PointClickMoveInput.look_around_while_held`; also hides the hint line about looking around |
 
 ## Character
 
 | Setting | Key | Default | Applied to |
 |---|---|---|---|
-| **Hero look**: one of ten | `character/look` | 10 · Battle Mage | `CharacterAppearance.set_look()` |
+| **Hero look**: one of ten | `character/look` | 8 · Necromancer | `CharacterAppearance.set_look()` |
+| **Float above the ground** | `character/hover` | off | `CharacterHover.enabled` on `Hero/Character/Visual/Hover` (component default: on; `player.tscn` turns it off); while the hero floats, the hover turns its steps off and slows its fall (`player_floating_fall.tres`) |
 | **Don't fall off ledges** | `gameplay/ledge_guard` | on | `LedgeGuard.enabled` |
-| **Jump (Space)** | `character/jump` | on | `GroundCharacter.can_jump` |
+| **Jump (Space)** | `character/jump` | on | `GroundCharacter.can_jump`; also hides the hint line about the jump |
 | **Jump height** 0.5…1.5 m | `character/jump_height` | 1.0 m | `GroundCharacter.jump_height` |
-| **Sprint (Shift)** | `character/sprint` | on | `GroundCharacter.can_sprint` |
+| **Sprint (Shift)** | `character/sprint` | on | `GroundCharacter.can_sprint`; also hides the hint line about sprint |
 | **Shift**: Hold / Press: on, again: off | `character/sprint_mode` | Hold | `CharacterActionInput.sprint_mode` |
-| **Speed bonus** +10…+100% | `character/sprint_bonus` | +50% | `LocomotionSettings.sprint_speed_multiplier` = 1 + value |
+| **Speed bonus** +10…+100% | `character/sprint_bonus` | +50% | `LocomotionSettings.sprint_speed_multiplier` = 1 + value / 100 |
 | **Sprint fatigue** | `character/fatigue` | on | `GroundCharacter.sprint_tires` |
 | **Stamina lasts** 3…10 s | `character/sprint_duration` | 5.0 s | `GroundCharacter.sprint_duration` |
 
-The ledge guard key stayed `gameplay/ledge_guard` after the switch moved to the Character tab, so a saved choice is
-not lost.
+The ledge guard uses the saved key `gameplay/ledge_guard` even though its control is on the Character tab.
 
 ## Camera
 
@@ -41,9 +48,15 @@ not lost.
 |---|---|---|---|
 | **RMB tilts the camera up and down** | `camera/mouse_pitch` | off | `OrbitCameraRig.mouse_pitch` |
 | **Turn the camera to follow the run** | `camera/follow` | off | `OrbitCameraRig.follow_movement` |
-| **Align the camera tilt** | `camera/align_pitch` | off | `OrbitCameraRig.follow_pitch` |
+| **Turn in** 0…10 s ("instant" at 0) | `camera/follow_time` | 1.1 s | `OrbitCameraRig.follow_time` (component default: 1.5 s) |
+| **Except a run toward the camera** | `camera/follow_except_toward` | on | `OrbitCameraRig.follow_toward_camera_angle`: off sets it to 0, and the camera turns behind any run, also one straight at it |
+| **Angle** 5…60° | `camera/follow_except_toward_angle` | 30° | `OrbitCameraRig.follow_toward_camera_angle` = value while the exception is on (the component default is 30° too) |
+| **Align the camera tilt on the run** | `camera/align_pitch` | off | `OrbitCameraRig.follow_pitch` |
 | **Tilt down** 8…80° | `camera/align_pitch_angle` | 22° | `OrbitCameraRig.follow_pitch_angle` = −value (component default: −40°) |
-| **Catch up in** 0…10 s ("instant" at 0), for the turn and the tilt | `camera/follow_time` | 1.1 s | `OrbitCameraRig.follow_time` (component default: 1.5 s) |
+| **Align the tilt in** 0…10 s ("instant" at 0) | `camera/align_pitch_time` | 1.1 s | `OrbitCameraRig.follow_pitch_time` (component default: 1.5 s) |
+| **Align the camera height on the run** | `camera/align_height` | off | `OrbitCameraRig.follow_zoom` |
+| **Height** 0…100% | `camera/align_height_level` | 55% | `OrbitCameraRig.follow_zoom_level` = value / 100: 0% is the camera lowered all the way, 100% raised all the way |
+| **Align the height in** 0…10 s ("instant" at 0) | `camera/align_height_time` | 1.5 s | `OrbitCameraRig.follow_zoom_time` |
 | **The cursor keeps its aim while the camera turns** | `camera/keep_aim` | on | `PointClickMoveInput.keep_aim_on_camera_turn` |
 | **The camera stops at obstacles behind it** | `camera/keep_out_of_geometry` | on | `CameraArm.keep_out_of_geometry` |
 | **Move in when the character is hidden** | `camera/pull_in_on_occlusion` | off | `CameraArm.pull_in_on_occlusion` |
@@ -79,11 +92,13 @@ on turns: the camera turns every frame, the character only every tick.
 | **Interface scale** 50…100% | `interface/ui_scale` | 75% | Root window `content_scale_factor` |
 | **FPS counter** | `interface/fps_counter` | on | `Hud/FpsCounter` visibility |
 | **Controls hint and speed** | `interface/help` | on | `Hud/Panel` visibility |
-| **Character path line** | `interface/path_line` | off | `PathView` visibility |
+| **Character path line** | `interface/path_line` | off | `Hero/PathView` visibility |
 | **Character state and events** | `interface/character_state` | off | `Hud/CharacterState` visibility (`CharacterMonitor`) |
 
-The interface scale changes the hint, the FPS counter, the stamina bar and the windows, not the 3D view. 100% is the
-size as authored in the scenes.
+The interface scale changes the hint, the FPS counter, the stamina bar, the character state panel, the "Discovered: …"
+message, the offer to travel, the loading screen and the windows, not the 3D view. 100% is the size as authored in the
+scenes. Dragged with the mouse, the slider applies the scale on release, so that the slider does not move away from
+under the cursor; the keyboard and the wheel apply it at once.
 
 ## Sound
 
@@ -92,15 +107,16 @@ size as authored in the scenes.
 | **Volume** 0…100% ("off" at 0) | `sound/volume` | 100% | `Master` bus volume; 0 mutes it |
 | **Footsteps** | `sound/footsteps` | on | `CharacterSounds.footsteps_enabled` |
 | **Jump and landing** | `sound/jump` | on | `CharacterSounds.jump_enabled` |
-| **Sprint start and sprinting** | `sound/sprint` | off | `CharacterSounds.sprint_enabled` |
+| **Sprint start and sprinting** | `sound/sprint` | off | `CharacterSounds.sprint_enabled` (component default: on) |
 
 ## Dependent settings
 
 Controls that make no sense without another setting are dimmed and cannot be changed: the backward slowdown without
 the sidestep mode for RMB + WASD, the jump height without the jump, everything about sprint without sprint, the
-stamina duration without fatigue, the tilt angle without tilt alignment, and the catch-up time without either follow
-or tilt alignment.
+stamina duration without fatigue, the turn's time without the turn, the tilt angle and its time without tilt
+alignment, the height and its time without height alignment, and the footsteps sound while the hero floats (it has no
+steps then).
 
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*

@@ -1,12 +1,14 @@
-<!-- translation of docs/en/getting-started.md @ e13fbe9f2ef5 -->
+<!-- translation of docs/en/getting-started.md @ a68235d39cbc -->
 # Primeiros passos
+
+[← Índice da documentação](index.md)
 
 > Esta é uma tradução do [original em inglês](../en/getting-started.md).
 > Onde houver diferenças, a versão em inglês é a correta.
 
 ## Requisitos
 
-- Godot 4.7.2, a versão padrão ou a .NET. O projeto ainda não tem código C#, então qualquer uma serve.
+- Godot 4.7.2. A versão padrão basta: o projeto usa GDScript e dispensa o SDK .NET.
 - Nada mais para a demo: o Jolt Physics vem embutido na engine, o renderizador é o Forward+ e todos os assets estão no
   repositório.
 
@@ -17,6 +19,10 @@
    abra o projeto. A primeira importação demora um pouco, pois o cache `.godot/` não está no repositório.
 3. Pressione F5. A cena principal é `res://gdscript/main.tscn`.
 
+A demo carrega suas configurações salvas anteriormente. Use **F10 → Redefinir tudo** para os padrões descritos aqui.
+Num clone novo, espere a importação terminar antes de abrir scripts ou executar testes. Não copie o cache `.godot/`
+de outro projeto.
+
 ## O que você vê
 
 O herói está no ponto de spawn, no meio de uma clareira cercada. Os controles estão listados no canto superior
@@ -25,7 +31,8 @@ esquerdo, a taxa de quadros no superior direito.
 - **Clique esquerdo** no chão: o herói corre até lá contornando obstáculos, e um marcador mostra o ponto.
 - **Segure o botão esquerdo**: o herói corre atrás do cursor.
 - **Botão direito + mouse**: orbitar a câmera. **Roda**: zoom.
-- **Os dois botões**: correr para onde a câmera olha. **Botão direito + WASD**: mover-se em relação à câmera.
+- **Botão direito, depois esquerdo**: correr para onde a câmera olha. **Esquerdo segurado, depois direito**: olhar
+  em volta durante a corrida. **Botão direito + WASD**: mover-se em relação à câmera.
 - **Shift** ativa a corrida rápida, **Espaço** pula, **F10** abre as configurações.
 
 A lista completa está em [Controles](controls.md).
@@ -40,6 +47,9 @@ Locais para visitar:
   testar a busca de caminhos.
 - As dez aparências do herói em fila junto ao muro sul. Escolha uma em Configurações → Personagem → **Aparência do
   herói**.
+- **A plataforma de teleporte** junto do Círculo Antigo, com um cristal giratório: suba nela e aperte E ou clique
+  na oferta para viajar à **Ilha Solitária** e ao **Acampamento do Eremita**. Uma plataforma na ilha
+  (“Teletransporte: Vale Verde”) traz você de volta.
 
 ## Configurações
 
@@ -60,11 +70,12 @@ código de saída. Num clone novo, importe o projeto uma vez antes, no editor ou
 
 ## Próximos passos
 
-- [Arquitetura](architecture.md): o que cada nó faz e como eles estão ligados.
-- [Usando no seu projeto](integration.md): quais arquivos levar e como configurá-los.
-- [Configuração do projeto](project-setup.md): camadas de física, ações de entrada e grupos que os componentes
-  esperam.
+- [Transfira o herói pronto](integration.md#transferindo-o-herói-da-demo-para-o-seu-projeto): arquivos exatos, um
+  nível de teste e verificações para uma integração funcional.
+- [Configurações](configurations.md): padrão fornecido e duas variantes úteis de movimento e câmera.
+- [Arquitetura](architecture.md): o que cada nó faz e como eles se conectam.
+- [Configuração do projeto](project-setup.md): camadas de física, ações de entrada e dependências opcionais da demo.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

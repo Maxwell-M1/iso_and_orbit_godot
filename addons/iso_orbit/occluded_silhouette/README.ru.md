@@ -1,5 +1,7 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ ed5707ab8355 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
 # Силуэт за препятствиями
+
+[← Оглавление документации (репозиторий шаблона)](../../../docs/ru/index.md)
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · **Русский** · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
@@ -28,20 +30,29 @@
 
 1. Скопируйте эту папку в `res://addons/iso_orbit/occluded_silhouette/`; материалы ссылаются на шейдеры по этому
    пути.
-2. Добавьте персонажу `Node` с `occluded_silhouette.gd`. В `target` укажите узел, в котором лежит модель, и
+2. Добавьте персонажу `Node` с `occluded_silhouette.gd`. В `target` укажите узел модели (у готового героя —
+   `Character/Visual`) и
    назначьте `silhouette_mask.tres`, `silhouette_body.tres`, `silhouette_gear.tres` и `silhouette_outline.tres` в
    `mask`, `body_fill`, `gear_fill` и `outline`.
 3. Меши под узлами, перечисленными в `gear_nodes` (`RightHand`, `LeftHand`), считаются предметами в руках.
+   Если таких узлов нет, все меши получают заливку тела; при иной структуре снаряжения измените имена.
 
 Цвета — параметры `color` у материалов, ширина каймы — `width` в `silhouette_outline.tres`, а `outline_enabled`
-отключает кайму. Силуэт появляется, только если препятствие стоит хотя бы в 30 см перед персонажем (`min_gap`).
+отключает кайму. Для силуэта препятствие должно находиться хотя бы в 30 см перед персонажем (`min_gap` — параметр
+материалов тела, снаряжения и контура из `silhouette_common.gdshaderinc`; меняйте его во всех трёх).
+
+Компонент назначает каждому мешу `material_overlay`, включая добавленные позже при смене облика. Если модель уже
+использует это свойство для другого эффекта, выберите, какому наложению оно принадлежит. При готовности компонента
+материалы копируются в цепочки проходов, поэтому цвета и `min_gap` задавайте в материалах до запуска сцены;
+`outline_enabled` можно менять во время игры.
 
 Использует буфер трафарета, который в Godot 4.5+ экспериментальный. Проверено с рендерером Forward+.
 
 ## Документация
 
-В репозитории шаблона: `docs/ru/systems/characters.md`.
+В репозитории шаблона: `docs/ru/systems/characters.md` (включая замену модели) и
+`docs/ru/integration.md` (копирование игрового героя).
 
 ---
 
-*Страница соответствует Iso & Orbit 1.1.0.*
+*Страница соответствует Iso & Orbit 1.2.0.*

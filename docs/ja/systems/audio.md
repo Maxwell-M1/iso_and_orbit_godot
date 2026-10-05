@@ -1,13 +1,15 @@
-<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
+<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
 # オーディオ
+
+[← ドキュメント目次](../index.md)
 
 > これは[英語の原文](../../en/systems/audio.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
 
-`GroundCharacter`は、自身に起きたことをシグナルで通知します。サウンドが使うのは`stepped(sprinting)`、`jumped`、`landed(impact_speed)`、`sprint_changed(sprinting)`です（シグナルの一覧：[ロコモーション](locomotion.md#キャラクターが通知すること)）。サウンド、足元の土ぼこり、アニメーションはこれらに接続し、キャラクター自身はそれらについて何も知りません。デモではサウンドを接続しています。
+`GroundCharacter`は、自身に起きたことをシグナルで通知します。サウンドが使うのは`stepped(sprinting)`、`jumped`、`landed(impact_speed)`、`sprint_changed(sprinting)`です（シグナルの一覧：[ロコモーション](locomotion.md#キャラクターが報告すること)）。サウンド、足元の土ぼこり、アニメーションはこれらに接続し、キャラクター自身はそれらについて何も知りません。デモではサウンドを接続しています。歩数を数えないとき（`steps_enabled`がオフ、またはヒーローが浮遊中）は、`footsteps_enabled`に関係なく足音が出ません。浮遊中のヒーローはジャンプからゆっくり降りて2 m/sで接地します。これは`landing_min_speed`未満なので`landed`は出ず、着地音もありません。
 
 ## CharacterSounds
 
-`CharacterSounds`（`Player/Sounds`）は、キャラクターの子である`Node3D`です。その子は`AudioStreamPlayer3D`ノードなので、音はキャラクターの位置から聞こえ、NPCでも同じように機能します。このノードがなくても、キャラクターは音が出ないだけで、まったく同じように動作します。
+`CharacterSounds`（`Hero/Character/Sounds`）は、キャラクターの子である`Node3D`です。その子は`AudioStreamPlayer3D`ノードなので、音はキャラクターの位置から聞こえ、NPCでも同じように機能します。このノードがなくても、キャラクターは音が出ないだけで、まったく同じように動作します。
 
 | サウンド | 再生ノード | 再生される内容 |
 |---|---|---|
@@ -21,12 +23,12 @@
 |---|---|---|
 | `character` | 親 | どのキャラクターのシグナルで再生するか |
 | `footsteps`、`jump`、`land`、`sprint_start`、`sprint_loop` | — | 再生ノード |
-| `footsteps_enabled`、`jump_enabled`、`sprint_enabled` | オン | サウンドのグループ。ジャンプのグループはジャンプと着地、ダッシュのグループは開始とループを含む |
+| `footsteps_enabled`、`jump_enabled`、`sprint_enabled` | オン（デモでは`sprint_enabled`がオフ） | サウンドのグループ。ジャンプのグループはジャンプと着地、ダッシュのグループは開始とループを含む |
 | `sprint_step_pitch`、`sprint_step_volume_db` | 1.08、+2 dB | ダッシュ中の足音 |
 | `land_full_speed`、`min_land_volume` | 10 m/s、0.3 | 着地音の音量カーブ |
 | `sprint_loop_fade` | 0.25秒 | ダッシュのループ音のフェード |
 
-音量は`gdscript/player/player.tscn`の各再生ノードで設定されています。実行中のゲームでは、リモートツリー（Remote）から調整できます。例外は`Land`で、その音量は着地のたびに落下速度から設定されます（`land_full_speed`、`min_land_volume`）。グループは設定 → サウンドで切り替えます。デモではダッシュのサウンドがデフォルトでオフです。そこにある全体の音量は`Master`バスの音量です。パーセントは振幅の割合で（50%で6 dB小さくなる）、0でバスがミュートされます。
+音量は`gdscript/player/player.tscn`の各再生ノードで設定されています。実行中のゲームでは、リモートツリー（Remote）から調整できます。例外は`Land`で、その音量は着地のたびに落下速度から設定されます（`land_full_speed`、`min_land_volume`）。グループは設定 → サウンドで切り替えます。デモでは設定と`player.tscn`の両方でダッシュ音がデフォルトでオフです。設定システムなしでも、ダッシュ固有の音は出ません。そこにある全体の音量は`Master`バスの音量です。パーセントは振幅の割合で（50%で6 dB小さくなる）、0でバスがミュートされます。
 
 ## サウンドそのもの
 
@@ -36,4 +38,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.1.0 に対応しています。*
+*このページは Iso & Orbit 1.2.0 に対応しています。*

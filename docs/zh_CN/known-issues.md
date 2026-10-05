@@ -1,5 +1,7 @@
-<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
+<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
 # 已知问题
+
+[← 文档目录](index.md)
 
 > 本文是[英文原文](../en/known-issues.md)的翻译。两者不一致时，以英文版为准。
 
@@ -8,11 +10,14 @@
 ## 局限
 
 - **仅支持鼠标和键盘。** 不支持手柄。
+- **游戏内不能重新绑定按键。** 请在“项目设置 → 输入映射”中修改，或通过代码中的 `InputMap` 修改。界面可以刷新按键名称，但没有重新绑定界面、冲突检测或绑定持久化功能。见[文本中的按键名称](systems/ui.md#文本中的按键名称)。
 - **没有动画。** 模型是静态的基本几何体；只有手持物品会随脚步摆动（`HandSway`）。`GroundCharacter` 会报告 `AnimationTree` 所需的信息：状态、作为混合值的速度、模型坐标轴下的移动和步态周期，见[移动](systems/locomotion.md#角色报告的信息)。
 - **台阶上的胶囊体。** 胶囊体的圆形底部会滚过每一级台阶的边缘：在台阶上，每级台阶会有一个物理帧的水平速度降到约 70%，身体会被放到台阶上、最多比原位置靠前几厘米。对于很长的楼梯，用一个不可见的坡道碰撞体会更平滑，见[移动](systems/locomotion.md#台阶和斜坡)。
-- **角色之间没有避让。** `NavigationMover` 沿路径移动，不使用导航避障，因此移动中的角色不会互相绕开。玩家身体位于第 2 层，只与第 1 层碰撞，因此由 `player.tscn` 制作的两个角色会互相穿过；如果它们应当互相阻挡，请将第 2 层加入它们的 `collision_mask`。演示中的 NPC 站着不动，作为障碍物烘焙进了导航网格。
+- **悬浮模型只是视觉效果。** `CharacterHover` 抬高模型而非身体：低天花板下模型可能陷入其中，相机焦点与相机臂检测仍在身体的高度。经过缺口时，模型会和身体一起下落。
+- **向上方向固定为 +Y。** 角色和组件仅支持以 `Vector3.UP` 为向上方向。
+- **角色之间没有避让。** `NavigationMover` 沿路径移动，不使用导航避障，因此移动中的角色不会互相绕开。玩家身体位于第 2 层，只与第 1 和第 4 层碰撞，因此由 `player.tscn` 制作的两个角色会互相穿过；如果它们应当互相阻挡，请将第 2 层加入它们的 `collision_mask`。演示中的 NPC 站着不动，作为障碍物烘焙进了导航网格。
 - **导航网格是预先烘焙的。** 在运行时移动障碍物不会改变路径。编辑关卡后，请重新烘焙网格（[世界与导航](systems/world-and-navigation.md#重新烘焙导航网格)）。
-- **仅支持 Godot 4.7。** 项目在 4.7.2 上测试。剪影需要模板缓冲区（4.5+），而场景警告检查复现的是 4.7.2 的判定条件。
+- **已验证的引擎和渲染器。** 要使用经过验证的配置，请采用 Godot 4.7.2、Jolt Physics 和 Forward+。测试套件尚未确认其他版本与渲染器的兼容性。剪影需要模板缓冲支持。
 
 ## 输入
 
@@ -38,9 +43,9 @@
 ## 项目文件
 
 - **经过舍入的旋转会产生“non-uniform scale”（非均匀缩放）警告。** 以 4 位数字写入 `.tscn` 的旋转会使基向量的轴长相差超过 1e-5，引擎会对物体和形状报告非均匀缩放。请以完整精度（9 位有效数字）写入 `Transform3D` 的数值。
-- **`shared/` 尚未完全与脚本语言无关。** `world.tscn` 和 `mountain.tscn` 使用了 `addons/iso_orbit/points_of_interest/point_of_interest.gd`，另有两个小型道具脚本位于 `shared/world/props/`。C# 版本将需要自己的地点脚本，或者一种仅用场景标记地点的方式。
+- **`shared/` 尚未完全与脚本语言无关。** 关卡和传送台使用了组件脚本：`world.tscn`、`island.tscn` 和 `mountain.tscn` 使用 `addons/iso_orbit/points_of_interest/point_of_interest.gd`；两个关卡使用 `addons/iso_orbit/levels/spawn_point.gd`；`shared/world/props/teleport_pad.tscn` 使用 `addons/iso_orbit/levels/level_portal.gd`。另外两个小型道具脚本位于 `shared/world/props/`。C# 版本需要自己的地点、出生点和传送门脚本，或仅通过场景标记它们的方法。
 - **退出时报告资源泄漏。** 如果脚本在脚步声播放后立即退出，引擎可能会报告泄漏的 `AudioStreamPlayback` 对象：使用 `--fixed-fps` 时，游戏时间跑在现实时间前面，而声音仍在播放。请先释放场景，稍等片刻再退出；`tests/run_checks.gd` 会等待 0.1 秒。
 
 ---
 
-*本页对应 Iso & Orbit 1.1.0。*
+*本页对应 Iso & Orbit 1.2.0。*

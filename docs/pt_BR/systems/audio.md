@@ -1,5 +1,7 @@
-<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
+<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
 # Áudio
+
+[← Índice da documentação](../index.md)
 
 > Esta é uma tradução do [original em inglês](../../en/systems/audio.md).
 > Onde houver diferenças, a versão em inglês é a correta.
@@ -7,11 +9,15 @@
 `GroundCharacter` informa o que acontece com ele por sinais; os sons usam `stepped(sprinting)`, `jumped`,
 `landed(impact_speed)` e `sprint_changed(sprinting)` (todos eles:
 [Locomoção](locomotion.md#o-que-o-personagem-informa)). Sons, poeira sob os pés ou animações se conectam a eles; o
-próprio personagem não sabe nada sobre isso. A demo conecta sons.
+próprio personagem não sabe nada sobre isso. A demo conecta sons. Quando os passos não são contados
+(`steps_enabled` desligado ou herói flutuando), não há som de passos, independentemente de
+`footsteps_enabled`. O herói flutuante desce lentamente do pulo e toca o chão a 2 m/s, abaixo de
+`landing_min_speed`: não ocorre `landed` nem som de aterrissagem.
 
 ## CharacterSounds
 
-`CharacterSounds` (`Player/Sounds`) é um `Node3D` filho do personagem. Os filhos dele são nós `AudioStreamPlayer3D`,
+`CharacterSounds` (`Hero/Character/Sounds`) é um `Node3D` filho do personagem. Seus filhos são nós
+`AudioStreamPlayer3D`,
 então o som sai do personagem e funciona igual para um NPC. Sem esse nó, o personagem funciona exatamente igual, só que
 em silêncio.
 
@@ -27,7 +33,7 @@ em silêncio.
 |---|---|---|
 | `character` | pai | De quem tocar os sinais |
 | `footsteps`, `jump`, `land`, `sprint_start`, `sprint_loop` | — | Os reprodutores |
-| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | ligado | Grupos de sons; o pulo cobre o pulo e a aterrissagem, a corrida rápida cobre o início e o loop |
+| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | ligados (`sprint_enabled` desligado na demo) | Grupos de sons; pulo inclui aterrissagem, corrida rápida inclui início e loop |
 | `sprint_step_pitch`, `sprint_step_volume_db` | 1,08; +2 dB | Passos durante a corrida rápida |
 | `land_full_speed`, `min_land_volume` | 10 m/s; 0,3 | Curva de volume da aterrissagem |
 | `sprint_loop_fade` | 0,25 s | Fade do loop da corrida rápida |
@@ -35,7 +41,8 @@ em silêncio.
 Os volumes são definidos nos reprodutores em `gdscript/player/player.tscn`; ajuste-os com o jogo rodando pela árvore
 Remota (Remote). A exceção é `Land`: o volume dele é definido antes de cada aterrissagem a partir da velocidade da
 queda (`land_full_speed`, `min_land_volume`). Os grupos são ligados e desligados em Configurações → Som; a demo deixa
-os sons da corrida rápida desligados por padrão. O volume geral ali é o barramento `Master`: a porcentagem é uma fração
+os sons da corrida rápida desligados por padrão, nas configurações e em `player.tscn`; assim, ela não tem sons
+próprios mesmo sem o sistema de configurações. O volume geral ali é o barramento `Master`: a porcentagem é uma fração
 da amplitude (50% é 6 dB mais baixo), e 0 silencia o barramento.
 
 ## Os sons em si
@@ -49,4 +56,4 @@ Sons reais gravados podem substituir estes: coloque arquivos com os mesmos nomes
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

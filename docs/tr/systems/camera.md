@@ -1,189 +1,232 @@
-<!-- translation of docs/en/systems/camera.md @ 1850159bc3c5 -->
+<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
+<!-- translation of docs/en/systems/camera.md @ pending -->
 # Kamera
+
+[← Belge dizini](../index.md)
 
 > Bu, [İngilizce orijinalin](../../en/systems/camera.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
-İki düğüm: `OrbitCameraRig` bir hedefi izler, onun etrafında döner ve yakınlaştırır; alt düğümü `CameraArm`,
-`Camera3D` düğümünü bir kolun ucunda tutar ve engellerde kolu kısaltır.
+`OrbitCameraRig`, bir `Node3D` hedefi izler; fareyle çevresinde döner, tekerlekle uzaklığı ve eğimi değiştirir.
+Çocuğu `CameraArm`, `Camera3D` düğümünü yerel +Z boyunca yerleştirir ve yakınındaki geometriden uzak tutar.
+Koşarken otomatik dönüş, eğim hizalaması ve yakınlaştırma hizalaması birbirinden bağımsız üç seçenektir.
 
+```text
+PlayableHero (şablonda sabit kök)
+├── Character (hareket eden hedef)
+└── CameraRig (OrbitCameraRig; target = ../Character)
+    └── CameraArm (CameraArm)
+        └── Camera3D (current = true)
 ```
-CameraRig (OrbitCameraRig)     hedefe yerleştirilir, sapma ve eğimle döndürülür
-└── CameraArm (CameraArm)      yerel +Z boyunca kol; uzunluğunu düzenek yakınlaştırmaya göre belirler
-    └── Camera3D               kolun ucunda, kol boyunca geriye bakar
-```
 
-Düzenek hedefin alt düğümü değil, kardeşidir. `_process` içinde hedefin enterpole edilmiş konumuna gider ve kendi
-fizik enterpolasyonu kapalıdır: aksi hâlde zaten yumuşatılmış bir konumu yeniden yumuşatır ve bir tik geride kalırdı.
-Projede fizik enterpolasyonu açıkken kamera ve karakter her kare hızında akıcı hareket eder.
+Düzeneği hareket eden hedefin içine değil yanına koyun: küresel konumunu ve dönüşünü kendisi ayarlar. Kol uzunlukları
+ve çarpışma yarıçapları anlamlı kalsın diye düzenek, kol, kamera ve üst düğümleri `(1, 1, 1)` ölçeğinde olsun.
+Düzenek, her çizilen karede kamerayı `target.get_global_transform_interpolated()` konumundan yerleştirir ve kendi
+fizik enterpolasyonunu `_ready()` içinde kapatır; çocukları varsayılan olarak aynı modu devralır. Hedef fizik
+tiklerinde hareket ediyorsa projede fizik enterpolasyonunu açın; yoksa hedef gözle görülür biçimde tik tik ilerler.
+Şablonda açıktır. `height_follow_time`, enterpolasyondan sonra hedefin dikey basamaklarını yumuşatabilir.
 
-## OrbitCameraRig
+`Camera3D`, varsayılan yerel dönüşümüyle başlamalıdır: kol çalışma sırasında konumunu ve dönüşünü ayarlar.
+Şablonda **Current** açıktır; 45° görüş açısı ve 300 dünya birimi uzak düzlemi kullanır. Sahneye sonradan başka
+bir etkin kamera girerse, görüntü kahramanın olacağı zaman bu kamerayı yeniden etkin yapın. Kamerayı veya tüm
+kahramanı kopyalamak için [Aktarma](../integration.md#kamera-tek-başına), eylem ve fizik katmanları için
+[Proje yapılandırması](../project-setup.md) sayfasına bakın.
 
-- **Yörünge.** Sağ tuşu (`camera_rotate`) basılı tutun ve fareyi hareket ettirin. Döndürürken imleç yakalanır ve tuşu
-  bıraktığınızda bulunduğu yere döner. Döndürme sırasında pencere odağı kaybederse veya oyun duraklarsa düzenek
-  imleci kendisi serbest bırakır.
-- **Fareyle eğme** (`mouse_pitch`, varsayılan olarak kapalı). Sağ tuşla dikey fare hareketi kamerayı da eğer.
-  Kapalıyken eğim yalnızca yakınlaştırmadan gelir.
-- **Yakınlaştırma.** Tekerlek kamerayı aşağıya ve yakına ya da yukarıya ve uzağa taşır. Mesafe ve eğim birlikte
-  değişir.
-- **Takip** (`follow_movement`, `follow_pitch`, ikisi de varsayılan olarak kapalı). Kamera koşan hedefin arkasına
-  yavaş yavaş döner ve eğimini yavaşça `follow_pitch_angle` değerine getirir.
+## Etkin değerler hangileri?
 
-### Yakınlaştırma eğrisi
+Aşağıdaki betik değerleri yeniden kullanılabilir bileşen varsayılanlarıdır.
+`gdscript/player/playable_hero.tscn` bunların birkaçını geçersiz kılar; demo başlarken `SettingsApplier` kaydedilmiş
+`Settings` değerlerini uygular. Kopyalanan kahraman sahnesi demo ayar penceresi veya otomatik yüklemesi olmadan,
+sahnedeki değerlerle çalışır.
 
-Yakınlaştırma 0 (en yakın) ile 1 (en uzak) arasında bir değerdir; tekerleğin her çentiği onu `zoom_step` (0,1) kadar
-değiştirir. Mesafe `near_distance` (5 m) ile `far_distance` (20 m) arasında değişir. Eğim `near_pitch` (−22°) ile
-`far_pitch` (−55°) arasında değişir, ancak düzgün değil: tepeden `flatten_start_zoom` (0,5; 12,5 m; −38,5°) değerine
-kadar düzgün değişir, bunun altında ise kamera hızla yataylaşır; böylece karakterin önü orta yükseklikte bile görünür.
-`flatten_end_zoom` (0,2; 8 m) değerinden itibaren kamera −22° açıyla bakar ve yalnızca yaklaşır.
+| Ayar | Betik varsayılanı | Oynanabilir kahraman sahnesi / yeni demo |
+|---|---:|---:|
+| Koşuda dönüş, eğim ve yakınlaştırma hizalaması | hepsi kapalı | hepsi kapalı |
+| `follow_time` | 1.5 s | 1.1 s |
+| `follow_pitch_angle`, `follow_pitch_time` | −40°, 1.5 s | −22°, 1.1 s |
+| `follow_zoom_level`, `follow_zoom_time` | 0.55, 1.5 s | 0.55, 1.5 s |
+| `follow_wait_after_rotate` | kapalı | açık |
+| `height_follow_time` | 0 s | 0.15 s |
 
-Demo `start_zoom` 0,55 ile başlar. Oradan bir çentik aşağı: −33,5°, iki: −26°, üç (8,75 m): −22,5°.
+Dönüş, eğim ve yakınlaştırma süreleriyle hedefleri yalnız ilgili takip anahtarı açıkken etkili olur.
+`height_follow_time`, elle döndürmede de hedefin dikey hareketini her zaman yumuşatır. Demoda önceden
+`user://settings.cfg` dosyasına kaydedilmiş seçimler yeni kurulum varsayılanlarını değiştirebilir.
+`SettingsApplier`, penceredeki pozitif "Aşağı eğim" derecelerini negatif eğime; %0–100 yüksekliği düzeneğin
+0–1 yakınlaştırma değerine dönüştürür.
 
-Eğim, yakınlaştırma eğimine bir ofset eklenmesiyle elde edilir. Fare (`mouse_pitch` ile) ve takip modu ofseti
-değiştirir; böylece tekerlek ve fare her zamanki gibi çalışır ve koşarken eğim yavaşça seçilen açıya döner.
-`mouse_pitch` kapatılınca ofset sıfırlanır. Eğim hiçbir zaman `min_pitch` (−80°) ve `max_pitch` (−8°) sınırlarını
-aşmaz.
+Uzunluklar ve hızlar Godot dünya birimleridir (şablondaki 1 birim = 1 m ölçeğinde metredir).
+`radians_as_degrees` işaretli açılar ve açısal hızlar Inspector'da derece gösterilir, ama GDScript atamalarında
+radyan kullanılır: `follow_pitch_angle` için `deg_to_rad(-22.0)`, `sharp_turn_speed` için
+`deg_to_rad(360.0)` kullanın. `playable_hero.tscn` içindeki serileştirilmiş `-0.383972...`, −22°'dir.
 
-### Takip modu
+## Dönüş, eğim ve yakınlaştırma
 
-| Özellik | Varsayılan | Anlamı |
-|---|---|---|
-| `follow_movement` | kapalı | Kamerayı koşan hedefin arkasına çevir |
-| `follow_pitch` | kapalı | Koşarken eğimi, dönüşle aynı hızda ve aynı durumlarda yavaşça `follow_pitch_angle` değerine getir; `follow_movement` olmadan da çalışır |
-| `follow_pitch_angle` | −40° | Hedef eğim (aşağı negatiftir), `min_pitch` ve `max_pitch` ile sınırlıdır |
-| `follow_time` | 1,5 sn | Neredeyse tamamen dönme süresi (açının %5'i kalır); 0 anında demektir |
-| `follow_min_speed` | 1 m/sn | Bu hızın altında kamera dönmez: dururken veya yerinde dönerken yön güvenilir değildir. Bu hız ile iki katı arasında dönüş yumuşakça güçlenir |
+`camera_rotate` tuşunu (şablonda sağ fare tuşu) basılı tutup fareyi hareket ettirerek kamerayı döndürün. İmleç
+yakalanır ve bırakılınca eski yerine döner; odağın kaybı veya duraklama da onu bırakır. `mouse_pitch` kapalıyken
+dikey fare hareketi etkisizdir ve eğimi tekerlek seçer. Fareyle eğmek için açın; `invert_pitch` ekseni tersine
+çevirir. Tekerleği yukarı kaydırmak kamerayı alçaltır, aşağı kaydırmak yükseltir. Yumuşak kaydırma,
+`zoom_step` değerinin bir kesri kadar ilerleyebilir.
 
-Demonun ayarları farklı varsayılanlar kullanır: yetişme süresi 1,1 sn ve 22° aşağı eğim.
+Yakınlaştırma 0 (yakın) ile 1 (uzak) arasındadır. Varsayılan tekerlek adımı 0.1'dir. Kol uzunluğu
+`near_distance` 5 ile `far_distance` 20 dünya birimi arasında değişir. Yakına geldikçe eğim azalır:
 
-Kamera şu durumlarda takip etmez:
+| Yakınlaştırma | Uzaklık | Temel eğim |
+|---:|---:|---:|
+| 0 | 5 | −22° |
+| 0.2 (`flatten_end_zoom`) | 8 | −22° |
+| 0.5 (`flatten_start_zoom`) | 12.5 | −38.5° |
+| 0.55 (`start_zoom`) | 13.25 | −40.15° |
+| 1 | 20 | −55° |
 
-- sağ tuş basılıyken: kamerayı fare kontrol eder, iki tuşla koşarken de;
-- sol tuşa basıldıktan sonraki ilk 0,2 sn boyunca, bunun tıklama mı basılı tutma mı olduğu belli olana kadar.
-  Duraklama, `main.tscn` içinde `CameraRig.set_follow_paused()` metoduna bağlanan
-  `PointClickMoveInput.hold_pending_changed` sinyalinden gelir.
+0.2 ile 0.5 arasında kamera alçalırken eğim hızla yataylaşır; ilerideki zemin daha kolay görülür. 0.2 altında
+yalnız uzaklık değişir. Fare ve takip eğimi, `min_pitch` ve `max_pitch` (−80° ve −8°) ile sınırlı bir ofset
+ekler. `mouse_pitch` kapatılınca, `follow_pitch` eğimi korumuyorsa ofseti silinir. `rotation_sharpness` ve
+`zoom_sharpness` fare ve tekerlek değişimlerini yumuşatır; 0 ilgili girdiyi anlık yapar.
 
-Hedefin hızını düzenek, hedefin fizik tiki başına hareketinden ölçer; bu yüzden herhangi bir `Node3D` hedef olabilir.
+## Takip modu
 
-Sol tuş basılıyken kamera döndüğünde imleç zeminde farklı bir noktayı gösterir, karakter ona doğru, kamera da
-karakterin ardından dönerdi: karakter daireler çizerek koşardı. Bu yüzden tuş basılıyken girdi bileşeni sistem
-imlecini dünyayla birlikte hareket ettirir. Bkz. [Girdi](input.md#tuş-basılıyken-imleç).
+`follow_movement`, `follow_pitch` ve `follow_zoom` seçeneklerinden istediklerinizi açın: kamera sırasıyla koşu
+yönünün arkasına döner, seçilen eğime yaklaşır ve seçilen yakınlaştırmaya gelir. Düzenek her fizik tikinde herhangi
+bir `Node3D` hedefin yatay hareketini ölçer; karakterin hız özelliği gerekmez. `follow_min_speed` altında takip
+etmez, bu hızla iki katı arasında takip gücü yumuşakça artar. Duran hedef yeni koşuya yeni yönle başlar.
 
-### Özellikler
+Etkin hareketlerin her biri kendi yayı üzerinde yumuşakça başlar ve yerleşir. Süresi, dönüş hızı sınırı engel
+olmadıkça, tam hızlı koşuda hareketsiz durumdan değişimin yaklaşık %95'ini tamamlama süresidir; 0 anlık değişim
+ister. Hareket durunca veya takip duraklayınca başlamış hareket kesilmek yerine frenler. Bu frenleme hızını
+`rotation_sharpness` ve `zoom_sharpness` belirler. Takip kamerayı doğrudan taşır; girdi yumuşatması ikinci bir
+gecikme eklemez.
 
-| Grup | Özellik | Varsayılan | Anlamı |
-|---|---|---|---|
-| | `target` | — | Neyin izleneceği |
-| | `arm` | — | `CameraArm`; boşsa ilk `CameraArm` alt düğümü |
-| | `camera` | — | Kol olmadan kullanılır; boşsa ilk `Camera3D` alt düğümü |
-| Input (girdi) | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Girdi eylemleri |
-| | `mouse_sensitivity` | 0,25 °/px | Yörünge hızı |
-| | `mouse_pitch` | kapalı | Dikey fare hareketi kamerayı eğer |
-| | `invert_pitch` | kapalı | Bu eğmeyi ters çevir |
-| | `zoom_step` | 0,1 | Tekerlek çentiği başına yakınlaştırma değişimi |
-| Framing (kadraj) | `focus_height` | 1,2 m | Kameranın baktığı noktanın hedefin orijininden yüksekliği |
-| | `near_distance`, `far_distance` | 5 m, 20 m | En yakın ve en uzak yakınlaştırmada kol uzunluğu |
-| | `near_pitch`, `far_pitch` | −22°, −55° | En yakın ve en uzak yakınlaştırmada eğim |
-| | `flatten_start_zoom`, `flatten_end_zoom` | 0,5; 0,2 | Eğimin daha hızlı yataylaşmaya başladığı ve yatay olduğu yer |
-| | `min_pitch`, `max_pitch` | −80°, −8° | Eğim sınırları |
-| | `start_zoom`, `start_yaw` | 0,55; 45° | Başlangıç yakınlaştırması ve yönü |
-| Follow (takip) | yukarıya bakın | | |
-| Smoothing (yumuşatma) | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Kameranın istenen sapmaya, eğime ve yakınlaştırmaya ne kadar hızlı ulaştığı |
+| Özellik | Betik varsayılanı | Etki |
+|---|---:|---|
+| `follow_movement`, `follow_time` | kapalı, 1.5 s | Yatay koşunun arkasına dönüş; dönüşü hemen hemen bitirme süresi |
+| `follow_max_turn_speed` | 0 | Otomatik yatay dönüşün °/s cinsinden üst sınırı; 0, anlık dönüşte de sınırı kaldırır |
+| `follow_toward_camera_angle` | 30° | Kameraya doğrudan yönün bu açısı içindeki koşuları yok sayar; açının iki katında tam dönüş gücü. 0 istisnayı kaldırır |
+| `sharp_turn_speed` | 360°/s | Daha keskin yön değişimi veya tersine dönüşte ara yönleri yok sayıp yeni yönü izler; 0 korumayı kapatır |
+| `teleport_speed` | 50 dünya birimi/s | Fizik tikleri arasındaki bundan hızlı yatay hareket koşu değil ışınlama sayılır |
+| `follow_pitch`, `follow_pitch_angle`, `follow_pitch_time` | kapalı, −40°, 1.5 s | Yatay dönüşten bağımsız olarak seçilen aşağı eğime gelir |
+| `follow_zoom`, `follow_zoom_level`, `follow_zoom_time` | kapalı, 0.55, 1.5 s | Dönüş ve eğimden bağımsız olarak 0–1 yakınlaştırma düzeyine gelir |
+| `follow_min_speed` | 1 dünya birimi/s | Takibin başladığı en düşük yatay hız; iki katında tam güç |
+| `follow_wait_after_rotate` | kapalı | Fareyle döndürme sonrası hedef `follow_min_speed` altına yavaşlayana veya yeni koşu bildirilene kadar görüntüyü korur |
 
-Metotlar: `look_along(direction)` kamerayı anında bir yön boyunca bakacak şekilde çevirir; `snap()` istenen konuma
-atlar, örneğin hedef ışınlandıktan sonra; `is_rotating()`; `set_follow_paused(paused)`.
+Kameraya doğru koşu koruması **yalnız dönüşü** etkiler. Doğrudan kameraya koşarken eğim ve yakınlaştırma açık ise
+değişebilir. Keskin dönüş koruması da yalnız dönüşü etkiler: ters yöne dönerken eğimle yakınlaştırma sürer; başlamış
+bir kamera dönüşü yavaşlayıp durabilir. Şablon kahramanının 720°/s `LocomotionSettings.turn_speed` değeri için
+360°/s eşik ters yön değişimlerini yakalarken daha yavaş kavisleri izler. Karakter dönüş hızını değiştirirseniz
+`sharp_turn_speed` değerini bunun yarısında veya altında tutun. Pozitif eşik karakter dönüş hızına ulaşırsa
+`PlayableHero` uyarır. `follow_toward_camera_angle` değerini 0 yapmak, kameraya doğru koşunun arkasına dönmeye
+bilerek izin verir.
 
-## CameraArm
+Eğim ve yakınlaştırma hizalaması birlikte açıkken yakınlaştırma uzaklığı değiştirir; eğim hizalaması yakınlaştırma
+eğrisini telafi eder. Görüntü bağımsız olarak `follow_pitch_angle` ve `follow_zoom_level` değerlerine yerleşir.
+Tekerlek ve fare koşu sırasında da çalışır; açık takip hareketleri görüntüyü yeniden hedeflere çeker.
+`height_follow_time` ayrıdır: özellikle basamaklarda düzeneğin hedefin **dünya Y konumunu** nasıl izlediğini
+yumuşatır. Yakınlaştırma düzeyini değiştirmez. 0 hedef yüksekliğini tam izler; kahraman sahnesindeki 0.15 s,
+dikey değişimin %95'ini yaklaşık bu sürede tamamlar.
 
-Kol uzunluğunu tekerlek belirler; kol engellerde kısalır ve yer açıldığında o uzunluğa geri döner.
+### Takibin durakladığı durumlar
 
-- **Arkadakinde durma** (`keep_out_of_geometry`, varsayılan olarak açık). Kameranın arkasında dağ, duvar veya çatı varsa
-  kamera içine girmez, hedefe doğru yaklaşır. Dağa doğru yürüyün, kamera yamaca girmeden hedefe yaklaşır; uzaklaşın,
-  arkasında yer açılınca geri gider. Kol yalnızca kamera kolun ucunda duramıyorsa kısalır. Kamera ile hedef arasında,
-  arkasında yer olan bir sütun veya çit kamerayı oynatmaz: karakter siluet olarak görünür. Kamera böyle bir engelin
-  hemen arkasında, `probe_radius` değerinden daha yakında duracak olsaydı, orada ona yer yoktur ve kamera engelin önüne
-  geçer.
-- **Hedef gizlenince yaklaşma** (`pull_in_on_occlusion`, varsayılan olarak kapalı). Bir çit veya duvar hedefi
-  neredeyse tamamen gizlerse kamera yumuşakça engelin önüne geçer, ancak hedefe hiçbir zaman `min_pull_in_length`
-  (2,5 m) değerinden daha fazla yaklaşmaz. Karakter duvarın hemen dibinde duruyorsa kamera karakterin sırtına
-  sıçramak yerine yerinde kalır.
-- **Yakında saydamlaşma.** Kol çok kısaldığında `fade_target` yarı saydam olur.
+Sağ fare tuşu basılıyken üç takip hareketi de çekmeyi bırakır. `follow_wait_after_rotate` açıkken, en az 0.2 sn
+veya 2 px hareket içeren bir kamera döndürmesi bittikten sonra geçerli koşu boyunca seçilen görüntü korunur. Sağ
+tuş bırakılmadan odak kaybolur veya oyun duraklarsa da böyledir; daha kısa dokunuş bekleme başlatmaz. Seçenek
+kapalıyken dönüş bittiğinde takip sürer. Hedef `follow_min_speed` altına yavaşlayınca, `end_follow_wait()` yeni
+koşu bildirince, `snap()` çağrılınca, hedef değişince veya hareket `teleport_speed` değerini aşınca bekleme biter.
+Yeni koşu eskisi durmadan başlayabilir; bu seçenek kullanılıyorsa girdinin `run_requested` sinyalini
+`end_follow_wait()` yöntemine bağlayın. Böyle sinyal olmadan sürekli hareket eden hedef kamerayı sonsuza dek
+bekletebilir; oyununuz yeni koşuyu bildiremiyorsa seçeneği kapalı bırakın.
 
-| Özellik | Varsayılan | Anlamı |
-|---|---|---|
-| `length` | 10 m | Kol uzunluğu; düzenek tarafından yakınlaştırmaya göre ayarlanır |
-| `camera` | — | Kamera; boşsa ilk `Camera3D` alt düğümü |
-| `keep_out_of_geometry` | açık | Kameranın arkasındaki gövdelerde dur |
-| `probe_radius` | 0,3 m | Kamera bu yarıçapta bir küredir ve duvarlardan bu kadar uzak durur |
-| `collision_mask` | 1. ve 3. katmanlar | Kolu durduran gövdeler: `world` ve `camera`. Karakterler (2. katman) durdurmaz |
-| `ignored_groups` | `camera_ignore` | Bu gruplardaki ya da bu gruplardaki bir düğümün altındaki gövdeler kolu durdurmaz |
-| `pull_in_on_occlusion` | kapalı | Hedef gizlenince yaklaş |
-| `min_pull_in_length` | 2,5 m | Kamera, gizlenen hedef yüzünden bundan daha fazla yaklaşmaz; engelin önünde daha az yer varsa yerinde kalır |
-| `pull_in_sharpness` | 10 | Kameranın gizleyen bir engelin önüne ne kadar hızlı geçtiği (0 anında). Arkadaki bir gövdede ise her zaman anında durur |
-| `occlusion_points` | göğüs, baş, dizler, yanlar | Görünürlüğü denetlenen hedef noktaları, kolun başlangıcına göre: sağ, yukarı, kameraya doğru |
-| `occlusion_share` | 0,75 | Noktaların bu payı gizlendiğinde hedef gizlenmiş sayılır. İnce bir direk veya ağaç gövdesi beşten üçünü gizler ve sayılmaz |
-| `occlusion_delay` | 0,25 sn | Kameranın yaklaşması için hedefin ne kadar süre gizli, geri çekilmesi için ne kadar süre görünür kalması gerektiği |
-| `return_delay`, `return_sharpness` | 0,3 sn; 4 | Kol anında kısalır ama bir duraklamadan sonra ve yumuşakça uzar; böylece kamera sütunlar arasında seğirmez. Dönüş yolundaki bir gövdenin içinden geçilmez, üstünden atlanır |
-| `fade_target` | — | Yakında neyin yarı saydam olacağı (demoda `Player/Visual`) |
-| `fade_start_length`, `fade_end_length`, `fade_transparency` | 1,5 m; 0,7 m; 0,75 | Hedef ilk uzunlukta saydamlaşmaya başlar ve ikincisinde %75 saydamdır |
-| `debug_draw` | kapalı | Kolu (gri: tekerlek uzunluğu, yeşil: mevcut uzunluk), kamera küresini ve hedefin noktalarına giden ışınları (kırmızı: gizli) çiz. Başka bir kameradan görünür |
+`playable_hero.tscn`, `PointClickMoveInput.hold_pending_changed` sinyalini `set_follow_paused()` yöntemine de
+bağlar. Sol fare tuşuna basıldıktan sonraki ilk 0.2 sn'de, girdi bunun tıklama mı basılı tutma mı olduğuna karar
+verirken takibi duraklatır. `run_requested`, yeni tıklama, basılı tutma veya sağ tuş + tuş koşusunda döndürme sonrası
+beklemeyi bitirir. Süren sol tuş koşusunda sağ tuşa basıp etrafa bakabilirsiniz; sağ tuş bırakıldığında o koşu
+yeni sayılmaz. Görüntü sonraki duruşa veya yeni koşuya kadar seçildiği yerde kalır.
+`keep_aim_on_camera_turn`, kamera hareket ederken imlecin aynı dünya noktasını hedeflemesini sağlar; koşu yönü
+kamerayı kovalamaz.
 
-Metotlar: `snap()`, `get_current_length()`, `is_pulled_in_by_occlusion()`.
+`Engine.time_scale` 0 olduğunda takip hareketleri durumlarını korur; zaman ilerleyince sürer. Hedefi elle
+taşırsanız veya `teleport_speed` denetimini tetiklemeyecek kısa mesafeye ışınlarsanız kamerayı ve kolu yerine
+oturtup hareket geçmişini sıfırlamak için `snap()` çağırın.
 
-### Yalnızca kamera için gövdeler
+## Özellikler
 
-Bunları 3. fizik katmanına (`camera`) koyun. Karakterler onlarla çarpışmaz, tıklamalar ve navigasyon onları görmez.
-Evin çatısında (`shared/world/props/house.tscn` içindeki `RoofCameraBlocker`) böyle bir gövde vardır: kamera çatıda
-durur, ancak kimse üzerine tırmanamaz veya üzerinden yol bulamaz.
+| Grup | Özellik | Betik varsayılanı | Anlamı |
+|---|---|---:|---|
+| Hedef | `target` | yok | İzlenecek `Node3D` |
+| Hedef | `arm`, `camera` | yok | Atanmamışsa ilk eşleşen doğrudan çocuk; `camera` yalnız kol yokken kullanılır |
+| Girdi | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Input Map eylemleri; eksik olanlar başlangıçta hata bildirir |
+| Girdi | `mouse_sensitivity`, `mouse_pitch`, `invert_pitch`, `zoom_step` | 0.25 °/px, kapalı, kapalı, 0.1 | Fareyle dönüş hızı, fareyle eğim denetimi, tekerlek adımı |
+| Kadraj | `focus_height` | 1.2 dünya birimi | Hedefin kökeninin üstündeki bakış noktası |
+| Kadraj | `near_distance`, `far_distance` | 5, 20 | Yakınlaştırma 0 ve 1'deki kol uzunlukları |
+| Kadraj | `near_pitch`, `far_pitch` | −22°, −55° | Yakınlaştırma 0 ve 1'deki temel eğimler |
+| Kadraj | `flatten_start_zoom`, `flatten_end_zoom` | 0.5, 0.2 | Eğimin daha hızlı yataylaştığı yakınlaştırma aralığı |
+| Kadraj | `min_pitch`, `max_pitch` | −80°, −8° | Fare ve takip ofsetleri dahil son eğim sınırları |
+| Kadraj | `start_zoom`, `start_yaw` | 0.55, 45° | İlk yakınlaştırma ve dünya eksenli yatay açı; `look_along()` daha sonra açıyı değiştirebilir |
+| Yumuşatma | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Yüksek değer fare/tekerlek hedeflerine daha çabuk ulaşır; 0 anlıktır |
+| Yumuşatma | `height_follow_time` | 0 s | Dikey hedef takibinin yaklaşık %95'ini tamamlama süresi; 0 tam izler |
 
-### `camera_ignore` grubu
+`look_along(direction)`, **dünya uzayındaki** bir yönün yatay bileşeni boyunca görüntüyü anında döndürür ve süren
+otomatik dönüşü durdurur. `snap()`, geçerli yatay açıyı, eğimi, yakınlaştırmayı, hedef konumunu ve kolun çarpışma
+tepkisini hemen uygular; ışınlamadan sonra kullanın. `get_zoom()` güncel 0–1 yakınlaştırmayı döndürür.
+`is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` ve `is_target_turning_sharply()` ilgili durumları
+bildirir. `set_follow_paused(paused)` ve `end_follow_wait()` yukarıdaki duraklamaları yönetir.
 
-Grup, içindeki bir düğümün altındaki her şeye de uygulanır. Onu bir kez, bir dekor sahnesinin köküne (böylece
-seviyedeki her örnekte bulunur) ya da seviyedeki bir klasör düğümüne atayın. Demonun buna ihtiyacı yoktur: ağaç
-gövdeleri (2,4 m'ye kadar) en yakın yakınlaştırmada bile (zeminden 3 m yukarıda) kameranın altında kalır.
+Düzenek bir kol veya kamera çocuğu (ya da açıkça atanmış `arm`/`camera`) ister; yoksa hata ayıklama derlemesinde
+assert çalışır. Küresel dönüşünü kendi ayarladığından `start_yaw`, `look_along()` ve otomatik dönüş, sabit kahraman
+kökü döndürülmüş olsa bile dünya eksenlerini kullanır.
 
-### Kol, engelin arkasındaki boşluğu bir gövdenin içinde olmaktan nasıl ayırır
+## Engeller, örtülme ve saydamlaşma
 
-Kol önce kameranın kolun ucunda durup duramayacağını denetler: küre orada kameranın önündeki engel de dahil hiçbir şeye
-değmemeli ve uç bir gövdenin içinde olmamalıdır. Kameradan hedefe giden bir ışın, içinden başladığı bir gövdenin
-yüzeylerini görmez; bu yüzden kameranın önündeki engelin uzak yüzeyini bulur. O yüzeyden kolun ucuna giden bir ışın,
-kameranın içinde bulunduğu gövdeye girer ve oradan hiç çıkmaz. Yolda bir şey varsa küre o yüzeyden kameraya doğru atılır
-ve diğerlerini geçerek yoldaki gövdenin önünde durur. Kolun yalnızca sıyırdığı bir sütun kamerayı oynatmaz.
-
-Jolt, kürenin bir atımın başlangıcında temas ettiği gövdeleri ve atımın içinden başladığı bir ağ gövdesini (dağ gibi)
-bildirmez. Bu yüzden yüzeyin hemen arkasında başka bir gövde varsa (arkasında uçurum olan bir çit) ya da atım başka bir
-gövdenin içinden başlayacaksa (birbirine yakın iki ince kaya çıkıntısı, kol neredeyse onlar boyunca uzanıyor), boş alan
-hedefe daha yakında aranır.
-
-Dönüş yolu da denetlenir. Kol yeniden uzamayı beklerken dönebilir ve koruduğu uzunlukta kamera bir duvarın içine
-düşebilir: o zaman kamera hemen boş uzunluğa geçer. Kamera ile döneceği yer arasında bir gövde varsa (kamera bir çitin
-önündeydi ve artık arkasında yer var), kamera duraklamadan sonra gövdenin içinden uçarak geçmek yerine onun üstünden
+`CameraArm` normalde `keep_out_of_geometry` kullanır: istenen kamera konumunda kamera küresi fizik gövdelerinin
+dışına sığmalıdır. Duvar, eğim veya çatı kamerayı içine alacaksa kol hemen kısalır. Hedefle kamera arasındaki çit,
+kameranın arkasında yer varsa kolu kısaltmaz. Hedefi örten çitin önüne özellikle geçmek için
+`pull_in_on_occlusion` açın; kol kalıcı örtülme bekler ve ancak en az `min_pull_in_length` kalıyorsa yaklaşır.
+Örtülme kalkınca kısa süre bekleyip yumuşakça geri döner. Dönüş yolunda engel varsa içinden uçmak yerine üzerinden
 atlar.
 
-## Ölçülen davranış
+### Kol engelin arkasındaki boşlukla gövdenin içini nasıl ayırır?
 
-`tests/camera_checks.gd` ve `tests/camera_arm_checks.gd` içinden:
+Kol önce kamera küresinin istenen uç konumuna sığıp sığmadığını denetler. Uç serbestse hedefle kamera arasındaki
+çitin arkasında kalabilir. Uç bir gövdeye dokunuyorsa veya içindeyse kol hedefe daha yakın serbest yer arar. Jolt
+şekil taramaları başlangıçta dokunulan veya içine girilmiş gövdeleri bildirmez; kol bu ilk boşluğu ayrıca denetler.
+İki gövde birbirine yakınsa hedefe daha yakın bir noktadan arar. Böylece hemen arkasında uçurum olan çite de
+kamera girmez.
 
-- Koşu kameraya 90° açıdayken takip: `follow_time` 0 iken %95 dönüş 0,17 sn'de, demonun 1,1 değeriyle 1,23 sn'de; 10
-  iken 2 sn sonra 90°'nin yalnızca 39°'si dönülmüştür. Dururken dönmez. Sağ tuş basılıyken dönmez, bırakılınca devam
-  eder.
-- Takip açıkken (1,1 sn) sol tuşu basılı tutma: ilk 0,2 sn kamera yerinde kalır (kısa bir tıklama onu oynatmaz),
-  ardından 1,25 sn'de koşunun arkasına kalan 28,3°'nin 27,1°'sini döner, bu sırada koşu yönü 0,01° değişir;
-  "anında" ile de aynı. Fareyi 150 px hareket ettirmek koşuyu 25° döndürür ve yeni yön korunur.
-  `keep_aim_on_camera_turn` kapalıyken karakter 1,25 sn'de 77,6° kıvrılır.
-- Eğim hizalama: tekerlekle alçaltılmış bir kamera (22,5° aşağı), `follow_time` 0,5 iken yavaşça 55°'ye gelir; yolun
-  %95'ini yaklaşık 0,65 sn'de alır ve dönüş kapalıysa koşunun ardından dönmez. 89°, kameranın 80° sınırına kırpılır.
-  Takip ve 20° eğimle sol tuşu basılı tutma: eğim 20°'ye giderken 1,25 sn'de 80°'den 22,5°'ye iner ve koşu yönü
-  0,01° değişir.
-- Kol: açık alanda tam uzunluk; arkadaki bir uçurum onu anında durdurur; uçuruma doğru yürürken kamera yaklaşır ve
-  uçurumun dışında kalır; uçurum kalkınca kol bir duraklamadan sonra yumuşakça geri döner. Hemen arkasında uçurum olan
-  bir çit: kamera çitin önünde durur. Kameranın hemen arkasındaki bir çit: kamera çitin önüne geçer. Kameranın dönmeyi
-  beklediği yerde beliren bir çit: kamera hemen çitin arkasına geçer. Kamera ile karakter arasında yarı yolda bir çit:
-  varsayılan olarak kamera çitin arkasında kalır; yaklaşma açıkken yumuşakça önüne geçer ve kısa bir örtülme sayılmaz.
-  Karakterin dibinde bir çit: kamera karakterin sırtına sıçramaz. İnce bir direk sayılmaz, kolu sıyıran bir sütun
-  kamerayı oynatmaz, `camera_ignore` içindeki gövdeler onu durdurmaz ve çok yakında karakter yarı saydamdır. Seviyede,
-  labirentin çalılarında, dağın yamacında ve ince kaya çıkıntılarında, bir çadırda ve zirvedeki taşlarda kamera bunların
-  içine girmez.
+Küre ve görünürlük ışınları `collision_mask` kullanır (ikilik `0b101`, 1 ve 3. katmanlar). Şablonda 1. katman
+katı dünya geometrisi, 3. katman `RoofCameraBlocker` gibi yalnız kameraya yönelik geometridir. 2. katmandaki
+karakterler ve 4. katmandaki görünmez karakter sınırları kolu oynatmaz. `camera_ignore` grubundaki veya bu
+gruptaki düğümün altındaki gövdeler yok sayılır. Bir nesnenin her örneğini etkilemek için grubu köküne koyun.
+Başka projeye aktarırken maske sayıları önemlidir; katman adları yalnız etikettir. `keep_out_of_geometry`
+kapalıysa yaklaşma ayarı ne olursa olsun kol kamerayı arkasındaki geometriden korumaz.
+
+Varsayılan beş `occlusion_points`, hedefin göğsünü, başını, dizlerini ve yanlarını örnekler. Bunlar düzeneğin
+hedef kökeninden `focus_height` kadar yukarı koyduğu **kol başlangıcına** göredir; x kameranın sağı, y yukarı,
+z yatay olarak kameraya doğrudur. `occlusion_share = 0.75`, beş noktadan en az dördünün örtülmesi demektir. Daha
+uzun veya süzülen model için noktaları ve `focus_height` değerini ayarlayın. Şablonun `CharacterHover` bileşeni
+görünen modeli gövdeden 0.35 dünya birimi yukarı kaldırabilir.
+
+`fade_target` isteğe bağlıdır. Atanınca kol `fade_start_length` değerinden kısaldıkça altındaki
+`GeometryInstance3D` düğümlerinin `transparency` değerini değiştirir; `fade_end_length` noktasında
+`fade_transparency` değerine ulaşır. Kahraman `Character/Visual` düğümünü atar. Yakın mesafe saydamlaşması,
+karakteri engellerin içinden çizen isteğe bağlı `OccludedSilhouette` eklentisinden ayrıdır.
+
+| Özellik | Betik varsayılanı | Anlamı |
+|---|---:|---|
+| `length`, `camera` | 10, yok | İstenen kol uzunluğu (genellikle düzenek ayarlar) ve atanmadıysa ilk doğrudan `Camera3D` çocuğu |
+| `keep_out_of_geometry`, `probe_radius` | açık, 0.3 | Kamera küresini maskelenen gövdelerin dışında tutar |
+| `collision_mask`, `ignored_groups` | 1 + 3. katmanlar, `camera_ignore` | Çarpışma ve örtülme denetimindeki gövdeler ve dışlanacak gruplar |
+| `pull_in_on_occlusion`, `min_pull_in_length`, `pull_in_sharpness` | kapalı, 2.5, 10 | Yaklaşma anahtarı, en kısa uzunluk ve yaklaşma hızı (0 anlık) |
+| `occlusion_points`, `occlusion_share`, `occlusion_delay` | beş nokta, 0.75, 0.25 s | Görünürlük örnekleri, örtülen pay ve yaklaşma/dönüş öncesi gecikme |
+| `return_delay`, `return_sharpness` | 0.3 s, 4 | Kolun uzama öncesi beklemesi ve hızı (0 keskinlik bekleme sonrası anlık) |
+| `fade_target`, `fade_start_length`, `fade_end_length`, `fade_transparency` | yok, 1.5, 0.7, 0.75 | İsteğe bağlı model saydamlaşması; 0.7 birim veya daha yakında tam |
+| `debug_draw` | kapalı | İstenen/geçerli kol uzunluğunu, kamera küresini ve görünürlük ışınlarını çizer; başka kameradan yararlıdır |
+
+`CameraArm.snap()` çarpışmayı yeniden hesaplayıp dönüş gecikmesi olmadan kamerayı yerleştirir.
+`get_current_length()` engellerden sonraki gerçek uzunluğu verir; `is_pulled_in_by_occlusion()` hedefin
+örtülmesinin kolu o anda içeri çekip çekmediğini bildirir.
+
+Yukarıdaki davranışlar [`tests/camera_checks.gd`](../../../tests/camera_checks.gd) ve
+[`tests/camera_arm_checks.gd`](../../../tests/camera_arm_checks.gd) ile denetlenir: takip zamanlaması,
+kameraya doğru koşu ve keskin dönüş korumaları, elle döndürme sonrası bekleme, eğim/yakınlaştırma hizalaması,
+basamaklarda dikey yumuşatma, engellerden kaçınma, isteğe bağlı yaklaşma, yok sayılan gruplar ve saydamlaşma.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*

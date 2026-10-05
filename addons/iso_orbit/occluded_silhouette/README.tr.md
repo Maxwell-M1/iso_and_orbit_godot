@@ -1,5 +1,7 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ ed5707ab8355 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
 # Engel Arkası Siluet
+
+[← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
 
@@ -29,20 +31,30 @@ Başka bir eklenti gerekmez.
 
 1. Bu klasörü `res://addons/iso_orbit/occluded_silhouette/` konumuna kopyalayın; malzemeler gölgelendiricilere bu
    yolla başvurur.
-2. Karaktere `occluded_silhouette.gd` betikli bir `Node` ekleyin. `target` özelliğini modeli tutan düğüme ayarlayın
+2. Karaktere `occluded_silhouette.gd` betikli bir `Node` ekleyin. `target` özelliğine modeli tutan düğümü
+   (sağlanan kahramanda `Character/Visual`) atayın
    ve `silhouette_mask.tres`, `silhouette_body.tres`, `silhouette_gear.tres` ve `silhouette_outline.tres` dosyalarını
    `mask`, `body_fill`, `gear_fill` ve `outline` özelliklerine atayın.
 3. `gear_nodes` içinde adı geçen düğümlerin (`RightHand`, `LeftHand`) altındaki örgüler eldeki nesne sayılır.
+   Bu düğümler yoksa bütün örgüler gövde dolgusunu alır; ekipmanın hiyerarşisi farklıysa adları değiştirin.
 
 Renkler malzemelerin `color` parametreleridir, kontur genişliği `silhouette_outline.tres` içindeki `width` değeridir
-ve `outline_enabled` konturu kapatır. Siluet için karakterin en az 30 cm önünde bir engel gerekir (`min_gap`).
+ve `outline_enabled` konturu kapatır. Siluet için karakterin en az 30 cm önünde bir engel gerekir
+(`min_gap`: `silhouette_common.gdshaderinc` dosyasından gelen gövde, ekipman ve kontur malzemelerinin parametresi;
+üçünde de değiştirin).
+
+Bileşen, görünüm değişince sonradan eklenen örgüler dahil her örgünün `material_overlay` özelliğini atar. Modeliniz
+bu özelliği başka etki için kullanıyorsa hangisinin sahibi olacağını seçin. Bileşen hazır olunca malzemeleri geçiş
+zincirlerine kopyalar; renkleri ve `min_gap` değerini sahne başlamadan malzemelerde ayarlayın.
+`outline_enabled` çalışma sırasında değişebilir.
 
 Godot 4.5+ sürümlerinde deneysel olan stencil arabelleğini kullanır. Forward+ işleyicisiyle test edilmiştir.
 
 ## Belgeler
 
-Şablon deposunda: `docs/tr/systems/characters.md`.
+Şablon deposunda: model değişimi dahil `docs/tr/systems/characters.md` ve oynanabilir kahramanı kopyalamak için
+`docs/tr/integration.md`.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*

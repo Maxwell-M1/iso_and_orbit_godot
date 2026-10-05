@@ -1,15 +1,20 @@
-<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
+<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
 # Ses
+
+[← Belge dizini](../index.md)
 
 > Bu, [İngilizce orijinalin](../../en/systems/audio.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
 `GroundCharacter` başına gelenleri sinyallerle bildirir; sesler `stepped(sprinting)`, `jumped`, `landed(impact_speed)`
 ve `sprint_changed(sprinting)` sinyallerini kullanır (hepsi: [Hareket](locomotion.md#karakterin-bildirdikleri)). Sesler,
 ayak altındaki toz veya animasyonlar bunlara bağlanır; karakterin kendisi bunlardan habersizdir. Demo sesleri bağlar.
+Adımlar sayılmıyorsa (`steps_enabled` kapalıysa veya kahraman süzülüyorsa) `footsteps_enabled` açık olsa bile
+ayak sesi çıkmaz. Süzülen kahraman zıplamadan yavaş iner ve 2 m/s ile zemine dokunur; bu hız
+`landing_min_speed` altında olduğundan `landed` ve iniş sesi oluşmaz.
 
 ## CharacterSounds
 
-`CharacterSounds` (`Player/Sounds`), karakterin `Node3D` türündeki bir alt düğümüdür. Alt düğümleri
+`CharacterSounds` (`Hero/Character/Sounds`), karakterin `Node3D` türündeki bir alt düğümüdür. Alt düğümleri
 `AudioStreamPlayer3D` düğümleridir; böylece ses karakterden gelir ve bir NPC için de aynı şekilde çalışır. Bu düğüm
 olmadan karakter tamamen aynı şekilde, yalnızca sessizce çalışır.
 
@@ -25,7 +30,7 @@ olmadan karakter tamamen aynı şekilde, yalnızca sessizce çalışır.
 |---|---|---|
 | `character` | üst düğüm | Kimin sinyallerinin çalınacağı |
 | `footsteps`, `jump`, `land`, `sprint_start`, `sprint_loop` | — | Oynatıcılar |
-| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | açık | Ses grupları; zıplama grubu zıplamayı ve inişi, depar grubu başlangıcı ve döngüyü kapsar |
+| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | açık (demoda `sprint_enabled` kapalı) | Ses grupları; zıplama grubu zıplamayı ve inişi, depar grubu başlangıcı ve döngüyü kapsar |
 | `sprint_step_pitch`, `sprint_step_volume_db` | 1,08; +2 dB | Deparda ayak sesleri |
 | `land_full_speed`, `min_land_volume` | 10 m/sn; 0,3 | İniş ses düzeyi eğrisi |
 | `sprint_loop_fade` | 0,25 sn | Depar döngüsünün yavaşça açılıp kapanma süresi |
@@ -33,7 +38,8 @@ olmadan karakter tamamen aynı şekilde, yalnızca sessizce çalışır.
 Ses düzeyleri `gdscript/player/player.tscn` içindeki oynatıcılarda ayarlanır; bunları çalışan oyunda Uzak (Remote)
 ağacı üzerinden ayarlayın. İstisna `Land` oynatıcısıdır: ses düzeyi her inişten önce düşüş hızından ayarlanır
 (`land_full_speed`, `min_land_volume`). Gruplar Ayarlar → Ses içinde açılıp kapatılır; demo depar seslerini
-varsayılan olarak kapatır. Oradaki genel ses düzeyi `Master` veri yoludur: yüzde, genliğin bir payıdır (%50, 6 dB
+varsayılan olarak ayarlarda ve `player.tscn` içinde kapatır; ayar sistemi olmasa da deparın kendi sesi yoktur.
+Oradaki genel ses düzeyi `Master` veri yoludur: yüzde, genliğin bir payıdır (%50, 6 dB
 daha kısıktır), 0 veri yolunun sesini kapatır.
 
 ## Seslerin kendileri
@@ -47,4 +53,4 @@ Bunların yerine gerçek kayıt sesler kullanılabilir: aynı adlı dosyaları k
 
 ---
 
-*Bu sayfa Iso & Orbit 1.1.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*

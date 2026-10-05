@@ -1,5 +1,7 @@
 # Tests
 
+[← Documentation index](index.md)
+
 The tests run the main scene headless, with real input events and real physics, and compare measurements with
 expectations.
 
@@ -11,6 +13,14 @@ Here `godot` is your Godot 4.7.2 executable. On Windows use the `_console.exe` b
 the terminal, so you see no output and get no exit code. On a fresh clone, import the project once first, in the
 editor or with `godot --headless --path . --import`.
 
+You can use the executable's full path instead of adding it to PATH. In PowerShell a quoted path needs `&`:
+
+```powershell
+& 'C:\path\to\Godot_console.exe' --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd
+```
+
+Replace the example path with your installed Godot 4.7.2 console executable and run from this project's root.
+
 Only some suites, for example while working on the camera: parts of their names after `--`.
 
 ```bash
@@ -21,32 +31,43 @@ The exit code is 1 if any check fails. At the end the runner prints how many che
 
 ## Suites
 
-The suites run in the order of `SUITES` in `tests/run_checks.gd`, on one instance of the main scene.
+Suites run in the order listed in `tests/run_checks.gd`, sharing one main scene. Choose the ones related to your
+change; use the full run before integrating changes across systems.
 
-| Suite | What it covers |
+| Suite | Main checks |
 |---|---|
-| `movement_checks.gd` | Acceleration and an exact stop, a new click while braking, a turn while braking, a reversal at full speed. Routes: around the trap, through the gap in the wall, the maze, up and down the ramp, onto the platform from the ramp's sides, an unreachable point on a crate. The ledge guard, and falling without it |
-| `world_checks.gd` | The mountain: a path from the ground to the top along the trail, the place is discovered once with its message, the slope cannot be climbed off the trail, the guard holds on the trail. The camp, the farmstead and the ruins are discovered with their messages. The NPCs: five with equipment and labels, someone at every place, all standing on the ground, paths go around them, nobody walks through them. The hero looks: ten by number, each with a body, eyes and a staff in the right hand; the walkway along the row is passable at full speed |
-| `hero_look_checks.gd` | The player's model: the staff in the right hand while turning; separate silhouette chains for the body and the equipment, also on meshes added later; the outline setting. The hand swing: still when standing; swinging and dipping on the run with the extremes on the steps, in turn; lagging on acceleration; returning after a stop; dipping on landing. The hero look: the default at startup; each of the ten set at runtime with one model, the staff swinging in the new hand and the silhouette on the new meshes |
-| `character_actions_checks.gd` | Sprint and fatigue through the input action, the stamina bar. Releasing Shift in hold mode with real events (on the run, with the left button, in the settings window, after toggle mode, a lost release). Toggle mode. Sprint and jump turned off, sprint without fatigue. The jump: height, the buffer, coyote time, a jump off an edge with the guard on, a 1.5 m jump. Character signals: steps by distance and faster when sprinting, none standing or in the air, jump and landing with the fall speed, walking down the ramp without a landing, sprint start and end. A sound for each signal and its switches; the sprint loop loops |
-| `character_state_checks.gd` | What the character reports: the states in a run and a sprint, the blend 0, 1 and 2, the movement in the model's axes for a run, a sidestep and backing up, the turn rate. A jump and a fall off an edge: the signals in order and the time in the air; no take-off down the ramp. The feet alternate, the gait cycle at the steps. The stairs east of the platform: up and down by a click without leaving the ground, almost at full speed; without stepping the first stair stops the character. A 0.4 m block, a 30° and a 50° slope. Routes on the level without a false take-off. The monitor panel: off by default, shown by the setting, the state and the events of a jump |
-| `input_checks.gd` | A mouse click: no run and no marker while pressed, a run to the pressed point after release. Holding in `STEER` mode: running toward the cursor, never to the pressed point, no marker, a quick stop on release. Holding in `FOLLOW_POINT` mode: running while held; on release a quick stop with `stop_on_release`, otherwise a run to the last cursor point with its marker. Both buttons: up the ramp, turning with the camera. RMB + WASD sidestepping and turning: direction, facing and speed for W, A, D, S and key pairs; nothing without the right button or in the off mode; stopping by the keys and by the button; the right button alone does not interrupt a click. LMB + RMB + A/D in all three modes. The left button pressed and released while walking with RMB + W: the walk goes on without a stop. The keys abandon a run to a clicked point and its marker fades. The cursor hidden while running with the left button held |
-| `camera_checks.gd` | Follow mode (off, instant, default, very slow) and its pauses (the right button, an undecided press). Holding the left button with and without the cursor keeping its aim. Orbit and zoom with the mouse: below the middle the wheel levels the camera fast; by default the right button does not tilt, with the setting it does, and turning it off restores the wheel's tilt. Tilt alignment on the run |
-| `camera_arm_checks.gd` | Full length in the open. A cliff behind: an immediate stop; walking toward it, the camera comes closer and stays out; with the cliff gone, a return after a pause, smoothly; without the stop, the camera is in the cliff. A fence with a cliff right behind it. A fence right at the camera: the camera comes in front of it; a fence where the waiting camera stands: behind it at once. Bodies on the camera layer stop it, on the characters' layer do not. A fence halfway: behind it by default, in front of it smoothly with pull-in, a short occlusion does not count. A fence at the character: no jump to the character's back. A thin post does not count. A column grazing the arm does not move the camera. Bodies in `camera_ignore` and under a node in it. Fading up close. Walls on the level (maze, mountain, tent, summit stones): the camera does not cut into them. The settings reach the arm |
-| `settings_window_checks.gd` | F10, the pause, focus, the released cursor capture; switches reach their nodes; the Controls tab (key modes, the backward slowdown slider); the Sound tab (the volume reaches the `Master` bus, the switches reach the character sounds); the Character tab (hero look, jump height, Shift mode, speed bonus, fatigue and stamina); dependent controls dim; the tilt slider stays within the camera's limits; interface scale; reset; Esc |
-| `localization_checks.gd` | English by default. Every interface string, in the scenes, the open settings window and the scripts, has a translation in every language, and no translation entry is unused. Switching the language changes the texts composed by code; language names are not translated; reset returns English |
+| `movement_checks.gd` | Acceleration, braking, retargeting, turning, reachable and unreachable destinations, routes around obstacles, ramps and ledges |
+| `world_checks.gd` | Navigation through the demo terrain, discovery areas, static NPC collisions and hero-display models |
+| `hero_look_checks.gd` | Switching all ten hero models, equipment placement, silhouettes and hand movement |
+| `character_actions_checks.gd` | Sprint and fatigue, hold/toggle input, rebinding and modifier release, jump buffering/coyote time, fall overrides, character signals and sounds |
+| `character_state_checks.gd` | Setup warnings, state and animation data, stairs/slopes, teleportation, floating, interpolation, stopped game time and the monitor panel |
+| `input_checks.gd` | Click versus hold, both-button order, both hold modes, key modes, cursor capture, cancellation and missing input actions |
+| `camera_checks.gd` | Orbit/zoom and follow at different frame/tick rates, sharp turns, runs toward the camera, manual-orbit wait, pitch/zoom/height alignment and teleportation |
+| `camera_arm_checks.gd` | Obstacle clearance, collision layers, ignored groups, optional occlusion pull-in and fading near the target |
+| `settings_window_checks.gd` | Pause and focus, every settings tab, property mapping, dependent controls, interface scale, reset and closing |
+| `localization_checks.gd` | Translation coverage, preserved action tokens, language changes, names for all 12 rebound actions, open tooltips/windows/loading tips and translation inheritance |
+| `level_checks.gd` | Spawn points, travel offers, loading progress and pause, scene replacement, preserved hero state and failure recovery |
+
+For the documented input/camera configurations, start with `movement`, `character_actions`, `input`, `camera` and
+`settings_window`. The filter `camera` selects both camera suites. When copying the hero into another project, also
+follow the [transfer checklist](integration.md#taking-the-demos-hero-into-your-project): passing this repository's
+suite does not prove that every required file and project setting was copied.
 
 ## How the tests behave
 
 - They run with the default settings and save nothing: the player's settings are reset to the defaults for the run
   and never overwritten.
 - Each check restores what it changed. The suites run one after another on one main scene, while a suite run alone
-  gets a fresh one, and a check must pass in both cases.
-- Any engine or script error also fails the run: a `Logger` added with `OS.add_logger()` counts them, and the runner
-  prints the count as "engine and script errors" and adds it to the failures. A crashed check is cut short but the
-  others carry on, and without the counter the crash would pass unnoticed. Under heavy CPU load Jolt may add a
-  warning of its own, see [Known issues](known-issues.md#tests).
-- A run that hangs fails after 600 s of game time.
+  gets a fresh one, and a check must pass in both cases. After each check `Engine.time_scale` goes back to 1, so a
+  check that crashed while time was slowed or stopped does not leave it so for the next ones.
+- Any engine or script error or warning also fails the run: a `Logger` added with `OS.add_logger()` counts them, and
+  the runner prints the count as "engine and script errors" and adds it to the failures. A crashed check is cut short
+  but the others carry on, and without the counter the crash would pass unnoticed. Only an error a check provokes on
+  purpose and announces beforehand (`expect_error()` of the runner, then `take_expected_errors()` to see that it came)
+  does not count, as in the check of a scene that cannot be a level. Under heavy CPU load Jolt may add a warning of
+  its own, see [Known issues](known-issues.md#tests).
+- A run that hangs fails after 1200 s of game time. While a level loads in the background, the frames without a
+  window run much faster than on a screen, and game time with them; the level checks wait for a change by real time.
 - Before exiting, the runner removes the main scene and waits 0.1 s. With `--fixed-fps` game time runs faster than
   real time while audio plays in real time, so footsteps played just before the end are still sounding. Exiting at
   once sometimes makes the engine report leaked `AudioStreamPlayback` objects and footstep resources.
@@ -70,6 +91,10 @@ helpers:
 | `_ticks(count)`, `_frames(count)`, `_wait_until(condition, max_ticks)` | Waiting |
 | `_send_key()`, `_send_button()`, `_send_motion()` | Real input events |
 | `_expect(condition, what)` | Counts a passed or failed check and prints it |
+| `_error_count()` | How many engine and script errors have come so far, except the expected ones: a check compares the count before and after what it does |
+| `_tree.call(&"expect_error", "part of the message")`, `_tree.call(&"take_expected_errors")` | Methods of the runner, not of `check_suite.gd`: the first announces an error the check provokes on purpose, so that it does not count; the second returns the announced errors that have not come and stops expecting them |
+| `_find_non_finite(found)` | Collects the 3D nodes of the main scene whose transform is not finite (INF or NaN) |
+| `_same_values(a, b)` | Whether two arrays hold the same values; unlike `==`, it does not take a NaN for the same as a NaN |
 | `_median()`, `_min()`, `_max()`, `_first_time_at_most()` | Statistics over recorded values |
 
 Do not name the classes that reach the `Settings` autoload (the settings window controls) as types in test scripts.
@@ -78,4 +103,4 @@ for that run. Get the settings node with `_tree.root.get_node(^"Settings")` and 
 
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*

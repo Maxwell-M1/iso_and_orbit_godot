@@ -1,193 +1,234 @@
-<!-- translation of docs/en/systems/camera.md @ 1850159bc3c5 -->
+<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
+<!-- translation of docs/en/systems/camera.md @ pending -->
 # Câmera
 
+[← Índice da documentação](../index.md)
+
 > Esta é uma tradução do [original em inglês](../../en/systems/camera.md).
-> Onde houver diferenças, a versão em inglês é a correta.
+> Em caso de divergência, consulte a versão em inglês.
 
-Dois nós: `OrbitCameraRig` segue um alvo, orbita e dá zoom; seu filho `CameraArm` segura o `Camera3D` na ponta de um
-braço e encurta o braço em obstáculos.
+`OrbitCameraRig` acompanha um alvo `Node3D`, gira em torno dele com o mouse e muda distância e inclinação com a
+roda. Seu filho `CameraArm` posiciona um `Camera3D` ao longo de +Z local e o mantém fora da geometria próxima. O
+giro automático, o alinhamento da inclinação e o alinhamento do zoom durante a corrida são três opções
+independentes.
 
+```text
+PlayableHero (raiz estacionária no modelo)
+├── Character (alvo em movimento)
+└── CameraRig (OrbitCameraRig; target = ../Character)
+    └── CameraArm (CameraArm)
+        └── Camera3D (current = true)
 ```
-CameraRig (OrbitCameraRig)     colocado no alvo, girado pela guinada e pela inclinação
-└── CameraArm (CameraArm)      braço ao longo do +Z local; o rig define o comprimento dele pelo zoom
-    └── Camera3D               na ponta do braço, olhando de volta ao longo dele
-```
 
-O rig é irmão do alvo, não filho dele. Ele se move em `_process` para a posição interpolada do alvo, e a sua própria
-interpolação de física fica desligada: senão ele suavizaria uma posição já suavizada e ficaria um tick atrasado. Com a
-interpolação de física ligada no projeto, a câmera e o personagem se movem suavemente em qualquer taxa de quadros.
+Mantenha o rig ao lado do alvo móvel, não sob ele: o rig define sua posição e rotação globais. Deixe rig, braço,
+câmera e seus ancestrais na escala `(1, 1, 1)` para que comprimento e raio de colisão conservem seu significado.
+O rig posiciona a câmera a cada quadro renderizado usando `target.get_global_transform_interpolated()` e desativa
+sua interpolação de física em `_ready()`; os filhos herdam esse modo por padrão. Ative a interpolação no projeto
+quando o alvo se mover em ticks de física, senão ele avançará visivelmente um tick de cada vez. O modelo já a
+ativa. `height_follow_time` pode suavizar a subida e descida vertical do alvo depois da interpolação.
 
-## OrbitCameraRig
+`Camera3D` deve começar com sua transformação local padrão: o braço define sua posição e rotação locais. O modelo
+a marca como **Current**, usa campo de visão de 45° e plano distante de 300 unidades do mundo. Se outra câmera
+ativa entrar na cena, volte a ativar esta quando o herói precisar controlar a visão. Veja
+[Integração](../integration.md#só-a-câmera) para copiar a câmera ou o herói inteiro e
+[Configuração do projeto](../project-setup.md) para ações e camadas de física.
 
-- **Órbita.** Segure o botão direito (`camera_rotate`) e mova o mouse. O cursor fica capturado enquanto você orbita e
-  volta para onde estava quando você solta o botão. Se a janela perde o foco ou o jogo pausa no meio da órbita, o
-  próprio rig libera o cursor.
-- **Inclinação com o mouse** (`mouse_pitch`, desligado por padrão). O movimento vertical do mouse com o botão direito
-  também inclina a câmera. Desligado, a inclinação vem só do zoom.
-- **Zoom.** A roda move a câmera para baixo e para mais perto, ou para cima e para mais longe. Distância e inclinação
-  mudam juntas.
-- **Seguir** (`follow_movement`, `follow_pitch`, ambos desligados por padrão). A câmera vira aos poucos para trás do
-  alvo em corrida e leva suavemente a inclinação a `follow_pitch_angle`.
+## Quais valores estão ativos?
 
-### A curva de zoom
+Os valores dos scripts abaixo são padrões dos componentes reutilizáveis. `gdscript/player/playable_hero.tscn`
+substitui alguns; `SettingsApplier` da demo aplica depois os valores salvos em `Settings` quando a cena principal
+inicia. Uma cena do herói copiada funciona sem o autoload ou a janela da demo, usando os valores da cena.
 
-O zoom é um valor de 0 (mais perto) a 1 (mais longe); cada passo da roda o muda em `zoom_step` (0,1). A distância vai
-de `near_distance` (5 m) a `far_distance` (20 m). A inclinação vai de `near_pitch` (−22°) a `far_pitch` (−55°), mas não
-de forma uniforme: do topo até `flatten_start_zoom` (0,5; 12,5 m; −38,5°) ela muda uniformemente, e abaixo disso a
-câmera se nivela rapidamente, para que o que está à frente do personagem já fique visível numa altura média. A partir
-de `flatten_end_zoom` (0,2; 8 m), a câmera olha a −22° e só se aproxima.
+| Ajuste | Padrão do script | Cena do herói / demo recém-iniciada |
+|---|---:|---:|
+| Alinhamento de giro, inclinação e zoom na corrida | todos desligados | todos desligados |
+| `follow_time` | 1.5 s | 1.1 s |
+| `follow_pitch_angle`, `follow_pitch_time` | −40°, 1.5 s | −22°, 1.1 s |
+| `follow_zoom_level`, `follow_zoom_time` | 0.55, 1.5 s | 0.55, 1.5 s |
+| `follow_wait_after_rotate` | desligado | ligado |
+| `height_follow_time` | 0 s | 0.15 s |
 
-A demo começa em `start_zoom` 0,55. Um passo da roda para baixo a partir daí: −33,5°; dois: −26°; três (8,75 m):
-−22,5°.
+Tempos e destinos de giro, inclinação e zoom só atuam quando os respectivos controles de acompanhamento estão
+ligados. `height_follow_time` sempre suaviza o movimento vertical do alvo, mesmo com órbita manual. Na demo, uma
+escolha anterior em `user://settings.cfg` pode substituir os padrões iniciais. `SettingsApplier` converte os graus
+positivos de “Inclinação para baixo” da janela em inclinação negativa e os 0–100% de “Altura” em zoom 0–1 do rig.
 
-A inclinação é a inclinação do zoom mais um deslocamento. O mouse (com `mouse_pitch`) e o modo de seguir mudam o
-deslocamento, então a roda e o mouse funcionam como sempre e, na corrida, a inclinação volta suavemente ao ângulo
-escolhido. Desligar `mouse_pitch` zera o deslocamento. A inclinação nunca passa de `min_pitch` (−80°) e `max_pitch`
-(−8°).
+Comprimentos e velocidades usam unidades do mundo Godot (metros quando a cena usa a escala 1 unidade = 1 m do
+modelo). Ângulos e velocidades angulares marcados `radians_as_degrees` aparecem em graus no Inspector; GDScript
+atribui radianos: use `deg_to_rad(-22.0)` para `follow_pitch_angle` e `deg_to_rad(360.0)` para
+`sharp_turn_speed`. O valor serializado `-0.383972...` em `playable_hero.tscn` equivale a −22°.
 
-### Modo de seguir
+## Órbita, inclinação e zoom
 
-| Propriedade | Padrão | Significado |
-|---|---|---|
-| `follow_movement` | desligado | Virar a câmera para trás do alvo em corrida |
-| `follow_pitch` | desligado | Levar suavemente a inclinação a `follow_pitch_angle` na corrida, na mesma taxa e nos mesmos casos que o giro; funciona sem `follow_movement` |
-| `follow_pitch_angle` | −40° | Inclinação alvo (para baixo é negativo), limitada por `min_pitch` e `max_pitch` |
-| `follow_time` | 1,5 s | Tempo para virar quase todo o caminho (resta 5% do ângulo); 0 é imediato |
-| `follow_min_speed` | 1 m/s | Abaixo dessa velocidade a câmera não vira: parado ou girando no lugar, a direção não é confiável. Entre essa velocidade e o dobro dela, o giro ganha força suavemente |
+Segure `camera_rotate` (botão direito no modelo) e mova o mouse para girar. O cursor é capturado e volta à posição
+anterior ao soltar; perda de foco ou pausa também o liberam. Com `mouse_pitch` desligado, o movimento vertical do
+mouse não afeta a visão e a roda escolhe a inclinação. Ligue-o para inclinar com o mouse; `invert_pitch` inverte o
+eixo. Roda para cima abaixa a câmera; para baixo a eleva. Rolagem suave pode mover uma fração de `zoom_step`.
 
-As configurações da demo usam padrões diferentes: tempo para alcançar de 1,1 s e inclinação de 22° para baixo.
+Zoom vai de 0 (perto) a 1 (longe). O passo padrão da roda é 0.1. O braço varia de `near_distance` 5 a
+`far_distance` 20 unidades do mundo. Perto, a inclinação fica mais rasa, conforme esta curva:
 
-A câmera não segue:
+| Zoom | Distância | Inclinação básica |
+|---:|---:|---:|
+| 0 | 5 | −22° |
+| 0.2 (`flatten_end_zoom`) | 8 | −22° |
+| 0.5 (`flatten_start_zoom`) | 12.5 | −38.5° |
+| 0.55 (`start_zoom`) | 13.25 | −40.15° |
+| 1 | 20 | −55° |
 
-- enquanto o botão direito está segurado: o mouse controla a câmera, inclusive ao correr com os dois botões;
-- nos primeiros 0,2 s depois de pressionar o botão esquerdo, até ficar claro se é um clique ou se o botão está sendo
-  segurado. A pausa vem de `PointClickMoveInput.hold_pending_changed`, conectado em `main.tscn` a
-  `CameraRig.set_follow_paused()`.
+Entre zoom 0.2 e 0.5, a câmera se nivela rapidamente ao descer, mostrando melhor o chão à frente. Abaixo de
+0.2, só a distância muda. A inclinação pelo mouse ou pelo acompanhamento soma um deslocamento à curva, limitado
+por `min_pitch` e `max_pitch` (−80° e −8°). Desligar `mouse_pitch` limpa seu deslocamento, salvo se
+`follow_pitch` ainda mantiver uma inclinação. `rotation_sharpness` e `zoom_sharpness` suavizam mouse e roda; 0
+torna a respectiva entrada imediata.
 
-A velocidade do alvo é medida pelo rig a partir do movimento do alvo por tick de física, então qualquer `Node3D` pode
-ser o alvo.
+## Modo de acompanhamento
 
-Quando a câmera gira com o botão esquerdo segurado, o cursor apontaria para outro ponto do chão e o personagem viraria
-atrás dele, e a câmera atrás do personagem: o personagem correria em círculos. Por isso, enquanto o botão está
-segurado, a entrada move o cursor do sistema junto com o mundo. Veja
-[Entrada](input.md#o-cursor-com-o-botão-segurado).
+Ative qualquer combinação de `follow_movement`, `follow_pitch` e `follow_zoom` para girar atrás da direção da
+corrida, aproximar-se de uma inclinação escolhida e voltar a um zoom escolhido. O rig mede o movimento horizontal
+por tick de física em qualquer alvo `Node3D`, sem exigir uma propriedade de velocidade. Abaixo de
+`follow_min_speed`, não acompanha; entre essa velocidade e o dobro, a força do acompanhamento cresce
+suavemente. Um alvo que para começa a próxima corrida com uma direção nova.
 
-### Propriedades
+Cada movimento ativo começa e se estabiliza suavemente com sua própria mola. Seu tempo aproxima o necessário para
+completar 95% de uma mudança a partir do repouso numa corrida a toda velocidade, se não houver limite de giro; 0
+pede mudança imediata. Ao parar ou pausar o acompanhamento, um movimento em curso freia, sem corte brusco.
+`rotation_sharpness` e `zoom_sharpness` definem a taxa dessa frenagem. O acompanhamento move a câmera diretamente,
+portanto a suavização da entrada não acrescenta outro atraso.
 
-| Grupo | Propriedade | Padrão | Significado |
-|---|---|---|---|
-| | `target` | — | O que seguir |
-| | `arm` | — | O `CameraArm`; se vazio, o primeiro filho `CameraArm` |
-| | `camera` | — | Usada sem braço; se vazia, o primeiro filho `Camera3D` |
-| Input | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Ações de entrada |
-| | `mouse_sensitivity` | 0,25 °/px | Velocidade da órbita |
-| | `mouse_pitch` | desligado | O movimento vertical do mouse inclina a câmera |
-| | `invert_pitch` | desligado | Inverter essa inclinação |
-| | `zoom_step` | 0,1 | Mudança do zoom por passo da roda |
-| Framing | `focus_height` | 1,2 m | Altura acima da origem do alvo para onde a câmera olha |
-| | `near_distance`, `far_distance` | 5 m, 20 m | Comprimento do braço no zoom mais perto e no mais longe |
-| | `near_pitch`, `far_pitch` | −22°, −55° | Inclinação no zoom mais perto e no mais longe |
-| | `flatten_start_zoom`, `flatten_end_zoom` | 0,5; 0,2 | Onde a inclinação começa a se nivelar mais rápido, e onde ela fica nivelada |
-| | `min_pitch`, `max_pitch` | −80°, −8° | Limites da inclinação |
-| | `start_zoom`, `start_yaw` | 0,55; 45° | Zoom e direção iniciais |
-| Follow | veja acima | | |
-| Smoothing | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | A rapidez com que a câmera chega à guinada, à inclinação e ao zoom desejados |
+| Propriedade | Padrão do script | Efeito |
+|---|---:|---|
+| `follow_movement`, `follow_time` | desligado, 1.5 s | Girar atrás da corrida horizontal; tempo para quase completar o giro |
+| `follow_max_turn_speed` | 0 | Velocidade angular máxima automática em °/s; 0 elimina o limite, inclusive em giro instantâneo |
+| `follow_toward_camera_angle` | 30° | Ignora corrida dentro deste ângulo em direção à câmera; força total do giro ao dobro do ângulo. 0 elimina a exceção |
+| `sharp_turn_speed` | 360°/s | Ignora direções intermediárias em mudança brusca ou inversão, depois assume a nova direção; 0 desativa a proteção |
+| `teleport_speed` | 50 unidades do mundo/s | Movimento horizontal mais rápido entre ticks é tratado como teleporte, não corrida |
+| `follow_pitch`, `follow_pitch_angle`, `follow_pitch_time` | desligado, −40°, 1.5 s | Aproxima a inclinação desse ângulo para baixo, independentemente do giro horizontal |
+| `follow_zoom`, `follow_zoom_level`, `follow_zoom_time` | desligado, 0.55, 1.5 s | Aproxima o zoom desse valor de 0–1, independente de giro e inclinação |
+| `follow_min_speed` | 1 unidade do mundo/s | Velocidade horizontal mínima para acompanhar; força total ao dobro dela |
+| `follow_wait_after_rotate` | desligado | Mantém a visão após órbita manual até o alvo reduzir a velocidade abaixo de `follow_min_speed` ou informar nova corrida |
 
-Métodos: `look_along(direction)` vira a câmera para olhar ao longo de uma direção na hora; `snap()` salta para a
-posição desejada, por exemplo depois de teleportar o alvo; `is_rotating()`; `set_follow_paused(paused)`.
+A proteção contra movimento em direção à câmera afeta **apenas o giro**. Uma corrida diretamente para a câmera
+ainda pode mudar inclinação e zoom se ativados. A proteção contra giros bruscos também afeta só o giro: inclinação
+e zoom continuam numa inversão, enquanto um giro já em curso pode frear aos poucos. Com
+`LocomotionSettings.turn_speed` de 720°/s do herói, o limite de 360°/s reconhece inversões e permite curvas mais
+lentas. Se mudar a velocidade de giro do personagem, deixe `sharp_turn_speed` na metade dela ou menos;
+`PlayableHero` avisa quando um limite positivo chega à velocidade de giro do personagem. Definir
+`follow_toward_camera_angle` como 0 permite, deliberadamente, que a câmera dê a volta numa corrida rumo a ela.
 
-## CameraArm
+Com alinhamentos de inclinação e zoom ativos, o zoom altera a distância e o alinhamento de inclinação compensa a
+curva do zoom. A visão chega a `follow_pitch_angle` e `follow_zoom_level` independentemente. Roda e mouse ainda
+funcionam durante a corrida; os acompanhamentos ativos trazem a visão de volta aos destinos. `height_follow_time`
+é separado: suaviza como o rig segue a **posição Y global** do alvo, especialmente em degraus. Não altera o nível
+de zoom. Em 0 acompanha a altura exatamente; os 0.15 s da cena do herói completam cerca de 95% da mudança vertical
+nesse tempo.
 
-A roda define o comprimento do braço; o braço encurta em obstáculos e volta a esse comprimento quando há espaço.
+### Quando o acompanhamento pausa
 
-- **Parar no que está atrás** (`keep_out_of_geometry`, ligado por padrão). Uma montanha, uma parede ou um telhado atrás
-  da câmera: a câmera não entra, mas se move em direção ao alvo. Ande em direção à montanha e a câmera se aproxima do
-  alvo sem entrar na encosta; afaste-se, e ela volta assim que houver espaço atrás dela. O braço só encurta se a câmera
-  não puder ficar na ponta dele. Uma coluna ou uma cerca entre a câmera e o alvo, com espaço atrás, não move a câmera: o
-  personagem aparece através dela como silhueta. Se a câmera fosse ficar colada atrás desse obstáculo, mais perto que
-  `probe_radius`, não há espaço para ela ali, e ela vai para a frente do obstáculo.
-- **Aproximar quando o alvo está encoberto** (`pull_in_on_occlusion`, desligado por padrão). Uma cerca ou uma parede
-  esconde o alvo quase por inteiro: a câmera vai suavemente para a frente do obstáculo, mas nunca mais perto que
-  `min_pull_in_length` (2,5 m) do alvo. Se o personagem está colado na parede, a câmera fica onde está em vez de saltar
-  para as costas do personagem.
-- **Esmaecer de perto.** Quando o braço está muito curto, `fade_target` fica translúcido.
+Os três movimentos param de puxar enquanto o botão direito está pressionado. Com `follow_wait_after_rotate` ativo,
+terminar uma órbita após pelo menos 0.2 s ou 2 px de movimento mantém a visão escolhida enquanto a corrida atual
+continua. Isso também vale se o foco se perder ou o jogo pausar antes de soltar o botão; um toque mais curto não
+inicia a espera. Com a opção desligada, o acompanhamento volta ao fim da órbita. A espera termina quando a
+velocidade cai abaixo de `follow_min_speed`, `end_follow_wait()` informa nova corrida, `snap()` é chamado, o alvo
+muda ou o movimento passa de `teleport_speed`. Uma nova corrida pode começar antes da anterior parar, por isso
+conecte o sinal `run_requested` da entrada a `end_follow_wait()` ao usar essa opção. Sem tal sinal, um alvo que se
+move continuamente pode deixar a câmera esperando indefinidamente; desligue a opção se o jogo não puder informar
+novas corridas.
 
-| Propriedade | Padrão | Significado |
-|---|---|---|
-| `length` | 10 m | Comprimento do braço; definido pelo rig a partir do zoom |
-| `camera` | — | A câmera; se vazia, o primeiro filho `Camera3D` |
-| `keep_out_of_geometry` | ligado | Parar em corpos atrás da câmera |
-| `probe_radius` | 0,3 m | A câmera é uma esfera com esse raio e se mantém a essa distância das paredes |
-| `collision_mask` | camadas 1 e 3 | Corpos que param o braço: `world` e `camera`. Personagens (camada 2) não |
-| `ignored_groups` | `camera_ignore` | Corpos nesses grupos, ou sob um nó deles, não param o braço |
-| `pull_in_on_occlusion` | desligado | Aproximar quando o alvo está encoberto |
-| `min_pull_in_length` | 2,5 m | A câmera não se aproxima mais que isso por causa de um alvo encoberto; com menos espaço na frente do obstáculo, ela fica onde está |
-| `pull_in_sharpness` | 10 | A rapidez com que a câmera vai para a frente de um obstáculo que esconde o alvo (0 é imediato). Ela sempre para na hora num corpo atrás |
-| `occlusion_points` | peito, cabeça, joelhos, lados | Pontos do alvo verificados quanto à visibilidade, relativos ao início do braço: direita, cima, em direção à câmera |
-| `occlusion_share` | 0,75 | O alvo está encoberto quando essa fração dos pontos está encoberta. Um poste fino ou um tronco esconde três de cinco e não conta |
-| `occlusion_delay` | 0,25 s | Quanto tempo o alvo precisa ficar encoberto para a câmera se aproximar, e visível para ela voltar |
-| `return_delay`, `return_sharpness` | 0,3 s; 4 | O braço encurta na hora, mas volta a crescer depois de uma pausa e suavemente, para que a câmera não trema entre colunas. Um corpo no caminho de volta é pulado, não atravessado |
-| `fade_target` | — | O que fica translúcido de perto (`Player/Visual` na demo) |
-| `fade_start_length`, `fade_end_length`, `fade_transparency` | 1,5 m; 0,7 m; 0,75 | O alvo começa a esmaecer no primeiro comprimento e fica 75% transparente no segundo |
-| `debug_draw` | desligado | Desenhar o braço (cinza: o comprimento da roda; verde: o atual), a esfera da câmera e os raios até os pontos do alvo (vermelho: encoberto). Visível de outra câmera |
+`playable_hero.tscn` conecta também `PointClickMoveInput.hold_pending_changed` a `set_follow_paused()`. Isso pausa
+o acompanhamento nos primeiros 0.2 s do botão esquerdo, enquanto a entrada distingue clique de botão segurado.
+Seu `run_requested` encerra a espera após órbita em novo clique, botão segurado ou corrida com botão direito +
+tecla. Pressionar o direito durante uma corrida com o esquerdo permite olhar em volta; ao soltar o direito, essa
+mesma corrida não conta como nova, então a visão fica onde o jogador a deixou até parada ou nova corrida.
+`keep_aim_on_camera_turn` mantém o cursor apontado para o mesmo ponto global enquanto a câmera se move, evitando
+que a direção da corrida persiga a câmera.
 
-Métodos: `snap()`, `get_current_length()`, `is_pulled_in_by_occlusion()`.
+Quando `Engine.time_scale` é 0, os movimentos de acompanhamento mantêm seu estado e retomam quando o tempo
+avança. Se mover manualmente um alvo ou teleportá-lo por distância curta demais para acionar `teleport_speed`,
+chame `snap()` para reposicionar câmera e braço e reiniciar o histórico de movimento.
 
-### Corpos só para a câmera
+## Propriedades
 
-Coloque-os na camada de física 3 (`camera`). Personagens não colidem com eles, e cliques e navegação não os enxergam. O
-telhado da casa (`RoofCameraBlocker` em `shared/world/props/house.tscn`) tem um corpo assim: a câmera para no telhado,
-mas ninguém consegue subir nele ou traçar caminho por ele.
+| Grupo | Propriedade | Padrão do script | Significado |
+|---|---|---:|---|
+| Alvo | `target` | nenhum | `Node3D` a acompanhar |
+| Alvo | `arm`, `camera` | nenhum | Primeiro filho direto correspondente, se vazio; use `camera` somente sem braço |
+| Entrada | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Ações do Mapa de Entrada; ausentes geram erro na inicialização |
+| Entrada | `mouse_sensitivity`, `mouse_pitch`, `invert_pitch`, `zoom_step` | 0.25 °/px, desligado, desligado, 0.1 | Velocidade da órbita, controle da inclinação com mouse e passo da roda |
+| Enquadramento | `focus_height` | 1.2 unidades do mundo | Ponto visado acima da origem do alvo |
+| Enquadramento | `near_distance`, `far_distance` | 5, 20 | Comprimentos do braço no zoom 0 e 1 |
+| Enquadramento | `near_pitch`, `far_pitch` | −22°, −55° | Inclinações básicas no zoom 0 e 1 |
+| Enquadramento | `flatten_start_zoom`, `flatten_end_zoom` | 0.5, 0.2 | Faixa do zoom que nivela mais depressa a inclinação |
+| Enquadramento | `min_pitch`, `max_pitch` | −80°, −8° | Limites finais, inclusive deslocamentos por mouse e acompanhamento |
+| Enquadramento | `start_zoom`, `start_yaw` | 0.55, 45° | Zoom e giro inicial no eixo global; `look_along()` pode mudar o giro depois |
+| Suavização | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Valores maiores alcançam mais rápido os destinos do mouse/roda; 0 é imediato |
+| Suavização | `height_follow_time` | 0 s | Tempo para cobrir cerca de 95% da mudança vertical do alvo; 0 segue exatamente |
 
-### O grupo `camera_ignore`
+`look_along(direction)` aponta imediatamente a visão ao longo da parte horizontal de uma direção em **coordenadas
+globais** e interrompe um giro automático em curso. `snap()` aplica imediatamente giro, inclinação, zoom, posição
+do alvo e resposta do braço às colisões; use depois de teleportar. `get_zoom()` retorna zoom atual de 0–1.
+`is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` e `is_target_turning_sharply()` informam esses estados.
+`set_follow_paused(paused)` e `end_follow_wait()` controlam as pausas descritas acima.
 
-O grupo também vale para tudo sob um nó que está nele. Defina-o uma vez na raiz da cena de um prop, para que toda
-instância no nível o tenha, ou num nó de pasta do nível. A demo não precisa dele: os troncos das árvores (até 2,4 m)
-ficam abaixo da câmera mesmo no zoom mais perto (3 m acima do chão).
+O rig exige um filho braço ou câmera (ou propriedade explícita `arm`/`camera`); a falta gera assert em versão de
+depuração. Ele define a rotação global; assim, `start_yaw`, `look_along()` e o giro automático usam eixos globais
+mesmo com a raiz estacionária do herói girada.
 
-### Como o braço distingue espaço atrás de um obstáculo de estar dentro de um corpo
+## Obstáculos, ocultação e transparência
 
-Primeiro, o braço verifica se a câmera pode ficar na ponta dele: a esfera não toca nada ali, nem o obstáculo à frente da
-câmera, e a ponta não está dentro de um corpo. Um raio da câmera até o alvo não enxerga as faces de um corpo dentro do
-qual ele começa, então ele encontra a face mais distante do obstáculo à frente da câmera. Um raio dessa face até a ponta
-do braço entra no corpo em que a câmera está e nunca sai dele. Se algo está no caminho, a esfera é lançada dessa face em
-direção à câmera e para na frente do corpo que está no caminho, passando pelos outros. Uma coluna que o braço apenas
-roça não move a câmera.
+`CameraArm` normalmente usa `keep_out_of_geometry`: uma esfera na posição desejada da câmera deve caber fora dos
+corpos físicos. Se uma parede, encosta ou teto ocupar essa posição, o braço encurta imediatamente. Uma cerca entre
+alvo e câmera não o encurta se ainda houver espaço atrás dela. Para aproximar deliberadamente a câmera pela frente
+de uma cerca que esconde o alvo, ative `pull_in_on_occlusion`; o braço espera ocultação contínua e só avança se
+restar pelo menos `min_pull_in_length`. Ao liberar a visão, aguarda um pouco e volta suavemente. Se houver obstáculo
+no caminho de volta, salta sobre ele em vez de atravessá-lo.
 
-O Jolt não reporta corpos que a esfera toca no início de um lançamento (cast), nem um corpo de malha (como a montanha)
-dentro do qual o lançamento começa. Então, se outro corpo está logo atrás da face (uma cerca com um penhasco atrás), ou
-o lançamento começaria dentro de outro corpo (duas lâminas de rocha bem próximas, com o braço quase ao longo delas), o
-espaço livre é procurado mais perto do alvo.
+### Como o braço distingue espaço livre atrás de um obstáculo de um corpo ocupado
 
-O caminho de volta também é verificado. Enquanto o braço espera para voltar a crescer, ele pode girar, e no comprimento
-que ele mantém a câmera pode acabar dentro de uma parede: então a câmera vai na hora para o comprimento livre. Se há um
-corpo entre a câmera e o lugar para onde ela volta (a câmera estava na frente de uma cerca, e agora há espaço atrás
-dela), depois da pausa a câmera pula por cima do corpo em vez de atravessá-lo.
+Primeiro, o braço verifica se a esfera cabe na ponta desejada. Ela pode ficar atrás de uma cerca entre o alvo e a
+câmera se esse lugar estiver livre. Se a ponta tocar ou ficar dentro de um corpo, ele procura um lugar livre mais
+perto do alvo. Os lançamentos de formas do Jolt não informam corpos tocados ou penetrados no começo do lançamento;
+por isso o braço verifica separadamente o espaço inicial. Com dois corpos próximos, procura a partir de um ponto
+mais perto do alvo. Isso também impede que a câmera entre numa cerca com penhasco logo atrás.
 
-## Comportamento medido
+A esfera e os raios de visibilidade usam `collision_mask` (binário `0b101`, camadas 1 e 3). No modelo, a camada 1
+contém geometria sólida do mundo e a 3 contém bloqueios exclusivos da câmera, como `RoofCameraBlocker`;
+personagens na 2 e limites invisíveis na 4 não movem o braço. Um corpo em `camera_ignore`, ou sob um nó desse
+grupo, é ignorado. Defina esse grupo na raiz de um objeto para afetar todas as instâncias. Os números das máscaras
+importam ao copiar para outro projeto; os nomes das camadas são apenas rótulos. Com `keep_out_of_geometry`
+desligado, o braço deixa de proteger a câmera da geometria atrás dela, independentemente da aproximação por
+ocultação.
 
-De `tests/camera_checks.gd` e `tests/camera_arm_checks.gd`:
+Os cinco `occlusion_points` padrão amostram peito, cabeça, joelhos e lados do alvo. São relativos ao **início do
+braço**, que o rig põe `focus_height` acima da origem do alvo: x para a direita da câmera, y para cima e z
+horizontalmente rumo à câmera. `occlusion_share = 0.75` exige pelo menos quatro dos cinco pontos bloqueados.
+Ajuste pontos e `focus_height` para modelos mais altos ou flutuantes. `CharacterHover` do modelo pode elevar o
+personagem visível 0.35 unidade do mundo acima do corpo.
 
-- Seguir com a corrida a 90° da câmera: `follow_time` 0 vira 95% em 0,17 s, o 1,1 da demo em 1,23 s; com 10, virou só
-  39° de 90° depois de 2 s. Parado, não vira. Com o botão direito segurado, não vira e continua depois de soltar.
-- Segurando o botão esquerdo com o seguir ligado (1,1 s): nos primeiros 0,2 s a câmera fica parada (um clique curto
-  não a move), depois em 1,25 s ela vira 27,1° dos 28,3° para trás da corrida, enquanto a direção da corrida muda
-  0,01°; com "imediato", também. Mover o mouse 150 px vira a corrida em 25°, e a nova direção se mantém. Com
-  `keep_aim_on_camera_turn` desligado, o personagem se curva 77,6° em 1,25 s.
-- Alinhamento da inclinação: uma câmera abaixada pela roda (22,5° para baixo) vai suavemente a 55° com `follow_time`
-  0,5, 95% do caminho em cerca de 0,65 s, sem virar atrás da corrida se o giro estiver desligado. 89° é limitado ao
-  limite de 80° da câmera. Segurando o botão esquerdo com o seguir e uma inclinação de 20°: a inclinação vai de 80° a
-  22,5° em 1,25 s, a caminho de 20°, e a direção da corrida muda 0,01°.
-- O braço: comprimento total em área aberta; um penhasco atrás o para na hora; andando em direção ao penhasco, a câmera
-  se aproxima e fica fora dele; sem o penhasco, o braço volta depois de uma pausa, suavemente. Uma cerca com um penhasco
-  logo atrás: a câmera para na frente da cerca. Uma cerca colada às costas da câmera: a câmera vai para a frente dela.
-  Uma cerca que aparece onde a câmera espera para voltar: a câmera vai para trás dela na hora. Uma cerca no meio do
-  caminho entre a câmera e o personagem: por padrão a câmera fica atrás dela; com a aproximação, vai suavemente para a
-  frente dela, e uma oclusão curta não conta. Uma cerca colada ao personagem: a câmera não salta para as costas do
-  personagem. Um poste fino não conta, uma coluna que roça o braço não move a câmera, corpos em `camera_ignore` não a
-  param, e de perto o personagem fica translúcido. No nível, junto às sebes do labirinto, à encosta da montanha e suas
-  lâminas de rocha, a uma barraca e às pedras do cume, a câmera não entra neles.
+`fade_target` é opcional. Quando definido, o braço altera a `transparency` dos descendentes `GeometryInstance3D`
+desse alvo se o braço ficar mais curto que `fade_start_length`, atingindo `fade_transparency` em
+`fade_end_length`. O herói atribui `Character/Visual`. Essa transparência de perto é distinta do addon opcional
+`OccludedSilhouette`, que desenha o personagem através de obstáculos.
+
+| Propriedade | Padrão do script | Significado |
+|---|---:|---|
+| `length`, `camera` | 10, nenhum | Comprimento desejado do braço (normalmente definido pelo rig) e primeiro filho direto `Camera3D`, salvo atribuição explícita |
+| `keep_out_of_geometry`, `probe_radius` | ligado, 0.3 | Manter uma esfera de câmera fora dos corpos incluídos na máscara |
+| `collision_mask`, `ignored_groups` | camadas 1 + 3, `camera_ignore` | Corpos considerados para colisão/ocultação e grupos excluídos |
+| `pull_in_on_occlusion`, `min_pull_in_length`, `pull_in_sharpness` | desligado, 2.5, 10 | Aproximação, comprimento mínimo e taxa de avanço (0 é imediato) |
+| `occlusion_points`, `occlusion_share`, `occlusion_delay` | cinco pontos, 0.75, 0.25 s | Amostras de visibilidade, fração bloqueada e espera antes de aproximar ou voltar |
+| `return_delay`, `return_sharpness` | 0.3 s, 4 | Espera e velocidade de extensão do braço (taxa 0 é imediata após a espera) |
+| `fade_target`, `fade_start_length`, `fade_end_length`, `fade_transparency` | nenhum, 1.5, 0.7, 0.75 | Transparência opcional do modelo, máxima a 0.7 unidade ou menos |
+| `debug_draw` | desligado | Desenha comprimentos desejado/atual, esfera da câmera e raios de visibilidade; útil de outra câmera |
+
+`CameraArm.snap()` recalcula colisões e posiciona a câmera sem esperar o retorno. `get_current_length()` dá o
+comprimento real após obstáculos; `is_pulled_in_by_occlusion()` informa se a ocultação do alvo a está aproximando.
+
+O comportamento acima é exercitado por [`tests/camera_checks.gd`](../../../tests/camera_checks.gd) e
+[`tests/camera_arm_checks.gd`](../../../tests/camera_arm_checks.gd): cobrem tempos de acompanhamento, proteções
+contra corridas rumo à câmera e giros bruscos, espera após órbita manual, alinhamentos de inclinação/zoom,
+suavização vertical nos degraus, desvio de obstáculos, aproximação opcional, grupos ignorados e transparência.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

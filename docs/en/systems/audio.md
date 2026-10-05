@@ -1,13 +1,17 @@
 # Audio
 
+[← Documentation index](../index.md)
+
 `GroundCharacter` reports what happens to it with signals; the sounds use `stepped(sprinting)`, `jumped`,
 `landed(impact_speed)` and `sprint_changed(sprinting)` (all of them:
 [Locomotion](locomotion.md#what-the-character-reports)). Sounds, dust under the feet or animations connect to them; the
-character itself knows nothing about them. The demo connects sounds.
+character itself knows nothing about them. The demo connects sounds. While steps are not counted (`steps_enabled` off,
+or the hero floats) there are no footsteps, whatever `footsteps_enabled` says. A floating hero comes down from a jump
+slowly and touches the ground at 2 m/s, below `landing_min_speed`: that is no `landed`, so there is no landing sound.
 
 ## CharacterSounds
 
-`CharacterSounds` (`Player/Sounds`) is a `Node3D` child of the character. Its children are `AudioStreamPlayer3D`
+`CharacterSounds` (`Hero/Character/Sounds`) is a `Node3D` child of the character. Its children are `AudioStreamPlayer3D`
 nodes, so the sound comes from the character and works the same for an NPC. Without this node the character works
 exactly the same, only silently.
 
@@ -23,7 +27,7 @@ exactly the same, only silently.
 |---|---|---|
 | `character` | parent | Whose signals to play |
 | `footsteps`, `jump`, `land`, `sprint_start`, `sprint_loop` | — | The players |
-| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | on | Groups of sounds; jump covers jump and landing, sprint covers the start and the loop |
+| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | on (`sprint_enabled` off in the demo) | Groups of sounds; jump covers jump and landing, sprint covers the start and the loop |
 | `sprint_step_pitch`, `sprint_step_volume_db` | 1.08, +2 dB | Footsteps while sprinting |
 | `land_full_speed`, `min_land_volume` | 10 m/s, 0.3 | Landing volume curve |
 | `sprint_loop_fade` | 0.25 s | Fade of the sprint loop |
@@ -31,7 +35,8 @@ exactly the same, only silently.
 The volumes are set on the players in `gdscript/player/player.tscn`; tune them in the running game through the
 Remote tree. The exception is `Land`: its volume is set before every landing from the fall speed
 (`land_full_speed`, `min_land_volume`). The groups are switched in Settings → Sound; the demo turns the sprint
-sounds off by default. The overall volume there is the `Master` bus: percent is a share of the amplitude (50% is
+sounds off by default, in its settings and in `player.tscn`, so the sprint has no sounds of its own without the
+settings system too. The overall volume there is the `Master` bus: percent is a share of the amplitude (50% is
 6 dB quieter), 0 mutes the bus.
 
 ## The sounds themselves
@@ -45,4 +50,4 @@ Real recorded sounds can replace these: put files with the same names in the fol
 
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*

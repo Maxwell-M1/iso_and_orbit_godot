@@ -1,33 +1,39 @@
-<!-- translation of docs/en/settings.md @ 9d607080ac9d -->
+<!-- translation of docs/en/settings.md @ 262d20fd6cef -->
 # 設定
+
+[← ドキュメント目次](index.md)
 
 > これは[英語の原文](../en/settings.md)の翻訳です。内容が異なる場合は、英語版が正しいものとします。
 
-F10で設定ウィンドウが開き、ゲームが一時停止します。EscまたはF10で閉じます。変更はすぐに反映され、ウィンドウを閉じたときとゲームの終了時に`user://settings.cfg`へ保存されます。**すべてリセット**で、すべての設定がデフォルトに戻ります。
+F10で設定ウィンドウが開き、ゲームが一時停止します。EscまたはF10で閉じます。変更はすぐに反映されます（マウスでドラッグするUIスケールだけはボタンを離すまで待ちます）。ウィンドウを閉じたときとゲームの終了時に`user://settings.cfg`へ保存されます。**すべてリセット**で、すべての設定がデフォルトに戻ります。
 
 デフォルト値は`gdscript/settings/game_settings.gd`の`DEFAULTS`にあります。デモは`gdscript/demo/settings_applier.gd`でそれらをノードのプロパティに適用します。下記のとおり、コンポーネント自身のプロパティのデフォルト値は異なる場合があります。設定システムの仕組みと設定の追加方法：[UI](systems/ui.md#設定)。
+
+単独でコピーしたヒーローには[構成](configurations.md)を使い、インスペクターのプロパティと一貫した設定を確認してください。このページは**デモのメニュー**を説明します。下のラベルは初期キー割り当てによるもので、実行中のメニューは`InputMap`から現在のキー名へ置き換えます。
 
 ## 操作
 
 | 設定 | キー | デフォルト | 適用先 |
 |---|---|---|---|
 | **左ボタン長押し**：カーソルへ直進 / 経路に沿って地点へ | `gameplay/hold_mode` | カーソルへ直進 | `PointClickMoveInput.hold_mode` |
-| **右ボタン + WASD**：オフ / 横移動 / 旋回 | `gameplay/camera_keys_mode` | 旋回 | `PointClickMoveInput.keys_with_camera`（コンポーネントのデフォルト：横移動） |
-| **左右ボタン + A/D**：オフ / 横移動 / 斜め | `gameplay/camera_steer_keys_mode` | 斜め | `PointClickMoveInput.keys_with_camera_steer`（コンポーネントのデフォルト：横移動） |
-| **後退（S）の減速** 0…80%、横移動のときのみ | `gameplay/backward_slowdown` | 30% | `LocomotionSettings.backward_speed_multiplier` = 1 − 値 |
+| **右ボタン + WASD**：オフ / 横移動 / 旋回 | `gameplay/camera_keys_mode` | 旋回 | `PointClickMoveInput.keys_with_camera`（コンポーネントのデフォルト：横移動）。オフでは対応するヒントも隠す |
+| **左右ボタン + A/D**：オフ / 横移動 / 斜め | `gameplay/camera_steer_keys_mode` | 斜め | `PointClickMoveInput.keys_with_camera_steer`（コンポーネントのデフォルト：横移動）。オフでは対応するヒントも隠す |
+| **後退（S）の減速** 0…80%、横移動のときのみ | `gameplay/backward_slowdown` | 30% | `LocomotionSettings.backward_speed_multiplier` = 1 − 値 / 100 |
 | **左ボタン長押しで走る間はカーソルを隠す** | `gameplay/hide_cursor_on_hold` | オン | `PointClickMoveInput.hide_cursor_while_held` |
+| **左ボタンで走行中の右ボタンはカメラを回すだけ** | `gameplay/look_around` | オン | `PointClickMoveInput.look_around_while_held`。見回しのヒント行にも反映する |
 
 ## キャラクター
 
 | 設定 | キー | デフォルト | 適用先 |
 |---|---|---|---|
-| **主人公の外見**：10種類から1つ | `character/look` | 10 · 戦闘魔導士 | `CharacterAppearance.set_look()` |
+| **主人公の外見**：10種類から1つ | `character/look` | 8 · ネクロマンサー | `CharacterAppearance.set_look()` |
+| **地面の上に浮く** | `character/hover` | オフ | `Hero/Character/Visual/Hover`の`CharacterHover.enabled`（コンポーネントのデフォルトはオン、`player.tscn`ではオフ）。浮遊中は歩数が止まり、`player_floating_fall.tres`で落下が遅くなる |
 | **崖から落ちない** | `gameplay/ledge_guard` | オン | `LedgeGuard.enabled` |
-| **ジャンプ（スペース）** | `character/jump` | オン | `GroundCharacter.can_jump` |
+| **ジャンプ（スペース）** | `character/jump` | オン | `GroundCharacter.can_jump`。ジャンプのヒントも隠す |
 | **ジャンプの高さ** 0.5…1.5 m | `character/jump_height` | 1.0 m | `GroundCharacter.jump_height` |
-| **ダッシュ（Shift）** | `character/sprint` | オン | `GroundCharacter.can_sprint` |
+| **ダッシュ（Shift）** | `character/sprint` | オン | `GroundCharacter.can_sprint`。ダッシュのヒントも隠す |
 | **Shift**：長押し / 押すとオン、もう一度でオフ | `character/sprint_mode` | 長押し | `CharacterActionInput.sprint_mode` |
-| **速度ボーナス** +10…+100% | `character/sprint_bonus` | +50% | `LocomotionSettings.sprint_speed_multiplier` = 1 + 値 |
+| **速度ボーナス** +10…+100% | `character/sprint_bonus` | +50% | `LocomotionSettings.sprint_speed_multiplier` = 1 + 値 / 100 |
 | **ダッシュの疲労** | `character/fatigue` | オン | `GroundCharacter.sprint_tires` |
 | **スタミナ持続時間** 3…10秒 | `character/sprint_duration` | 5.0秒 | `GroundCharacter.sprint_duration` |
 
@@ -39,9 +45,15 @@ F10で設定ウィンドウが開き、ゲームが一時停止します。Esc�
 |---|---|---|---|
 | **右ボタンでカメラを上下に傾ける** | `camera/mouse_pitch` | オフ | `OrbitCameraRig.mouse_pitch` |
 | **走る方向へカメラを回す** | `camera/follow` | オフ | `OrbitCameraRig.follow_movement` |
-| **カメラの傾きを揃える** | `camera/align_pitch` | オフ | `OrbitCameraRig.follow_pitch` |
+| **回転時間** 0…10 s（0では「即時」） | `camera/follow_time` | 1.1 s | `OrbitCameraRig.follow_time`（コンポーネントのデフォルト：1.5 s） |
+| **カメラへ向かって走るときは除く** | `camera/follow_except_toward` | オン | `OrbitCameraRig.follow_toward_camera_angle`。オフでは0となり、真正面からカメラへ向かう走行も含め、どの走行でも後ろへ回る |
+| **角度** 5…60° | `camera/follow_except_toward_angle` | 30° | 除外がオンの間、`OrbitCameraRig.follow_toward_camera_angle`に設定する。コンポーネントのデフォルトも30° |
+| **走る間カメラの傾きを揃える** | `camera/align_pitch` | オフ | `OrbitCameraRig.follow_pitch` |
 | **見下ろし角** 8…80° | `camera/align_pitch_angle` | 22° | `OrbitCameraRig.follow_pitch_angle` = −値（コンポーネントのデフォルト：−40°） |
-| **追従時間** 0…10秒（0では「即時」）、旋回と傾きの両方に適用 | `camera/follow_time` | 1.1秒 | `OrbitCameraRig.follow_time`（コンポーネントのデフォルト：1.5秒） |
+| **傾きの調整時間** 0…10 s（0では「即時」） | `camera/align_pitch_time` | 1.1 s | `OrbitCameraRig.follow_pitch_time`（コンポーネントのデフォルト：1.5 s） |
+| **走る間カメラの高さを揃える** | `camera/align_height` | オフ | `OrbitCameraRig.follow_zoom` |
+| **高さ** 0…100% | `camera/align_height_level` | 55% | `OrbitCameraRig.follow_zoom_level` = 値 / 100。0%はカメラを最も低く、100%は最も高くする |
+| **高さの調整時間** 0…10 s（0では「即時」） | `camera/align_height_time` | 1.5 s | `OrbitCameraRig.follow_zoom_time` |
 | **カメラ回転中もカーソルが狙いを保つ** | `camera/keep_aim` | オン | `PointClickMoveInput.keep_aim_on_camera_turn` |
 | **カメラが背後の障害物で止まる** | `camera/keep_out_of_geometry` | オン | `CameraArm.keep_out_of_geometry` |
 | **キャラクターが隠れたら寄る** | `camera/pull_in_on_occlusion` | オフ | `CameraArm.pull_in_on_occlusion` |
@@ -70,10 +82,10 @@ V-Syncでは、フレーム数がモニターのリフレッシュレートを�
 | **UIスケール** 50…100% | `interface/ui_scale` | 75% | ルートウィンドウの`content_scale_factor` |
 | **FPSカウンター** | `interface/fps_counter` | オン | `Hud/FpsCounter`の表示 |
 | **操作ヒントと速度** | `interface/help` | オン | `Hud/Panel`の表示 |
-| **キャラクターの経路線** | `interface/path_line` | オフ | `PathView`の表示 |
+| **キャラクターの経路線** | `interface/path_line` | オフ | `Hero/PathView`の表示 |
 | **キャラクターの状態とイベント** | `interface/character_state` | オフ | `Hud/CharacterState`の表示（`CharacterMonitor`） |
 
-UIスケールは、ヒント、FPSカウンター、スタミナバー、ウィンドウの大きさを変えますが、3Dビューは変えません。100%はシーンで作成したときのサイズです。
+UIスケールはヒント、FPSカウンター、スタミナバー、キャラクター状態パネル、「発見：…」の通知、移動の案内、ローディング画面、ウィンドウを変えます。3Dビューには影響しません。100%はシーンで作成したサイズです。マウスでスライダーをドラッグした場合は、カーソルの下からスライダーが逃げないよう、ボタンを離した時点で適用します。キーボードとホイールからの変更は直ちに反映されます。
 
 ## サウンド
 
@@ -82,12 +94,12 @@ UIスケールは、ヒント、FPSカウンター、スタミナバー、ウィ
 | **音量** 0…100%（0では「オフ」） | `sound/volume` | 100% | `Master`バスの音量。0でミュート |
 | **足音** | `sound/footsteps` | オン | `CharacterSounds.footsteps_enabled` |
 | **ジャンプと着地** | `sound/jump` | オン | `CharacterSounds.jump_enabled` |
-| **ダッシュ開始とダッシュ中** | `sound/sprint` | オフ | `CharacterSounds.sprint_enabled` |
+| **ダッシュ開始とダッシュ中** | `sound/sprint` | オフ | `CharacterSounds.sprint_enabled`（コンポーネントのデフォルトはオン） |
 
 ## 依存する設定
 
-別の設定がないと意味をなさない項目は、薄く表示されて変更できなくなります。右ボタン + WASDが横移動モードでないときの後退の減速、ジャンプがオフのときのジャンプの高さ、ダッシュがオフのときのダッシュ関連すべて、疲労がオフのときのスタミナ持続時間、傾きの揃えがオフのときの見下ろし角、追従と傾きの揃えがどちらもオフのときの追従時間です。
+別の設定がないと意味をなさない項目は薄く表示され、変更できません。右ボタン＋WASDが横移動でないときの後退減速、ジャンプがオフのときのジャンプ高、ダッシュがオフのときのダッシュ関連の項目、疲労がオフのときのスタミナ持続時間、旋回がオフのときの回転時間、傾きの自動調整がオフのときの角度と時間、高さの自動調整がオフのときの高さと時間、ヒーローが浮遊して歩数のない間の足音です。
 
 ---
 
-*このページは Iso & Orbit 1.1.0 に対応しています。*
+*このページは Iso & Orbit 1.2.0 に対応しています。*

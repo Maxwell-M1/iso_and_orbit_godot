@@ -1,10 +1,15 @@
 # Known issues
 
+[← Documentation index](index.md)
+
 Limitations of the project and engine quirks it works around. Each entry says what you see and what to do.
 
 ## Limitations
 
 - **Mouse and keyboard only.** There is no gamepad support.
+- **No in-game key rebinding.** Change bindings in Project Settings → Input Map or through `InputMap` in code.
+  The interface can refresh key names, but there is no rebinding screen, conflict detection or binding persistence.
+  See [key names in texts](systems/ui.md#key-names-in-texts).
 - **No animations.** The models are static primitives; only the held item swings with the steps (`HandSway`).
   `GroundCharacter` reports what an `AnimationTree` needs: the state, the speed as a blend value, the movement in the
   model's axes and the gait cycle, see [Locomotion](systems/locomotion.md#what-the-character-reports).
@@ -12,14 +17,18 @@ Limitations of the project and engine quirks it works around. Each entry says wh
   drops to about 70% for one tick per stair, and the body is put up to a few centimeters ahead onto the stair. For a
   long flight of stairs an invisible ramp collider is smoother, see
   [Locomotion](systems/locomotion.md#stairs-and-slopes).
+- **A floating model is cosmetic.** `CharacterHover` lifts the model, not the body: under a low ceiling the model can
+  sink into it, and the camera's focus and the arm's checks stay at the body's height. Over a gap the model falls with
+  the body.
+- **Up is +Y.** The character and its components support only `Vector3.UP` as up.
 - **No avoidance between characters.** `NavigationMover` follows a path and does not use navigation avoidance, so
-  moving characters do not steer around each other. The player's body is on layer 2 and collides only with layer 1,
-  so two characters made from `player.tscn` pass through each other; add layer 2 to their `collision_mask` if they
-  should block each other. The NPCs in the demo stand still and are baked into the navigation mesh as obstacles.
+  moving characters do not steer around each other. The player's body is on layer 2 and collides only with layers 1
+  and 4, so two characters made from `player.tscn` pass through each other; add layer 2 to their `collision_mask` if
+  they should block each other. The NPCs in the demo stand still and are baked into the navigation mesh as obstacles.
 - **The navigation mesh is baked in advance.** Moving an obstacle at runtime does not change paths. After editing the
   level, rebake the mesh ([World and navigation](systems/world-and-navigation.md#rebaking-the-navigation-mesh)).
-- **Godot 4.7 only.** The project is tested on 4.7.2. The silhouette needs the stencil buffer (4.5+), and the scene
-  warning check repeats the conditions of 4.7.2.
+- **Tested engine and renderer.** Use Godot 4.7.2, Jolt Physics and Forward+ for the verified setup. Compatibility
+  with other versions and renderers is not established by the test suite. The silhouette requires stencil support.
 
 ## Input
 
@@ -68,13 +77,15 @@ Limitations of the project and engine quirks it works around. Each entry says wh
 - **Rounded rotations make "non-uniform scale" warnings.** A rotation written to a `.tscn` with 4 digits makes the
   basis axis lengths differ by more than 1e-5, and the engine reports a non-uniform scale on bodies and shapes. Write
   `Transform3D` numbers at full precision (9 significant digits).
-- **`shared/` is not fully language-neutral yet.** `world.tscn` and `mountain.tscn` use
-  `addons/iso_orbit/points_of_interest/point_of_interest.gd`, and two small prop scripts live in `shared/world/props/`.
-  A C# version would need its own places script or a scene-only way to mark places.
+- **`shared/` is not fully language-neutral yet.** The levels and the pad use scripts of the components: `world.tscn`,
+  `island.tscn` and `mountain.tscn` use `addons/iso_orbit/points_of_interest/point_of_interest.gd`, both levels
+  `addons/iso_orbit/levels/spawn_point.gd`, and `shared/world/props/teleport_pad.tscn`
+  `addons/iso_orbit/levels/level_portal.gd`. Two small prop scripts live in `shared/world/props/` too. A C# version
+  would need its own scripts for places, spawn points and portals, or a scene-only way to mark them.
 - **Leaked resources reported on exit.** If a script exits right after footsteps play, the engine may report leaked
   `AudioStreamPlayback` objects: with `--fixed-fps` game time runs ahead of real time while the sounds still play.
   Free the scene and wait a moment before quitting; `tests/run_checks.gd` waits 0.1 s.
 
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*

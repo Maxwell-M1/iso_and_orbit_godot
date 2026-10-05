@@ -1,5 +1,7 @@
-<!-- translation of docs/en/systems/audio.md @ 6a9b8c66c53c -->
+<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
 # Audio
+
+[← Índice de documentación](../index.md)
 
 > Esta es una traducción del [original en inglés](../../en/systems/audio.md).
 > Si hay diferencias, la versión en inglés es la correcta.
@@ -8,10 +10,14 @@
 `landed(impact_speed)` y `sprint_changed(sprinting)` (todas las señales:
 [Locomoción](locomotion.md#lo-que-informa-el-personaje)). Los sonidos, el polvo bajo los pies o las animaciones se
 conectan a ellas; el personaje en sí no sabe nada de ellos. La demo conecta sonidos.
+Cuando no se cuentan los pasos (`steps_enabled` desactivado o héroe flotante), no hay sonido de pasos, sin importar
+`footsteps_enabled`. Un héroe flotante desciende lentamente de un salto y toca el suelo a 2 m/s, por debajo de
+`landing_min_speed`: no se emite `landed` ni suena el aterrizaje.
 
 ## CharacterSounds
 
-`CharacterSounds` (`Player/Sounds`) es un `Node3D` hijo del personaje. Sus hijos son nodos `AudioStreamPlayer3D`, así
+`CharacterSounds` (`Hero/Character/Sounds`) es un `Node3D` hijo del personaje. Sus hijos son nodos
+`AudioStreamPlayer3D`, así
 que el sonido sale del personaje y funciona igual para un NPC. Sin este nodo el personaje funciona exactamente igual,
 solo que en silencio.
 
@@ -27,7 +33,7 @@ solo que en silencio.
 |---|---|---|
 | `character` | el padre | De quién reproducir las señales |
 | `footsteps`, `jump`, `land`, `sprint_start`, `sprint_loop` | — | Los reproductores |
-| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | activado | Grupos de sonidos; el salto abarca el salto y el aterrizaje, el sprint abarca el inicio y el bucle |
+| `footsteps_enabled`, `jump_enabled`, `sprint_enabled` | activado (`sprint_enabled` desactivado en la demo) | Grupos de sonidos; el salto abarca el salto y el aterrizaje, el sprint abarca el inicio y el bucle |
 | `sprint_step_pitch`, `sprint_step_volume_db` | 1,08; +2 dB | Los pasos durante el sprint |
 | `land_full_speed`, `min_land_volume` | 10 m/s; 0,3 | Curva de volumen del aterrizaje |
 | `sprint_loop_fade` | 0,25 s | Fundido del bucle del sprint |
@@ -35,7 +41,8 @@ solo que en silencio.
 Los volúmenes se fijan en los reproductores en `gdscript/player/player.tscn`; ajústalos con el juego en marcha a
 través del árbol Remoto (Remote). La excepción es `Land`: su volumen se fija antes de cada aterrizaje a partir de la
 velocidad de caída (`land_full_speed`, `min_land_volume`). Los grupos se activan y desactivan en Configuración →
-Sonido; la demo desactiva por defecto los sonidos del sprint. El volumen general allí es el del bus `Master`: el
+Sonido; la demo desactiva por defecto los sonidos del sprint tanto en los ajustes como en `player.tscn`, por lo que
+tampoco suenan en un héroe copiado sin el sistema de ajustes. El volumen general es el del bus `Master`: el
 porcentaje es una fracción de la amplitud (50% es 6 dB más bajo), y 0 silencia el bus.
 
 ## Los sonidos en sí
@@ -50,4 +57,4 @@ Se pueden reemplazar por sonidos grabados reales: pon en la carpeta archivos con
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.1.0.*
+*Esta página corresponde a Iso & Orbit 1.2.0.*

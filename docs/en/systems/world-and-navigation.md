@@ -1,13 +1,89 @@
 # World and navigation
 
-The demo level is `shared/world/world.tscn`: an 80 × 80 m glade behind a wooden fence. Everything in it is built
-from primitives and shaders; the fine surface patterns come from baked textures.
+[← Documentation index](../index.md)
+
+The demo's start level is `shared/world/world.tscn`, the meadow: an 80 × 80 m glade behind a wooden fence. Everything
+in it is built from primitives and shaders; the fine surface patterns come from baked textures. A teleport pad by the
+Ancient Circle leads to the second level, Lonely Isle; both are described in [Levels](levels.md#the-demos-levels).
+
+## Physics layers and navigation
+
+Obstacles are `StaticBody3D` on layer 1 (`world`), characters on layer 2 (`characters`), camera-only bodies on layer 3
+(`camera`), invisible walls at the edge of a level on layer 4 (`bounds`), see [Project
+setup](../project-setup.md#physics-layers). The navigation mesh is baked from layer 1 collisions (the island's also
+from layer 4, its edge walls) with a 0.5 m agent radius; the character's capsule is 0.35 m, so paths keep a margin
+from corners.
+
+| `NavigationMesh` parameter | Value | Why |
+|---|---|---|
+| `agent_radius` | 0.5 m | Paths keep clear of corners |
+| `agent_height` | 1.75 m | Existing demo bake value; use at least the full collision height for a new level with ceilings (the hero capsule is 1.8 m) |
+| `agent_max_slope` | 40° | The mountain's slopes stay off the mesh |
+| `cell_height` | 0.025 m | Fine enough to measure the climb below |
+| `cell_size` | 0.25 m | Horizontal bake resolution; must match the navigation map |
+| `agent_max_climb` | 0.3 m (12 cells) | The stairs the character steps onto (`GroundCharacter.max_step_height`) |
+| `geometry_parsed_geometry_type` | Static Colliders | The mesh follows the collision shapes, not the visible meshes. The collision mask below applies to colliders, and the invisible walls, which have no mesh, count only this way |
+| `geometry_collision_mask` | layer 1; the island: 1 and 4 | Only obstacles count, and the invisible walls |
+| `filter_walkable_low_height_spans` | off in the demo | Enable for a new level with ceilings so spans below `agent_height` clearance are excluded |
+
+**Match navigation to the collision body.** Use `agent_max_climb` no higher than `GroundCharacter.max_step_height`
+(0.3 m here), and a navigation slope limit no higher than the body's floor limit (40° versus 45° here). Bake after
+changing either value. Navigation is rasterized into cells, so matching the numbers is not a guarantee for every
+edge: test the highest intended stair and the lowest forbidden ledge. The demo tests its 0.2 m stairs and rejects a
+0.4 m block. Fine 0.025 m vertical cells make these small height differences distinguishable.
+
+For new levels, use agent height at least equal to the full capsule height and enable
+`filter_walkable_low_height_spans`; height alone does not enable that clearance filter. Include ceiling colliders in
+the bake. A floating model extends above the body, so check its visual clearance separately. Radius controls path
+clearance around walls; after changing capsule radius, check narrow corridors and rebake too.
+
+Keep map and mesh `cell_height` and `cell_size` equal. The demo uses 0.025 m vertically and 0.25 m horizontally;
+the corresponding project settings are `navigation/3d/default_cell_height` and `navigation/3d/default_cell_size`.
+Godot's [NavigationMesh reference](https://docs.godotengine.org/en/stable/classes/class_navigationmesh.html) describes
+the bake resolution, rounding and clearance filter.
+
+The baked surface can sit slightly above the collision floor. `NavigationMover` compares path progress in the XZ
+plane; physics determines the body's actual height. Physics layers select bake geometry, whereas the region's
+navigation layers and `NavigationMover.navigation_layers` select usable paths.
+
+An empty navigation result falls back to direct movement; a partial path can end short of an unreachable target.
+Use **Debug → Visible Navigation** and the demo's **Character path line** before tuning movement to compensate for a
+bad route. See [Locomotion](locomotion.md#navigationmover).
+
+## Rebaking the navigation mesh
+
+The mesh is baked in advance and stored right in each level's scene, `shared/world/world.tscn` and
+`shared/world/island/island.tscn` (the `NavigationMesh` resource of `NavigationRegion3D`); the game does not recompute
+it. After editing a level, rebake its mesh. Both use the same parameters, except the collision mask: the island's
+mesh is baked from layers 1 and 4.
+
+**When:** you moved, added, removed or resized anything with a collision shape on layer 1 (`world`): a rock, a crate,
+a wall, a tree, a prop, an NPC, the mountain; on the island also an invisible wall (layer 4, `bounds`). Not needed
+when only the look changed (a mesh, a
+material), or for bodies on layer 3 (`camera`), the player's character (layer 2) and areas (`Area3D`). If you forget,
+paths go through a moved object (the character runs into it and slides along) or around the empty spot where it stood.
+
+**In the editor:**
+
+1. Open the level's scene.
+2. Select `NavigationRegion3D` in the scene tree.
+3. Press **Bake NavigationMesh** on the toolbar above the 3D view. After a couple of seconds the blue mesh in the view
+   updates: a hole the agent radius (0.5 m) around the object, solid mesh where it used to stand.
+4. Save the scene (Ctrl+S): the mesh is embedded in the scene.
+
+The bake parameters are on the resource itself: select `NavigationRegion3D` and expand `Navigation Mesh` in the
+inspector.
+
+After rebaking, run the tests ([Tests](../testing.md)): their routes follow the mesh. In the running game, Debug →
+Visible Navigation in the editor shows the mesh, and Settings (F10) → Interface → **Character path line** shows the
+character's path.
 
 ## The level
 
 - **The center** is the spawn point. Around it: a ring of ruined columns, a U-shaped trap open toward the spawn, a
   long wall with a gap, crates, a grove, a hedge maze and a 1.6 m platform with a ramp on its west side and stairs on
-  its east side (seven 0.2 m stairs with 0.4 m treads). The tests use all of these, so they stay where they are.
+  its east side (seven 0.2 m stairs with 0.4 m treads, one static body of seven boxes). The tests use all of these, so
+  they stay where they are.
 - **Roads** are dirt strips from the south fence through the gap in the wall to the spawn and on to the mountain, the
   ruins, the camp and the ramp; the farmstead's road branches off south of the wall. They are only a pattern (the
   segments `ROADS` in `shared/world/terrain.gdshaderinc`) and do not affect movement. The ground and the gentle grass
@@ -19,10 +95,9 @@ from primitives and shaders; the fine surface patterns come from baked textures.
 - **The ten hero looks** in a row with their backs to the south wall, east of the gap (see
   [Characters](characters.md#hero-looks)).
 
-The forest, bushes and boulders were placed once by a throwaway script with a fixed seed, keeping clear of the
-places the tests use (routes, the run along the southern strip, the jump off the platform, everything around the
-spawn). The script is not in the project; the layout is now edited in the editor. When moving trees, keep those
-places clear.
+Edit the prop instances in the level scene to change the layout, then rebake navigation. The regression tests use
+specific routes and obstacle positions in this demo; use a separate level for your own layout, or update the tests
+alongside changes to their test geometry.
 
 ### Places and NPCs
 
@@ -42,8 +117,9 @@ goes around them and nobody walks through them. The camp, the farmstead and the 
 peak is in `mountain.tscn`.
 
 **A new place:** add a `PointOfInterest` (an `Area3D` whose `collision_mask` includes the characters' layer 2) with
-a collision shape and a `title` to any world scene. The toast finds every place through its group; no connections
-are needed. Add the title to the translations ([UI](ui.md#translations)).
+a collision shape and a `title` to any world scene. The toast finds every place through its group, also on a level
+loaded later; no connections are needed. Add the title to the translations ([UI](ui.md#translations)). Lonely Isle has
+a fifth place, Hermit's Camp.
 
 ## Surfaces
 
@@ -67,12 +143,15 @@ grain) comes from baked textures, see below.
 | Barrels | `barrel` | Staves with gaps, rusty iron hoops, a plank lid |
 | Logs, trunks, banner pole | `bark` | Furrowed bark with moss near the ground and on the north side; charred and smoldering logs at the campfire |
 | Tree crowns, bushes | `foliage` | Leaves in two layers on three axis planes, lumps, a lighter top; needles on pines, orange and red on the autumn oak |
-| Ground | `ground_grid` | See below |
+| Ground | `ground_grid` | See below. The island's grass is `island_ground.tres`, the same ground with the roads off (`roads`) |
 | Mountain | `mountain` | Grass, the trail and rock layers chosen by the face color |
-| Water in the well | `water` | Slow ripples |
+| Water in the well, the island's lake | `water` | Slow ripples. The lake (`lake_water.tres`) is a lighter blue with a stronger ripple (`ripple` 0.55 against 0.35) |
 
 The masonry pattern follows the mesh faces and knows the box size: a `BoxMesh` without face subdivisions has a
-vertex only at each corner, so `abs(VERTEX)` gives the half sizes. The courses on the sides fit the height, and the
+vertex only at each corner, so `abs(VERTEX)` gives the half sizes. They reach the pixels unchanged (a `flat`
+varying): interpolated, they would differ in the last digits from pixel to pixel, and a course count that falls on a
+half (a 1.4 m stair with 0.4 m courses) would round up in some pixels and down in others, and flicker. The plaster,
+plank and cloth shaders pass the box size the same way. The courses on the sides fit the height, and the
 top course of a side is the edge of the top stones, so its joints continue the top's joints at the edge. The ramp
 (a thin slab) is one such course, and the joints of its ends match the top. The maze boxes, in contrast, have face
 subdivisions every 25 cm (`subdivide_*`), because their sides are displaced by noise from the world position: copies of
@@ -98,10 +177,8 @@ The surface patterns (grass with blades and flowers, dirt with pebbles, leaves, 
 fibers, thatch, woven cloth) were designed as noise shaders, but the game does not compute them for every pixel: they
 were baked once into seamless textures in `shared/world/textures/`, and the world shaders tile them.
 
-The reason is frame time. The ground alone cost the GPU about 2.5 ms per frame in a 2560 × 1511 window: every pixel
-looped over 18 cells of grass blades with sines and hashes. With textures the GPU needs about 2 ms for the whole frame
-instead of 4.5, and the frame rate went from 160–230 to 300–470 (12 views of the level, no V-Sync, an RTX 4090
-Laptop GPU; beyond that the CPU is the limit).
+Baking replaces repeated per-pixel noise calculations with texture samples. Keep the import settings below when
+replacing these textures; several channels contain shader data rather than ordinary color.
 
 - **Seamless.** The noise of the patterns repeats with the tile, with a whole number of features per tile, so the seam
   is invisible. The exception is `ground_mask`: the large patches and roads over the whole 96 m ground, not tiled.
@@ -140,60 +217,6 @@ a path to be built along the trail:
 The camera looks from the south-east by default, so on the far side of the trail the mountain hides the hero, who
 then shows as a silhouette (see [Characters](characters.md#occludedsilhouette-one-shape-the-weapon-outlined-a-rim)).
 
-## Physics layers and navigation
-
-Obstacles are `StaticBody3D` on layer 1 (`world`), characters on layer 2 (`characters`), camera-only bodies on layer 3
-(`camera`), see [Project setup](../project-setup.md#physics-layers). The navigation mesh is baked from layer 1
-collisions with a 0.5 m agent radius; the character's capsule is 0.35 m, so paths keep a margin from corners.
-
-| `NavigationMesh` parameter | Value | Why |
-|---|---|---|
-| `agent_radius` | 0.5 m | Paths keep clear of corners |
-| `agent_height` | 1.75 m | |
-| `agent_max_slope` | 40° | The mountain's slopes stay off the mesh |
-| `cell_height` | 0.025 m | Fine enough to measure the climb below |
-| `agent_max_climb` | 0.3 m (12 cells) | The stairs the character steps onto (`GroundCharacter.max_step_height`) |
-| `geometry_collision_mask` | layer 1 | Only obstacles count |
-
-**A path never leads onto a ledge higher than the body can climb.** `GroundCharacter` steps onto stairs up to
-`max_step_height` (0.3 m), so the mesh joins ledges up to 0.3 m (`agent_max_climb`) and no higher: the stairs east of
-the platform are joined, the platform's 1.6 m edge and the ramp's sides higher than 0.3 m are not. Recast measures
-heights in whole cells, so the cells must be fine. The mesh used to be baked with `agent_max_climb` = 0.25 m at
-`cell_height` = 0.25 m, and it treated a ledge of almost 0.5 m as walkable: the path to the platform entered the ramp
-from the side, where its edge is 0.4 m above the ground, and the character ran into it. With 0.025 m cells the climb
-is measured to 2.5 cm. The navigation map's cell height must not exceed the mesh's (or the engine warns), so
-`project.godot` sets `navigation/3d/default_cell_height` to 0.025. If you change `max_step_height`, set
-`agent_max_climb` to the same value and rebake.
-
-A Recast mesh hangs about two cell heights above the ground (0.05 m here; it was 0.5 m with the old 0.25 m cells).
-That is why `NavigationMover` compares path points in the horizontal plane, see
-[Locomotion](locomotion.md#navigationmover).
-
-## Rebaking the navigation mesh
-
-The mesh is baked in advance and stored right in `shared/world/world.tscn` (the `NavigationMesh` resource of
-`NavigationRegion3D`); the game does not recompute it. After editing the level, rebake it.
-
-**When:** you moved, added, removed or resized anything with a collision shape on layer 1 (`world`): a rock, a crate,
-a wall, a tree, a prop, an NPC, the mountain. Not needed when only the look changed (a mesh, a
-material), or for bodies on layer 3 (`camera`), the player's character (layer 2) and areas (`Area3D`). If you forget,
-paths go through a moved object (the character runs into it and slides along) or around the empty spot where it stood.
-
-**In the editor:**
-
-1. Open `shared/world/world.tscn`.
-2. Select `NavigationRegion3D` in the scene tree.
-3. Press **Bake NavigationMesh** on the toolbar above the 3D view. After a couple of seconds the blue mesh in the view
-   updates: a hole the agent radius (0.5 m) around the object, solid mesh where it used to stand.
-4. Save the scene (Ctrl+S): the mesh is embedded in the scene.
-
-The bake parameters are on the resource itself: select `NavigationRegion3D` and expand `Navigation Mesh` in the
-inspector.
-
-After rebaking, run the tests ([Tests](../testing.md)): their routes follow the mesh. In the running game, Debug →
-Visible Navigation in the editor shows the mesh, and Settings (F10) → Interface → **Character path line** shows the
-character's path.
-
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*

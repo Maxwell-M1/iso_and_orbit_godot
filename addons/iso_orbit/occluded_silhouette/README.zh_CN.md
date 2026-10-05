@@ -1,5 +1,7 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ ed5707ab8355 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
 # 遮挡剪影
+
+[← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文**
 
@@ -25,17 +27,19 @@
 ## 配置
 
 1. 将此文件夹复制到 `res://addons/iso_orbit/occluded_silhouette/`；材质通过该路径引用着色器。
-2. 给角色添加一个挂载 `occluded_silhouette.gd` 的 `Node`。将 `target` 设为容纳模型的节点，并把 `silhouette_mask.tres`、`silhouette_body.tres`、`silhouette_gear.tres` 和 `silhouette_outline.tres` 分别赋给 `mask`、`body_fill`、`gear_fill` 和 `outline`。
-3. 位于 `gear_nodes` 中所列节点（`RightHand`、`LeftHand`）之下的网格被视为手持物品。
+2. 给角色添加一个挂载 `occluded_silhouette.gd` 的 `Node`。将 `target` 设为容纳模型的节点（随附英雄使用 `Character/Visual`），并把 `silhouette_mask.tres`、`silhouette_body.tres`、`silhouette_gear.tres` 和 `silhouette_outline.tres` 分别赋给 `mask`、`body_fill`、`gear_fill` 和 `outline`。
+3. 位于 `gear_nodes` 中所列节点（`RightHand`、`LeftHand`）之下的网格被视为手持物品。没有这些节点的模型，所有网格都使用身体填充；如果装备采用其他节点结构，请更改名称。
 
-颜色是各材质的 `color` 参数，描边宽度是 `silhouette_outline.tres` 中的 `width`，`outline_enabled` 可以关闭描边。剪影要求障碍物位于角色前方至少 30 厘米处（`min_gap`）。
+颜色由各材质的 `color` 参数决定，描边宽度是 `silhouette_outline.tres` 中的 `width`，`outline_enabled` 可以关闭描边。剪影要求障碍物位于角色前方至少 30 厘米处（`min_gap`，来自 `silhouette_common.gdshaderinc`，用于身体、装备和描边材质；修改时须同时更新三者）。
+
+组件会设置每个网格的 `material_overlay`，包括切换外观后新增的网格。如果模型已将该属性用于其他效果，需要决定由哪个叠加效果接管。组件就绪时会把材质复制到各通道链中，因此颜色和 `min_gap` 应在场景启动前于材质中设置；`outline_enabled` 可以在运行时更改。
 
 使用模板缓冲区，该功能在 Godot 4.5+ 中是实验性的。已在 Forward+ 渲染器上测试。
 
 ## 文档
 
-见模板仓库中的 `docs/zh_CN/systems/characters.md`。
+见模板仓库中的 `docs/zh_CN/systems/characters.md`（包括替换模型）和 `docs/zh_CN/integration.md`（复制可操控英雄）。
 
 ---
 
-*本页对应 Iso & Orbit 1.1.0。*
+*本页对应 Iso & Orbit 1.2.0。*

@@ -1,5 +1,7 @@
-<!-- translation of docs/en/systems/ui.md @ 40a5a08ac8d9 -->
+<!-- translation of docs/en/systems/ui.md @ 8fc9a768e40b -->
 # Interfaz de usuario
+
+[← Índice de documentación](../index.md)
 
 > Esta es una traducción del [original en inglés](../../en/systems/ui.md).
 > Si hay diferencias, la versión en inglés es la correcta.
@@ -15,7 +17,10 @@ Ventanas sobre el juego, el sistema de configuración, el HUD y las traducciones
   está abierta (y todo lo que tenga encima) o la abre. Esc (`ui_cancel`) cierra la ventana de arriba; F10
   (`toggle_settings`) abre o cierra la ventana de configuración (`settings_screen`).
 - Mientras hay alguna ventana abierta, el juego está en pausa (`pause_game`) y el cursor del mouse es visible.
-  `UiRoot` se ejecuta en `PROCESS_MODE_ALWAYS` y sus ventanas lo heredan.
+  `UiRoot` solo pausa un juego en marcha y termina su propia pausa: si el juego estaba pausado al abrir la
+  ventana, la pausa sigue a cargo de quien la inició. Si este la termina, el juego continúa detrás de la ventana
+  (consulta [Niveles](levels.md#un-cambio-de-nivel)). `UiRoot` se ejecuta en `PROCESS_MODE_ALWAYS` y sus ventanas
+  lo heredan.
 - El foco del teclado pasa al `initial_focus` de la ventana cuando se abre y vuelve a donde estaba cuando se cierra.
 - Señales: `screen_opened(screen)`, `screen_closed(screen)`. Consultas: `has_open_screens()`, `get_top_screen()`.
 
@@ -71,11 +76,11 @@ Sonido. Todas las opciones y sus valores por defecto están en [Configuración](
   - `SettingLanguageButton`: el idioma de la interfaz, ver abajo.
 - Los controles que no tienen sentido sin otra opción se atenúan y se bloquean: la ralentización hacia atrás sin el
   modo lateral, la altura del salto sin el salto, todo lo del sprint sin el sprint, la duración de la resistencia sin
-  la fatiga, el ángulo de inclinación sin la alineación de la inclinación, el tiempo de alcance sin el seguimiento ni
-  la alineación (`_update_dependent_rows()`).
+  la fatiga, el tiempo de giro sin girar, el ángulo y tiempo de inclinación sin alinearla, la altura y tiempo sin
+  alineación de altura y los pasos mientras el héroe flota (`_update_dependent_rows()`).
 - Cada página de pestaña es un `ScrollContainer`: una pestaña larga se desplaza (también siguiendo el foco del
   teclado) y la ventana no crece. La altura de la ventana es el `custom_minimum_size` del `TabContainer` (440). La
-  pestaña más larga, Personaje, cabe, y toda la ventana queda en pantalla con la escala de interfaz al 100%.
+  pestaña Cámara, la más larga, y Personaje se desplazan; toda la ventana permanece visible al 100% de escala.
 - **Restablecer todo** llama a `reset_to_defaults()`. La ventana guarda la configuración cuando se cierra.
 - El texto de ayuda de V-Sync lo compone el código a partir de una frase traducida y la frecuencia de actualización
   del monitor.
@@ -92,11 +97,16 @@ el control deslizante se alejaría de él. El teclado y la rueda cambian la esca
 
 | Nodo en `main.tscn` | Script | Qué muestra |
 |---|---|---|
-| `Hud`, `Hud/Panel` | `gdscript/demo/hud.gd` en `Hud` | La ayuda de controles y la velocidad. El script solo actualiza la velocidad; `settings_applier.gd` muestra u oculta el panel y oculta las líneas de las funciones desactivadas (las teclas con clic der., ambos botones + A/D, sprint, salto) |
+| `Hud`, `Hud/Panel` | `gdscript/demo/hud.gd` en `Hud` | Ayuda de controles con las teclas actuales (`Hud/ActionTexts`, consulta [Nombres de teclas en los textos](#nombres-de-teclas-en-los-textos)) y velocidad real del héroe (`GroundCharacter.get_move_speed()`; contra una pared es 0). El script solo actualiza la velocidad; `settings_applier.gd` muestra u oculta el panel y las líneas de funciones desactivadas (mirar alrededor, teclas con derecho, ambos botones + A/D, sprint y salto) |
 | `Hud/FpsCounter` | `FpsCounter` (Label) | Fotogramas por segundo en la esquina superior derecha; funciona en pausa |
 | `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Debajo del contador de FPS: lo que está haciendo el héroe (estado, velocidad y mezcla, movimiento, giro, suelo o aire, pasos y pies, resistencia) y los últimos eventos. Oculto por defecto. Ver [Locomoción](locomotion.md#charactermonitor-el-estado-como-texto) |
-| `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | "Lugar descubierto: …" durante `show_time` (3,5 s) cuando el jugador entra por primera vez en un `PointOfInterest`. Encuentra todos los lugares a través del grupo `points_of_interest`; `show_discovery(title)` muestra uno manualmente |
+| `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | «Lugar descubierto: …» durante `show_time` (3.5 s) al entrar por primera vez en un `PointOfInterest`. Encuentra todos mediante `points_of_interest`, incluso los añadidos después al cargar otro nivel (`watch_added_places` activado; desactivado: solo lugares iniciales); `show_discovery(title)` permite mostrar uno manualmente |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Aparece cuando empieza a gastarse la resistencia, se pone roja mientras el personaje está agotado (variación `StaminaBarExhausted`) y se desvanece en 0,6 s cuando vuelve a estar llena |
+| `Hud/TravelPrompt` | `TravelPrompt` (Control), `gdscript/ui/travel_prompt.gd` | Invitación a viajar en una plataforma, sobre la barra de resistencia: tecla de `interact` en un distintivo (`InputNames.of_action()`) y «Teletransporte: <lugar>». La tecla o un clic confirma (`confirmed(portal)`), también con Mayús u otro modificador. El botón no toma el foco: Espacio salta y no lo pulsa. No es una ventana: el juego sigue |
+
+La pantalla de carga (`LoadingScreen` en `main.tscn`, del addon `levels`) no pertenece al HUD: cubre el juego
+durante el cambio de nivel; consulta [Niveles](levels.md#la-pantalla-de-carga). El HUD se oculta mientras captura
+la imagen y reaparece debajo de ella.
 
 El panel de ayuda, el contador de FPS, la línea de ruta y el panel del estado del personaje se activan y desactivan en
 Configuración → Interfaz.
@@ -105,8 +115,9 @@ Configuración → Interfaz.
 
 `shared/ui/ui_theme.tres` es el tema del proyecto (`gui/theme/custom`): paneles, la ventana, botones y estas
 variaciones de tipo: `WindowPanel`, `WindowLayout`, `TabPage`, `SettingsList`, `HintLabel`, `FpsCounter`,
-`DiscoveryToast`, `StaminaBar`, `StaminaBarExhausted`. Los nodos eligen una variación con `theme_type_variation` en
-lugar de sobrescribir los estilos uno por uno.
+`DiscoveryToast`, `StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`. Los nodos eligen una variación
+con `theme_type_variation` en vez de sobrescribir estilos. La pantalla de carga lleva su propio tema,
+`loading_screen_theme.tres`, para mantener el mismo aspecto en cualquier proyecto.
 
 ## Traducciones
 
@@ -118,9 +129,11 @@ opción `interface/language` (Configuración → Interfaz → **Idioma**, inglé
 Cómo se traducen los textos:
 
 - **Los textos de las escenas** los traduce el motor: los textos de `Label`, `Button` y `CheckButton`, los elementos
-  de `OptionButton`, los tooltips, los títulos de las pestañas y los textos de `Label3D` sobre los NPC
-  (`auto_translate_mode`).
-- **Los textos compuestos por código** usan `tr()`: "Lugar descubierto: …" con el nombre del lugar, los valores de
+  de `OptionButton`, los tooltips, los títulos de pestañas y los textos de `Label3D` sobre PNJ y letreros de
+  teletransporte (`auto_translate_mode`). El título que el script escribe en la pantalla de carga se traduce
+  igual; sus consejos los traduce el script antes de insertar los nombres de teclas (`tip_format`).
+- **Los textos compuestos por código** usan `tr()`: «Lugar descubierto: …» con el nombre del lugar, la invitación
+  «Teletransporte: %s», los valores de
   los controles deslizantes con unidades y el texto de ayuda de V-Sync se reconstruyen con
   `NOTIFICATION_TRANSLATION_CHANGED`; el indicador de velocidad se reconstruye en cada fotograma de todos modos. Esos
   nodos desactivan la traducción automática para sí mismos, para que el motor no intente traducir el resultado
@@ -136,13 +149,59 @@ Cómo se traducen los textos:
    Traducciones; en inglés, Project Settings → Localization → Translations).
 3. Agrega el nombre propio del idioma a `NATIVE_NAMES` en `gdscript/ui/settings/setting_language_button.gd`. La lista
    de la ventana de configuración se construye a partir de las traducciones cargadas, así que no cambia nada más.
-4. Ejecuta las pruebas: `tests/localization_checks.gd` informa de cada texto de la interfaz que falte en una
-   traducción y de cada entrada de traducción que el juego ya no muestre.
+4. Ejecuta las pruebas: `tests/localization_checks.gd` informa de cada texto ausente, entrada que ya no se muestra
+   o traducción que pierde una marca de tecla.
 
-**Un texto nuevo:** escríbelo en inglés en la escena o en `tr("...")`, y luego agrega un `msgid` con su traducción a
-cada archivo `.po`. La prueba recoge los textos de las escenas; los textos que solo los scripts pasan a `tr()` están
+**Un texto nuevo:** escríbelo en inglés en la escena o en `tr("...")`, nombra las teclas mediante marcas (consulta
+la sección siguiente) y agrega un `msgid` traducido a cada archivo `.po`. La prueba recoge las escenas, incluidas
+las plantillas de `ActionTexts`; los textos que solo los scripts pasan a `tr()` están
 listados en `SCRIPT_STRINGS` en `tests/localization_checks.gd`, así que agrega allí los nuevos.
+
+### Nombres de teclas en los textos
+
+Un texto no escribe una tecla fija: escribe la acción entre llaves y, al mostrarlo, se inserta su tecla actual.
+`{sprint} — run faster` muestra «Shift — correr más rápido» y, al asignar sprint a Ctrl, «Ctrl — correr más
+rápido». Las indicaciones siguen siendo correctas si se cambia el mapa de entrada o el juego deja reasignar teclas.
+`InputNames` (del addon `ui_screens`) obtiene los nombres:
+
+- `{action}`: primera tecla o botón de ratón de la acción. Una tecla se nombra según la letra que muestra la
+  distribución del jugador (W en QWERTY y en una distribución rusa, Z en AZERTY), incluidos modificadores
+  (`Ctrl+S`). Los botones usan nombres breves: izquierdo, derecho, central, rueda arriba, etc. Una asignación
+  física limitada a un modificador de un lado indica ese lado, como `Ctrl+Right Shift`; una lógica admite ambos.
+- `{a/b}`: varias acciones separadas por barras. `{move_left/move_right}` muestra «A/D». Dos acciones de rueda,
+  arriba y abajo, se muestran como «Rueda».
+- `{a+b+c+d}`: junta los nombres si todos son una sola letra. Por ejemplo,
+  `{move_forward+move_left+move_back+move_right}` muestra «WASD»; de otro modo los separa con barras.
+- Una acción sin eventos se muestra como «Sin asignar». Una marca de acción que no está en el mapa permanece
+  literal para hacer visible la ausencia.
+
+Los nombres también se traducen: los botones (`InputNames.get_mouse_names()`), «Space», «Unbound», «Left %s» y
+«Right %s» tienen entradas en los archivos `.po`; los otros nombres de teclas son iguales en todos los idiomas.
+Una traducción conserva las marcas de su cadena; `localization_checks.gd` falla si se pierde o modifica una.
+
+Quién inserta los nombres:
+
+- **`ActionTexts`** es un `Node` de la escena. Atiende todos los controles bajo su padre (o bajo `root`) cuyos
+  textos, descripciones o elementos `OptionButton` contienen marcas: conserva las plantillas, desactiva su
+  traducción propia y establece los textos traducidos con las teclas. Repite al cambiar de idioma. Tanto el HUD
+  (`Hud/ActionTexts`) como la ventana de ajustes tienen uno. `ActionTexts` conserva esas plantillas. Los controles
+  sin marcas siguen como estaban,
+  incluidos los hijos que heredan traducción. Si se desactivó explícitamente la traducción en un control, su
+  plantilla permanece literal pero los nombres de teclas sí se localizan. Excluye controles cuyo texto establece
+  otro script, pues una actualización devolvería la plantilla. Tras cambiar teclas, llama a
+  `get_tree().call_group(ActionTexts.GROUP, &"refresh")`.
+- **Código:** `InputNames.format(tr(text))` para un texto completo o `InputNames.of_action(&"interact")` para una
+  sola tecla, como el distintivo de la invitación. `TravelPrompt` pertenece a `ActionTexts.GROUP`, por lo que
+  actualizar el grupo también renueva su tecla visible.
+- **Consejos de pantalla de carga:** `LoadingScreen.tip_format` es un `Callable` que convierte un consejo
+  traducido en el texto visible. `gdscript/main.gd` lo establece en `InputNames.format` y agrega la pantalla a
+  `ActionTexts.GROUP`. `LoadingScreen.refresh()` vuelve a formatear el consejo actual sin reiniciar su tiempo.
+  El addon `levels` no necesita `ui_screens`: sin `tip_format`, muestra el consejo traducido.
+
+Si cambias el mapa de entrada en Ajustes del proyecto antes de iniciar, los textos ya muestran las asignaciones
+nuevas. Si lo cambias con `InputMap` durante la partida, actualiza el grupo después de editarlo; también funciona
+con el juego pausado. La demo no incluye una pestaña para reasignar teclas durante la partida.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.1.0.*
+*Esta página corresponde a Iso & Orbit 1.2.0.*

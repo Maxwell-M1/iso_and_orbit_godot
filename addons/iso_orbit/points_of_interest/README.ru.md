@@ -1,5 +1,7 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 6dce2786aac6 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 70ad45747177 -->
 # Интересные места
+
+[← Оглавление документации (репозиторий шаблона)](../../../docs/ru/index.md)
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · **Русский** · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
@@ -14,8 +16,8 @@
 
 | Файл | Класс | Назначение |
 |---|---|---|
-| `point_of_interest.gd` | `PointOfInterest` (Area3D) | Испускает `discovered(title)`, когда в область впервые входит тело из группы `player`; добавляет себя в группу `points_of_interest` |
-| `discovery_toast.gd`, `discovery_toast.tscn` | `DiscoveryToast` (Label) | Показывает «Открыто место: …» на несколько секунд, когда открыто любое место |
+| `point_of_interest.gd` | `PointOfInterest` (Area3D) | Выдаёт `discovered(title)`, когда впервые входит тело группы `player`; входит в группу `points_of_interest`; `is_discovered()` показывает, найдено ли место; `mark_discovered()` помечает его без сигнала (повторно загруженный уровень, сохранённая игра) |
+| `discovery_toast.gd`, `discovery_toast.tscn` | `DiscoveryToast` (Label) | Показывает «Открыто место: …» несколько секунд при находке любого места, включая места уровней, загруженных позже (`watch_added_places`; если выключено — только существовавшие при запуске) |
 
 Другие аддоны не нужны.
 
@@ -25,16 +27,21 @@
 2. Поместите тело игрока в группу `player` (или задайте `player_group`).
 3. Для каждого места добавьте `Area3D` с `point_of_interest.gd` и формой столкновения, задайте его `title` и включите
    в его `collision_mask` физический слой игрока.
-4. Добавьте `discovery_toast.tscn` в свой HUD. При запуске он подключается к каждому месту в сцене; связывать ничего
-   не нужно.
+4. Добавьте `discovery_toast.tscn` в свой HUD. При запуске он подключается ко всем местам сцены, а если
+   `watch_added_places` не выключен — и к добавленным позднее; вручную соединять сигналы не нужно.
+
+Место помнит открытие лишь пока существует: при удалении уровня оно тоже удаляется, и повторно загруженный
+уровень снова считает его неизвестным. Постоянный список найденного хранит игра: в шаблоне `gdscript/main.gd`
+сохраняет места по уровням и вызывает `mark_discovered()` при повторной загрузке.
 
 Текст сообщения и названия проходят через сервер переводов, поэтому их можно локализовать. Внешний вид задаёт
 вариация типа темы `DiscoveryToast`.
 
 ## Документация
 
-В репозитории шаблона: `docs/ru/systems/world-and-navigation.md` и `docs/ru/systems/ui.md`.
+В репозитории шаблона: `docs/ru/systems/world-and-navigation.md`, `docs/ru/systems/ui.md` и
+`docs/ru/systems/levels.md`.
 
 ---
 
-*Страница соответствует Iso & Orbit 1.1.0.*
+*Страница соответствует Iso & Orbit 1.2.0.*

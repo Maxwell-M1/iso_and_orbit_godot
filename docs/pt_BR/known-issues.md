@@ -1,5 +1,7 @@
-<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
+<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
 # Problemas conhecidos
+
+[← Índice da documentação](index.md)
 
 > Esta é uma tradução do [original em inglês](../en/known-issues.md).
 > Onde houver diferenças, a versão em inglês é a correta.
@@ -9,6 +11,9 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
 ## Limitações
 
 - **Só mouse e teclado.** Não há suporte a gamepad.
+- **Sem remapeamento de teclas no jogo.** Altere os vínculos em Project Settings → Input Map ou por `InputMap`
+  no código. A interface atualiza os nomes, mas não há tela de remapeamento, detecção de conflitos nem persistência
+  dos vínculos. Veja [nomes das teclas nos textos](systems/ui.md#nomes-das-teclas-nos-textos).
 - **Sem animações.** Os modelos são primitivas estáticas; só o item na mão balança com os passos (`HandSway`).
   `GroundCharacter` informa o que um `AnimationTree` precisa: o estado, a velocidade como valor de mistura, o
   movimento nos eixos do modelo e o ciclo da passada, veja
@@ -17,16 +22,20 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
   horizontal cai para cerca de 70% durante um tick por degrau, e o corpo é colocado sobre o degrau até alguns
   centímetros à frente. Para uma escada longa, um colisor de rampa invisível é mais suave, veja
   [Locomoção](systems/locomotion.md#degraus-e-encostas).
+- **Modelo flutuante é apenas visual.** `CharacterHover` eleva o modelo, não o corpo: sob teto baixo ele pode
+  atravessá-lo, e o foco da câmera e as verificações do braço continuam na altura do corpo. Sobre um vão, o
+  modelo cai com ele.
+- **Para cima é +Y.** O personagem e os componentes suportam apenas `Vector3.UP` como direção superior.
 - **Sem desvio entre personagens.** `NavigationMover` segue um caminho e não usa o desvio da navegação (avoidance),
   então personagens em movimento não desviam uns dos outros. O corpo do jogador está na camada 2 e só colide com a
-  camada 1, então dois personagens feitos a partir de `player.tscn` se atravessam; adicione a camada 2 à
+  camadas 1 e 4, então dois personagens feitos a partir de `player.tscn` se atravessam; adicione a camada 2 à
   `collision_mask` deles se eles devem bloquear um ao outro. Os NPCs da demo ficam parados e entram na geração da
   malha de navegação como obstáculos.
 - **A malha de navegação é gerada com antecedência.** Mover um obstáculo em tempo de execução não muda os caminhos.
   Depois de editar o nível, gere a malha de novo
-  ([Mundo e navegação](systems/world-and-navigation.md#gerar-a-malha-de-navegação-de-novo)).
-- **Só Godot 4.7.** O projeto é testado na 4.7.2. A silhueta precisa do stencil buffer (4.5+), e a verificação de
-  avisos das cenas repete as condições da 4.7.2.
+  ([Mundo e navegação](systems/world-and-navigation.md#gerando-novamente-a-malha-de-navegação)).
+- **Motor e renderizador testados.** Use Godot 4.7.2, Jolt Physics e Forward+ para reproduzir o ambiente
+  verificado. A suíte não estabelece compatibilidade com outras versões e renderizadores. A silhueta exige stencil.
 
 ## Entrada
 
@@ -52,7 +61,7 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
 - **Um corpo logo atrás de um obstáculo.** O Jolt não reporta corpos que um shape cast toca no seu início. Quando
   outro corpo está logo atrás do obstáculo em que a câmera está (uma cerca com um penhasco atrás), o braço procura
   espaço livre mais perto do alvo. Veja
-  [Câmera](systems/camera.md#como-o-braço-distingue-espaço-atrás-de-um-obstáculo-de-estar-dentro-de-um-corpo).
+  [Câmera](systems/camera.md#como-o-braço-distingue-espaço-livre-atrás-de-um-obstáculo-de-um-corpo-ocupado).
 - **Saltos no movimento sem interpolação de física.** A interpolação de física está ligada por padrão. Desligada
   (Configurações → Exibição), o personagem e a câmera se movem tick a tick, 60 vezes por segundo: num monitor rápido
   isso parece irregular, e com a câmera seguindo a corrida o personagem balança nas curvas.
@@ -77,14 +86,17 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
 - **Rotações arredondadas geram avisos de "non-uniform scale".** Uma rotação gravada num `.tscn` com 4 dígitos faz os
   comprimentos dos eixos da base diferirem em mais de 1e-5, e a engine reporta uma escala não uniforme em corpos e
   formas. Grave os números de `Transform3D` com precisão total (9 dígitos significativos).
-- **`shared/` ainda não é totalmente neutro quanto à linguagem.** `world.tscn` e `mountain.tscn` usam
-  `addons/iso_orbit/points_of_interest/point_of_interest.gd`, e dois pequenos scripts de props ficam em
-  `shared/world/props/`. Uma versão em C# precisaria do seu próprio script de locais ou de uma forma de marcar locais
-  só com a cena.
+- **`shared/` ainda não é totalmente neutro quanto à linguagem.** Níveis e plataforma usam scripts dos
+  componentes: `world.tscn`, `island.tscn` e `mountain.tscn` usam
+  `addons/iso_orbit/points_of_interest/point_of_interest.gd`; ambos os níveis usam
+  `addons/iso_orbit/levels/spawn_point.gd`, e `shared/world/props/teleport_pad.tscn` usa
+  `addons/iso_orbit/levels/level_portal.gd`. Dois scripts pequenos de objetos também ficam em
+  `shared/world/props/`. Uma versão em C# precisaria de scripts próprios para lugares, pontos de entrada e
+  portais ou de uma forma de marcá-los só na cena.
 - **Recursos vazados reportados na saída.** Se um script sai logo depois de tocar passos, a engine pode reportar
   objetos `AudioStreamPlayback` vazados: com `--fixed-fps`, o tempo de jogo corre à frente do tempo real enquanto os
   sons ainda tocam. Libere a cena e espere um momento antes de sair; `tests/run_checks.gd` espera 0,1 s.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

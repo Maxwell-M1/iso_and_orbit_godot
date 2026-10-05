@@ -1,5 +1,7 @@
-<!-- translation of docs/en/known-issues.md @ c0ab20536204 -->
+<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
 # Problemas conocidos
+
+[← Índice de documentación](index.md)
 
 > Esta es una traducción del [original en inglés](../en/known-issues.md).
 > Si hay diferencias, la versión en inglés es la correcta.
@@ -9,6 +11,10 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 ## Limitaciones
 
 - **Solo mouse y teclado.** No hay soporte para gamepad.
+- **No se pueden reasignar teclas dentro del juego.** Cambia las asignaciones en Ajustes del proyecto → Mapa de
+  entrada o mediante `InputMap` en código. La interfaz puede actualizar los nombres mostrados, pero no hay
+  ventana de reasignación, detección de conflictos ni almacenamiento de asignaciones. Consulta
+  [nombres de teclas en los textos](systems/ui.md#nombres-de-teclas-en-los-textos).
 - **Sin animaciones.** Los modelos son primitivas estáticas; solo el objeto en la mano se balancea con los pasos
   (`HandSway`). `GroundCharacter` informa de lo que necesita un `AnimationTree`: el estado, la velocidad como valor de
   mezcla, el movimiento en los ejes del modelo y el ciclo de la marcha, ver
@@ -17,16 +23,20 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
   escalera la velocidad horizontal baja a cerca del 70% durante un tick por escalón, y el cuerpo se coloca sobre el
   escalón hasta unos centímetros más adelante. Para una escalera larga, un colisionador de rampa invisible es más suave,
   ver [Locomoción](systems/locomotion.md#escalones-y-pendientes).
+- **El modelo flotante es visual.** `CharacterHover` eleva el modelo, no el cuerpo: puede penetrar un techo bajo,
+  y el foco de cámara y las comprobaciones del brazo siguen a la altura del cuerpo. Sobre un hueco, ambos caen.
+- **Arriba es +Y.** El personaje y sus componentes solo admiten `Vector3.UP` como dirección vertical.
 - **Sin evasión entre personajes.** `NavigationMover` sigue una ruta y no usa la evasión de navegación, así que los
   personajes en movimiento no se esquivan entre sí. El cuerpo del jugador está en la capa 2 y solo colisiona con la
-  capa 1, así que dos personajes creados a partir de `player.tscn` se atraviesan; agrega la capa 2 a su
+  capas 1 y 4, así que dos personajes creados a partir de `player.tscn` se atraviesan; agrega la capa 2 a su
   `collision_mask` si deben bloquearse entre sí. Los NPC de la demo están quietos y están horneados en la malla de
   navegación como obstáculos.
 - **La malla de navegación se hornea de antemano.** Mover un obstáculo en tiempo de ejecución no cambia las rutas.
   Después de editar el nivel, vuelve a hornear la malla
   ([Mundo y navegación](systems/world-and-navigation.md#volver-a-hornear-la-malla-de-navegación)).
-- **Solo Godot 4.7.** El proyecto está probado en 4.7.2. La silueta necesita el búfer de stencil (4.5+), y la
-  comprobación de advertencias de escena repite las condiciones de 4.7.2.
+- **Motor y renderizador probados.** Usa Godot 4.7.2, Jolt Physics y Forward+ para reproducir la configuración
+  verificada. Las pruebas no establecen compatibilidad con otras versiones o renderizadores. La silueta requiere
+  soporte de stencil.
 
 ## Entrada
 
@@ -52,7 +62,7 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 - **Un cuerpo justo detrás de un obstáculo.** Jolt no informa los cuerpos que un shape cast toca en su inicio.
   Cuando otro cuerpo está justo detrás del obstáculo en el que está la cámara (una cerca con un acantilado detrás),
   el brazo busca en su lugar espacio libre más cerca del objetivo. Ver
-  [Cámara](systems/camera.md#cómo-distingue-el-brazo-el-espacio-detrás-de-un-obstáculo-de-estar-dentro-de-un-cuerpo).
+  [Cámara](systems/camera.md#cómo-distingue-el-brazo-entre-espacio-libre-detrás-de-un-obstáculo-y-el-interior-de-un-cuerpo).
 - **Saltos en el movimiento sin interpolación de física.** La interpolación de física está activada por defecto. Si la
   desactivas (Configuración → Pantalla), el personaje y la cámara se mueven tick a tick, 60 veces por segundo: en un
   monitor rápido se ve irregular, y con la cámara siguiendo la carrera el personaje se tambalea en los giros.
@@ -80,10 +90,13 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
   con 4 dígitos hace que las longitudes de los ejes de la base difieran en más de 1e-5, y el motor informa una escala
   no uniforme en cuerpos y formas. Escribe los números de `Transform3D` con precisión completa (9 dígitos
   significativos).
-- **`shared/` todavía no es del todo neutral respecto al lenguaje.** `world.tscn` y `mountain.tscn` usan
-  `addons/iso_orbit/points_of_interest/point_of_interest.gd`, y dos pequeños scripts de props viven en
-  `shared/world/props/`. Una versión en C# necesitaría su propio script de lugares o una forma de marcar lugares
-  solo con la escena.
+- **`shared/` todavía no es del todo neutral respecto al lenguaje.** Los niveles y la plataforma usan scripts
+  de los componentes: `world.tscn`, `island.tscn` y `mountain.tscn` usan
+  `addons/iso_orbit/points_of_interest/point_of_interest.gd`; ambos niveles,
+  `addons/iso_orbit/levels/spawn_point.gd`; y `shared/world/props/teleport_pad.tscn`,
+  `addons/iso_orbit/levels/level_portal.gd`. Otros dos scripts de objetos están en `shared/world/props/`.
+  Una versión en C# necesitaría scripts propios para lugares, puntos de aparición y portales, o una forma de
+  marcarlos solo desde la escena.
 - **Fugas de recursos informadas al salir.** Si un script sale justo después de que suenen pasos, el motor puede
   informar fugas de objetos `AudioStreamPlayback`: con `--fixed-fps` el tiempo de juego va por delante del tiempo
   real mientras los sonidos todavía suenan. Libera la escena y espera un momento antes de salir;
@@ -91,4 +104,4 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.1.0.*
+*Esta página corresponde a Iso & Orbit 1.2.0.*

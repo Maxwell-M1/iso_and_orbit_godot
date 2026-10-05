@@ -1,17 +1,92 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
 # Mundo e navegação
+
+[← Índice da documentação](../index.md)
 
 > Esta é uma tradução do [original em inglês](../../en/systems/world-and-navigation.md).
 > Onde houver diferenças, a versão em inglês é a correta.
 
-O nível da demo é `shared/world/world.tscn`: uma clareira de 80 × 80 m atrás de uma cerca de madeira. Tudo nele é feito
-de primitivas e shaders; os padrões finos das superfícies vêm de texturas pré-calculadas.
+O nível inicial da demo é `shared/world/world.tscn`, uma clareira de 80 × 80 m cercada de madeira. Tudo é feito
+de primitivas e shaders; os padrões finos das superfícies vêm de texturas pré-calculadas. Uma plataforma junto
+do Círculo Antigo leva ao segundo nível, Ilha Solitária; ambos estão descritos em
+[Níveis](levels.md#os-níveis-da-demo).
+
+## Camadas de física e navegação
+
+Obstáculos são `StaticBody3D` na camada 1 (`world`), personagens na 2 (`characters`), corpos exclusivos da
+câmera na 3 (`camera`) e muros invisíveis nas bordas na 4 (`bounds`); veja
+[Configuração do projeto](../project-setup.md#camadas-de-física). A malha é gerada das colisões da camada 1
+(na ilha, também da 4) com raio de agente de 0.5 m. A cápsula do herói tem raio de 0.35 m, deixando folga
+nos cantos.
+
+| Parâmetro do `NavigationMesh` | Valor | Motivo |
+|---|---|---|
+| `agent_radius` | 0.5 m | Manter caminhos afastados dos cantos |
+| `agent_height` | 1.75 m | Valor da malha da demo; num nível novo com tetos, use pelo menos a altura total da colisão (cápsula de 1.8 m) |
+| `agent_max_slope` | 40° | Excluir as encostas da montanha da malha |
+| `cell_height` | 0.025 m | Precisão vertical para medir a escalada |
+| `cell_size` | 0.25 m | Resolução horizontal da geração; deve igualar a do mapa de navegação |
+| `agent_max_climb` | 0.3 m (12 células) | Degraus que o corpo sobe (`GroundCharacter.max_step_height`) |
+| `geometry_parsed_geometry_type` | Static Colliders | Seguir as formas de colisão, não as malhas visuais. A máscara abaixo se aplica aos colisores, incluindo muros invisíveis sem malha |
+| `geometry_collision_mask` | camada 1; ilha: 1 e 4 | Contar obstáculos e muros invisíveis |
+| `filter_walkable_low_height_spans` | desligado na demo | Ative em novo nível com tetos para excluir trechos com folga inferior a `agent_height` |
+
+**Combine navegação e corpo de colisão.** Use `agent_max_climb` no máximo igual a
+`GroundCharacter.max_step_height` (0.3 m aqui) e limite de inclinação da navegação no máximo igual ao do piso
+do corpo (40° versus 45° aqui). Gere de novo após alterar qualquer um. A navegação é rasterizada em células;
+igualar números não garante cada borda: teste o degrau mais alto desejado e a borda mais baixa proibida. A demo
+testa degraus de 0.2 m e rejeita bloco de 0.4 m. Células verticais finas de 0.025 m distinguem essas alturas.
+
+Em níveis novos, use altura do agente pelo menos igual à cápsula inteira e ative
+`filter_walkable_low_height_spans`; a altura sozinha não ativa o filtro. Inclua colisores dos tetos na geração.
+Um modelo flutuante se estende acima do corpo; confira separadamente sua folga visual. O raio controla a folga
+das rotas junto às paredes; ao mudar o raio da cápsula, teste passagens estreitas e gere a malha de novo.
+
+Mantenha `cell_height` e `cell_size` do mapa e da malha iguais. A demo usa 0.025 m verticalmente e 0.25 m
+horizontalmente; ajustes correspondentes: `navigation/3d/default_cell_height` e
+`navigation/3d/default_cell_size`. A
+[referência NavigationMesh do Godot](https://docs.godotengine.org/en/stable/classes/class_navigationmesh.html)
+explica resolução, arredondamento e filtro de folga.
+
+A superfície gerada pode ficar ligeiramente acima do piso de colisão. `NavigationMover` compara o avanço pelo
+caminho no plano XZ; a física define a altura real do corpo. Camadas de física selecionam geometria para gerar
+a malha; camadas da região e `NavigationMover.navigation_layers` selecionam caminhos utilizáveis.
+
+Um resultado vazio de navegação recorre a movimento direto; um caminho parcial pode terminar antes de um destino
+inacessível. Use **Debug → Visible Navigation** e **Linha do caminho do personagem** na demo antes de ajustar o
+movimento para compensar uma rota ruim. Veja [Locomoção](locomotion.md#navigationmover).
+
+## Gerando novamente a malha de navegação
+
+A malha é pré-gerada e guardada em cada cena, `shared/world/world.tscn` e
+`shared/world/island/island.tscn` (recurso `NavigationMesh` de `NavigationRegion3D`); o jogo não a recalcula.
+Após editar um nível, gere a sua malha novamente. Os parâmetros são iguais, exceto a máscara de colisão: a ilha
+inclui camadas 1 e 4.
+
+**Quando:** mudou, adicionou, removeu ou redimensionou algo com forma de colisão na camada 1 (`world`): rocha,
+caixote, muro, árvore, objeto, NPC ou montanha; na ilha, também muro invisível (camada 4, `bounds`). Não é
+necessário se só a aparência mudou (malha ou material), nem para corpos na camada 3 (`camera`), personagem do
+jogador (camada 2) ou áreas (`Area3D`). Sem atualizar, caminhos atravessam um objeto movido ou contornam o
+espaço vazio onde estava.
+
+**No editor:**
+
+1. Abra a cena do nível.
+2. Selecione `NavigationRegion3D` na árvore.
+3. Pressione **Bake NavigationMesh** na barra acima da visão 3D. Após alguns segundos, a malha azul se atualiza:
+   uma abertura com raio do agente (0.5 m) em volta do objeto e malha sólida onde ele estava antes.
+4. Salve a cena (Ctrl+S): a malha fica embutida.
+
+Os parâmetros de geração estão no recurso: selecione `NavigationRegion3D` e expanda `Navigation Mesh` no Inspector.
+Depois de gerar, execute os [Testes](../testing.md), cujas rotas usam a malha. No jogo, Debug → Visible Navigation
+no editor a mostra, e Configurações (F10) → Interface → **Linha do caminho do personagem** mostra a rota.
 
 ## O nível
 
 - **O centro** é o ponto de spawn. Em volta dele: um anel de colunas em ruínas, uma armadilha em forma de U aberta para
   o spawn, um muro longo com uma abertura, caixotes, um bosque, um labirinto de sebes e uma plataforma de 1,6 m com uma
-  rampa no lado oeste e uma escada no lado leste (sete degraus de 0,2 m com pisos de 0,4 m). Os testes usam tudo isso,
+  rampa no lado oeste e uma escada no lado leste (sete degraus de 0.2 m com pisos de 0.4 m, um só corpo estático de
+  sete caixas). Os testes usam tudo isso,
   então essas coisas ficam onde estão.
 - **As estradas** são faixas de terra da cerca sul, pela abertura no muro, até o spawn e daí até a montanha, as ruínas,
   o acampamento e a rampa; a estrada do sítio se ramifica ao sul do muro. Elas são só um padrão (os segmentos `ROADS`
@@ -24,6 +99,10 @@ de primitivas e shaders; os padrões finos das superfícies vêm de texturas pr�
 - **A montanha** no nordeste, com 10 m de altura e uma única trilha em espiral até o topo.
 - **As dez aparências do herói** em fila de costas para o muro sul, a leste da abertura (veja
   [Personagens](characters.md#aparências-do-herói)).
+
+Edite as instâncias dos objetos na cena do nível para alterar a disposição e gere a navegação novamente. Os
+testes de regressão usam rotas e posições específicas da demo; use outro nível para seu layout ou atualize os
+testes junto da geometria que eles examinam.
 
 A floresta, os arbustos e os pedregulhos foram posicionados uma vez por um script descartável com uma semente fixa,
 deixando livres os lugares que os testes usam (rotas, a corrida pela faixa sul, o pulo da plataforma, tudo em volta do
@@ -48,8 +127,9 @@ navegação os contorna e ninguém os atravessa. O acampamento, o sítio e as ru
 em `mountain.tscn`.
 
 **Um novo local:** adicione um `PointOfInterest` (um `Area3D` cuja `collision_mask` inclui a camada 2 dos personagens)
-com uma forma de colisão e um `title` a qualquer cena do mundo. O aviso (toast) encontra todos os locais pelo grupo;
-nenhuma conexão é necessária. Adicione o título às traduções ([UI](ui.md#traduções)).
+com uma forma de colisão e um `title` a qualquer cena do mundo. O aviso encontra todos os locais pelo grupo,
+inclusive em nível carregado depois; nenhuma conexão é necessária. Adicione o título às traduções
+([UI](ui.md#traduções)). A Ilha Solitária tem um quinto lugar, Acampamento do Eremita.
 
 ## Superfícies
 
@@ -73,12 +153,16 @@ folhas, casca, grão da pedra) vem de texturas pré-calculadas, veja abaixo.
 | Barris | `barrel` | Aduelas com frestas, aros de ferro enferrujados, uma tampa de tábuas |
 | Toras, troncos, mastro do estandarte | `bark` | Casca sulcada com musgo perto do chão e no lado norte; toras carbonizadas e em brasa na fogueira |
 | Copas das árvores, arbustos | `foliage` | Folhas em duas camadas em três planos de eixo, tufos, um topo mais claro; agulhas nos pinheiros, laranja e vermelho no carvalho de outono |
-| Chão | `ground_grid` | Veja abaixo |
+| Chão | `ground_grid` | Veja abaixo. A grama da ilha usa `island_ground.tres`, o mesmo chão sem estradas (`roads`) |
 | Montanha | `mountain` | Grama, a trilha e camadas de rocha escolhidas pela cor da face |
-| Água do poço | `water` | Ondulações lentas |
+| Água do poço e lago da ilha | `water` | Ondulações lentas. O lago (`lake_water.tres`) é azul mais claro e tem ondulação mais forte (`ripple` 0.55 contra 0.35) |
 
 O padrão da alvenaria segue as faces da malha e conhece o tamanho da caixa: um `BoxMesh` sem subdivisões de face só tem
-um vértice em cada canto, então `abs(VERTEX)` dá as metades das dimensões. As fiadas nas laterais se ajustam à altura,
+um vértice em cada canto, então `abs(VERTEX)` dá as metades das dimensões. Elas chegam inalteradas aos pixels
+(variável `flat`): interpoladas, os últimos dígitos poderiam variar entre pixels, e uma contagem de fiadas no
+meio (escada de 1.4 m com fiadas de 0.4 m) arredondaria para cima em alguns pixels e para baixo em outros,
+causando oscilação visual. Os shaders de reboco, tábuas e tecido passam o tamanho da caixa do mesmo modo. As
+fiadas nas laterais se ajustam à altura,
 e a fiada de cima de uma lateral é a borda das pedras do topo, então suas juntas continuam as juntas do topo na borda.
 A rampa (uma laje fina) é uma dessas fiadas, e as juntas das suas pontas coincidem com o topo. Já as caixas do
 labirinto têm subdivisões de face a cada 25 cm (`subdivide_*`), porque suas laterais são deslocadas por ruído a partir
@@ -106,10 +190,8 @@ fibras da madeira, sapê, tecido) foram criados como shaders de ruído, mas o jo
 foram pré-calculados (baked) uma vez em texturas sem emendas em `shared/world/textures/`, e os shaders do mundo as
 repetem lado a lado.
 
-O motivo é o tempo de quadro. Só o chão custava à GPU cerca de 2,5 ms por quadro numa janela de 2560 × 1511: cada pixel
-percorria 18 células de lâminas de grama com senos e hashes. Com texturas, a GPU precisa de cerca de 2 ms para o quadro
-inteiro em vez de 4,5, e a taxa de quadros foi de 160–230 para 300–470 (12 vistas do nível, sem V-Sync, uma RTX 4090
-Laptop GPU; além disso, o limite é a CPU).
+O pré-cálculo substitui cálculos de ruído repetidos em cada pixel por amostras de textura. Preserve os ajustes de
+importação abaixo ao substituir texturas: vários canais contêm dados para shaders, não cores comuns.
 
 - **Sem emendas.** O ruído dos padrões se repete junto com o ladrilho, com um número inteiro de elementos por ladrilho,
   então a emenda é invisível. A exceção é `ground_mask`: as grandes manchas e as estradas sobre o chão inteiro de 96 m,
@@ -153,63 +235,6 @@ preciso para que um caminho fosse traçado ao longo da trilha:
 Por padrão, a câmera olha do sudeste, então no lado oposto da trilha a montanha esconde o herói, que então aparece como
 silhueta (veja [Personagens](characters.md#occludedsilhouette-uma-forma-a-arma-contornada-uma-borda)).
 
-## Camadas de física e navegação
-
-Os obstáculos são `StaticBody3D` na camada 1 (`world`), os personagens na camada 2 (`characters`), os corpos só para a
-câmera na camada 3 (`camera`), veja [Configuração do projeto](../project-setup.md#camadas-de-física). A malha de
-navegação é gerada a partir das colisões da camada 1 com um raio do agente de 0,5 m; a cápsula do personagem tem
-0,35 m, então os caminhos mantêm uma margem dos cantos.
-
-| Parâmetro do `NavigationMesh` | Valor | Por quê |
-|---|---|---|
-| `agent_radius` | 0,5 m | Os caminhos ficam longe dos cantos |
-| `agent_height` | 1,75 m | |
-| `agent_max_slope` | 40° | As encostas da montanha ficam fora da malha |
-| `cell_height` | 0,025 m | Fina o bastante para medir a escalada abaixo |
-| `agent_max_climb` | 0,3 m (12 células) | Os degraus em que o personagem sobe (`GroundCharacter.max_step_height`) |
-| `geometry_collision_mask` | camada 1 | Só os obstáculos contam |
-
-**Um caminho nunca leva a uma borda mais alta do que o corpo consegue subir.** `GroundCharacter` sobe degraus de até
-`max_step_height` (0,3 m), então a malha liga bordas de até 0,3 m (`agent_max_climb`) e não mais altas: os degraus a
-leste da plataforma são ligados, a borda de 1,6 m da plataforma e as laterais da rampa acima de 0,3 m não. O Recast mede
-alturas em células inteiras, então as células precisam ser finas. A malha era gerada com `agent_max_climb` = 0,25 m e
-`cell_height` = 0,25 m, e tratava uma borda de quase 0,5 m como transitável: o caminho até a plataforma entrava na rampa
-pela lateral, onde a borda dela fica 0,4 m acima do chão, e o personagem batia nela. Com células de 0,025 m, a escalada
-é medida com precisão de 2,5 cm. A altura de célula do mapa de navegação não pode passar da altura de célula da malha
-(senão a engine avisa), então o `project.godot` define `navigation/3d/default_cell_height` como 0,025. Se você mudar
-`max_step_height`, defina `agent_max_climb` com o mesmo valor e gere a malha de novo.
-
-Uma malha do Recast fica suspensa cerca de duas alturas de célula acima do chão (0,05 m aqui; era 0,5 m com as antigas
-células de 0,25 m). É por isso que o `NavigationMover` compara os pontos do caminho no plano horizontal, veja
-[Locomoção](locomotion.md#navigationmover).
-
-## Gerar a malha de navegação de novo
-
-A malha é gerada (baked) com antecedência e guardada dentro de `shared/world/world.tscn` (o recurso `NavigationMesh` do
-`NavigationRegion3D`); o jogo não a recalcula. Depois de editar o nível, gere-a de novo.
-
-**Quando:** você moveu, adicionou, removeu ou redimensionou qualquer coisa com uma forma de colisão na camada 1
-(`world`): uma rocha, um caixote, um muro, uma árvore, um prop, um NPC, a montanha. Não é necessário quando só a
-aparência mudou (uma malha, um material), nem para corpos na camada 3 (`camera`), o personagem do jogador (camada 2) e
-áreas (`Area3D`). Se você esquecer, os caminhos atravessam um objeto movido (o personagem bate nele e desliza ao longo
-dele) ou contornam o espaço vazio onde ele estava.
-
-**No editor:**
-
-1. Abra `shared/world/world.tscn`.
-2. Selecione `NavigationRegion3D` na árvore de cena.
-3. Pressione **Gerar NavigationMesh** (**Bake NavigationMesh**) na barra de ferramentas acima da viewport 3D. Depois
-   de alguns segundos, a malha azul na viewport se atualiza: um buraco do tamanho do raio do agente (0,5 m) em volta do
-   objeto, malha contínua onde ele estava antes.
-4. Salve a cena (Ctrl+S): a malha fica embutida na cena.
-
-Os parâmetros de geração ficam no próprio recurso: selecione `NavigationRegion3D` e expanda `Navigation Mesh` no
-Inspetor (Inspector).
-
-Depois de gerar de novo, rode os testes ([Testes](../testing.md)): as rotas deles seguem a malha. No jogo em execução,
-Depurar → Navegação Visível (Debug → Visible Navigation) no editor mostra a malha, e Configurações (F10) → Interface →
-**Linha do caminho do personagem** mostra o caminho do personagem.
-
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

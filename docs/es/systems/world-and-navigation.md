@@ -1,18 +1,97 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ 139c7571619f -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
 # Mundo y navegación
+
+[← Índice de documentación](../index.md)
 
 > Esta es una traducción del [original en inglés](../../en/systems/world-and-navigation.md).
 > Si hay diferencias, la versión en inglés es la correcta.
 
-El nivel de la demo es `shared/world/world.tscn`: un claro de 80 × 80 m detrás de una cerca de madera. Todo en él
-está construido con primitivas y shaders; los patrones finos de las superficies vienen de texturas horneadas.
+El nivel inicial de la demo es `shared/world/world.tscn`, el prado: un claro de 80 × 80 m detrás de una cerca de
+madera. Todo está construido con primitivas y shaders; los patrones finos proceden de texturas horneadas. Una
+plataforma junto al Círculo Antiguo lleva al segundo nivel, Isla Solitaria; ambos se describen en
+[Niveles](levels.md#los-niveles-de-la-demo).
+
+## Capas de física y navegación
+
+Los obstáculos son `StaticBody3D` en la capa 1 (`world`), los personajes en la capa 2 (`characters`), los cuerpos
+solo para la cámara en la capa 3 (`camera`) y paredes invisibles de borde en la capa 4 (`bounds`); consulta
+[Preparación del proyecto](../project-setup.md#capas-de-física). La malla se hornea desde colisiones de capa 1
+(también la 4 en la isla) con radio de agente de 0.5 m; la cápsula del personaje tiene radio 0.35 m, dejando
+margen en las esquinas.
+
+| Parámetro de `NavigationMesh` | Valor | Por qué |
+|---|---|---|
+| `agent_radius` | 0,5 m | Las rutas se mantienen alejadas de las esquinas |
+| `agent_height` | 1.75 m | Valor de las mallas existentes; para niveles nuevos con techos usa al menos la altura completa de colisión (cápsula del héroe: 1.8 m) |
+| `agent_max_slope` | 40° | Las laderas de la montaña quedan fuera de la malla |
+| `cell_height` | 0,025 m | Lo bastante fina para medir la escalada de abajo |
+| `cell_size` | 0.25 m | Resolución horizontal; debe coincidir con el mapa de navegación |
+| `agent_max_climb` | 0,3 m (12 celdas) | Los escalones a los que sube el personaje (`GroundCharacter.max_step_height`) |
+| `geometry_parsed_geometry_type` | Static Colliders | La malla sigue formas de colisión, no mallas visuales. La máscara siguiente se aplica a colisionadores; las paredes invisibles solo cuentan así |
+| `geometry_collision_mask` | capa 1; isla: 1 y 4 | Obstáculos y, en la isla, paredes invisibles |
+| `filter_walkable_low_height_spans` | desactivado en la demo | Actívalo en un nivel nuevo con techos para excluir zonas con menos espacio libre que `agent_height` |
+
+**Haz coincidir navegación y cuerpo.** `agent_max_climb` no debe superar `GroundCharacter.max_step_height`
+(0.3 m aquí), y el límite de pendiente de navegación no debe superar el del suelo del cuerpo (40° frente a 45°).
+Vuelve a hornear al cambiar uno de ellos. La navegación se rasteriza en celdas: igualar números no garantiza todos
+los bordes. Prueba el escalón más alto permitido y la cornisa más baja prohibida. La demo prueba escalones de
+0.2 m y rechaza un bloque de 0.4 m. Las celdas verticales finas de 0.025 m permiten distinguir esas alturas.
+
+Para niveles nuevos, usa una altura de agente al menos igual a la cápsula completa y activa
+`filter_walkable_low_height_spans`: la altura por sí sola no activa el filtro. Incluye los colisionadores de techo
+en el horneado. Un modelo flotante sobrepasa el cuerpo: comprueba también su espacio visual. El radio controla
+el margen junto a paredes; si cambias el de la cápsula, revisa los pasillos estrechos y vuelve a hornear.
+
+Mantén iguales `cell_height` y `cell_size` del mapa y la malla. La demo usa 0.025 m verticalmente y 0.25 m
+horizontalmente; los ajustes del proyecto son `navigation/3d/default_cell_height` y
+`navigation/3d/default_cell_size`.
+La [referencia de NavigationMesh](https://docs.godotengine.org/en/stable/classes/class_navigationmesh.html)
+explica la resolución, el redondeo y el filtro de espacio libre.
+
+La superficie horneada puede quedar algo elevada sobre el suelo de colisión. `NavigationMover` compara el avance
+de la ruta en el plano XZ; la física determina la altura real del cuerpo. Las capas físicas seleccionan la
+geometría del horneado, mientras las capas de la región y `NavigationMover.navigation_layers` seleccionan rutas.
+
+Una ruta vacía hace avanzar directamente; una parcial puede terminar antes de un destino inaccesible. Usa
+**Depuración → Navegación visible** y **Línea de ruta del personaje** de la demo antes de modificar el movimiento
+para compensar una ruta defectuosa. Consulta [Locomoción](locomotion.md#navigationmover).
+
+## Volver a hornear la malla de navegación
+
+La malla se hornea de antemano y se guarda en cada escena de nivel: `shared/world/world.tscn` y
+`shared/world/island/island.tscn` (recurso `NavigationMesh` de `NavigationRegion3D`). El juego no la recalcula.
+Tras editar un nivel, vuelve a hornear su malla. Ambas usan los mismos parámetros salvo la máscara de colisión:
+la isla hornea las capas 1 y 4.
+
+**Cuándo:** moviste, agregaste, quitaste o cambiaste el tamaño de algo con una forma de colisión en la capa 1
+(`world`): una roca, una caja, un muro, un árbol, un objeto, un PNJ o la montaña; en la isla, también una pared
+invisible de la capa 4 (`bounds`). No hace falta cuando solo cambió el
+aspecto (una malla, un material), ni para los cuerpos en la capa 3 (`camera`), el personaje del jugador (capa 2) y
+las áreas (`Area3D`). Si lo olvidas, las rutas atraviesan un objeto movido (el personaje choca contra él y se desliza
+a lo largo) o rodean el lugar vacío donde estaba.
+
+**En el editor:**
+
+1. Abre la escena del nivel.
+2. Selecciona `NavigationRegion3D` en el árbol de escenas.
+3. Presiona **Bakear NavigationMesh** (Bake NavigationMesh) en la barra de herramientas sobre la vista 3D. Tras un
+   par de segundos la malla azul de la vista se actualiza: un hueco del radio del agente (0,5 m) alrededor del
+   objeto, malla continua donde estaba antes.
+4. Guarda la escena (Ctrl+S): la malla queda incrustada en la escena.
+
+Los parámetros del horneado están en el propio recurso: selecciona `NavigationRegion3D` y despliega
+`Navigation Mesh` en el Inspector.
+
+Después de volver a hornear, ejecuta las pruebas ([Pruebas](../testing.md)): sus recorridos siguen la malla. Con el
+juego en marcha, Depuración → Navegación Visible (Debug → Visible Navigation) en el editor muestra la malla, y
+Configuración (F10) → Interfaz → **Línea de ruta del personaje** muestra la ruta del personaje.
 
 ## El nivel
 
 - **El centro** es el punto de aparición. A su alrededor: un anillo de columnas en ruinas, una trampa en forma de U
   abierta hacia el punto de aparición, un muro largo con un hueco, cajas, una arboleda, un laberinto de setos y una
   plataforma de 1,6 m con una rampa en su lado oeste y una escalera en su lado este (siete escalones de 0,2 m con
-  huellas de 0,4 m). Las pruebas usan todo esto, así que se queda donde está.
+  huellas de 0,4 m, en un cuerpo estático formado por siete cajas). Las pruebas usan todo esto, así que permanece.
 - **Los caminos** son franjas de tierra desde la cerca sur, a través del hueco del muro, hasta el punto de aparición
   y de ahí hacia la montaña, las ruinas, el campamento y la rampa; el camino de la granja se desvía al sur del muro.
   Son solo un patrón (los segmentos `ROADS` en `shared/world/terrain.gdshaderinc`) y no afectan al movimiento. Tanto
@@ -26,10 +105,9 @@ está construido con primitivas y shaders; los patrones finos de las superficies
 - **Los diez aspectos del héroe** en fila de espaldas al muro sur, al este del hueco (ver
   [Personajes](characters.md#aspectos-del-héroe)).
 
-El bosque, los arbustos y las rocas se colocaron una vez con un script desechable con una semilla fija, dejando
-libres los lugares que usan las pruebas (los recorridos, la carrera por la franja sur, el salto desde la plataforma,
-todo lo que rodea el punto de aparición). El script no está en el proyecto; la distribución ahora se edita en el
-editor. Al mover árboles, mantén despejados esos lugares.
+Edita las instancias de objetos en la escena del nivel para cambiar su disposición y vuelve a hornear la malla.
+Las pruebas de regresión usan rutas y posiciones concretas de obstáculos de esta demo: usa otro nivel para tu
+distribución o actualiza las pruebas junto con su geometría.
 
 ### Lugares y NPC
 
@@ -50,8 +128,8 @@ está en `mountain.tscn`.
 
 **Un lugar nuevo:** agrega un `PointOfInterest` (un `Area3D` cuya `collision_mask` incluya la capa 2 de los
 personajes) con una forma de colisión y un `title` a cualquier escena del mundo. El aviso encuentra cada lugar a
-través de su grupo; no hacen falta conexiones. Agrega el título a las traducciones
-([Interfaz de usuario](ui.md#traducciones)).
+través de su grupo, incluso en un nivel cargado después; no hacen falta conexiones. Agrega el título a las
+traducciones ([Interfaz de usuario](ui.md#traducciones)). Isla Solitaria tiene un quinto lugar: Campamento del Ermitaño.
 
 ## Superficies
 
@@ -76,12 +154,15 @@ abajo.
 | Barriles | `barrel` | Duelas con rendijas, aros de hierro oxidados, una tapa de tablones |
 | Leños, troncos, asta del estandarte | `bark` | Corteza surcada con musgo cerca del suelo y en el lado norte; leños carbonizados y humeantes en la fogata |
 | Copas de árboles, arbustos | `foliage` | Hojas en dos capas sobre tres planos de ejes, bultos, una parte superior más clara; agujas en los pinos, naranja y rojo en el roble otoñal |
-| Suelo | `ground_grid` | Ver abajo |
+| Suelo | `ground_grid` | Ver abajo. La hierba de la isla usa `island_ground.tres`, el mismo suelo sin caminos (`roads`) |
 | Montaña | `mountain` | Hierba, el sendero y capas de roca elegidos según el color de la cara |
-| Agua del pozo | `water` | Ondas lentas |
+| Agua del pozo y lago de la isla | `water` | Ondas lentas. El lago (`lake_water.tres`) es azul más claro y tiene ondulaciones más fuertes (`ripple` 0.55 frente a 0.35) |
 
 El patrón de la mampostería sigue las caras de la malla y conoce el tamaño de la caja: un `BoxMesh` sin subdivisiones
-de caras tiene un vértice solo en cada esquina, así que `abs(VERTEX)` da los semitamaños. Las hiladas de los lados se
+de caras tiene un vértice solo en cada esquina, así que `abs(VERTEX)` da los semitamaños. Llegan sin cambios a los
+píxeles mediante un valor `flat`: si se interpolaran, sus últimos dígitos variarían entre píxeles y una cantidad
+de hiladas en el punto medio (escalón de 1.4 m con hiladas de 0.4 m) se redondearía en sentidos distintos,
+produciendo parpadeo. Los shaders de yeso, tablones y tela transmiten así el tamaño de caja. Las hiladas de los lados se
 ajustan a la altura, y la hilada superior de un lado es el borde de las piedras de arriba, así que sus juntas
 continúan las juntas de la parte superior en el borde. La rampa (una losa delgada) es una de esas hiladas, y las
 juntas de sus extremos coinciden con la parte superior. Las cajas del laberinto, en cambio, tienen subdivisiones de
@@ -111,10 +192,9 @@ piedra, revoque, fibras de madera, paja, tela tejida) se diseñaron como shaders
 calcula para cada píxel: se hornearon una vez en texturas sin costuras en `shared/world/textures/`, y los shaders del
 mundo las repiten en mosaico.
 
-La razón es el tiempo de fotograma. Solo el suelo le costaba a la GPU unos 2,5 ms por fotograma en una ventana de
-2560 × 1511: cada píxel recorría 18 celdas de briznas de hierba con senos y hashes. Con texturas, la GPU necesita
-unos 2 ms para todo el fotograma en lugar de 4,5, y la tasa de fotogramas pasó de 160–230 a 300–470 (12 vistas del
-nivel, sin V-Sync, una RTX 4090 Laptop GPU; más allá de eso, el límite es la CPU).
+El horneado sustituye cálculos de ruido repetidos en cada píxel por muestras de textura. Al reemplazar estas
+texturas, conserva los ajustes de importación siguientes: varios canales contienen datos para shaders, no colores
+ordinarios.
 
 - **Sin costuras.** El ruido de los patrones se repite con el mosaico, con un número entero de rasgos por mosaico,
   así que la costura es invisible. La excepción es `ground_mask`: las grandes manchas y los caminos sobre todo el
@@ -161,64 +241,6 @@ La cámara mira desde el sureste por defecto, así que en el lado lejano del sen
 entonces se ve como una silueta (ver
 [Personajes](characters.md#occludedsilhouette-una-sola-forma-el-arma-contorneada-un-borde)).
 
-## Capas de física y navegación
-
-Los obstáculos son `StaticBody3D` en la capa 1 (`world`), los personajes en la capa 2 (`characters`), los cuerpos
-solo para la cámara en la capa 3 (`camera`), ver [Preparación del proyecto](../project-setup.md#capas-de-física). La
-malla de navegación se hornea a partir de las colisiones de la capa 1 con un radio de agente de 0,5 m; la cápsula del
-personaje es de 0,35 m, así que las rutas dejan un margen respecto a las esquinas.
-
-| Parámetro de `NavigationMesh` | Valor | Por qué |
-|---|---|---|
-| `agent_radius` | 0,5 m | Las rutas se mantienen alejadas de las esquinas |
-| `agent_height` | 1,75 m | |
-| `agent_max_slope` | 40° | Las laderas de la montaña quedan fuera de la malla |
-| `cell_height` | 0,025 m | Lo bastante fina para medir la escalada de abajo |
-| `agent_max_climb` | 0,3 m (12 celdas) | Los escalones a los que sube el personaje (`GroundCharacter.max_step_height`) |
-| `geometry_collision_mask` | capa 1 | Solo cuentan los obstáculos |
-
-**Una ruta nunca lleva a una cornisa más alta de lo que el cuerpo puede subir.** `GroundCharacter` sube escalones de
-hasta `max_step_height` (0,3 m), así que la malla une cornisas de hasta 0,3 m (`agent_max_climb`) y no más altas: la
-escalera al este de la plataforma queda unida; el borde de 1,6 m de la plataforma y los costados de la rampa de más de
-0,3 m, no. Recast mide las alturas en celdas enteras, así que las celdas deben ser finas. La malla se horneaba antes con
-`agent_max_climb` = 0,25 m y `cell_height` = 0,25 m, y trataba como transitable una cornisa de casi 0,5 m: la ruta a la
-plataforma entraba en la rampa por el costado, donde su borde está a 0,4 m sobre el suelo, y el personaje chocaba contra
-ella. Con celdas de 0,025 m la escalada se mide con una precisión de 2,5 cm. La altura de celda del mapa de navegación
-no debe superar la de la malla (o el motor emite una advertencia), así que `project.godot` fija
-`navigation/3d/default_cell_height` en 0,025. Si cambias `max_step_height`, pon `agent_max_climb` al mismo valor y
-vuelve a hornear la malla.
-
-Una malla de Recast queda suspendida unas dos alturas de celda sobre el suelo (0,05 m aquí; era 0,5 m con las
-antiguas celdas de 0,25 m). Por eso `NavigationMover` compara los puntos de la ruta en el plano horizontal, ver
-[Locomoción](locomotion.md#navigationmover).
-
-## Volver a hornear la malla de navegación
-
-La malla se hornea de antemano y se guarda directamente en `shared/world/world.tscn` (el recurso `NavigationMesh` de
-`NavigationRegion3D`); el juego no la recalcula. Después de editar el nivel, vuelve a hornearla.
-
-**Cuándo:** moviste, agregaste, quitaste o cambiaste el tamaño de algo con una forma de colisión en la capa 1
-(`world`): una roca, una caja, un muro, un árbol, un prop, un NPC, la montaña. No hace falta cuando solo cambió el
-aspecto (una malla, un material), ni para los cuerpos en la capa 3 (`camera`), el personaje del jugador (capa 2) y
-las áreas (`Area3D`). Si lo olvidas, las rutas atraviesan un objeto movido (el personaje choca contra él y se desliza
-a lo largo) o rodean el lugar vacío donde estaba.
-
-**En el editor:**
-
-1. Abre `shared/world/world.tscn`.
-2. Selecciona `NavigationRegion3D` en el árbol de escenas.
-3. Presiona **Bakear NavigationMesh** (Bake NavigationMesh) en la barra de herramientas sobre la vista 3D. Tras un
-   par de segundos la malla azul de la vista se actualiza: un hueco del radio del agente (0,5 m) alrededor del
-   objeto, malla continua donde estaba antes.
-4. Guarda la escena (Ctrl+S): la malla queda incrustada en la escena.
-
-Los parámetros del horneado están en el propio recurso: selecciona `NavigationRegion3D` y despliega
-`Navigation Mesh` en el Inspector.
-
-Después de volver a hornear, ejecuta las pruebas ([Pruebas](../testing.md)): sus recorridos siguen la malla. Con el
-juego en marcha, Depuración → Navegación Visible (Debug → Visible Navigation) en el editor muestra la malla, y
-Configuración (F10) → Interfaz → **Línea de ruta del personaje** muestra la ruta del personaje.
-
 ---
 
-*Esta página corresponde a Iso & Orbit 1.1.0.*
+*Esta página corresponde a Iso & Orbit 1.2.0.*

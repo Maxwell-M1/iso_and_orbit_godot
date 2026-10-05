@@ -1,5 +1,7 @@
-<!-- translation of docs/en/testing.md @ 18e83a14bbd9 -->
+<!-- translation of docs/en/testing.md @ fd518f56694a -->
 # Testes
+
+[← Índice da documentação](index.md)
 
 > Esta é uma tradução do [original em inglês](../en/testing.md). Onde houver diferenças, a versão em inglês é a correta.
 
@@ -14,6 +16,16 @@ Aqui `godot` é o seu executável do Godot 4.7.2. No Windows, use a versão `_co
 terminal, então você não vê a saída nem recebe o código de saída. Num clone novo, importe o projeto uma vez antes, no
 editor ou com `godot --headless --path . --import`.
 
+Você pode usar o caminho completo do executável em vez de acrescentá-lo ao PATH. No PowerShell, um caminho entre
+aspas precisa de `&`:
+
+```powershell
+& 'C:\path\to\Godot_console.exe' --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd
+```
+
+Substitua o caminho de exemplo pelo executável de console Godot 4.7.2 instalado e execute a partir da raiz deste
+projeto.
+
 Só algumas suítes, por exemplo enquanto trabalha na câmera: partes dos nomes delas depois de `--`.
 
 ```bash
@@ -25,32 +37,44 @@ falharam em cada suíte.
 
 ## Suítes
 
-As suítes rodam na ordem de `SUITES` em `tests/run_checks.gd`, numa única instância da cena principal.
+As suítes rodam na ordem listada em `tests/run_checks.gd`, compartilhando uma cena principal. Escolha as
+relacionadas à sua alteração; use a execução completa antes de integrar mudanças entre sistemas.
 
-| Suíte | O que cobre |
+| Suíte | Verificações principais |
 |---|---|
-| `movement_checks.gd` | Aceleração e parada exata, um novo clique durante a frenagem, uma curva durante a frenagem, uma inversão em velocidade máxima. Rotas: em volta da armadilha, pela abertura no muro, o labirinto, subindo e descendo a rampa, para a plataforma pelas laterais da rampa, um ponto inalcançável sobre um caixote. A proteção de bordas, e a queda sem ela |
-| `world_checks.gd` | A montanha: um caminho do chão ao topo pela trilha, o local é descoberto uma vez com sua mensagem, a encosta não pode ser escalada fora da trilha, a proteção segura na trilha. O acampamento, o sítio e as ruínas são descobertos com suas mensagens. Os NPCs: cinco com equipamento e rótulos, alguém em cada local, todos de pé no chão, os caminhos os contornam, ninguém os atravessa. As aparências do herói: dez por número, cada uma com corpo, olhos e um cajado na mão direita; a passagem ao longo da fila é transitável em velocidade máxima |
-| `hero_look_checks.gd` | O modelo do jogador: o cajado na mão direita durante as curvas; cadeias de silhueta separadas para o corpo e o equipamento, também em malhas adicionadas depois; a configuração do contorno. O balanço da mão: parada quando em pé; balançando e baixando na corrida, com os extremos nos passos, alternadamente; atrasando na aceleração; voltando depois de uma parada; baixando na aterrissagem. A aparência do herói: a padrão na inicialização; cada uma das dez definida em tempo de execução com um só modelo, o cajado balançando na nova mão e a silhueta nas novas malhas |
-| `character_actions_checks.gd` | Corrida rápida e cansaço pela ação de entrada, a barra de fôlego. Soltar o Shift no modo segurar com eventos reais (na corrida, com o botão esquerdo, na janela de configurações, depois do modo alternar, uma soltura perdida). O modo alternar. Corrida rápida e pulo desligados, corrida rápida sem cansaço. O pulo: altura, o buffer, coyote time, um pulo de uma borda com a proteção ligada, um pulo de 1,5 m. Sinais do personagem: passos por distância e mais rápidos na corrida rápida, nenhum parado ou no ar, pulo e aterrissagem com a velocidade da queda, descer a rampa sem aterrissagem, início e fim da corrida rápida. Um som para cada sinal e seus interruptores; o loop da corrida rápida se repete |
-| `character_state_checks.gd` | O que o personagem informa: os estados numa corrida e numa corrida rápida, a mistura 0, 1 e 2, o movimento nos eixos do modelo numa corrida, num passo lateral e num recuo, a velocidade de giro. Um pulo e uma queda de uma borda: os sinais em ordem e o tempo no ar; nenhuma saída do chão descendo a rampa. Os pés se alternam, o ciclo da passada nos passos. A escada a leste da plataforma: subida e descida por um clique sem sair do chão, quase em velocidade máxima; sem a subida de degraus, o primeiro degrau para o personagem. Um bloco de 0,4 m, uma encosta de 30° e uma de 50°. Rotas no nível sem uma falsa saída do chão. O painel do monitor: desligado por padrão, mostrado pela configuração, o estado e os eventos de um pulo |
-| `input_checks.gd` | Um clique do mouse: sem corrida e sem marcador enquanto pressionado, corrida até o ponto pressionado depois de soltar. Segurar no modo `STEER`: corrida em direção ao cursor, nunca até o ponto pressionado, sem marcador, parada rápida ao soltar. Segurar no modo `FOLLOW_POINT`: corrida enquanto segurado; ao soltar, parada rápida com `stop_on_release`, senão corrida até o último ponto do cursor com seu marcador. Os dois botões: subida da rampa, giro com a câmera. BDM + WASD nos modos lateral e virar: direção, orientação e velocidade para W, A, D, S e pares de teclas; nada sem o botão direito ou no modo desligado; parada pelas teclas e pelo botão; o botão direito sozinho não interrompe um clique. BEM + BDM + A/D nos três modos. O botão esquerdo pressionado e solto enquanto anda com BDM + W: a caminhada continua sem parar. As teclas abandonam uma corrida até um ponto clicado e seu marcador some. O cursor oculto ao correr segurando o botão esquerdo |
-| `camera_checks.gd` | O modo de seguir (desligado, imediato, padrão, muito lento) e suas pausas (o botão direito, um pressionamento indefinido). Segurar o botão esquerdo com e sem o cursor mantendo a mira. Órbita e zoom com o mouse: abaixo do meio a roda nivela a câmera rapidamente; por padrão o botão direito não inclina, com a configuração inclina, e desligá-la restaura a inclinação da roda. Alinhamento da inclinação na corrida |
-| `camera_arm_checks.gd` | Comprimento total em área aberta. Um penhasco atrás: parada imediata; andando em direção a ele, a câmera se aproxima e fica fora dele; sem o penhasco, retorno depois de uma pausa, suavemente; sem a parada, a câmera fica dentro do penhasco. Uma cerca com um penhasco logo atrás. Uma cerca colada à câmera: a câmera vai para a frente dela; uma cerca onde a câmera espera: para trás dela na hora. Corpos na camada da câmera a param, na camada dos personagens não. Uma cerca no meio do caminho: atrás dela por padrão, na frente dela suavemente com a aproximação, uma oclusão curta não conta. Uma cerca junto ao personagem: sem salto para as costas do personagem. Um poste fino não conta. Uma coluna que roça o braço não move a câmera. Corpos em `camera_ignore` e sob um nó dele. Esmaecimento de perto. Paredes do nível (labirinto, montanha, barraca, pedras do cume): a câmera não entra nelas. As configurações chegam ao braço |
-| `settings_window_checks.gd` | F10, a pausa, o foco, a captura do cursor liberada; os interruptores chegam aos seus nós; a aba Controles (modos das teclas, o slider da redução do recuo); a aba Som (o volume chega ao barramento `Master`, os interruptores chegam aos sons do personagem); a aba Personagem (aparência do herói, altura do pulo, modo do Shift, bônus de velocidade, cansaço e fôlego); controles dependentes ficam esmaecidos; o slider de inclinação fica dentro dos limites da câmera; escala da interface; redefinição; Esc |
-| `localization_checks.gd` | Inglês por padrão. Cada string da interface, nas cenas, na janela de configurações aberta e nos scripts, tem tradução em todos os idiomas, e nenhuma entrada de tradução fica sem uso. Trocar o idioma muda os textos montados pelo código; os nomes dos idiomas não são traduzidos; a redefinição volta ao inglês |
+| `movement_checks.gd` | Aceleração, frenagem, mudança de destino, giro, destinos alcançáveis e inacessíveis, caminhos entre obstáculos, rampas e bordas |
+| `world_checks.gd` | Navegação pelo terreno da demo, áreas de descoberta, colisão de NPCs estáticos e modelos do herói em exposição |
+| `hero_look_checks.gd` | Troca dos dez modelos, posição dos equipamentos, silhuetas e movimento das mãos |
+| `character_actions_checks.gd` | Corrida rápida e cansaço, modo segurado/alternado, remapeamento e liberação de modificadoras, pulo antecipado/tolerância de borda, ajustes temporários de queda, sinais e sons |
+| `character_state_checks.gd` | Avisos de configuração, estado e dados de animação, degraus/encostas, teleporte, flutuação, interpolação, tempo de jogo parado e painel monitor |
+| `input_checks.gd` | Clique versus botão segurado, ordem dos dois botões, modos de hold, modos das teclas, captura do cursor, cancelamento e ações ausentes |
+| `camera_checks.gd` | Órbita/zoom e acompanhamento em diferentes taxas de quadros/ticks, giros bruscos, corrida rumo à câmera, espera após órbita manual, alinhamentos de inclinação/zoom/altura e teleporte |
+| `camera_arm_checks.gd` | Folga diante de obstáculos, camadas de colisão, grupos ignorados, aproximação opcional ao ocultar o alvo e transparência perto dele |
+| `settings_window_checks.gd` | Pausa e foco, todas as abas, mapeamento das propriedades, controles dependentes, escala da interface, redefinição e fechamento |
+| `localization_checks.gd` | Cobertura das traduções, tokens de ações preservados, mudança de idioma, nomes das 12 ações remapeáveis, dicas/janelas abertas/dicas de carregamento e herança das traduções |
+| `level_checks.gd` | Pontos de entrada, ofertas de viagem, progresso e pausa no carregamento, troca de cenas, estado do herói preservado e recuperação de falhas |
+
+Para as configurações de entrada e câmera documentadas, comece com `movement`, `character_actions`, `input`,
+`camera` e `settings_window`. O filtro `camera` seleciona ambas as suítes da câmera. Ao copiar o herói para outro
+projeto, siga também a [lista de transferência](integration.md#transferindo-o-herói-da-demo-para-o-seu-projeto):
+a suíte deste repositório não comprova que todos os arquivos e ajustes necessários foram copiados.
 
 ## Como os testes se comportam
 
 - Eles rodam com as configurações padrão e não salvam nada: as configurações do jogador são redefinidas para o padrão
   durante a execução e nunca são sobrescritas.
 - Cada verificação restaura o que mudou. As suítes rodam uma após a outra numa única cena principal, enquanto uma suíte
-  rodada sozinha recebe uma nova, e uma verificação precisa passar nos dois casos.
-- Qualquer erro da engine ou de script também faz a execução falhar: um `Logger` adicionado com `OS.add_logger()` os
+  rodada sozinha recebe uma nova, e uma verificação precisa passar nos dois casos. Após cada uma,
+  `Engine.time_scale` volta a 1, para uma falha com tempo lento ou parado não afetar a próxima.
+- Qualquer erro ou aviso do motor ou script também faz a execução falhar: um `Logger` adicionado com
+  `OS.add_logger()` os
   conta, e o executor imprime a contagem como "engine and script errors" e a soma às falhas. Uma verificação que
-  travou é interrompida, mas as outras continuam, e sem o contador a falha passaria despercebida. Sob carga pesada de
-  CPU, o Jolt pode adicionar um aviso próprio, veja [Problemas conhecidos](known-issues.md#testes).
-- Uma execução que trava falha depois de 600 s de tempo de jogo.
+  travou é interrompida, mas as outras continuam. Só erros provocados de propósito e anunciados antes
+  (`expect_error()` do executor, depois `take_expected_errors()` para conferir que ocorreram) não contam, como
+  o teste de uma cena inválida como nível. Sob carga pesada de CPU, o Jolt pode avisar; veja
+  [Problemas conhecidos](known-issues.md#testes).
+- Uma execução travada falha após 1200 s de tempo de jogo. No carregamento em segundo plano, quadros sem janela
+  passam muito mais rápido que na tela; por isso os testes de níveis esperam mudanças em tempo real.
 - Antes de sair, o executor remove a cena principal e espera 0,1 s. Com `--fixed-fps`, o tempo de jogo corre mais
   rápido que o tempo real enquanto o áudio toca em tempo real, então passos tocados logo antes do fim ainda estão
   soando. Sair na hora às vezes faz a engine reportar objetos `AudioStreamPlayback` e recursos de passos vazados.
@@ -74,6 +98,10 @@ tem os auxiliares compartilhados:
 | `_ticks(count)`, `_frames(count)`, `_wait_until(condition, max_ticks)` | Espera |
 | `_send_key()`, `_send_button()`, `_send_motion()` | Eventos de entrada reais |
 | `_expect(condition, what)` | Conta uma verificação aprovada ou reprovada e a imprime |
+| `_error_count()` | Número de erros do motor e scripts até agora, exceto esperados; uma verificação compara antes e depois |
+| `_tree.call(&"expect_error", "part of the message")`, `_tree.call(&"take_expected_errors")` | Métodos do executor, não de `check_suite.gd`: o primeiro anuncia erro intencional, o segundo devolve os anunciados que não ocorreram e encerra a expectativa |
+| `_find_non_finite(found)` | Reúne nós 3D da cena principal cuja transformação não é finita (INF ou NaN) |
+| `_same_values(a, b)` | Compara os valores de dois arrays; diferente de `==`, não considera um NaN igual a outro |
 | `_median()`, `_min()`, `_max()`, `_first_time_at_most()` | Estatísticas sobre valores registrados |
 
 Não use como tipos, em scripts de teste, as classes que acessam o autoload `Settings` (os controles da janela de
@@ -83,4 +111,4 @@ falha ao compilar e quebra o jogo inteiro naquela execução. Obtenha o nó de c
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.1.0.*
+*Esta página corresponde ao Iso & Orbit 1.2.0.*

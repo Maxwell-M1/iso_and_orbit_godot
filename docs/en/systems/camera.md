@@ -1,186 +1,224 @@
 # Camera
 
-Two nodes: `OrbitCameraRig` follows a target, orbits and zooms; its child `CameraArm` holds the `Camera3D` at the
-end of an arm and shortens the arm at obstacles.
+[← Documentation index](../index.md)
 
+`OrbitCameraRig` follows a `Node3D` target, turns around it with the mouse, and changes distance and tilt with the
+wheel. Its child `CameraArm` places a `Camera3D` along local +Z and keeps it out of nearby geometry. Automatic turning,
+tilt alignment, and zoom alignment while the target runs are three independent options.
+
+```text
+PlayableHero (stationary root in the template)
+├── Character (moving target)
+└── CameraRig (OrbitCameraRig; target = ../Character)
+    └── CameraArm (CameraArm)
+        └── Camera3D (current = true)
 ```
-CameraRig (OrbitCameraRig)     placed at the target, turned by yaw and pitch
-└── CameraArm (CameraArm)      arm along local +Z; the rig sets its length from the zoom
-    └── Camera3D               at the end of the arm, looking back along it
-```
 
-The rig is a sibling of the target, not its child. It moves in `_process` to the target's interpolated position,
-and its own physics interpolation is off: otherwise it would smooth an already smoothed position and lag a tick
-behind. With physics interpolation on in the project, the camera and the character move smoothly at any frame rate.
+Keep the rig beside the moving target, not under it: the rig sets its own global position and rotation. Leave the rig,
+arm, camera, and their ancestors at scale `(1, 1, 1)` so arm lengths and collision radii remain meaningful. The rig
+places the camera each rendered frame from `target.get_global_transform_interpolated()` and disables its own physics
+interpolation in `_ready()`; its children inherit that mode by default. Enable project physics interpolation when the
+target moves in physics ticks; otherwise the target advances visibly one tick at a time. The template enables it.
+`height_follow_time` can smooth the target's vertical steps after interpolation.
 
-## OrbitCameraRig
+The `Camera3D` should start at its default local transform: the arm sets its local position and rotation. The template
+marks it **Current** and uses a 45° field of view and 300 world unit far plane. If another current camera enters the
+scene later, make this camera current when the hero should own the view. See
+[Integration](../integration.md#the-camera-alone) for copying the camera or the entire hero, and
+[Project setup](../project-setup.md) for input actions and physics layers.
 
-- **Orbit.** Hold the right button (`camera_rotate`) and move the mouse. The cursor is captured while you orbit and
-  returns to where it was when you release the button. If the window loses focus or the game pauses mid-orbit, the
-  rig releases the cursor itself.
-- **Tilt with the mouse** (`mouse_pitch`, off by default). Vertical mouse movement with the right button also tilts
-  the camera. Off, the tilt comes from the zoom only.
-- **Zoom.** The wheel moves the camera down and closer or up and farther. Distance and tilt change together.
-- **Follow** (`follow_movement`, `follow_pitch`, both off by default). The camera gradually turns behind the
-  running target and eases its tilt to `follow_pitch_angle`.
+## Which values are active?
 
-### The zoom curve
+The script values below are reusable component defaults. `gdscript/player/playable_hero.tscn` overrides a few of them;
+the demo's `SettingsApplier` then applies saved `Settings` values when the main scene starts. A copied hero scene works
+without the demo settings window or autoload, using its scene values.
 
-The zoom is a value from 0 (closest) to 1 (farthest); each wheel notch changes it by `zoom_step` (0.1). Distance
-goes from `near_distance` (5 m) to `far_distance` (20 m). The tilt goes from `near_pitch` (−22°) to `far_pitch`
-(−55°), but not evenly: from the top down to `flatten_start_zoom` (0.5, 12.5 m, −38.5°) it changes evenly, and below
-that the camera levels out quickly, so that ahead of the character is visible already at a medium height. From
-`flatten_end_zoom` (0.2, 8 m) the camera looks at −22° and only moves closer.
+| Setting | Script default | Playable hero scene / fresh demo |
+|---|---:|---:|
+| Turn, tilt, zoom alignment on a run | all off | all off |
+| `follow_time` | 1.5 s | 1.1 s |
+| `follow_pitch_angle`, `follow_pitch_time` | −40°, 1.5 s | −22°, 1.1 s |
+| `follow_zoom_level`, `follow_zoom_time` | 0.55, 1.5 s | 0.55, 1.5 s |
+| `follow_wait_after_rotate` | off | on |
+| `height_follow_time` | 0 s | 0.15 s |
 
-The demo starts at `start_zoom` 0.55. One notch down from there: −33.5°, two: −26°, three (8.75 m): −22.5°.
+The turn, tilt, and zoom times and goals take effect only when their respective follow switches are enabled.
+`height_follow_time` always smooths the target's vertical motion, including in manual orbit. In the demo, a previous
+choice saved in `user://settings.cfg` can replace the fresh defaults. The `SettingsApplier` converts the settings
+window's positive “tilt down” degrees to a negative pitch, and its 0–100% height to the rig's 0–1 zoom.
 
-The tilt is the zoom tilt plus an offset. The mouse (with `mouse_pitch`) and follow mode change the offset, so the
-wheel and the mouse work as usual and on the run the tilt eases back to the chosen angle. Turning `mouse_pitch` off
-clears the offset. The tilt never goes past `min_pitch` (−80°) and `max_pitch` (−8°).
+Lengths and speeds are in Godot world units (metres when a scene uses the template's 1 unit = 1 m scale). Angles and
+angular speeds marked `radians_as_degrees` show degrees in the Inspector, but GDScript assigns radians: use
+`deg_to_rad(-22.0)` for `follow_pitch_angle` and `deg_to_rad(360.0)` for `sharp_turn_speed`. The serialized
+`-0.383972...` in `playable_hero.tscn` is −22°.
 
-### Follow mode
+## Orbit, tilt, and zoom
 
-| Property | Default | Meaning |
-|---|---|---|
-| `follow_movement` | off | Turn the camera behind the running target |
-| `follow_pitch` | off | Ease the tilt to `follow_pitch_angle` on the run, at the same rate and in the same cases as the turn; works without `follow_movement` |
-| `follow_pitch_angle` | −40° | Target tilt (down is negative), limited by `min_pitch` and `max_pitch` |
-| `follow_time` | 1.5 s | Time to turn nearly all the way (5% of the angle is left); 0 is instant |
-| `follow_min_speed` | 1 m/s | Below this speed the camera does not turn: standing or pivoting, the direction is unreliable. Between this speed and twice it the turn gains strength smoothly |
+Hold `camera_rotate` (RMB in the template) and move the mouse to orbit. The cursor is captured and returned to its
+former position on release; losing focus or pausing releases it too. With `mouse_pitch` off, vertical mouse motion has
+no effect and the wheel chooses tilt. Turn it on to tilt with the mouse; `invert_pitch` reverses that axis. Wheel up
+lowers the camera, and wheel down raises it. Smooth scrolling can move by a fraction of `zoom_step`.
 
-The demo's settings use different defaults: catch-up time 1.1 s and tilt 22° down.
+Zoom is a number from 0 (near) to 1 (far). The default wheel step is 0.1. The arm length interpolates from
+`near_distance` 5 to `far_distance` 20 world units. Tilt is shallower up close, following this curve:
 
-The camera does not follow:
+| Zoom | Distance | Base tilt |
+|---:|---:|---:|
+| 0 | 5 | −22° |
+| 0.2 (`flatten_end_zoom`) | 8 | −22° |
+| 0.5 (`flatten_start_zoom`) | 12.5 | −38.5° |
+| 0.55 (`start_zoom`) | 13.25 | −40.15° |
+| 1 | 20 | −55° |
 
-- while the right button is held: the mouse controls the camera, including when running with both buttons;
-- for the first 0.2 s after a left button press, until it is clear whether it is a click or a hold. The pause comes
-  from `PointClickMoveInput.hold_pending_changed`, connected in `main.tscn` to `CameraRig.set_follow_paused()`.
+Between zoom 0.2 and 0.5, the tilt levels out quickly as the camera comes down, making the ground ahead easier to see.
+Below 0.2, only the distance changes. Mouse tilt and follow tilt add an offset to the curve, bounded by `min_pitch` and
+`max_pitch` (−80° and −8°). Turning `mouse_pitch` off clears its offset unless `follow_pitch` still holds a tilt.
+`rotation_sharpness` and `zoom_sharpness` smooth mouse and wheel changes; 0 makes the corresponding input immediate.
 
-The target's speed is measured by the rig from the target's movement per physics tick, so any `Node3D` can be the
-target.
+## Follow mode
 
-When the camera turns while the left button is held, the cursor would point at a different spot on the ground and
-the character would turn after it, and the camera after the character: the character would run in circles. So while
-the button is held, the input moves the system cursor along with the world. See
-[Input](input.md#the-cursor-while-the-button-is-held).
+Set any combination of `follow_movement`, `follow_pitch`, and `follow_zoom` to make the camera turn behind the running
+direction, approach a chosen tilt, and approach a chosen zoom level. The rig measures horizontal movement per physics
+tick from any `Node3D` target, so it does not require a character velocity property. Below `follow_min_speed` it does
+not follow; from that speed to twice it, follow strength grows smoothly. A target that stops starts its next run with a
+fresh direction.
 
-### Properties
+Each enabled motion starts and settles smoothly on its own spring. Its time is approximately how long it takes to cover
+95% of a change from rest during a full-speed run, provided no turn-speed cap intervenes; 0 requests an immediate
+change. When movement stops or follow pauses, a motion already under way brakes rather than cutting off.
+`rotation_sharpness` and `zoom_sharpness` set that braking rate. The follow itself moves the camera directly, so input
+smoothing does not add a second lag.
 
-| Group | Property | Default | Meaning |
-|---|---|---|---|
-| | `target` | — | What to follow |
-| | `arm` | — | The `CameraArm`; if empty, the first `CameraArm` child |
-| | `camera` | — | Used without an arm; if empty, the first `Camera3D` child |
-| Input | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Input actions |
-| | `mouse_sensitivity` | 0.25 °/px | Orbit speed |
-| | `mouse_pitch` | off | Vertical mouse movement tilts the camera |
-| | `invert_pitch` | off | Invert that tilt |
-| | `zoom_step` | 0.1 | Zoom change per wheel notch |
-| Framing | `focus_height` | 1.2 m | Height above the target's origin the camera looks at |
-| | `near_distance`, `far_distance` | 5 m, 20 m | Arm length at the closest and farthest zoom |
-| | `near_pitch`, `far_pitch` | −22°, −55° | Tilt at the closest and farthest zoom |
-| | `flatten_start_zoom`, `flatten_end_zoom` | 0.5, 0.2 | Where the tilt starts leveling out faster, and where it is level |
-| | `min_pitch`, `max_pitch` | −80°, −8° | Tilt limits |
-| | `start_zoom`, `start_yaw` | 0.55, 45° | Initial zoom and direction |
-| Follow | see above | | |
-| Smoothing | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | How fast the camera reaches the wanted yaw, tilt and zoom |
+| Property | Script default | Effect |
+|---|---:|---|
+| `follow_movement`, `follow_time` | off, 1.5 s | Turn behind the horizontal run; time to nearly finish the turn |
+| `follow_max_turn_speed` | 0 | Maximum automatic yaw speed in °/s; 0 removes the cap, including for an instant turn |
+| `follow_toward_camera_angle` | 30° | Ignore runs within this angle of straight toward the camera; full turn strength by twice the angle. 0 removes this exception |
+| `sharp_turn_speed` | 360°/s | Ignore passing directions during a sharper turn or reversal, then take up its new direction; 0 disables this guard |
+| `teleport_speed` | 50 world units/s | Horizontal movement faster than this between physics ticks is treated as a teleport, not a run |
+| `follow_pitch`, `follow_pitch_angle`, `follow_pitch_time` | off, −40°, 1.5 s | Bring tilt to this downward angle, independently of yaw |
+| `follow_zoom`, `follow_zoom_level`, `follow_zoom_time` | off, 0.55, 1.5 s | Bring zoom to this 0–1 level, independently of yaw and tilt |
+| `follow_min_speed` | 1 world unit/s | Minimum horizontal speed to begin following; full strength at twice this speed |
+| `follow_wait_after_rotate` | off | Keep the view after a mouse orbit until the target slows below `follow_min_speed` or a new run is reported |
 
-Methods: `look_along(direction)` turns the camera to look along a direction at once; `snap()` jumps to the wanted
-position, for example after teleporting the target; `is_rotating()`; `set_follow_paused(paused)`.
+The toward-camera guard affects **turning only**. A run directly at the camera can still change tilt and zoom if those
+options are enabled. The sharp-turn guard also affects turning only: tilt and zoom continue during a reversal, while a
+turn already under way can coast to a stop. For the template hero's 720°/s `LocomotionSettings.turn_speed`, the 360°/s
+sharp-turn threshold catches reversals while allowing slower curves. If you change character turn speed, keep
+`sharp_turn_speed` at half that speed or lower; `PlayableHero` warns when a positive threshold reaches the character
+turn speed. Setting `follow_toward_camera_angle` to 0 intentionally permits the camera to turn around behind a run
+toward it.
 
-## CameraArm
+When both tilt and zoom alignment are on, zoom changes the distance while the tilt alignment compensates for the zoom
+curve. The view settles at `follow_pitch_angle` and `follow_zoom_level` independently. The wheel and mouse still work
+during a run; enabled follow motions bring the view back to their goals. `height_follow_time` is separate: it smooths
+how the rig follows the target's **world Y position**, especially on stairs. It does not change the zoom level. At 0 it
+tracks the target height exactly; the hero scene's 0.15 s makes 95% of a vertical change in about that time.
 
-The wheel sets the arm length; the arm shortens at obstacles and returns to that length when there is room.
+### When follow pauses
 
-- **Stop at what is behind** (`keep_out_of_geometry`, on by default). A mountain, a wall or a roof behind the camera:
-  the camera does not go inside but moves toward the target. Walk toward the mountain and the camera comes closer to the
-  target without entering the slope; walk away, and it goes back once there is room behind it. The arm shortens only if
-  the camera cannot stand at its end. A column or a fence between the camera and the target, with room behind it, does
-  not move the camera: the character shows through as a silhouette. If the camera would stand right at the back of
-  such an obstacle, closer than `probe_radius`, there is no room for it there, and it moves in front of the obstacle.
-- **Move in when the target is hidden** (`pull_in_on_occlusion`, off by default). A fence or a wall hides the target
-  almost entirely: the camera smoothly moves in front of the obstacle, but never closer than `min_pull_in_length`
-  (2.5 m) to the target. If the character stands right at the wall, the camera stays put instead of jumping to the
-  character's back.
-- **Fade up close.** When the arm is very short, `fade_target` turns translucent.
+All three follow motions stop pulling while RMB is held. With `follow_wait_after_rotate` on, ending an orbit after at
+least 0.2 s or 2 px of motion keeps the chosen view while the current run continues. This also applies if focus is lost
+or the game pauses before RMB is released; a shorter tap does not start a wait. With the option off, follow resumes when
+the orbit ends. The wait ends when movement slows below `follow_min_speed`, `end_follow_wait()` reports a new run,
+`snap()` is called, the target changes, or a movement exceeds `teleport_speed`. A new run can begin before the old one
+stops, so connect the input's `run_requested` signal to `end_follow_wait()` when using this option. Without such a
+signal, a continuously moving target can keep the camera waiting indefinitely; leave the option off if the game cannot
+report new runs.
 
-| Property | Default | Meaning |
-|---|---|---|
-| `length` | 10 m | Arm length; set by the rig from the zoom |
-| `camera` | — | The camera; if empty, the first `Camera3D` child |
-| `keep_out_of_geometry` | on | Stop at bodies behind the camera |
-| `probe_radius` | 0.3 m | The camera is a sphere of this radius and keeps that far from walls |
-| `collision_mask` | layers 1 and 3 | Bodies that stop the arm: `world` and `camera`. Characters (layer 2) do not |
-| `ignored_groups` | `camera_ignore` | Bodies in these groups, or under a node in them, do not stop the arm |
-| `pull_in_on_occlusion` | off | Move in when the target is hidden |
-| `min_pull_in_length` | 2.5 m | The camera does not move closer than this because of a hidden target; with less room in front of the obstacle it stays put |
-| `pull_in_sharpness` | 10 | How fast the camera moves in front of a hiding obstacle (0 is instant). It always stops at a body behind at once |
-| `occlusion_points` | chest, head, knees, sides | Points of the target checked for visibility, relative to the arm's start: right, up, toward the camera |
-| `occlusion_share` | 0.75 | The target is hidden when this share of the points is hidden. A thin post or a trunk hides three of five and does not count |
-| `occlusion_delay` | 0.25 s | How long the target must stay hidden for the camera to move in, and visible for it to move back |
-| `return_delay`, `return_sharpness` | 0.3 s, 4 | The arm shortens at once but grows back after a pause and smoothly, so the camera does not twitch among columns. A body on the way back is jumped over, not passed through |
-| `fade_target` | — | What turns translucent up close (`Player/Visual` in the demo) |
-| `fade_start_length`, `fade_end_length`, `fade_transparency` | 1.5 m, 0.7 m, 0.75 | The target starts fading at the first length and is 75% transparent at the second |
-| `debug_draw` | off | Draw the arm (gray: the wheel length, green: the current one), the camera sphere and the rays to the target's points (red: hidden). Visible from another camera |
+`playable_hero.tscn` also connects `PointClickMoveInput.hold_pending_changed` to `set_follow_paused()`. This pauses
+follow during the first 0.2 s of an LMB press, while the input decides whether it was a click or a hold. Its
+`run_requested` signal ends the post-orbit wait for a new click, hold, or RMB + key run. Pressing RMB during an existing
+LMB run can be used to look around; that run does not count as a new one after RMB is released, so the view remains
+where the player left it until a later stop or new run. The input's `keep_aim_on_camera_turn` keeps the cursor aimed at
+the same world point while the camera moves, preventing the running direction from chasing the camera.
 
-Methods: `snap()`, `get_current_length()`, `is_pulled_in_by_occlusion()`.
+When `Engine.time_scale` is 0, follow motions hold their state and resume when time advances. If you move a target
+manually or teleport it a short distance that does not trigger the `teleport_speed` check, call `snap()` to put the
+camera and arm into place and reset motion history.
 
-### Bodies only for the camera
+## Properties
 
-Put them on physics layer 3 (`camera`). Characters do not collide with them, and clicks and navigation do not see
-them. The roof of the house (`RoofCameraBlocker` in `shared/world/props/house.tscn`) has such a body: the camera
-stops at the roof, but nobody can climb onto it or path across it.
+| Group | Property | Script default | Meaning |
+|---|---|---:|---|
+| Target | `target` | none | `Node3D` to follow |
+| Target | `arm`, `camera` | none | First matching direct child if unset; use `camera` only without an arm |
+| Input | `rotate_action`, `zoom_in_action`, `zoom_out_action` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` | Input Map actions; missing ones report an error at startup |
+| Input | `mouse_sensitivity`, `mouse_pitch`, `invert_pitch`, `zoom_step` | 0.25 °/px, off, off, 0.1 | Mouse orbit rate, mouse tilt controls, wheel increment |
+| Framing | `focus_height` | 1.2 world units | Aim point above the target origin |
+| Framing | `near_distance`, `far_distance` | 5, 20 | Arm lengths at zoom 0 and 1 |
+| Framing | `near_pitch`, `far_pitch` | −22°, −55° | Base tilts at zoom 0 and 1 |
+| Framing | `flatten_start_zoom`, `flatten_end_zoom` | 0.5, 0.2 | Zoom interval that levels the tilt more quickly |
+| Framing | `min_pitch`, `max_pitch` | −80°, −8° | Final tilt limits, including mouse and follow offsets |
+| Framing | `start_zoom`, `start_yaw` | 0.55, 45° | Initial zoom and world-axis yaw; `look_along()` can change the yaw later |
+| Smoothing | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Higher values reach mouse/wheel goals faster; 0 is immediate |
+| Smoothing | `height_follow_time` | 0 s | Time for vertical target following to cover about 95%; 0 is exact tracking |
 
-### The `camera_ignore` group
+`look_along(direction)` immediately points the view along the horizontal part of a **world-space** direction and stops
+an automatic turn already under way. `snap()` immediately applies the current yaw, tilt, zoom, target position, and arm
+collision response; use it after teleporting. `get_zoom()` returns the current 0–1 zoom. `is_rotating()`,
+`is_follow_paused()`, `is_follow_waiting()`, and `is_target_turning_sharply()` report those states.
+`set_follow_paused(paused)` and `end_follow_wait()` control the pauses described above.
 
-The group also applies to everything under a node in it. Set it once on a prop scene's root, so every instance in the
-level has it, or on a level folder node. The demo does not need it: tree trunks (up to 2.4 m) are below the camera
-even at the closest zoom (3 m above the ground).
+The rig requires an arm or camera child (or an explicit `arm`/`camera` property); a missing one asserts in a debug
+build. It sets its global rotation, so `start_yaw`, `look_along()`, and automatic turning use world axes even if the
+stationary hero root is rotated.
+
+## Obstacles, occlusion, and fade
+
+`CameraArm` normally uses `keep_out_of_geometry`: a sphere at the desired camera position must fit outside physics
+bodies. If a wall, slope, or roof would contain the camera, the arm shortens immediately. A fence between the target and
+a camera that still has room behind the fence does not shorten it. To deliberately move in front of a fence that hides
+the target, enable `pull_in_on_occlusion`; the arm waits for sustained occlusion and only pulls in when at least
+`min_pull_in_length` remains. Once clear, it waits briefly and returns smoothly. If an obstacle lies on the return path,
+it jumps across it rather than flying through it.
 
 ### How the arm tells room behind an obstacle from being inside a body
 
-First the arm checks whether the camera can stand at the arm's end: the sphere touches nothing there, the obstacle in
-front of the camera included, and the end is not inside a body. A ray from the camera to the target does not see the
-faces of a body it starts inside, so it finds the far face of the obstacle in front of the camera. A ray from that face
-to the arm's end enters the body the camera is in and never leaves it. If something is in the way, the sphere is cast
-from that face toward the camera and stops in front of the body that is in the way, passing others by. A column that the
-arm only grazes does not move the camera.
+The arm first checks whether the camera sphere fits at its desired end. It can stay behind a fence between the target
+and camera when that end is clear. If the end touches or lies inside a body, the arm finds a free place closer to the
+target. Jolt shape casts do not report bodies touched or entered at the start of a cast, so the arm checks that starting
+space separately; when two bodies are close together, it searches from a point nearer the target. This also keeps the
+camera out of a fence with a cliff immediately behind it.
 
-Jolt does not report bodies that the sphere touches at the start of a cast, nor a mesh body (such as the mountain)
-that the cast starts inside. So if another body stands right behind the face (a fence with a cliff behind it), or the
-cast would start inside another body (two rock blades close together, the arm running almost along them), free space
-is searched closer to the target.
+Both the sphere and the visibility rays use `collision_mask` (binary `0b101`, layers 1 and 3). In the template, layer 1
+is solid world geometry and layer 3 is camera-only geometry such as `RoofCameraBlocker`; characters on layer 2 and
+invisible character bounds on layer 4 do not move the arm. A body in `camera_ignore`, or beneath a node in that group,
+is ignored. Set that group on a prop root to affect every instance. These mask numbers matter when copying to another
+project; layer names are only labels. With `keep_out_of_geometry` off, the arm no longer protects the camera from
+geometry behind it, regardless of the pull-in setting.
 
-The way back is checked too. While the arm waits to grow back, it can turn, and at the length it keeps, the camera
-can end up in a wall: then the camera goes to the free length at once. If a body stands between the camera and where
-it returns to (the camera stood in front of a fence, and now there is room behind it), the camera jumps over the body
-after the pause instead of flying through it.
+The five default `occlusion_points` sample the target's chest, head, knees, and sides. They are relative to the **arm's
+start**, which the rig places `focus_height` above the target origin; x is camera-right, y is up, and z is horizontally
+toward the camera. `occlusion_share = 0.75` means at least four of the five points must be blocked. Adjust the points
+and `focus_height` for a taller or floating model. The template's `CharacterHover` can lift the visible model 0.35 world
+units above its body.
 
-## Measured behavior
+`fade_target` is optional. When set, the arm changes the `transparency` of its `GeometryInstance3D` descendants as the
+arm becomes shorter than `fade_start_length`, reaching `fade_transparency` at `fade_end_length`. The hero assigns
+`Character/Visual`. This close-range fade is distinct from the optional `OccludedSilhouette` addon, which draws a
+character through obstacles.
 
-From `tests/camera_checks.gd` and `tests/camera_arm_checks.gd`:
+| Property | Script default | Meaning |
+|---|---:|---|
+| `length`, `camera` | 10, none | Desired arm length (normally set by the rig), and its first direct `Camera3D` child unless assigned |
+| `keep_out_of_geometry`, `probe_radius` | on, 0.3 | Keep a camera sphere outside masked bodies |
+| `collision_mask`, `ignored_groups` | layers 1 + 3, `camera_ignore` | Bodies considered by collision and occlusion checks, and groups excluded from them |
+| `pull_in_on_occlusion`, `min_pull_in_length`, `pull_in_sharpness` | off, 2.5, 10 | Pull-in switch, minimum length, and approach rate (0 is immediate) |
+| `occlusion_points`, `occlusion_share`, `occlusion_delay` | five points, 0.75, 0.25 s | Visibility samples, blocked share, and delay before pull-in or return |
+| `return_delay`, `return_sharpness` | 0.3 s, 4 | Wait and speed of arm extension (0 sharpness is immediate after the wait) |
+| `fade_target`, `fade_start_length`, `fade_end_length`, `fade_transparency` | none, 1.5, 0.7, 0.75 | Optional model fade; full at 0.7 units or closer |
+| `debug_draw` | off | Draw desired/current arm lengths, camera sphere, and visibility rays; useful from another camera |
 
-- Follow with the run at 90° to the camera: `follow_time` 0 turns 95% in 0.17 s, the demo's 1.1 in 1.23 s; at 10 it
-  has turned only 39° of 90° after 2 s. Standing, it does not turn. With the right button held it does not turn and
-  continues after release.
-- Holding the left button with follow on (1.1 s): for the first 0.2 s the camera stays put (a short click does not
-  move it), then in 1.25 s it turns 27.1° of the 28.3° behind the run while the running direction changes by 0.01°;
-  with "instant", too. Moving the mouse 150 px turns the run by 25°, and the new direction holds. With
-  `keep_aim_on_camera_turn` off the character curls 77.6° in 1.25 s.
-- Tilt alignment: a camera lowered by the wheel (22.5° down) eases to 55° at `follow_time` 0.5, 95% of the way in
-  about 0.65 s, without turning after the run if the turn is off. 89° is clamped to the camera's 80° limit. Holding
-  the left button with follow and a 20° tilt: the tilt goes from 80° to 22.5° in 1.25 s, on its way to 20°, and the
-  running direction changes by 0.01°.
-- The arm: full length in the open; a cliff behind stops it at once; walking toward the cliff, the camera moves closer
-  and stays out of it; with the cliff gone, the arm returns after a pause, smoothly. A fence with a cliff right behind
-  it: the camera stops in front of the fence. A fence right at the camera's back: the camera comes in front of it. A
-  fence that appears where the camera waits to go back: the camera goes behind it at once. A fence halfway between the
-  camera and the character: by default the camera stays behind it; with pull-in it moves in front of it smoothly, and a
-  short occlusion does not count. A fence right at the character: the camera does not jump to the character's back. A
-  thin post does not count, a column grazing the arm does not move the camera, bodies in `camera_ignore` do not stop it,
-  and up close the character is translucent. On the level, at the maze hedges, the mountain slope and its rock blades, a
-  tent and the summit stones, the camera does not cut into them.
+`CameraArm.snap()` recomputes collision and places the camera without return delays. `get_current_length()` gives its
+actual length after obstacles; `is_pulled_in_by_occlusion()` reports whether target occlusion is currently moving it
+inward.
+
+The behavior above is exercised by [`tests/camera_checks.gd`](../../../tests/camera_checks.gd) and
+[`tests/camera_arm_checks.gd`](../../../tests/camera_arm_checks.gd): they cover follow timing, toward-camera and
+sharp-turn guards, waiting after mouse orbit, tilt/zoom alignment, vertical stair smoothing, obstacle avoidance,
+optional pull-in, ignored groups, and fading.
 
 ---
 
-*This page matches Iso & Orbit 1.1.0.*
+*This page matches Iso & Orbit 1.2.0.*
