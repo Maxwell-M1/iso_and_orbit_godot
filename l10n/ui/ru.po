@@ -230,6 +230,18 @@ msgid "instant"
 msgstr "сразу"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Except a run toward the camera"
+msgstr "Кроме бега на камеру"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Angle"
+msgstr "Угол"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When the character runs toward you, straight at the camera or up to this angle off, the camera does not swing round. A run farther to the side turns it, gently at first. Off: the camera turns behind any run."
+msgstr "Когда персонаж бежит на вас — прямо на камеру или с отклонением не больше этого угла, — камера не разворачивается. Бег сильнее вбок поворачивает её, сначала мягко. Выключено — камера поворачивается за любым бегом."
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Align the camera height on the run"
 msgstr "Выравнивать высоту камеры на бегу"
 

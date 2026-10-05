@@ -44,6 +44,11 @@ const CAMERA_MOUSE_PITCH := &"camera/mouse_pitch"
 const CAMERA_FOLLOW := &"camera/follow"
 ## In how many seconds the camera turns behind the run (OrbitCameraRig.follow_time).
 const CAMERA_FOLLOW_TIME := &"camera/follow_time"
+## A run toward the camera does not turn it (OrbitCameraRig.follow_toward_camera_angle); off, the camera turns behind
+## any run, also one straight at it.
+const CAMERA_FOLLOW_EXCEPT_TOWARD := &"camera/follow_except_toward"
+## Within how many degrees of straight at the camera a run does not turn it.
+const CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE := &"camera/follow_except_toward_angle"
 const CAMERA_ALIGN_PITCH := &"camera/align_pitch"
 ## How far the camera looks down, in degrees: 0 is horizontal, 90 is straight from above.
 const CAMERA_ALIGN_PITCH_ANGLE := &"camera/align_pitch_angle"
@@ -107,6 +112,8 @@ const DEFAULTS := {
 	CAMERA_MOUSE_PITCH: false,
 	CAMERA_FOLLOW: false,
 	CAMERA_FOLLOW_TIME: 1.1,
+	CAMERA_FOLLOW_EXCEPT_TOWARD: true,
+	CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE: 30.0,
 	CAMERA_ALIGN_PITCH: false,
 	CAMERA_ALIGN_PITCH_ANGLE: 22.0,
 	CAMERA_ALIGN_PITCH_TIME: 1.1,

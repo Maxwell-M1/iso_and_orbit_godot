@@ -230,6 +230,18 @@ msgid "instant"
 msgstr "即時"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Except a run toward the camera"
+msgstr "カメラへ向かって走るときは除く"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Angle"
+msgstr "角度"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When the character runs toward you, straight at the camera or up to this angle off, the camera does not swing round. A run farther to the side turns it, gently at first. Off: the camera turns behind any run."
+msgstr "キャラクターがこちらへ、カメラへまっすぐ、またはこの角度までのずれで走ってくるとき、カメラは回り込みません。それより横へ外れた走りではカメラが回り、最初はゆるやかです。オフ：カメラはどの走りでも背後へ回ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Align the camera height on the run"
 msgstr "走る間カメラの高さを揃える"
 

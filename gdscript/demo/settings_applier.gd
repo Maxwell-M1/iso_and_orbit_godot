@@ -135,6 +135,13 @@ func _apply(key: StringName, value: Variant) -> void:
 		GameSettings.CAMERA_FOLLOW_TIME:
 			if _camera_rig != null:
 				_camera_rig.follow_time = value
+		GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD, GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE:
+			if _camera_rig != null:
+				# The switch and the angle make one property of the camera: off, the angle is 0, and the camera turns
+				# behind any run.
+				var on: bool = Settings.get_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD)
+				var angle: float = Settings.get_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE)
+				_camera_rig.follow_toward_camera_angle = deg_to_rad(angle) if on else 0.0
 		GameSettings.CAMERA_ALIGN_PITCH_TIME:
 			if _camera_rig != null:
 				_camera_rig.follow_pitch_time = value

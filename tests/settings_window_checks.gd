@@ -59,8 +59,21 @@ func _check_settings_window() -> void:
 	pitch_angle.value = 60.0
 	pitch_time.value = 2.0
 	var pitch_text := (screen.find_child("AlignPitchValue") as Label).text
+	# A run toward the camera: its switch and its angle, locked while the camera does not follow the run.
+	var toward := screen.find_child("FollowExceptToward") as CheckButton
+	var toward_angle := screen.find_child("FollowExceptTowardAngle") as HSlider
+	var toward_locked := toward.disabled and not toward_angle.editable
 	(screen.find_child("CameraFollow") as CheckButton).button_pressed = true
 	follow_time.value = 0.0
+	var toward_unlocked := not toward.disabled and toward_angle.editable
+	toward_angle.value = 45.0
+	var toward_text := (screen.find_child("FollowExceptTowardValue") as Label).text
+	var toward_set := rad_to_deg(_rig.follow_toward_camera_angle)
+	toward.button_pressed = false
+	var toward_off := rad_to_deg(_rig.follow_toward_camera_angle)
+	var angle_locked_by_switch := not toward_angle.editable
+	toward.button_pressed = true
+	var toward_back := rad_to_deg(_rig.follow_toward_camera_angle)
 	var fps_counter: Control = _main.get_node("Hud/FpsCounter")
 	print(("after the clicks: ledge guard %s, max_fps %d, interpolation %s, FPS counter %s, follow %s in %.1f s " +
 			"(\"%s\"), slider locked while off %s") % [
@@ -77,6 +90,14 @@ func _check_settings_window() -> void:
 			"the look-around switch reaches the input, and its hint line hides")
 	_expect(slider_locked and follow_time.editable and _rig.follow_movement and _rig.follow_time == 0.0
 			and follow_time_text.text == "instant", "camera follow and its speed reach the camera")
+	print(("a run toward the camera: locked while the follow is off %s, unlocked by it %s; %.0f deg (\"%s\") on " +
+			"the camera, off %.0f deg (the angle locked %s), on again %.0f deg; slider %.0f..%.0f") % [toward_locked,
+		toward_unlocked, toward_set, toward_text, toward_off, angle_locked_by_switch, toward_back,
+		toward_angle.min_value, toward_angle.max_value])
+	_expect(toward_locked and toward_unlocked and is_equal_approx(toward_set, 45.0) and toward_text == "45°"
+			and toward_off == 0.0 and angle_locked_by_switch and is_equal_approx(toward_back, 45.0)
+			and is_equal_approx(toward_angle.min_value, 5.0) and is_equal_approx(toward_angle.max_value, 60.0),
+			"a run toward the camera: the switch and the angle (5-60 deg) reach the camera, off is 0 deg")
 	print(("pitch: sliders locked while off %s, unlocked by it %s (the turn's speed still locked %s), follow_pitch %s " +
 			"at %.1f deg (\"%s\") in %.1f s, slider %.0f..%.0f, camera limits %.1f..%.1f") % [
 		pitch_slider_locked, pitch_unlocked, turn_speed_still_locked, _rig.follow_pitch,
@@ -267,7 +288,9 @@ func _check_settings_window() -> void:
 			and input.look_around_while_held == GameSettings.DEFAULTS[GameSettings.LOOK_AROUND]
 			and look_help.visible == GameSettings.DEFAULTS[GameSettings.LOOK_AROUND]
 			and max_fps.get_selected_id() == 0 and not pitch_angle.editable and not pitch_time.editable
-			and not follow_time.editable
+			and not follow_time.editable and toward.button_pressed and toward.disabled and not toward_angle.editable
+			and is_equal_approx(rad_to_deg(_rig.follow_toward_camera_angle),
+					GameSettings.DEFAULTS[GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE])
 			and is_equal_approx(_rig.follow_pitch_time, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_PITCH_TIME])
 			and not _rig.follow_zoom and not height_level.editable and not height_time.editable
 			and is_equal_approx(_rig.follow_zoom_level, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_HEIGHT_LEVEL] / 100.0)

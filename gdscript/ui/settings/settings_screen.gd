@@ -11,12 +11,15 @@ extends UiScreen
 ## Settings that decide whether other controls of the window can be changed (see [method _update_dependent_rows]).
 const _DEPENDENCY_KEYS: Array[StringName] = [
 	GameSettings.CAMERA_KEYS_MODE, GameSettings.JUMP, GameSettings.SPRINT, GameSettings.FATIGUE,
-	GameSettings.CAMERA_FOLLOW, GameSettings.CAMERA_ALIGN_PITCH, GameSettings.CAMERA_ALIGN_HEIGHT,
-	GameSettings.CHARACTER_HOVER,
+	GameSettings.CAMERA_FOLLOW, GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD, GameSettings.CAMERA_ALIGN_PITCH,
+	GameSettings.CAMERA_ALIGN_HEIGHT, GameSettings.CHARACTER_HOVER,
 ]
 
 @onready var _follow_time_row: Control = %FollowTimeRow
 @onready var _follow_time: SettingSlider = %FollowTime
+@onready var _follow_except_toward: CheckButton = %FollowExceptToward
+@onready var _follow_except_toward_row: Control = %FollowExceptTowardRow
+@onready var _follow_except_toward_angle: SettingSlider = %FollowExceptTowardAngle
 @onready var _align_pitch_row: Control = %AlignPitchRow
 @onready var _align_pitch_angle: SettingSlider = %AlignPitchAngle
 @onready var _align_pitch_time_row: Control = %AlignPitchTimeRow
@@ -74,15 +77,17 @@ func _on_setting_changed(key: StringName, _value: Variant) -> void:
 
 ## Controls that make sense only with another setting: the backward slowdown with sidestepping on RMB (only there
 ## does S move the character backward), the jump height with jumping, everything about the sprint with the sprint,
-## the stamina also with fatigue; the speed of the turn when the camera follows the run, the pitch and its speed when
-## the camera aligns the pitch, the height and its speed when it aligns the height; the footstep sounds without
-## floating (a floating hero has no steps).
+## the stamina also with fatigue; the speed of the turn and the run toward the camera when the camera follows the run,
+## the angle of that run also when it is excepted; the pitch and its speed when the camera aligns the pitch, the
+## height and its speed when it aligns the height; the footstep sounds without floating (a floating hero has no
+## steps).
 func _update_dependent_rows() -> void:
 	var camera_keys: int = Settings.get_value(GameSettings.CAMERA_KEYS_MODE)
 	var jump: bool = Settings.get_value(GameSettings.JUMP)
 	var sprint: bool = Settings.get_value(GameSettings.SPRINT)
 	var fatigue: bool = Settings.get_value(GameSettings.FATIGUE)
 	var follow: bool = Settings.get_value(GameSettings.CAMERA_FOLLOW)
+	var except_toward: bool = Settings.get_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD)
 	var align_pitch: bool = Settings.get_value(GameSettings.CAMERA_ALIGN_PITCH)
 	var align_height: bool = Settings.get_value(GameSettings.CAMERA_ALIGN_HEIGHT)
 	var hover: bool = Settings.get_value(GameSettings.CHARACTER_HOVER)
@@ -93,6 +98,8 @@ func _update_dependent_rows() -> void:
 	_set_enabled(_fatigue, sprint)
 	_set_enabled(_sprint_duration, sprint and fatigue, _sprint_duration_row)
 	_set_enabled(_follow_time, follow, _follow_time_row)
+	_set_enabled(_follow_except_toward, follow)
+	_set_enabled(_follow_except_toward_angle, follow and except_toward, _follow_except_toward_row)
 	_set_enabled(_align_pitch_angle, align_pitch, _align_pitch_row)
 	_set_enabled(_align_pitch_time, align_pitch, _align_pitch_time_row)
 	_set_enabled(_align_height_level, align_height, _align_height_row)

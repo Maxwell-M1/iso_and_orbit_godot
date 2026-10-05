@@ -230,6 +230,18 @@ msgid "instant"
 msgstr "anında"
 
 #: gdscript/ui/settings/settings_screen.tscn
+msgid "Except a run toward the camera"
+msgstr "Kameraya doğru koşu hariç"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "Angle"
+msgstr "Açı"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "When the character runs toward you, straight at the camera or up to this angle off, the camera does not swing round. A run farther to the side turns it, gently at first. Off: the camera turns behind any run."
+msgstr "Karakter size doğru, doğrudan kameraya ya da bu açıya kadar sapmayla koştuğunda kamera arkasına dönmez. Daha yana doğru bir koşu kamerayı döndürür, önce yumuşakça. Kapalıyken kamera her koşunun arkasına döner."
+
+#: gdscript/ui/settings/settings_screen.tscn
 msgid "Align the camera height on the run"
 msgstr "Koşarken kamera yüksekliğini hizala"
 

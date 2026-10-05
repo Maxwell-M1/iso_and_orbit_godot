@@ -469,6 +469,48 @@ layout_mode = 2
 text = "1.1 s"
 horizontal_alignment = 2
 
+[node name="FollowExceptToward" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Except a run toward the camera"
+script = ExtResource("2_check")
+key = &"camera/follow_except_toward"
+
+[node name="FollowExceptTowardRow" type="HBoxContainer" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FollowExceptTowardLabel" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowExceptTowardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Angle"
+
+[node name="FollowExceptTowardAngle" type="HSlider" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowExceptTowardRow" node_paths=PackedStringArray("value_label")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 5.0
+max_value = 60.0
+value = 30.0
+script = ExtResource("4_slider")
+key = &"camera/follow_except_toward_angle"
+value_label = NodePath("../FollowExceptTowardValue")
+value_format = "%d°"
+
+[node name="FollowExceptTowardValue" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List/FollowExceptTowardRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "30°"
+horizontal_alignment = 2
+
+[node name="FollowExceptTowardHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "When the character runs toward you, straight at the camera or up to this angle off, the camera does not swing round. A run farther to the side turns it, gently at first. Off: the camera turns behind any run."
+autowrap_mode = 3
+
 [node name="AlignPitch" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 layout_mode = 2
 text = "Align the camera tilt on the run"
