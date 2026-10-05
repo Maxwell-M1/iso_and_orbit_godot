@@ -36,9 +36,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if settings_screen != null and event.is_action_pressed(settings_action):
+	# A missing action is reported once at the start and then not read: the engine would report it at every event.
+	if settings_screen != null and InputMap.has_action(settings_action) and event.is_action_pressed(settings_action):
 		toggle(settings_screen)
-	elif has_open_screens() and event.is_action_pressed(&"ui_cancel"):
+	elif has_open_screens() and InputMap.has_action(&"ui_cancel") and event.is_action_pressed(&"ui_cancel"):
 		close_top()
 	else:
 		return

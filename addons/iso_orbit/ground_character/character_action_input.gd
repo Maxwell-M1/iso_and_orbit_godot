@@ -58,7 +58,7 @@ func _ready() -> void:
 ## of the sprint key itself is skipped: it changes the action state anyway, and on some systems (X11) it carries the
 ## modifiers from before the press.
 func _input(event: InputEvent) -> void:
-	if sprint_mode != SprintMode.HOLD or _sprint_modifiers.is_empty() or not Input.is_action_pressed(sprint_action):
+	if sprint_mode != SprintMode.HOLD or _sprint_modifiers.is_empty() or not _is_pressed(sprint_action):
 		return
 	var with_modifiers := event as InputEventWithModifiers
 	if with_modifiers == null or event.is_action(sprint_action):
@@ -70,9 +70,9 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(jump_action):
+	if _has_action(jump_action) and event.is_action_pressed(jump_action):
 		character.jump()
-	elif sprint_mode == SprintMode.TOGGLE and event.is_action_pressed(sprint_action):
+	elif sprint_mode == SprintMode.TOGGLE and _has_action(sprint_action) and event.is_action_pressed(sprint_action):
 		_sprint_toggled = not _sprint_toggled
 	else:
 		return
@@ -82,7 +82,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(_delta: float) -> void:
 	if sprint_mode == SprintMode.HOLD:
 		# By polling, not by events: the key release may have gone to the UI or arrived while the game was paused.
-		character.sprint_requested = Input.is_action_pressed(sprint_action)
+		character.sprint_requested = _is_pressed(sprint_action)
 		return
 	if _sprint_toggled and character.is_exhausted():
 		_sprint_toggled = false
@@ -92,6 +92,16 @@ func _physics_process(_delta: float) -> void:
 ## Sprint is turned on by a press (in the [constant SprintMode.TOGGLE] mode).
 func is_sprint_toggled() -> bool:
 	return _sprint_toggled
+
+
+## Whether [param action] is set and in the Input Map. A missing action is reported once at the start and then not
+## read: the engine would report it again at every read.
+static func _has_action(action: StringName) -> bool:
+	return action != &"" and InputMap.has_action(action)
+
+
+static func _is_pressed(action: StringName) -> bool:
+	return _has_action(action) and Input.is_action_pressed(action)
 
 
 ## The modifier keys of the action [param action]; empty if it has a key that is not a modifier, or an event that is not

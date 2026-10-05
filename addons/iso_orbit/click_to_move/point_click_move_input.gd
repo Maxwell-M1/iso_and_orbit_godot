@@ -252,7 +252,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	# Only the press: the release is checked by polling in _physics_process, because the UI may intercept it, and then
 	# the character would run after the cursor forever.
-	if not event.is_action_pressed(move_action):
+	if not _has_action(move_action) or not event.is_action_pressed(move_action):
 		return
 	_held = true
 	_holding = false
@@ -352,11 +352,11 @@ func is_cursor_hidden() -> bool:
 
 
 ## Forget the press under way: a click not yet released does not run to its point, and a run that the held button or
-## the keys with [member camera_steer_action] drive stops smoothly, as on their release. A hidden cursor appears where
-## the aim was. A button that stays held counts only from its next press; the keys with the camera button are read
-## every tick and walk again at once. For example, before the character is put elsewhere
-## ([method GroundCharacter.teleport]) or when the controls are taken away. A run to a clicked point is the mover's and
-## goes on: [method NavigationMover.halt] stops it too.
+## the keys with [member camera_steer_action] drive stops smoothly, also in [constant HoldMode.FOLLOW_POINT] mode (it
+## does not run on to the last point). A hidden cursor appears where the aim was. A button that stays held counts only
+## from its next press; the keys with the camera button are read every tick and walk again at once. For example, before
+## the character is put elsewhere ([method GroundCharacter.teleport]) or when the controls are taken away. A run to a
+## clicked point is the mover's and goes on: [method NavigationMover.halt] stops it too.
 func cancel() -> void:
 	var driving := _holding or _keys_steering
 	_held = false
@@ -380,7 +380,7 @@ func cancel() -> void:
 
 ## The button is held: released means a click or the end of a hold; held longer than [member hold_delay] means a hold.
 func _update_hold(delta: float) -> void:
-	if not Input.is_action_pressed(move_action):
+	if not _is_pressed(move_action):
 		_release()
 		return
 	_held_time += delta
@@ -396,7 +396,7 @@ func _steer_while_held() -> void:
 	if _is_camera_steer_pressed() and not _looking:
 		var strafe := 0.0
 		if keys_with_camera_steer != KeysMode.OFF:
-			strafe = Input.get_axis(move_left_action, move_right_action)
+			strafe = _get_strength(move_right_action) - _get_strength(move_left_action)
 		var facing := _camera_relative(1.0, 0.0) if keys_with_camera_steer == KeysMode.SIDESTEP else Vector3.ZERO
 		var direction := _camera_relative(1.0, strafe)
 		_steer(direction, facing)
@@ -439,6 +439,11 @@ func _steer_by_keys(after_hold: bool) -> void:
 func _get_keys() -> Vector2:
 	if keys_with_camera == KeysMode.OFF or not _is_camera_steer_pressed():
 		return Vector2.ZERO
+	for action: StringName in [move_left_action, move_right_action, move_back_action, move_forward_action]:
+		if not _has_action(action):
+			# Without some of the keys the others still walk.
+			return Vector2(_get_strength(move_right_action) - _get_strength(move_left_action),
+					_get_strength(move_forward_action) - _get_strength(move_back_action)).limit_length(1.0)
 	return Input.get_vector(move_left_action, move_right_action, move_back_action, move_forward_action)
 
 
@@ -760,7 +765,21 @@ func _get_camera() -> Camera3D:
 
 
 func _is_camera_steer_pressed() -> bool:
-	return camera_steer_action != &"" and Input.is_action_pressed(camera_steer_action)
+	return _is_pressed(camera_steer_action)
+
+
+## Whether [param action] is set and in the Input Map. A missing action is reported once at the start and then not
+## read: the engine would report it again at every read.
+static func _has_action(action: StringName) -> bool:
+	return action != &"" and InputMap.has_action(action)
+
+
+static func _is_pressed(action: StringName) -> bool:
+	return _has_action(action) and Input.is_action_pressed(action)
+
+
+static func _get_strength(action: StringName) -> float:
+	return Input.get_action_strength(action) if _has_action(action) else 0.0
 
 
 static func _is_cursor_captured() -> bool:

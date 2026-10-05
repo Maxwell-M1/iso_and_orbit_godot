@@ -25,12 +25,15 @@ func _ready() -> void:
 	_button.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	_button.pressed.connect(_on_pressed)
 	hide()
+	if not InputMap.has_action(action):
+		push_error("TravelPrompt: input action \"%s\" is missing in Project Settings > Input Map." % action)
 
 
 func _shortcut_input(event: InputEvent) -> void:
 	# Not a shortcut of the button: that one wants exactly the modifiers of the action, and the key must work with Shift
 	# held too (the hero sprints onto the pad).
-	if is_visible_in_tree() and _portal != null and event.is_action_pressed(action):
+	# A missing action is reported once at the start and then not read: the engine would report it at every event.
+	if is_visible_in_tree() and _portal != null and InputMap.has_action(action) and event.is_action_pressed(action):
 		get_viewport().set_input_as_handled()
 		_on_pressed()
 
@@ -76,6 +79,8 @@ func _update_text() -> void:
 
 ## The key of [member action] by its Latin letter, the way the other hints name the keys (WASD), whatever the layout.
 func _get_key_name() -> String:
+	if not InputMap.has_action(action):
+		return ""
 	for event in InputMap.action_get_events(action):
 		var key := event as InputEventKey
 		if key != null:

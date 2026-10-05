@@ -249,21 +249,27 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(rotate_action):
+	if _has_action(rotate_action) and event.is_action_pressed(rotate_action):
 		_begin_rotate()
-	elif event.is_action_released(rotate_action):
+	elif _has_action(rotate_action) and event.is_action_released(rotate_action):
 		_end_rotate()
 	elif event is InputEventMouseMotion and _rotating:
 		# Accumulate: several events can arrive per frame; they are applied at once in _process.
 		_mouse_motion += (event as InputEventMouseMotion).screen_relative
 		_rotate_motion += (event as InputEventMouseMotion).screen_relative.length()
-	elif event.is_action_pressed(zoom_in_action):
+	elif _has_action(zoom_in_action) and event.is_action_pressed(zoom_in_action):
 		_add_zoom(-zoom_step * _get_wheel_factor(event))
-	elif event.is_action_pressed(zoom_out_action):
+	elif _has_action(zoom_out_action) and event.is_action_pressed(zoom_out_action):
 		_add_zoom(zoom_step * _get_wheel_factor(event))
 	else:
 		return
 	get_viewport().set_input_as_handled()
+
+
+## Whether [param action] is set and in the Input Map. A missing action is reported once at the start and then not
+## read: the engine would report it again at every event.
+static func _has_action(action: StringName) -> bool:
+	return action != &"" and InputMap.has_action(action)
 
 
 func _notification(what: int) -> void:

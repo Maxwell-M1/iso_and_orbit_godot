@@ -2,7 +2,7 @@ extends "res://tests/check_suite.gd"
 ## Mouse and keys with real input events: a click, an LMB hold in both modes, LMB + RMB (and RMB released a moment
 ## before LMB), RMB over a run after the cursor looking around, RMB + WASD and LMB + RMB + A/D in all modes, keys
 ## dropping the run to a click point, the signal of a new run, the cursor hiding while running with LMB held, the press
-## under way cancelled.
+## under way cancelled, input actions missing from the project.
 
 
 func _checks() -> Array[Callable]:
@@ -21,6 +21,7 @@ func _checks() -> Array[Callable]:
 		_check_run_requested,
 		_check_hold_hides_cursor,
 		_check_cancel,
+		_check_missing_actions,
 	]
 
 
@@ -895,3 +896,52 @@ func _check_cancel() -> void:
 	_expect(running and shown and stop_time > 0.0, "a hold run cancelled stops as on release, the cursor is shown")
 	_expect(stayed and stayed_after_release, "the button still held does not run after cancel, nor does its release")
 	_expect(next_click, "the next click runs as usual")
+
+
+## Input actions missing from the project (here the action names of the components, the window root and the travel
+## offer are changed at run time to ones the project lacks): nothing reads them, so while the mouse, the wheel and the
+## keys are used the engine reports nothing, the hero stays and no window opens. Each component reports a missing
+## action once at the start; here they are renamed later, so nothing is reported at all. Everything is put back after.
+func _check_missing_actions() -> void:
+	print("\n== missing input actions: nothing reads them, nothing is reported")
+	var ui_root: UiRoot = _main.get_node(^"UiRoot")
+	var prompt: Node = _main.get_node(^"Hud/TravelPrompt")
+	var renamed := {
+		_input: [&"move_action", &"camera_steer_action", &"move_forward_action", &"move_back_action",
+			&"move_left_action", &"move_right_action"],
+		_actions: [&"sprint_action", &"jump_action"],
+		_rig: [&"rotate_action", &"zoom_in_action", &"zoom_out_action"],
+		ui_root: [&"settings_action"],
+		prompt: [&"action"],
+	}
+	var saved := []
+	for node: Object in renamed:
+		for property: StringName in renamed[node]:
+			saved.append([node, property, node.get(property)])
+			node.set(property, StringName("missing_" + property))
+	await _teleport(Vector3(-30, 0, 34))
+	var start := _player.global_position
+	var center := _tree.root.get_visible_rect().size / 2.0
+	var errors := _error_count()
+	_send_button(MOUSE_BUTTON_LEFT, true, center + Vector2(150, 0))
+	_send_button(MOUSE_BUTTON_RIGHT, true, center + Vector2(150, 0))
+	for i in 20:
+		_send_motion(center + Vector2(150 + i * 5, 0), Vector2(5, 0))
+		await _tree.physics_frame
+	for key: Key in [KEY_W, KEY_A, KEY_SHIFT, KEY_SPACE, KEY_E, KEY_F10]:
+		_send_key(key)
+	_send_button(MOUSE_BUTTON_WHEEL_UP, true, center)
+	_send_button(MOUSE_BUTTON_WHEEL_DOWN, true, center)
+	await _ticks(20)
+	_send_button(MOUSE_BUTTON_RIGHT, false, center)
+	_send_button(MOUSE_BUTTON_LEFT, false, center)
+	await _ticks(10)
+	errors = _error_count() - errors
+	var moved := _flat_distance(start, _player.global_position)
+	var window := ui_root.has_open_screens()
+	for entry: Array in saved:
+		(entry[0] as Object).set(entry[1], entry[2])
+	await _teleport(Vector3.ZERO)
+	print("errors %d, the hero moved %.2f m, a window open %s" % [errors, moved, window])
+	_expect(errors == 0, "the engine reports nothing while the missing actions' keys and buttons are used")
+	_expect(moved < 0.05 and not window, "nothing reads them: the hero stays and no window opens")
