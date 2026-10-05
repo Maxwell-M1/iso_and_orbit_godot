@@ -1,7 +1,7 @@
 extends SceneTree
-## Windowless checks of the demo: running and navigation, the world and the characters in it, the hero look, sprint
-## and jump, what the character reports, stairs and slopes, mouse and keys, the camera and its arm, the settings
-## window, interface languages. The check suites are [code]tests/*_checks.gd[/code] (the base is
+## Windowless checks of the demo: running and navigation, the world and the characters in it, the hero look, sprint and
+## jump, what the character reports, stairs and slopes, mouse and keys, the camera and its arm, the settings window,
+## interface languages, levels and the teleport. The check suites are [code]tests/*_checks.gd[/code] (the base is
 ## [code]tests/check_suite.gd[/code]); they run in the order of [constant SUITES] on the same main scene.
 ##
 ## Run from the project folder (saves nothing, exit code 1 on failure):
@@ -10,7 +10,8 @@ extends SceneTree
 ##   godot --headless --fixed-fps 60 --path . --script res://tests/run_checks.gd -- camera input
 ##
 ## Any engine or script error during a check also counts as a failure: a crashed check is interrupted, but the
-## others go on, and without this it would pass unnoticed.
+## others go on, and without this it would pass unnoticed. Only an error a check provokes on purpose and announces
+## beforehand ([method expect_error]) does not count.
 
 ## The check suites in the order they run.
 const SUITES := [
@@ -24,18 +25,26 @@ const SUITES := [
 	preload("res://tests/camera_arm_checks.gd"),
 	preload("res://tests/settings_window_checks.gd"),
 	preload("res://tests/localization_checks.gd"),
+	preload("res://tests/level_checks.gd"),
 ]
 const CheckSuite := preload("res://tests/check_suite.gd")
-## If a check hangs (the script crashed before quit()), it ends in failure after this many seconds of game time.
-const TIMEOUT := 600.0
+## If a check hangs (the script crashed before quit()), it ends in failure after this many seconds of game time. While a
+## level loads in the background, the frames without a window run much faster than on a screen, and game time with them.
+const TIMEOUT := 1200.0
 
 
-## Counts engine and script errors.
+## Counts engine and script errors, except the expected ones.
 class ErrorCounter extends Logger:
 	var errors := 0
+	## Parts of the messages of the errors the checks expect: each one excuses one error.
+	var expected: Array[String] = []
 
-	func _log_error(_function: String, _file: String, _line: int, _code: String, _rationale: String,
+	func _log_error(_function: String, _file: String, _line: int, code: String, rationale: String,
 			_editor_notify: bool, _error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		for part in expected:
+			if part in code or part in rationale:
+				expected.erase(part)
+				return
 		errors += 1
 
 var _main: Node3D
@@ -92,6 +101,19 @@ func _finish() -> void:
 		OS.delay_msec(100)
 		await process_frame
 	quit(1 if _failures > 0 else 0)
+
+
+## A check is about to provoke an error whose message contains [param part]: it does not count as a failure. The
+## check reads [method take_expected_errors] afterwards to see that it came.
+func expect_error(part: String) -> void:
+	_errors.expected.append(part)
+
+
+## The expected errors that have not come; from now on they are not expected.
+func take_expected_errors() -> Array[String]:
+	var left := _errors.expected.duplicate()
+	_errors.expected.clear()
+	return left
 
 
 func _on_timeout() -> void:

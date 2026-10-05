@@ -22,7 +22,7 @@ func _check_mountain() -> void:
 	print("\n== the mountain: up the path to the summit, the summit is discovered once, no way up the slopes")
 	var center := Vector3(27, 0, -28)
 	var summit_spot := center + Vector3(cos(deg_to_rad(85.0)), 0, sin(deg_to_rad(85.0))) * 2.0 + Vector3.UP * 10.0
-	var summit: PointOfInterest = _main.get_node("World/NavigationRegion3D/Mountain/Shrine/Summit")
+	var summit: PointOfInterest = _levels.get_current_level().get_node("NavigationRegion3D/Mountain/Shrine/Summit")
 	var toast: Label = _main.get_node("Hud/DiscoveryToast")
 	var discoveries := [0]
 	var on_discovered := func(_title: String) -> void: discoveries[0] += 1
@@ -110,12 +110,12 @@ func _check_places() -> void:
 
 
 ## A place added during the game, as with a level loaded later, is announced too; one marked as found beforehand
-## (mark_discovered) stays silent.
+## (mark_discovered) stays silent. Without watch_added_places the caption is only for the places there at startup.
 func _check_places_added_later() -> void:
-	print("\n== places added during the game: announced; one marked as found stays silent")
+	print("\n== places added during the game: announced; one marked as found stays silent; not watched when asked")
 	var toast: DiscoveryToast = _main.get_node("Hud/DiscoveryToast")
 	await _wait_until(func() -> bool: return toast.modulate.a == 0.0, 600)
-	var level: Node3D = _main.get_node("World")
+	var level := _levels.get_current_level()
 	var announced := _add_place(level, "Lookout", Vector3(-8, 0, 0))
 	var known := _add_place(level, "Old Well", Vector3(-8, 0, 6))
 	known.mark_discovered()
@@ -133,9 +133,20 @@ func _check_places_added_later() -> void:
 		signals[0], not silent, announced.is_discovered(), message])
 	_expect(silent, "a place marked as found does not announce itself")
 	_expect(shown and message == "Discovered: Lookout", "a place added during the game is announced")
+	await _wait_until(func() -> bool: return toast.modulate.a == 0.0, 600)
+	toast.watch_added_places = false
+	var unwatched := _add_place(level, "Quiet Hill", Vector3(-8, 0, -6))
+	await _teleport(unwatched.global_position)
+	await _frames(45)
+	var unwatched_shown := toast.modulate.a > 0.0
+	toast.watch_added_places = true
+	print("not watched: discovered %s, message shown %s" % [unwatched.is_discovered(), unwatched_shown])
+	_expect(unwatched.is_discovered() and not unwatched_shown,
+			"without watch_added_places a place added later is found, but not announced")
 	await _teleport(Vector3.ZERO)
 	announced.queue_free()
 	known.queue_free()
+	unwatched.queue_free()
 	await _wait_until(func() -> bool: return toast.modulate.a == 0.0, 600)
 
 
@@ -159,7 +170,7 @@ func _add_place(level: Node3D, title: String, at: Vector3) -> PointOfInterest:
 ## summit), each with a title and something in the hands; nobody can walk through a character.
 func _check_characters_at_places() -> void:
 	print("\n== characters at the places of interest: every place has someone, all stand on the ground")
-	var characters: Node3D = _main.get_node("World/NavigationRegion3D/Characters")
+	var characters: Node3D = _levels.get_current_level().get_node("NavigationRegion3D/Characters")
 	var places := _tree.get_nodes_in_group(PointOfInterest.GROUP)
 	var space := _player.get_world_3d().direct_space_state
 	var visited := {}
@@ -206,7 +217,7 @@ func _place_of(position: Vector3, places: Array[Node]) -> PointOfInterest:
 ## become the player's look; one can walk along the line without bumping into anything.
 func _check_mage_options() -> void:
 	print("\n== mage options for the hero: ten numbered models, each fits the player, the walkway along them is free")
-	var gallery: Node3D = _main.get_node("World/NavigationRegion3D/MageOptions")
+	var gallery: Node3D = _levels.get_current_level().get_node("NavigationRegion3D/MageOptions")
 	var report := PackedStringArray()
 	var complete := gallery.get_child_count() == 10
 	for i in gallery.get_child_count():
@@ -241,7 +252,7 @@ func _check_mage_options() -> void:
 ## the character's max_step_height.
 func _check_navigation_climb() -> void:
 	print("\n== the navigation mesh climbs the character's stairs")
-	var region: NavigationRegion3D = _main.get_node("World/NavigationRegion3D")
+	var region: NavigationRegion3D = _levels.get_current_level().get_node("NavigationRegion3D")
 	var climb := region.navigation_mesh.agent_max_climb
 	print("agent_max_climb %.2f m, max_step_height %.2f m" % [climb, _player.max_step_height])
 	_expect(is_equal_approx(climb, _player.max_step_height),

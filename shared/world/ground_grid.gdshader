@@ -12,6 +12,8 @@ uniform vec3 grass_color : source_color = vec3(0.34, 0.47, 0.25);
 uniform vec3 grass_dark_color : source_color = vec3(0.24, 0.37, 0.2);
 uniform vec3 grass_dry_color : source_color = vec3(0.5, 0.5, 0.29);
 uniform float roughness : hint_range(0.0, 1.0) = 0.95;
+// The trails (ROADS) are the meadow's: the ground of another level turns them off.
+uniform bool roads = true;
 
 // Grid: 0 is off, 1 is full strength. The cell is cell_size, with a thick line every major_every cells.
 uniform float grid_strength : hint_range(0.0, 1.0) = 0.0;
@@ -45,7 +47,10 @@ void fragment() {
 	base = mix(base, grass_dry_color, smoothstep(0.62, 0.8, patches) * 0.8);
 	Ground grass = grass_at(p, base, tint_mask);
 
-	Ground ground = with_roads(p, grass, road_mask);
+	Ground ground = grass;
+	if (roads) {
+		ground = with_roads(p, grass, road_mask);
+	}
 	vec3 color = ground.color;
 	vec2 tilt = ground.tilt;
 	float ao = ground.ao;

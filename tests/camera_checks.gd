@@ -298,7 +298,7 @@ func _check_camera_follow_pauses() -> void:
 ## With [param pitch] above zero, the camera also levels its pitch to that many degrees down.
 ## A headless window does not move the cursor, so the "system" cursor stays where the events put it.
 func _hold_and_watch(follow_time: float, keep_aim: bool, nudge := Vector2.ZERO, pitch := 0.0) -> Dictionary:
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	input.hold_mode = PointClickMoveInput.HoldMode.STEER
 	input.keep_aim_on_camera_turn = keep_aim
 	_rig.follow_movement = false
@@ -379,7 +379,7 @@ func _heading_turn_over(ticks: int) -> float:
 ## teleport end it. A hold that goes on after RMB, steered by the mouse, is not a new run: the wait lasts until the stop.
 func _check_camera_waits_after_rotate() -> void:
 	print("\n== the follow waits after the camera has been rotated with the right button")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var keys_before := input.keys_with_camera
 	var pitch_angle := _rig.follow_pitch_angle
 	input.keys_with_camera = PointClickMoveInput.KeysMode.TURN

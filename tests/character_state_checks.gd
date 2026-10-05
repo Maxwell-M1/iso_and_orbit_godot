@@ -336,10 +336,10 @@ func _check_acceleration() -> void:
 ## Without a facing it keeps facing where it faced.
 func _check_teleport() -> void:
 	print("\n== a teleport mid-run: stands at once, faces where told, no jerk")
+	await _teleport(Vector3(-30, 0, STRIP_Z))
 	var teleports := [0]
 	var on_teleport := func() -> void: teleports[0] += 1
 	_player.teleported.connect(on_teleport)
-	await _teleport(Vector3(-30, 0, STRIP_Z))
 	_mover.steer(Vector3.RIGHT)
 	await _ticks(60)
 	var speed_before := _player.get_move_speed()

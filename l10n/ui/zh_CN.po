@@ -572,3 +572,43 @@ msgstr "开启 V-Sync 时，帧数永远不会超过显示器刷新率%s，高�
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Language"
 msgstr "语言"
+
+#: gdscript/main.tscn
+msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
+msgstr "按住左键，英雄会追着光标奔跑；松开即停下。"
+
+#: gdscript/main.tscn
+msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
+msgstr "按住右键并移动鼠标可旋转相机；滚轮可降低和升高相机。"
+
+#: gdscript/main.tscn
+msgid "Hold the right button, then the left one: the hero runs where the camera looks."
+msgstr "先按住右键，再按住左键：英雄朝相机所看的方向奔跑。"
+
+#: gdscript/main.tscn
+msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
+msgstr "英雄追着光标奔跑时，按住右键即可环顾四周：奔跑方向保持不变。"
+
+#: gdscript/main.tscn
+msgid "Shift makes the hero run faster for as long as stamina lasts."
+msgstr "按住 Shift，英雄会在体力耗尽前跑得更快。"
+
+#: gdscript/main.tscn
+msgid "F10 opens the settings: controls, camera, display, sound and more."
+msgstr "按 F10 打开设置：操作、相机、显示、声音等。"
+
+#: gdscript/ui/travel_prompt.gd
+msgid "Teleport to %s"
+msgstr "传送至%s"
+
+#: shared/world/world.tscn
+msgid "Lonely Isle"
+msgstr "孤岛"
+
+#: shared/world/island/island.tscn
+msgid "Green Vale"
+msgstr "翠谷"
+
+#: shared/world/island/island.tscn
+msgid "Hermit's Camp"
+msgstr "隐士营地"

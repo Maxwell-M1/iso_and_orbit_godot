@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://cc2hfsdjvfl8q"]
+
+[ext_resource type="Script" uid="uid://ds5nv5fmhhmw4" path="res://gdscript/player/playable_hero.gd" id="1_hero"]
+[ext_resource type="PackedScene" uid="uid://cw2w35xfjknkf" path="res://gdscript/player/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://cyi4p1jtx0mn0" path="res://addons/iso_orbit/click_to_move/point_click_move_input.gd" id="3_input"]
+[ext_resource type="Script" uid="uid://bmuwcu4h5tdp4" path="res://addons/iso_orbit/ground_character/character_action_input.gd" id="4_actions"]
+[ext_resource type="Script" uid="uid://bj25id7ftv7xd" path="res://addons/iso_orbit/orbit_camera/orbit_camera_rig.gd" id="5_rig"]
+[ext_resource type="Script" uid="uid://c4skgj3oyx1kh" path="res://addons/iso_orbit/orbit_camera/camera_arm.gd" id="6_arm"]
+[ext_resource type="PackedScene" path="res://addons/iso_orbit/click_to_move/click_marker.tscn" id="7_marker"]
+[ext_resource type="Script" uid="uid://c27yi0w48nkdr" path="res://addons/iso_orbit/click_to_move/navigation_path_view.gd" id="8_path_view"]
+
+[node name="PlayableHero" type="Node3D" node_paths=PackedStringArray("character", "input", "actions", "camera_rig", "camera_arm", "camera", "click_marker", "path_view", "sounds", "appearance", "hover", "silhouette")]
+script = ExtResource("1_hero")
+character = NodePath("Character")
+input = NodePath("PlayerInput")
+actions = NodePath("PlayerActionInput")
+camera_rig = NodePath("CameraRig")
+camera_arm = NodePath("CameraRig/CameraArm")
+camera = NodePath("CameraRig/CameraArm/Camera3D")
+click_marker = NodePath("ClickMarker")
+path_view = NodePath("PathView")
+sounds = NodePath("Character/Sounds")
+appearance = NodePath("Character/Appearance")
+hover = NodePath("Character/Visual/Hover")
+silhouette = NodePath("Character/Silhouette")
+
+[node name="Character" parent="." groups=["player"] instance=ExtResource("2_player")]
+
+[node name="PlayerInput" type="Node" parent="." node_paths=PackedStringArray("mover", "camera")]
+script = ExtResource("3_input")
+mover = NodePath("../Character/NavigationMover")
+camera = NodePath("../CameraRig/CameraArm/Camera3D")
+
+[node name="PlayerActionInput" type="Node" parent="." node_paths=PackedStringArray("character")]
+script = ExtResource("4_actions")
+character = NodePath("../Character")
+
+[node name="CameraRig" type="Node3D" parent="." node_paths=PackedStringArray("target", "arm")]
+script = ExtResource("5_rig")
+target = NodePath("../Character")
+arm = NodePath("CameraArm")
+follow_wait_after_rotate = true
+height_follow_time = 0.15
+
+[node name="CameraArm" type="Node3D" parent="CameraRig" node_paths=PackedStringArray("fade_target")]
+script = ExtResource("6_arm")
+fade_target = NodePath("../../Character/Visual")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig/CameraArm"]
+current = true
+fov = 45.0
+far = 300.0
+
+[node name="ClickMarker" parent="." instance=ExtResource("7_marker")]
+
+[node name="PathView" type="MeshInstance3D" parent="." node_paths=PackedStringArray("mover")]
+visible = false
+script = ExtResource("8_path_view")
+mover = NodePath("../Character/NavigationMover")
+
+[connection signal="destination_picked" from="PlayerInput" to="ClickMarker" method="show_at"]
+[connection signal="hold_pending_changed" from="PlayerInput" to="CameraRig" method="set_follow_paused"]
+[connection signal="run_requested" from="PlayerInput" to="CameraRig" method="end_follow_wait"]
+[connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
+[connection signal="arrived" from="Character/NavigationMover" to="ClickMarker" method="fade_out"]
+[connection signal="destination_cancelled" from="Character/NavigationMover" to="ClickMarker" method="fade_out"]

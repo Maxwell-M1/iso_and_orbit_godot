@@ -45,7 +45,7 @@ func _check_settings_window() -> void:
 	(screen.find_child("FpsCounter") as CheckButton).button_pressed = false
 	(screen.find_child("HideCursor") as CheckButton).button_pressed = false
 	(screen.find_child("LookAround") as CheckButton).button_pressed = false
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var look_help: Control = _main.get_node("Hud/Panel/Lines/LookHelp")
 	var follow_time := screen.find_child("FollowTime") as HSlider
 	var follow_time_text := screen.find_child("FollowTimeValue") as Label
@@ -157,7 +157,7 @@ func _check_settings_window() -> void:
 	var jump_help: Control = _main.get_node("Hud/Panel/Lines/JumpHelp")
 	var sprint_help: Control = _main.get_node("Hud/Panel/Lines/SprintHelp")
 	var sprint_bonus := screen.find_child("SprintBonus") as HSlider
-	var actions: CharacterActionInput = _main.get_node("PlayerActionInput")
+	var actions := _actions
 	var jump_height := screen.find_child("JumpHeight") as HSlider
 	var sprint_mode := screen.find_child("SprintMode") as OptionButton
 	var fatigue := screen.find_child("Fatigue") as CheckButton

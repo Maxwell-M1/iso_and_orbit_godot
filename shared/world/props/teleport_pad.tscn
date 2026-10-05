@@ -1,0 +1,67 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://addons/iso_orbit/levels/level_portal.gd" id="1_portal"]
+[ext_resource type="Material" path="res://shared/world/materials/stone_altar.tres" id="2_altar"]
+[ext_resource type="Material" path="res://shared/world/materials/crystal.tres" id="3_crystal"]
+[ext_resource type="Script" path="res://shared/world/props/hover_spin.gd" id="4_spin"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_area"]
+height = 2.0
+radius = 1.1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_base"]
+material = ExtResource("2_altar")
+top_radius = 1.35
+bottom_radius = 1.45
+height = 0.06
+radial_segments = 32
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_inlay"]
+material = ExtResource("3_crystal")
+top_radius = 0.95
+bottom_radius = 0.95
+height = 0.08
+radial_segments = 32
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_crystal"]
+material = ExtResource("3_crystal")
+radius = 0.26
+height = 0.9
+radial_segments = 4
+rings = 2
+
+[node name="TeleportPad" type="Area3D" node_paths=PackedStringArray("title_label")]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_portal")
+title_label = NodePath("Sign")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_area")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_base")
+
+[node name="Inlay" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_inlay")
+
+[node name="Crystal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+mesh = SubResource("SphereMesh_crystal")
+script = ExtResource("4_spin")
+
+[node name="Glow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+light_color = Color(0.45, 0.82, 1, 1)
+light_energy = 1.6
+omni_range = 5.0
+
+[node name="Sign" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+billboard = 1
+modulate = Color(0.85, 0.95, 1, 1)
+font_size = 44
+outline_size = 10

@@ -23,11 +23,15 @@ var failures := 0
 
 var _tree: SceneTree
 var _main: Node3D
+var _hero: PlayableHero
+var _levels: LevelHost
 var _player: GroundCharacter
 var _mover: NavigationMover
 var _rig: OrbitCameraRig
 var _camera: Camera3D
 var _marker: Node3D
+var _input: PointClickMoveInput
+var _actions: CharacterActionInput
 # The character has reached the destination (NavigationMover.arrived): for _run_until_arrived().
 var _arrived := false
 
@@ -36,11 +40,15 @@ var _arrived := false
 func setup(tree: SceneTree, main: Node3D) -> void:
 	_tree = tree
 	_main = main
-	_player = main.get_node("Player")
-	_mover = main.get_node("Player/NavigationMover")
-	_rig = main.get_node("CameraRig")
-	_camera = main.get_node("CameraRig/CameraArm/Camera3D")
-	_marker = main.get_node("ClickMarker")
+	_hero = main.get_node("Hero")
+	_levels = main.get_node("Levels")
+	_player = _hero.character
+	_mover = _player.mover
+	_rig = _hero.camera_rig
+	_camera = _hero.camera
+	_marker = _hero.click_marker
+	_input = _hero.input
+	_actions = _hero.actions
 
 
 ## Run the suite's checks in order.
@@ -79,10 +87,7 @@ func _check_route(title: String, from: Vector3, to: Vector3, max_time: float, re
 
 
 func _teleport(position: Vector3) -> void:
-	_mover.halt()
-	_player.velocity = Vector3.ZERO
-	_player.global_position = position
-	_player.reset_physics_interpolation()
+	_player.teleport(position)
 	for i in 3:
 		await _tree.physics_frame
 

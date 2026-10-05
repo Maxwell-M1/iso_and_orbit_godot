@@ -1,62 +1,37 @@
 [gd_scene format=3 uid="uid://4qncb4aiqhwd"]
 
-[ext_resource type="PackedScene" uid="uid://cg6tw5ia2xed4" path="res://shared/world/world.tscn" id="1_world"]
-[ext_resource type="PackedScene" uid="uid://cw2w35xfjknkf" path="res://gdscript/player/player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://cyi4p1jtx0mn0" path="res://addons/iso_orbit/click_to_move/point_click_move_input.gd" id="3_input"]
-[ext_resource type="Script" uid="uid://bj25id7ftv7xd" path="res://addons/iso_orbit/orbit_camera/orbit_camera_rig.gd" id="4_camera"]
-[ext_resource type="PackedScene" path="res://addons/iso_orbit/click_to_move/click_marker.tscn" id="5_marker"]
-[ext_resource type="Script" uid="uid://c27yi0w48nkdr" path="res://addons/iso_orbit/click_to_move/navigation_path_view.gd" id="6_path_view"]
+[ext_resource type="Script" uid="uid://di7mefvb2xbl2" path="res://gdscript/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://dd8g5rpcrqdcr" path="res://addons/iso_orbit/levels/level_host.gd" id="2_levels"]
+[ext_resource type="PackedScene" uid="uid://cg6tw5ia2xed4" path="res://shared/world/world.tscn" id="3_world"]
+[ext_resource type="PackedScene" uid="uid://cc2hfsdjvfl8q" path="res://gdscript/player/playable_hero.tscn" id="4_hero"]
 [ext_resource type="Script" uid="uid://bkx1pl1u185h3" path="res://gdscript/demo/hud.gd" id="7_hud"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/ui_screens/fps_counter.tscn" id="8_fps"]
 [ext_resource type="Script" uid="uid://er6yhyof6pcs" path="res://gdscript/demo/settings_applier.gd" id="9_applier"]
 [ext_resource type="PackedScene" path="res://gdscript/ui/ui_root.tscn" id="10_ui_root"]
-[ext_resource type="Script" uid="uid://bmuwcu4h5tdp4" path="res://addons/iso_orbit/ground_character/character_action_input.gd" id="11_actions"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/ground_character/stamina_bar.tscn" id="12_stamina_bar"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/points_of_interest/discovery_toast.tscn" id="13_toast"]
-[ext_resource type="Script" uid="uid://c4skgj3oyx1kh" path="res://addons/iso_orbit/orbit_camera/camera_arm.gd" id="14_arm"]
 [ext_resource type="Script" uid="uid://c87pp147hwgur" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
+[ext_resource type="PackedScene" path="res://gdscript/ui/travel_prompt.tscn" id="16_prompt"]
+[ext_resource type="PackedScene" path="res://addons/iso_orbit/levels/loading_screen.tscn" id="17_loading"]
 
-[node name="Main" type="Node3D" unique_id=94359211]
+[node name="Main" type="Node3D" unique_id=94359211 node_paths=PackedStringArray("levels", "hero", "hud", "travel_prompt")]
+script = ExtResource("1_main")
+levels = NodePath("Levels")
+hero = NodePath("Hero")
+hud = NodePath("Hud")
+travel_prompt = NodePath("Hud/TravelPrompt")
 
-[node name="World" parent="." unique_id=675439468 instance=ExtResource("1_world")]
+[node name="Levels" type="Node3D" parent="." node_paths=PackedStringArray("loading_screen")]
+script = ExtResource("2_levels")
+loading_screen = NodePath("../LoadingScreen")
 
-[node name="Player" parent="." unique_id=1867483770 groups=["player"] instance=ExtResource("2_player")]
+[node name="World" parent="Levels" unique_id=675439468 instance=ExtResource("3_world")]
 
-[node name="PlayerInput" type="Node" parent="." unique_id=1263002197 node_paths=PackedStringArray("mover", "camera")]
-script = ExtResource("3_input")
-mover = NodePath("../Player/NavigationMover")
-camera = NodePath("../CameraRig/CameraArm/Camera3D")
-
-[node name="PlayerActionInput" type="Node" parent="." unique_id=957766112 node_paths=PackedStringArray("character")]
-script = ExtResource("11_actions")
-character = NodePath("../Player")
-
-[node name="CameraRig" type="Node3D" parent="." unique_id=1161148146 node_paths=PackedStringArray("target", "arm")]
-script = ExtResource("4_camera")
-target = NodePath("../Player")
-arm = NodePath("CameraArm")
-follow_wait_after_rotate = true
-height_follow_time = 0.15
-
-[node name="CameraArm" type="Node3D" parent="CameraRig" unique_id=253517607 node_paths=PackedStringArray("fade_target")]
-script = ExtResource("14_arm")
-fade_target = NodePath("../../Player/Visual")
-
-[node name="Camera3D" type="Camera3D" parent="CameraRig/CameraArm" unique_id=853064253]
-current = true
-fov = 45.0
-far = 300.0
-
-[node name="ClickMarker" parent="." unique_id=1095703120 instance=ExtResource("5_marker")]
-
-[node name="PathView" type="MeshInstance3D" parent="." unique_id=500089121 node_paths=PackedStringArray("mover")]
-visible = false
-script = ExtResource("6_path_view")
-mover = NodePath("../Player/NavigationMover")
+[node name="Hero" parent="." instance=ExtResource("4_hero")]
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1610239526 node_paths=PackedStringArray("character")]
 script = ExtResource("7_hud")
-character = NodePath("../Player")
+character = NodePath("../Hero/Character")
 
 [node name="Panel" type="PanelContainer" parent="Hud" unique_id=883681759]
 offset_left = 12.0
@@ -124,26 +99,18 @@ mouse_filter = 2
 custom_minimum_size = Vector2(380, 0)
 layout_mode = 2
 script = ExtResource("15_monitor")
-character = NodePath("../../../Player")
+character = NodePath("../../../Hero/Character")
 
 [node name="DiscoveryToast" parent="Hud" unique_id=1319316861 instance=ExtResource("13_toast")]
 
 [node name="StaminaBar" parent="Hud" unique_id=301746729 node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
-stamina = NodePath("../../Player/Stamina")
+stamina = NodePath("../../Hero/Character/Stamina")
 
-[node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "player_appearance", "player_hover", "player_silhouette", "path_view", "help_panel", "fps_counter", "character_state", "look_help", "keys_help", "strafe_help", "sprint_help", "jump_help")]
+[node name="TravelPrompt" parent="Hud" instance=ExtResource("16_prompt")]
+
+[node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("hero", "help_panel", "fps_counter", "character_state", "look_help", "keys_help", "strafe_help", "sprint_help", "jump_help")]
 script = ExtResource("9_applier")
-player = NodePath("../Player")
-player_actions = NodePath("../PlayerActionInput")
-ledge_guard = NodePath("../Player/LedgeGuard")
-player_input = NodePath("../PlayerInput")
-camera_rig = NodePath("../CameraRig")
-camera_arm = NodePath("../CameraRig/CameraArm")
-character_sounds = NodePath("../Player/Sounds")
-player_appearance = NodePath("../Player/Appearance")
-player_hover = NodePath("../Player/Visual/Hover")
-player_silhouette = NodePath("../Player/Silhouette")
-path_view = NodePath("../PathView")
+hero = NodePath("../Hero")
 help_panel = NodePath("../Hud/Panel")
 fps_counter = NodePath("../Hud/FpsCounter")
 character_state = NodePath("../Hud/CharacterState")
@@ -155,9 +122,5 @@ jump_help = NodePath("../Hud/Panel/Lines/JumpHelp")
 
 [node name="UiRoot" parent="." unique_id=414458971 instance=ExtResource("10_ui_root")]
 
-[connection signal="destination_picked" from="PlayerInput" to="ClickMarker" method="show_at"]
-[connection signal="hold_pending_changed" from="PlayerInput" to="CameraRig" method="set_follow_paused"]
-[connection signal="run_requested" from="PlayerInput" to="CameraRig" method="end_follow_wait"]
-[connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
-[connection signal="arrived" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]
-[connection signal="destination_cancelled" from="Player/NavigationMover" to="ClickMarker" method="fade_out"]
+[node name="LoadingScreen" parent="." instance=ExtResource("17_loading")]
+tips = PackedStringArray("Hold the left button and the hero runs after the cursor; let go, and it stops.", "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it.", "Hold the right button, then the left one: the hero runs where the camera looks.", "While the hero runs after the cursor, hold the right button to look around: the run keeps its course.", "Shift makes the hero run faster for as long as stamina lasts.", "F10 opens the settings: controls, camera, display, sound and more.")

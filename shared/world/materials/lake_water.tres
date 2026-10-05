@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shared/world/water.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://pbmgkyle6qhl" path="res://shared/world/textures/noise_detail.webp" id="tex_noise_detail"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/noise_texture = ExtResource("tex_noise_detail")
+shader_parameter/water_color = Color(0.07, 0.18, 0.23, 1)
+shader_parameter/ripple = 0.55

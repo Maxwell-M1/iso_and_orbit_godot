@@ -1,7 +1,8 @@
 extends "res://tests/check_suite.gd"
-## Interface languages: English by default; every interface string has a translation into every project language,
-## and the translations have no strings the game no longer shows; picking a language in the settings window at once
-## changes the texts the code composes too, and the language names in the list are not translated.
+## Interface languages: English by default; every interface string has a translation into every project language, on
+## every level the portals lead to too, and the translations have no strings the game no longer shows; picking a
+## language in the settings window at once changes the texts the code composes too, and the language names in the list
+## are not translated.
 
 ## Strings that scripts translate with tr(): they cannot be found in the scenes.
 const SCRIPT_STRINGS: Array[String] = [
@@ -51,10 +52,17 @@ func _check_every_string_translated() -> void:
 		_add(strings, place.title, place)
 	var toast: DiscoveryToast = _main.get_node("Hud/DiscoveryToast")
 	_add(strings, toast.text_format, toast)
+	var prompt: TravelPrompt = _main.get_node("Hud/TravelPrompt")
+	_add(strings, prompt.text_format, prompt)
+	var loading: LoadingScreen = _main.get_node("LoadingScreen")
+	for tip in loading.tips:
+		_add(strings, tip, loading)
+	var levels := _collect_levels(strings)
 	for text in SCRIPT_STRINGS:
 		_add(strings, text, null)
 	await _close_settings()
-	print("%d strings with letters in the main scene, the settings window and the scripts" % strings.size())
+	print("%d strings with letters in the main scene, %d more levels, the settings window and the scripts" % [
+		strings.size(), levels])
 	_expect(opened and strings.size() > 90, "the strings are collected from the open settings window too")
 
 	for locale: String in TranslationServer.get_loaded_locales():
@@ -150,9 +158,47 @@ func _collect(node: Node, strings: Dictionary) -> void:
 		_collect(child, strings)
 
 
+## The levels the portals lead to, from the current one on, built outside the tree: their texts, the names of their
+## places and of the places their portals lead to. Returns how many levels there were besides the current one.
+func _collect_levels(strings: Dictionary) -> int:
+	var current := _levels.get_current_level()
+	var seen := {current.scene_file_path: true}
+	var queue: Array[Node] = [current]
+	var built: Array[Node] = []
+	while not queue.is_empty():
+		var level: Node = queue.pop_front()
+		_collect(level, strings)
+		for node in level.find_children("*", "Area3D", true, false):
+			if node is PointOfInterest:
+				_add(strings, (node as PointOfInterest).title, node)
+			elif node is LevelPortal:
+				var portal := node as LevelPortal
+				_add(strings, portal.title, portal)
+				if not seen.has(portal.target_level):
+					seen[portal.target_level] = true
+					var next := (load(portal.target_level) as PackedScene).instantiate()
+					built.append(next)
+					queue.append(next)
+	for level in built:
+		level.free()
+	return built.size()
+
+
 func _add(strings: Dictionary, text: String, where: Node) -> void:
 	if _letters.search(_placeholders.sub(text, "", true)) != null and not strings.has(text):
-		strings[text] = String(_main.get_path_to(where)) if where != null else "script"
+		strings[text] = _where(where)
+
+
+## Where the text was found: the path in the main scene; on a level outside the tree, its file and the path in it.
+func _where(node: Node) -> String:
+	if node == null:
+		return "script"
+	if node.is_inside_tree():
+		return String(_main.get_path_to(node))
+	var level := node
+	while level.get_parent() != null:
+		level = level.get_parent()
+	return "%s:%s" % [level.scene_file_path.get_file(), level.get_path_to(node)]
 
 
 func _open_settings() -> Control:

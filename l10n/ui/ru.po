@@ -572,3 +572,43 @@ msgstr "С V-Sync кадров не бывает больше частоты м�
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Language"
 msgstr "Язык"
+
+#: gdscript/main.tscn
+msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
+msgstr "Зажмите левую кнопку — герой бежит за курсором; отпустите — останавливается."
+
+#: gdscript/main.tscn
+msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
+msgstr "Зажмите правую кнопку и ведите мышью, чтобы повернуть камеру; колесо опускает и поднимает её."
+
+#: gdscript/main.tscn
+msgid "Hold the right button, then the left one: the hero runs where the camera looks."
+msgstr "Зажмите правую кнопку, затем левую — герой бежит туда, куда смотрит камера."
+
+#: gdscript/main.tscn
+msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
+msgstr "Пока герой бежит за курсором, зажмите правую кнопку, чтобы осмотреться: бег не сбивается с курса."
+
+#: gdscript/main.tscn
+msgid "Shift makes the hero run faster for as long as stamina lasts."
+msgstr "Shift ускоряет бег, пока хватает сил."
+
+#: gdscript/main.tscn
+msgid "F10 opens the settings: controls, camera, display, sound and more."
+msgstr "F10 — настройки: управление, камера, изображение, звук и не только."
+
+#: gdscript/ui/travel_prompt.gd
+msgid "Teleport to %s"
+msgstr "Телепорт: %s"
+
+#: shared/world/world.tscn
+msgid "Lonely Isle"
+msgstr "Одинокий остров"
+
+#: shared/world/island/island.tscn
+msgid "Green Vale"
+msgstr "Зелёная долина"
+
+#: shared/world/island/island.tscn
+msgid "Hermit's Camp"
+msgstr "Лагерь отшельника"

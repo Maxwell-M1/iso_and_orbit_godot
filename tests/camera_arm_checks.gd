@@ -12,7 +12,7 @@ var _arm: CameraArm
 
 func setup(tree: SceneTree, main: Node3D) -> void:
 	super(tree, main)
-	_arm = main.get_node("CameraRig/CameraArm")
+	_arm = _hero.camera_arm
 
 
 func _checks() -> Array[Callable]:

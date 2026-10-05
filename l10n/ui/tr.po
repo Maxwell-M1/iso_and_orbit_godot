@@ -572,3 +572,43 @@ msgstr "V-Sync açıkken kare sayısı monitörün yenileme hızını%s hiçbir 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Language"
 msgstr "Dil"
+
+#: gdscript/main.tscn
+msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
+msgstr "Sol tuşu basılı tutun, kahraman imleci takip ederek koşar; bırakın, durur."
+
+#: gdscript/main.tscn
+msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
+msgstr "Kamerayı döndürmek için sağ tuşu basılı tutup fareyi hareket ettirin; tekerlek onu alçaltır ve yükseltir."
+
+#: gdscript/main.tscn
+msgid "Hold the right button, then the left one: the hero runs where the camera looks."
+msgstr "Önce sağ, sonra sol tuşu basılı tutun: kahraman kameranın baktığı yöne koşar."
+
+#: gdscript/main.tscn
+msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
+msgstr "Kahraman imleci takip ederek koşarken etrafa bakmak için sağ tuşu basılı tutun: koşu yönünü korur."
+
+#: gdscript/main.tscn
+msgid "Shift makes the hero run faster for as long as stamina lasts."
+msgstr "Shift, dayanıklılık yettiği sürece kahramanın daha hızlı koşmasını sağlar."
+
+#: gdscript/main.tscn
+msgid "F10 opens the settings: controls, camera, display, sound and more."
+msgstr "F10 ayarları açar: kontroller, kamera, görüntü, ses ve daha fazlası."
+
+#: gdscript/ui/travel_prompt.gd
+msgid "Teleport to %s"
+msgstr "Işınlan: %s"
+
+#: shared/world/world.tscn
+msgid "Lonely Isle"
+msgstr "Issız Ada"
+
+#: shared/world/island/island.tscn
+msgid "Green Vale"
+msgstr "Yeşil Vadi"
+
+#: shared/world/island/island.tscn
+msgid "Hermit's Camp"
+msgstr "Münzevinin Kampı"

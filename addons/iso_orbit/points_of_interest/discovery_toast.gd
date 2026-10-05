@@ -1,7 +1,8 @@
 class_name DiscoveryToast
 extends Label
 ## A "Discovered: …" caption for a few seconds when the player finds a [PointOfInterest]. It finds the places
-## at startup by the group [constant PointOfInterest.GROUP], and those added later too: a level loaded during the game.
+## at startup by the group [constant PointOfInterest.GROUP], and those added later too: a level loaded during the game
+## ([member watch_added_places]).
 
 ## How to write it: a format string with the place name. Both the string and the name are translated.
 @export var text_format := "Discovered: %s"
@@ -11,6 +12,10 @@ extends Label
 
 ## How long it takes to fade in and to fade out.
 @export_range(0.0, 2.0, 0.05, "suffix:s") var fade_time := 0.6
+
+## Announce the places added after startup too: those of a level loaded during the game. Off: only the places there at
+## startup are announced.
+@export var watch_added_places := true
 
 var _tween: Tween
 var _title := ""
@@ -47,7 +52,7 @@ func _update_text() -> void:
 
 
 func _on_node_added(node: Node) -> void:
-	if node is PointOfInterest:
+	if watch_added_places and node is PointOfInterest:
 		_watch(node)
 
 

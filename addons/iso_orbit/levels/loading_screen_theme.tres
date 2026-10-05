@@ -1,0 +1,32 @@
+[gd_resource type="Theme" format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_background"]
+bg_color = Color(1, 1, 1, 0.14)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(1, 0.86, 0.5, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[resource]
+LoadingBar/base_type = &"ProgressBar"
+LoadingBar/styles/background = SubResource("StyleBoxFlat_bar_background")
+LoadingBar/styles/fill = SubResource("StyleBoxFlat_bar_fill")
+LoadingTip/base_type = &"Label"
+LoadingTip/colors/font_color = Color(0.86, 0.88, 0.92, 1)
+LoadingTip/colors/font_shadow_color = Color(0, 0, 0, 0.6)
+LoadingTip/constants/shadow_offset_x = 1
+LoadingTip/constants/shadow_offset_y = 2
+LoadingTip/font_sizes/font_size = 18
+LoadingTitle/base_type = &"Label"
+LoadingTitle/colors/font_color = Color(1, 0.93, 0.78, 1)
+LoadingTitle/colors/font_shadow_color = Color(0, 0, 0, 0.65)
+LoadingTitle/constants/shadow_offset_x = 2
+LoadingTitle/constants/shadow_offset_y = 3
+LoadingTitle/font_sizes/font_size = 44

@@ -103,7 +103,7 @@ func _check_sprint() -> void:
 	_player.sprint_tires = true
 
 	# Shift as a toggle: on, off, on, and it turns off by itself when the character is exhausted (stamina for 1 s).
-	var actions: CharacterActionInput = _main.get_node("PlayerActionInput")
+	var actions := _actions
 	actions.sprint_mode = CharacterActionInput.SprintMode.TOGGLE
 	_player.sprint_duration = 1.0
 	await _teleport(Vector3(-30, 0, 34))
@@ -148,7 +148,7 @@ func _check_sprint() -> void:
 ## it).
 func _check_sprint_key_release() -> void:
 	print("\n== Shift released in the HOLD mode: the sprint always ends")
-	var actions: CharacterActionInput = _main.get_node("PlayerActionInput")
+	var actions := _actions
 	var ui: UiRoot = _main.get_node("UiRoot")
 	_player.stamina.refill()
 	await _teleport(Vector3(-30, 0, 34))

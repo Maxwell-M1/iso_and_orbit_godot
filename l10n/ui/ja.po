@@ -572,3 +572,43 @@ msgstr "V-Syncでは、フレーム数がモニターのリフレッシュレー
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Language"
 msgstr "言語"
+
+#: gdscript/main.tscn
+msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
+msgstr "左ボタンを押し続けると、主人公がカーソルを追って走ります。離すと止まります。"
+
+#: gdscript/main.tscn
+msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
+msgstr "右ボタンを押したままマウスを動かすとカメラが回ります。ホイールでカメラを上げ下げできます。"
+
+#: gdscript/main.tscn
+msgid "Hold the right button, then the left one: the hero runs where the camera looks."
+msgstr "右ボタン、続けて左ボタンを押し続けると、主人公はカメラの向く方へ走ります。"
+
+#: gdscript/main.tscn
+msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
+msgstr "主人公がカーソルを追って走っている間に右ボタンを押し続けると、走る向きを保ったまま周りを見回せます。"
+
+#: gdscript/main.tscn
+msgid "Shift makes the hero run faster for as long as stamina lasts."
+msgstr "Shiftを押すと、スタミナが続く限り主人公は速く走ります。"
+
+#: gdscript/main.tscn
+msgid "F10 opens the settings: controls, camera, display, sound and more."
+msgstr "F10で設定を開きます：操作、カメラ、表示、サウンドなど。"
+
+#: gdscript/ui/travel_prompt.gd
+msgid "Teleport to %s"
+msgstr "%sへテレポート"
+
+#: shared/world/world.tscn
+msgid "Lonely Isle"
+msgstr "孤島"
+
+#: shared/world/island/island.tscn
+msgid "Green Vale"
+msgstr "緑の谷"
+
+#: shared/world/island/island.tscn
+msgid "Hermit's Camp"
+msgstr "隠者の野営地"

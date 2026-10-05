@@ -572,3 +572,43 @@ msgstr "Com V-Sync nunca há mais quadros que a taxa de atualização do monitor
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Language"
 msgstr "Idioma"
+
+#: gdscript/main.tscn
+msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
+msgstr "Segure o botão esquerdo e o herói corre atrás do cursor; solte, e ele para."
+
+#: gdscript/main.tscn
+msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
+msgstr "Segure o botão direito e mova o mouse para girar a câmera; a roda a abaixa e a levanta."
+
+#: gdscript/main.tscn
+msgid "Hold the right button, then the left one: the hero runs where the camera looks."
+msgstr "Segure o botão direito e depois o esquerdo: o herói corre para onde a câmera olha."
+
+#: gdscript/main.tscn
+msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
+msgstr "Enquanto o herói corre atrás do cursor, segure o botão direito para olhar ao redor: a corrida mantém o rumo."
+
+#: gdscript/main.tscn
+msgid "Shift makes the hero run faster for as long as stamina lasts."
+msgstr "Shift faz o herói correr mais rápido enquanto o fôlego durar."
+
+#: gdscript/main.tscn
+msgid "F10 opens the settings: controls, camera, display, sound and more."
+msgstr "F10 abre as configurações: controles, câmera, exibição, som e mais."
+
+#: gdscript/ui/travel_prompt.gd
+msgid "Teleport to %s"
+msgstr "Teletransporte: %s"
+
+#: shared/world/world.tscn
+msgid "Lonely Isle"
+msgstr "Ilha Solitária"
+
+#: shared/world/island/island.tscn
+msgid "Green Vale"
+msgstr "Vale Verde"
+
+#: shared/world/island/island.tscn
+msgid "Hermit's Camp"
+msgstr "Acampamento do Eremita"

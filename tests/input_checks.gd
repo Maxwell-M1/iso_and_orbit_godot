@@ -61,7 +61,7 @@ func _check_click_input() -> void:
 
 func _check_hold_steer() -> void:
 	print("\n== hold the button, mode STEER (towards the cursor, no pathfinding)")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	input.hold_mode = PointClickMoveInput.HoldMode.STEER
 	await _teleport(Vector3.ZERO)
 	await _settle_camera()
@@ -102,7 +102,7 @@ func _check_hold_steer() -> void:
 
 func _check_hold_follow_point(stop_on_release: bool) -> void:
 	print("\n== hold the button, mode FOLLOW_POINT, stop_on_release = %s" % stop_on_release)
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	input.hold_mode = PointClickMoveInput.HoldMode.FOLLOW_POINT
 	input.stop_on_release = stop_on_release
 	await _teleport(Vector3.ZERO)
@@ -231,7 +231,7 @@ func _check_camera_steer_turn() -> void:
 ## the run over at once from where it was.
 func _check_camera_steer_release() -> void:
 	print("\n== both buttons released one after the other, the right one first")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var stop_time := _mover.settings.stop_time + 0.1
 	var report := PackedStringArray()
 	var on_course := true
@@ -297,7 +297,7 @@ func _release_camera_steer_first(ticks: int, nudge := Vector2.ZERO) -> Dictionar
 ## keep_aim_on_camera_turn, the cursor stays in place on the screen, and the camera turn turns the run.
 func _check_look_around() -> void:
 	print("\n== the left button runs after the cursor, then the right one: looking around, the run keeps its course")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var report := PackedStringArray()
 	var kept := true
 	for mode: int in [PointClickMoveInput.HoldMode.STEER, PointClickMoveInput.HoldMode.FOLLOW_POINT]:
@@ -384,7 +384,7 @@ func _look_around(view: Vector3, aim: Vector3, orbit: Vector2, nudge := Vector2.
 ## does not run off when RMB looks around.
 func _check_look_around_order() -> void:
 	print("\n== the press order: looking around or running where the camera looks")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var center := _tree.root.get_visible_rect().size / 2.0
 
 	# Both together: LMB, and RMB within hold_delay. The camera looks north, the cursor is to the east.
@@ -506,7 +506,7 @@ func _press_right_again(mouse_first: bool) -> float:
 ## The run direction comes from NavigationMover: it does not depend on whether the character is blocked by an obstacle.
 func _check_camera_keys() -> void:
 	print("\n== keys with the right button (WASD) and with both buttons (A/D): sidestep and turn modes")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var keys_before := input.keys_with_camera
 	var steer_keys_before := input.keys_with_camera_steer
 	await _teleport(Vector3.ZERO)
@@ -692,7 +692,7 @@ func _run_key_cases(cases: Array) -> Dictionary:
 ## the camera) leaves the run alone, and the marker stays.
 func _check_keys_drop_click_point() -> void:
 	print("\n== right button + keys drop the run to a click point, its marker fades out")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var keys_before := input.keys_with_camera
 	input.keys_with_camera = PointClickMoveInput.KeysMode.SIDESTEP
 	await _teleport(Vector3.ZERO)
@@ -727,7 +727,7 @@ func _check_keys_drop_click_point() -> void:
 ## already running to, not for RMB alone, and not when the keys carry on a hold that has just ended.
 func _check_run_requested() -> void:
 	print("\n== the signal of a new run: a click, a hold, the keys with the right button")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	var keys_before := input.keys_with_camera
 	input.keys_with_camera = PointClickMoveInput.KeysMode.TURN
 	var counts := [0]
@@ -785,7 +785,7 @@ func _check_run_requested() -> void:
 ## decided.
 func _check_hold_hides_cursor() -> void:
 	print("\n== the cursor hides while the left button is held to run")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	input.hold_mode = PointClickMoveInput.HoldMode.STEER
 	await _teleport(Vector3.ZERO)
 	await _settle_camera()
@@ -846,7 +846,7 @@ func _check_hold_hides_cursor() -> void:
 ## still held does nothing, nor does its release; the next click runs as usual.
 func _check_cancel() -> void:
 	print("\n== cancel: a pending click is dropped, a hold run stops, the cursor comes back")
-	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var input := _input
 	input.hold_mode = PointClickMoveInput.HoldMode.STEER
 	await _teleport(Vector3.ZERO)
 	await _settle_camera()
