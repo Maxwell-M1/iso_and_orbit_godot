@@ -3,7 +3,7 @@ extends "res://tests/check_suite.gd"
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
 ## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
 ## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
-## the pitch and the height on the run, gliding up the stairs, the follow while time stands still.
+## the pitch and the height on the run, gliding up the stairs, the follow while time stands still, a turned hero.
 
 
 func _checks() -> Array[Callable]:
@@ -19,6 +19,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_zoom_follow,
 		_check_height_follow,
 		_check_follow_time_stopped,
+		_check_turned_hero,
 	]
 
 
@@ -868,3 +869,27 @@ func _check_follow_time_stopped() -> void:
 	_expect(still, "time stopped: the following camera stays where it is, also instant and without smoothing")
 	_expect(clean, "no node gets a non-finite transform, and no errors come")
 	_expect(follows, "when time goes on, the camera turns behind the run again")
+
+
+## The hero's root turned (in the editor, or here by code by 120°): the camera turns in the world's axes, so a teleport
+## that turns it looks along the given direction, and the model runs facing the run. Everything comes back after.
+func _check_turned_hero() -> void:
+	print("\n== the hero's root turned: the camera and the model keep the world's directions")
+	_hero.rotation.y = deg_to_rad(120.0)
+	_hero.teleport(Vector3(-30, 0, 34), Vector3.RIGHT)
+	await _ticks(2)
+	var camera_off := _camera_angle_to(Vector3.RIGHT)
+	var model_off := _flat_angle(_visual_forward(), Vector3.RIGHT)
+	_mover.steer(Vector3.BACK)
+	await _ticks(40)
+	var run_off := _flat_angle(_visual_forward(), Vector3.BACK)
+	var local := _player.get_local_movement()
+	_mover.stop()
+	await _ticks_until_stopped(60)
+	_hero.rotation.y = 0.0
+	await _teleport(Vector3.ZERO)
+	print("camera %.1f deg and model %.1f deg from the facing; running: %.1f deg from the run, local movement %s" % [
+			camera_off, model_off, run_off, local.snappedf(0.01)])
+	_expect(camera_off < 1.0, "a teleport that turns the camera looks along the given direction")
+	_expect(model_off < 1.0 and run_off < 3.0 and absf(local.x) < 0.05,
+			"the model faces the given direction, then the run, which counts as running forward")

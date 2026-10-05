@@ -1,12 +1,12 @@
 extends "res://tests/check_suite.gd"
 ## What the character reports about itself, for animations and the interface: the state and its changes, the blend of
 ## speeds, movement and acceleration in the model's axes, turning, floor contact and time in the air, feet and the gait
-## cycle, the steps switch, a teleport mid-run. Stairs and slopes: up and down a staircase without leaving the ground
-## with the real height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a
-## false take-off. Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without
-## lag, a jump, a ledge and a wall, a slower fall, turning it off and on. While time stands still, the running hero
-## stays as it is. The monitor panel shows the state and the latest events. The demo's character is set up without
-## warnings.
+## cycle, the steps switch, a teleport mid-run, a body turned in the level. Stairs and slopes: up and down a staircase
+## without leaving the ground with the real height of every stair, a block too high, a gentle and a steep slope. Routes
+## on the level without a false take-off. Floating (CharacterHover): the height and the sway, no steps, a glide over the
+## stairs, a ramp without lag, a jump, a ledge and a wall, a slower fall, turning it off and on. While time stands
+## still, the running hero stays as it is. The monitor panel shows the state and the latest events. The demo's
+## character is set up without warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
 const STRIP_Z := 34.0
@@ -22,6 +22,7 @@ func _checks() -> Array[Callable]:
 		_check_sidestep_and_turn,
 		_check_acceleration,
 		_check_teleport,
+		_check_turned_body,
 		_check_stairs,
 		_check_slopes_and_high_block,
 		_check_level_routes,
@@ -929,6 +930,42 @@ func _check_hover_toggle() -> void:
 	_expect(absf(at_once - hover.height) <= height_range and absf(after_tick - hover.height) <= height_range
 			and fall_at_once and let_go and taken_back,
 			"a hover turned on before its first tick floats at once; out of the tree it lets the steps and the fall go")
+
+
+## A character whose body stands turned in the level, as an NPC turned in the editor (here by 120°): it starts facing
+## along the body's −Z without turning its model, runs with the model along the run (which counts as running forward),
+## and a teleport with a facing turns the model there at once. The model turns relative to the body.
+func _check_turned_body() -> void:
+	print("\n== a character turned in the level: the model faces where it runs")
+	var npc := (load("res://gdscript/player/player.tscn") as PackedScene).instantiate() as GroundCharacter
+	npc.rotation.y = deg_to_rad(120.0)
+	npc.position = Vector3(-24, 0, STRIP_Z)
+	_levels.get_current_level().add_child(npc)
+	var model_forward := func() -> Vector3:
+		var look := -npc.visual.global_basis.z
+		return Vector3(look.x, 0.0, look.z).normalized()
+	var body_forward := -npc.global_basis.z
+	await _ticks(10)
+	var standing := _flat_angle(model_forward.call(), body_forward)
+	npc.mover.steer(Vector3.RIGHT)
+	await _ticks(40)
+	var running := _flat_angle(model_forward.call(), Vector3.RIGHT)
+	var local := npc.get_local_movement()
+	npc.mover.stop()
+	await _ticks(30)
+	npc.teleport(Vector3(-24, 0, STRIP_Z), Vector3.BACK)
+	var teleported := _flat_angle(model_forward.call(), Vector3.BACK)
+	await _ticks(5)
+	var kept := _flat_angle(model_forward.call(), Vector3.BACK)
+	npc.queue_free()
+	await _ticks(2)
+	print(("standing: %.1f deg from the body's facing; running: %.1f deg from the run, local movement %s; " +
+			"teleported: %.1f deg from the facing, %.1f deg 5 ticks later") % [standing, running, local.snappedf(0.01),
+			teleported, kept])
+	_expect(standing < 1.0, "at the start the model faces along the turned body and does not turn")
+	_expect(running < 3.0 and absf(local.x) < 0.05 and local.y > 0.9,
+			"on the run the model faces the run, which counts as running forward")
+	_expect(teleported < 1.0 and kept < 1.0, "a teleport with a facing turns the model there at once, and it stays")
 
 
 ## Time stands still (Engine.time_scale 0): the physics ticks go on with a zero step. The running hero stays as it is,

@@ -523,8 +523,9 @@ func _apply_transform() -> void:
 			focus.y = _follow_height
 		global_position = focus + Vector3.UP * focus_height
 	var pitch := clampf(_get_base_pitch(_zoom) + _pitch_offset, min_pitch, max_pitch)
-	# The default Node3D rotation order is YXZ: pitch first, then rotation around the vertical.
-	rotation = Vector3(pitch, _yaw, 0.0)
+	# The default Node3D rotation order is YXZ: pitch first, then rotation around the vertical. In the world's axes, like
+	# the position: the rig may be under a turned node.
+	global_rotation = Vector3(pitch, _yaw, 0.0)
 	var distance := lerpf(near_distance, far_distance, _zoom)
 	if arm != null:
 		# The arm is a child of the node and updates after it in the same frame.

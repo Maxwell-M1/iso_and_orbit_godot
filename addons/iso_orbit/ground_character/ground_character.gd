@@ -96,7 +96,8 @@ const _SUPPORT_PROBE := 0.05
 @export var mover: NavigationMover
 
 ## The model to turn so that it faces along the run (or where [method NavigationMover.get_facing] says, if the
-## character walks sideways). Its "face" is the −Z direction.
+## character walks sideways). Its "face" is the −Z direction. It turns relative to its parent, so the body may stand
+## turned in the level: the character starts facing along the body's −Z.
 @export var visual: Node3D
 
 ## How fast the model turns to catch up with the running direction.
@@ -290,8 +291,8 @@ func teleport(position: Vector3, facing := Vector3.ZERO) -> void:
 	if not flat_facing.is_zero_approx():
 		mover.face(flat_facing)
 		if visual != null:
-			# As in _turn_visual(): the node faces along −Z.
-			visual.rotation.y = atan2(-flat_facing.x, -flat_facing.z)
+			# As in _turn_visual(): the node faces along −Z, turned relative to its parent.
+			visual.rotation.y = atan2(-flat_facing.x, -flat_facing.z) - _get_visual_parent_yaw()
 	velocity = Vector3.ZERO
 	_move_velocity = Vector3.ZERO
 	_driven_velocity = Vector3.ZERO
@@ -737,12 +738,23 @@ func _start_step_segment(length: float) -> void:
 func _turn_visual(delta: float) -> void:
 	if visual != null:
 		var facing := mover.get_facing()
-		# The node faces along −Z; rotated by angle a, this direction is (−sin a, 0, −cos a).
-		var target_yaw := atan2(-facing.x, -facing.z)
+		# The node faces along −Z; rotated by angle a, this direction is (−sin a, 0, −cos a). The facing is the world's,
+		# and the node turns relative to its parent: the body may stand turned in the level.
+		var target_yaw := atan2(-facing.x, -facing.z) - _get_visual_parent_yaw()
 		visual.rotation.y = rotate_toward(visual.rotation.y, target_yaw, visual_turn_speed * delta)
 	var yaw := _get_model_yaw()
 	_turn_rate = angle_difference(_model_yaw, yaw) / delta if delta > 0.0 else 0.0
 	_model_yaw = yaw
+
+
+## How the parent of [member visual] is turned in the world around the vertical, from −Z: the model turns relative to
+## it.
+func _get_visual_parent_yaw() -> float:
+	var parent := visual.get_parent_node_3d()
+	if parent == null:
+		return 0.0
+	var forward := -parent.global_basis.z
+	return atan2(-forward.x, -forward.z)
 
 
 ## Where the model faces, as a turn around the vertical from −Z: the model itself, or without it where the character
