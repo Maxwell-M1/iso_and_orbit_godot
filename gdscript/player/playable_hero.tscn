@@ -30,6 +30,8 @@ silhouette = NodePath("Character/Silhouette")
 script = ExtResource("3_input")
 mover = NodePath("../Character/NavigationMover")
 camera = NodePath("../CameraRig/CameraArm/Camera3D")
+keys_with_camera = 2
+keys_with_camera_steer = 2
 
 [node name="PlayerActionInput" type="Node" parent="." node_paths=PackedStringArray("character")]
 script = ExtResource("4_actions")
@@ -39,6 +41,9 @@ character = NodePath("../Character")
 script = ExtResource("5_rig")
 target = NodePath("../Character")
 arm = NodePath("CameraArm")
+follow_time = 1.1
+follow_pitch_angle = -0.3839724354387525
+follow_pitch_time = 1.1
 follow_wait_after_rotate = true
 height_follow_time = 0.15
 

@@ -108,6 +108,7 @@ jump = NodePath("Jump")
 land = NodePath("Land")
 sprint_start = NodePath("SprintStart")
 sprint_loop = NodePath("SprintLoop")
+sprint_enabled = false
 
 [node name="Footsteps" type="AudioStreamPlayer3D" parent="Sounds" unique_id=1093318640]
 stream = SubResource("AudioStreamRandomizer_steps")
