@@ -9,41 +9,41 @@ msgstr ""
 
 #: gdscript/main.tscn
 msgid ""
-"LMB on the ground — run there\n"
-"Hold LMB — run after the cursor\n"
-"RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera\n"
-"Hold RMB, then LMB — run where the camera looks"
+"{move_to_cursor} on the ground — run there\n"
+"Hold {move_to_cursor} — run after the cursor\n"
+"{camera_rotate} + mouse — orbit the camera\n"
+"{camera_zoom_in/camera_zoom_out} — lower or raise the camera\n"
+"Hold {camera_rotate}, then {move_to_cursor} — run where the camera looks"
 msgstr ""
-"左键点击地面 — 跑向该点\n"
-"按住左键 — 跟随光标奔跑\n"
-"右键 + 鼠标 — 环绕旋转相机\n"
-"滚轮 — 降低或升高相机\n"
-"按住右键再按左键 — 向相机所看方向奔跑"
+"{move_to_cursor}点击地面 — 跑向该点\n"
+"按住{move_to_cursor} — 跟随光标奔跑\n"
+"{camera_rotate} + 鼠标 — 环绕旋转相机\n"
+"{camera_zoom_in/camera_zoom_out} — 降低或升高相机\n"
+"按住{camera_rotate}再按{move_to_cursor} — 向相机所看方向奔跑"
 
 #: gdscript/main.tscn
-msgid "Hold LMB, then RMB — look around on the run"
-msgstr "按住左键再按右键 — 奔跑时环顾四周"
+msgid "Hold {move_to_cursor}, then {camera_rotate} — look around on the run"
+msgstr "按住{move_to_cursor}再按{camera_rotate} — 奔跑时环顾四周"
 
 #: gdscript/main.tscn
-msgid "RMB + WASD — move relative to the camera"
-msgstr "右键 + WASD — 相对相机移动"
+msgid "{camera_rotate} + {move_forward+move_left+move_back+move_right} — move relative to the camera"
+msgstr "{camera_rotate} + {move_forward+move_left+move_back+move_right} — 相对相机移动"
 
 #: gdscript/main.tscn
-msgid "LMB + RMB + A/D — run diagonally"
-msgstr "左键 + 右键 + A/D — 斜向奔跑"
+msgid "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — run diagonally"
+msgstr "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — 斜向奔跑"
 
 #: gdscript/main.tscn
-msgid "Shift — run faster"
-msgstr "Shift — 加速奔跑"
+msgid "{sprint} — run faster"
+msgstr "{sprint} — 加速奔跑"
 
 #: gdscript/main.tscn
-msgid "Space — jump"
-msgstr "空格 — 跳跃"
+msgid "{jump} — jump"
+msgstr "{jump} — 跳跃"
 
 #: gdscript/main.tscn
-msgid "F10 — settings"
-msgstr "F10 — 设置"
+msgid "{toggle_settings} — settings"
+msgstr "{toggle_settings} — 设置"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Settings"
@@ -54,8 +54,8 @@ msgid "Controls"
 msgstr "操作"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Held LMB"
-msgstr "按住左键"
+msgid "Held {move_to_cursor}"
+msgstr "按住{move_to_cursor}"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Straight to the cursor"
@@ -66,24 +66,16 @@ msgid "To the point along a path"
 msgstr "沿路径前往该点"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB + WASD"
-msgstr "右键 + WASD"
-
-#: gdscript/ui/settings/settings_screen.tscn
 msgid "Off"
 msgstr "关闭"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sidestep: face forward, S backs up"
-msgstr "侧移：面朝前方，S 后退"
+msgid "Sidestep: face forward, {move_back} backs up"
+msgstr "侧移：面朝前方，{move_back} 后退"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Turn: face the way you go, S toward the camera"
-msgstr "转向：面朝前进方向，S 走向相机"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB + RMB + A/D"
-msgstr "左键 + 右键 + A/D"
+msgid "Turn: face the way you go, {move_back} toward the camera"
+msgstr "转向：面朝前进方向，{move_back} 走向相机"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Sidestep: face forward"
@@ -94,28 +86,28 @@ msgid "Diagonal: face the way you go"
 msgstr "斜向：面朝前进方向"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Backing up (S) slower by"
-msgstr "后退（S）减速"
+msgid "Backing up ({move_back}) slower by"
+msgstr "后退（{move_back}）减速"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
-msgstr "按住右键时，W 朝相机所看方向前进。侧移模式下，角色与相机朝向一致：A 和 D 向两侧移动，S 后退。转向模式下，角色面朝前进方向：A 和 D 向左、向右走，S 走向相机。同时按住两键时，A 和 D 让奔跑方向斜向前偏。"
+msgid "With {camera_rotate}, {move_forward} leads where the camera looks. Sidestepping, the character faces the way the camera does: {move_left} and {move_right} step aside, {move_back} backs up. Turning, the character faces the way they go: {move_left} and {move_right} go left and right, {move_back} toward the camera. With {move_to_cursor} + {camera_rotate}, {move_left} and {move_right} veer the run diagonally forward."
+msgstr "按住{camera_rotate}时，{move_forward} 朝相机所看方向前进。侧移模式下，角色与相机朝向一致：{move_left} 和 {move_right} 向两侧移动，{move_back} 后退。转向模式下，角色面朝前进方向：{move_left} 和 {move_right} 向左、向右走，{move_back} 走向相机。同时按住{move_to_cursor}和{camera_rotate}时，{move_left} 和 {move_right} 让奔跑方向斜向前偏。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Hide the cursor while running with LMB held"
-msgstr "按住左键奔跑时隐藏光标"
+msgid "Hide the cursor while running with {move_to_cursor} held"
+msgstr "按住{move_to_cursor}奔跑时隐藏光标"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "按下一旦变为按住，光标即隐藏；松开后光标在你瞄准的位置重新出现。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB during an LMB run only turns the camera"
-msgstr "按住左键奔跑时，右键只旋转相机"
+msgid "{camera_rotate} while running with {move_to_cursor} only turns the camera"
+msgstr "按住{move_to_cursor}奔跑时，{camera_rotate}只旋转相机"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
-msgstr "先左键后右键：角色保持路线，你可以环顾四周；松开后鼠标从你瞄准的位置继续引导。先右键或两键同时：向相机所看方向奔跑。关闭：无论按键顺序，两键都向相机所看方向奔跑。"
+msgid "{move_to_cursor}, then {camera_rotate}: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. {camera_rotate} first, or both together: run where the camera looks. Off: {move_to_cursor} and {camera_rotate} run where the camera looks in any order."
+msgstr "先{move_to_cursor}后{camera_rotate}：角色保持路线，你可以环顾四周；松开后鼠标从你瞄准的位置继续引导。先{camera_rotate}或两键同时：向相机所看方向奔跑。关闭：无论按键顺序，{move_to_cursor}和{camera_rotate}都向相机所看方向奔跑。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"
@@ -146,8 +138,8 @@ msgid "At an edge the character stops, or slides along it when running at an ang
 msgstr "角色在边缘处停下；斜着跑向边缘时，会像沿墙一样沿边缘滑行。低矮的台阶仍可走下。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Jump (Space)"
-msgstr "跳跃（空格）"
+msgid "Jump ({jump})"
+msgstr "跳跃（{jump}）"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Jump height"
@@ -158,12 +150,8 @@ msgid "%.1f m"
 msgstr "%.1f 米"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sprint (Shift)"
-msgstr "冲刺（Shift）"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "Shift"
-msgstr "Shift"
+msgid "Sprint ({sprint})"
+msgstr "冲刺（{sprint}）"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Hold"
@@ -194,12 +182,12 @@ msgid "Camera"
 msgstr "相机"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB tilts the camera up and down"
-msgstr "右键可上下倾斜相机"
+msgid "{camera_rotate} tilts the camera up and down"
+msgstr "{camera_rotate}可上下倾斜相机"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
-msgstr "关闭时：右键加鼠标只让相机绕角色旋转，相机的高度和倾角由滚轮调节。"
+msgid "Off: {camera_rotate} with the mouse only orbits the camera around the character, and {camera_zoom_in/camera_zoom_out} sets its height and tilt."
+msgstr "关闭时：{camera_rotate}加鼠标只让相机绕角色旋转，相机的高度和倾角由{camera_zoom_in/camera_zoom_out}调节。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn the camera to follow the run"
@@ -218,8 +206,8 @@ msgid "Align the tilt in"
 msgstr "倾角对齐用时"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
-msgstr "角色奔跑时，相机平滑过渡到此倾角。滚轮（以及可倾斜相机时的右键）照常改变倾角，奔跑中又会平滑恢复。"
+msgid "While the character runs, the camera eases to this tilt. {camera_zoom_in/camera_zoom_out} (and {camera_rotate}, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "角色奔跑时，相机平滑过渡到此倾角。{camera_zoom_in/camera_zoom_out}（以及可倾斜相机时的{camera_rotate}）照常改变倾角，奔跑中又会平滑恢复。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn in"
@@ -254,20 +242,20 @@ msgid "Align the height in"
 msgstr "高度对齐用时"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
-msgstr "角色奔跑时，相机平滑过渡到此高度：0% 为降到最低，100% 为升到最高。滚轮照常改变高度，奔跑中又会平滑恢复。若同时对齐倾角，倾角保持不变。"
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. {camera_zoom_in/camera_zoom_out} changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "角色奔跑时，相机平滑过渡到此高度：0% 为降到最低，100% 为升到最高。{camera_zoom_in/camera_zoom_out}照常改变高度，奔跑中又会平滑恢复。若同时对齐倾角，倾角保持不变。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
-msgstr "用右键转动相机后，在角色停下或你用左键开始新的奔跑之前，相机不会自行转动、倾斜或改变高度。"
+msgid "After you turn the camera with {camera_rotate}, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with {move_to_cursor}."
+msgstr "用{camera_rotate}转动相机后，在角色停下或你用{move_to_cursor}开始新的奔跑之前，相机不会自行转动、倾斜或改变高度。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"
 msgstr "相机转动时光标保持瞄准"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
-msgstr "按住左键时，光标随世界移动，角色朝你瞄准的位置奔跑。关闭后光标在屏幕上不动，角色会像打方向盘的汽车一样偏向光标。"
+msgid "While {move_to_cursor} is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "按住{move_to_cursor}时，光标随世界移动，角色朝你瞄准的位置奔跑。关闭后光标在屏幕上不动，角色会像打方向盘的汽车一样偏向光标。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The camera stops at obstacles behind it"
@@ -586,28 +574,28 @@ msgid "Language"
 msgstr "语言"
 
 #: gdscript/main.tscn
-msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
-msgstr "按住左键，英雄会追着光标奔跑；松开即停下。"
+msgid "Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops."
+msgstr "按住{move_to_cursor}，英雄会追着光标奔跑；松开即停下。"
 
 #: gdscript/main.tscn
-msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
-msgstr "按住右键并移动鼠标可旋转相机；滚轮可降低和升高相机。"
+msgid "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it."
+msgstr "按住{camera_rotate}并移动鼠标可旋转相机；{camera_zoom_in/camera_zoom_out}可降低和升高相机。"
 
 #: gdscript/main.tscn
-msgid "Hold the right button, then the left one: the hero runs where the camera looks."
-msgstr "先按住右键，再按住左键：英雄朝相机所看的方向奔跑。"
+msgid "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks."
+msgstr "先按住{camera_rotate}，再按住{move_to_cursor}：英雄朝相机所看的方向奔跑。"
 
 #: gdscript/main.tscn
-msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
-msgstr "英雄追着光标奔跑时，按住右键即可环顾四周：奔跑方向保持不变。"
+msgid "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course."
+msgstr "英雄追着光标奔跑时，按住{camera_rotate}即可环顾四周：奔跑方向保持不变。"
 
 #: gdscript/main.tscn
-msgid "Shift makes the hero run faster for as long as stamina lasts."
-msgstr "按住 Shift，英雄会在体力耗尽前跑得更快。"
+msgid "{sprint} makes the hero run faster for as long as stamina lasts."
+msgstr "按住 {sprint}，英雄会在体力耗尽前跑得更快。"
 
 #: gdscript/main.tscn
-msgid "F10 opens the settings: controls, camera, display, sound and more."
-msgstr "按 F10 打开设置：操作、相机、显示、声音等。"
+msgid "{toggle_settings} opens the settings: controls, camera, display, sound and more."
+msgstr "按 {toggle_settings} 打开设置：操作、相机、显示、声音等。"
 
 #: gdscript/ui/travel_prompt.gd
 msgid "Teleport to %s"
@@ -624,3 +612,59 @@ msgstr "翠谷"
 #: shared/world/island/island.tscn
 msgid "Hermit's Camp"
 msgstr "隐士营地"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "LMB"
+msgstr "左键"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "RMB"
+msgstr "右键"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "MMB"
+msgstr "中键"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel up"
+msgstr "滚轮上"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel down"
+msgstr "滚轮下"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel left"
+msgstr "滚轮左"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel right"
+msgstr "滚轮右"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse back"
+msgstr "后退键"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse forward"
+msgstr "前进键"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel"
+msgstr "滚轮"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Space"
+msgstr "空格"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Unbound"
+msgstr "未绑定"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Left %s"
+msgstr "左%s"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Right %s"
+msgstr "右%s"

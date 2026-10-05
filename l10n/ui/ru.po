@@ -9,41 +9,41 @@ msgstr ""
 
 #: gdscript/main.tscn
 msgid ""
-"LMB on the ground — run there\n"
-"Hold LMB — run after the cursor\n"
-"RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera\n"
-"Hold RMB, then LMB — run where the camera looks"
+"{move_to_cursor} on the ground — run there\n"
+"Hold {move_to_cursor} — run after the cursor\n"
+"{camera_rotate} + mouse — orbit the camera\n"
+"{camera_zoom_in/camera_zoom_out} — lower or raise the camera\n"
+"Hold {camera_rotate}, then {move_to_cursor} — run where the camera looks"
 msgstr ""
-"ЛКМ по земле — бежать в точку\n"
-"Зажатая ЛКМ — бежать за курсором\n"
-"ПКМ + мышь — вращать камеру\n"
-"Колесо — опустить или поднять камеру\n"
-"Зажатая ПКМ, затем ЛКМ — бежать, куда смотрит камера"
+"{move_to_cursor} по земле — бежать в точку\n"
+"Зажатая {move_to_cursor} — бежать за курсором\n"
+"{camera_rotate} + мышь — вращать камеру\n"
+"{camera_zoom_in/camera_zoom_out} — опустить или поднять камеру\n"
+"Зажатая {camera_rotate}, затем {move_to_cursor} — бежать, куда смотрит камера"
 
 #: gdscript/main.tscn
-msgid "Hold LMB, then RMB — look around on the run"
-msgstr "Зажатая ЛКМ, затем ПКМ — осмотреться на бегу"
+msgid "Hold {move_to_cursor}, then {camera_rotate} — look around on the run"
+msgstr "Зажатая {move_to_cursor}, затем {camera_rotate} — осмотреться на бегу"
 
 #: gdscript/main.tscn
-msgid "RMB + WASD — move relative to the camera"
-msgstr "ПКМ + WASD — ходить относительно камеры"
+msgid "{camera_rotate} + {move_forward+move_left+move_back+move_right} — move relative to the camera"
+msgstr "{camera_rotate} + {move_forward+move_left+move_back+move_right} — ходить относительно камеры"
 
 #: gdscript/main.tscn
-msgid "LMB + RMB + A/D — run diagonally"
-msgstr "ЛКМ + ПКМ + A/D — бежать наискосок"
+msgid "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — run diagonally"
+msgstr "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — бежать наискосок"
 
 #: gdscript/main.tscn
-msgid "Shift — run faster"
-msgstr "Shift — бежать быстрее"
+msgid "{sprint} — run faster"
+msgstr "{sprint} — бежать быстрее"
 
 #: gdscript/main.tscn
-msgid "Space — jump"
-msgstr "Пробел — прыжок"
+msgid "{jump} — jump"
+msgstr "{jump} — прыжок"
 
 #: gdscript/main.tscn
-msgid "F10 — settings"
-msgstr "F10 — настройки"
+msgid "{toggle_settings} — settings"
+msgstr "{toggle_settings} — настройки"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Settings"
@@ -54,8 +54,8 @@ msgid "Controls"
 msgstr "Управление"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Held LMB"
-msgstr "Зажатая ЛКМ"
+msgid "Held {move_to_cursor}"
+msgstr "Зажатая {move_to_cursor}"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Straight to the cursor"
@@ -66,24 +66,16 @@ msgid "To the point along a path"
 msgstr "К точке по пути"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB + WASD"
-msgstr "ПКМ + WASD"
-
-#: gdscript/ui/settings/settings_screen.tscn
 msgid "Off"
 msgstr "Выключено"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sidestep: face forward, S backs up"
-msgstr "Боком: лицом вперёд, S — спиной"
+msgid "Sidestep: face forward, {move_back} backs up"
+msgstr "Боком: лицом вперёд, {move_back} — спиной"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Turn: face the way you go, S toward the camera"
-msgstr "С поворотом: лицом по ходу, S — к камере"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB + RMB + A/D"
-msgstr "ЛКМ + ПКМ + A/D"
+msgid "Turn: face the way you go, {move_back} toward the camera"
+msgstr "С поворотом: лицом по ходу, {move_back} — к камере"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Sidestep: face forward"
@@ -94,28 +86,28 @@ msgid "Diagonal: face the way you go"
 msgstr "Наискосок: лицом по ходу"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Backing up (S) slower by"
-msgstr "Задом (S) медленнее на"
+msgid "Backing up ({move_back}) slower by"
+msgstr "Задом ({move_back}) медленнее на"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
-msgstr "С ПКМ W ведёт туда, куда смотрит камера. Боком персонаж смотрит туда же, куда камера: A и D — вбок, S — спиной вперёд. С поворотом — лицом по ходу: A и D — влево и вправо, S — к камере. С обеими кнопками A и D уводят бег наискосок вперёд."
+msgid "With {camera_rotate}, {move_forward} leads where the camera looks. Sidestepping, the character faces the way the camera does: {move_left} and {move_right} step aside, {move_back} backs up. Turning, the character faces the way they go: {move_left} and {move_right} go left and right, {move_back} toward the camera. With {move_to_cursor} + {camera_rotate}, {move_left} and {move_right} veer the run diagonally forward."
+msgstr "С {camera_rotate} {move_forward} ведёт туда, куда смотрит камера. Боком персонаж смотрит туда же, куда камера: {move_left} и {move_right} — вбок, {move_back} — спиной вперёд. С поворотом — лицом по ходу: {move_left} и {move_right} — влево и вправо, {move_back} — к камере. С {move_to_cursor} + {camera_rotate} {move_left} и {move_right} уводят бег наискосок вперёд."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Hide the cursor while running with LMB held"
-msgstr "Прятать курсор, пока бежишь с зажатой ЛКМ"
+msgid "Hide the cursor while running with {move_to_cursor} held"
+msgstr "Прятать курсор, пока бежишь с зажатой {move_to_cursor}"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "Курсор пропадает, как только нажатие стало удержанием, и появляется после отпускания кнопки — там, куда целились."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB during an LMB run only turns the camera"
-msgstr "ПКМ на бегу с ЛКМ только поворачивает камеру"
+msgid "{camera_rotate} while running with {move_to_cursor} only turns the camera"
+msgstr "{camera_rotate} на бегу с {move_to_cursor} только поворачивает камеру"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
-msgstr "ЛКМ, потом ПКМ — осмотреться, пока персонаж держит курс; после этого мышь ведёт его дальше оттуда, куда вы целились. Сначала ПКМ или обе сразу — бег туда, куда смотрит камера. Выключено: обе кнопки в любом порядке — бег туда, куда смотрит камера."
+msgid "{move_to_cursor}, then {camera_rotate}: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. {camera_rotate} first, or both together: run where the camera looks. Off: {move_to_cursor} and {camera_rotate} run where the camera looks in any order."
+msgstr "{move_to_cursor}, потом {camera_rotate} — осмотреться, пока персонаж держит курс; после этого мышь ведёт его дальше оттуда, куда вы целились. Сначала {camera_rotate} или обе сразу — бег туда, куда смотрит камера. Выключено: {move_to_cursor} и {camera_rotate} в любом порядке — бег туда, куда смотрит камера."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"
@@ -146,8 +138,8 @@ msgid "At an edge the character stops, or slides along it when running at an ang
 msgstr "У края персонаж останавливается, а если бежит к нему под углом — скользит вдоль, как вдоль стены. С невысоких ступенек сходить можно."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Jump (Space)"
-msgstr "Прыжок (пробел)"
+msgid "Jump ({jump})"
+msgstr "Прыжок ({jump})"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Jump height"
@@ -158,12 +150,8 @@ msgid "%.1f m"
 msgstr "%.1f м"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sprint (Shift)"
-msgstr "Бег с ускорением (Shift)"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "Shift"
-msgstr "Shift"
+msgid "Sprint ({sprint})"
+msgstr "Бег с ускорением ({sprint})"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Hold"
@@ -194,12 +182,12 @@ msgid "Camera"
 msgstr "Камера"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB tilts the camera up and down"
-msgstr "ПКМ наклоняет камеру вверх-вниз"
+msgid "{camera_rotate} tilts the camera up and down"
+msgstr "{camera_rotate} наклоняет камеру вверх-вниз"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
-msgstr "Выключено — ПКМ с мышью только вращает камеру вокруг персонажа, а высоту и наклон задаёт колесо."
+msgid "Off: {camera_rotate} with the mouse only orbits the camera around the character, and {camera_zoom_in/camera_zoom_out} sets its height and tilt."
+msgstr "Выключено — {camera_rotate} с мышью только вращает камеру вокруг персонажа, а высоту и наклон задаёт {camera_zoom_in/camera_zoom_out}."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn the camera to follow the run"
@@ -218,8 +206,8 @@ msgid "Align the tilt in"
 msgstr "Выравнивать наклон за"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
-msgstr "Пока персонаж бежит, камера плавно приходит к этому наклону. Колесо (и ПКМ, если она наклоняет камеру) меняет наклон как обычно, а на бегу он снова выравнивается."
+msgid "While the character runs, the camera eases to this tilt. {camera_zoom_in/camera_zoom_out} (and {camera_rotate}, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "Пока персонаж бежит, камера плавно приходит к этому наклону. {camera_zoom_in/camera_zoom_out} (и {camera_rotate}, если она наклоняет камеру) меняет наклон как обычно, а на бегу он снова выравнивается."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn in"
@@ -254,20 +242,20 @@ msgid "Align the height in"
 msgstr "Выравнивать высоту за"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
-msgstr "Пока персонаж бежит, камера плавно приходит к этой высоте: 0% — опущена до конца, 100% — поднята до конца. Колесо меняет высоту как обычно, а на бегу она снова выравнивается. Если выравнивается и наклон, он при этом не меняется."
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. {camera_zoom_in/camera_zoom_out} changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "Пока персонаж бежит, камера плавно приходит к этой высоте: 0% — опущена до конца, 100% — поднята до конца. {camera_zoom_in/camera_zoom_out} меняет высоту как обычно, а на бегу она снова выравнивается. Если выравнивается и наклон, он при этом не меняется."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
-msgstr "После поворота камеры ПКМ она сама не поворачивается, не наклоняется и не меняет высоту, пока персонаж не остановится или вы не начнёте новый бег ЛКМ."
+msgid "After you turn the camera with {camera_rotate}, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with {move_to_cursor}."
+msgstr "После поворота камеры {camera_rotate} она сама не поворачивается, не наклоняется и не меняет высоту, пока персонаж не остановится или вы не начнёте новый бег {move_to_cursor}."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"
 msgstr "Курсор держит цель, пока камера поворачивается"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
-msgstr "Пока ЛКМ зажата, курсор едет вместе с миром, и персонаж бежит туда, куда целились. Без этого курсор стоит на месте экрана, и персонаж забирает в его сторону, как машина за рулём."
+msgid "While {move_to_cursor} is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "Пока {move_to_cursor} зажата, курсор едет вместе с миром, и персонаж бежит туда, куда целились. Без этого курсор стоит на месте экрана, и персонаж забирает в его сторону, как машина за рулём."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The camera stops at obstacles behind it"
@@ -586,28 +574,28 @@ msgid "Language"
 msgstr "Язык"
 
 #: gdscript/main.tscn
-msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
-msgstr "Зажмите левую кнопку — герой бежит за курсором; отпустите — останавливается."
+msgid "Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops."
+msgstr "Зажмите {move_to_cursor} — герой бежит за курсором; отпустите — останавливается."
 
 #: gdscript/main.tscn
-msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
-msgstr "Зажмите правую кнопку и ведите мышью, чтобы повернуть камеру; колесо опускает и поднимает её."
+msgid "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it."
+msgstr "Зажмите {camera_rotate} и ведите мышью, чтобы повернуть камеру; {camera_zoom_in/camera_zoom_out} опускает и поднимает её."
 
 #: gdscript/main.tscn
-msgid "Hold the right button, then the left one: the hero runs where the camera looks."
-msgstr "Зажмите правую кнопку, затем левую — герой бежит туда, куда смотрит камера."
+msgid "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks."
+msgstr "Зажмите {camera_rotate}, затем {move_to_cursor} — герой бежит туда, куда смотрит камера."
 
 #: gdscript/main.tscn
-msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
-msgstr "Пока герой бежит за курсором, зажмите правую кнопку, чтобы осмотреться: бег не сбивается с курса."
+msgid "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course."
+msgstr "Пока герой бежит за курсором, зажмите {camera_rotate}, чтобы осмотреться: бег не сбивается с курса."
 
 #: gdscript/main.tscn
-msgid "Shift makes the hero run faster for as long as stamina lasts."
-msgstr "Shift ускоряет бег, пока хватает сил."
+msgid "{sprint} makes the hero run faster for as long as stamina lasts."
+msgstr "{sprint} ускоряет бег, пока хватает сил."
 
 #: gdscript/main.tscn
-msgid "F10 opens the settings: controls, camera, display, sound and more."
-msgstr "F10 — настройки: управление, камера, изображение, звук и не только."
+msgid "{toggle_settings} opens the settings: controls, camera, display, sound and more."
+msgstr "{toggle_settings} — настройки: управление, камера, изображение, звук и не только."
 
 #: gdscript/ui/travel_prompt.gd
 msgid "Teleport to %s"
@@ -624,3 +612,59 @@ msgstr "Зелёная долина"
 #: shared/world/island/island.tscn
 msgid "Hermit's Camp"
 msgstr "Лагерь отшельника"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "LMB"
+msgstr "ЛКМ"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "RMB"
+msgstr "ПКМ"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "MMB"
+msgstr "СКМ"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel up"
+msgstr "Колесо вверх"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel down"
+msgstr "Колесо вниз"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel left"
+msgstr "Колесо влево"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel right"
+msgstr "Колесо вправо"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse back"
+msgstr "Кнопка «назад»"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse forward"
+msgstr "Кнопка «вперёд»"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel"
+msgstr "Колесо"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Space"
+msgstr "Пробел"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Unbound"
+msgstr "Не назначено"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Left %s"
+msgstr "Левый %s"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Right %s"
+msgstr "Правый %s"

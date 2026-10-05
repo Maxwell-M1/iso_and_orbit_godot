@@ -20,6 +20,7 @@ var _portal: LevelPortal
 
 
 func _ready() -> void:
+	add_to_group(ActionTexts.GROUP)
 	# The key is named by the keyboard, and the text is composed of two translations: neither is translated as a whole.
 	_key.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	_button.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
@@ -41,8 +42,7 @@ func _shortcut_input(event: InputEvent) -> void:
 ## Offer to travel through [param portal].
 func show_for(portal: LevelPortal) -> void:
 	_portal = portal
-	_key.text = _get_key_name()
-	_update_text()
+	refresh()
 	show()
 
 
@@ -64,7 +64,14 @@ func get_portal() -> LevelPortal:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and _portal != null:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		refresh()
+
+
+## Update the offered key and destination after the bindings or language change.
+func refresh() -> void:
+	_key.text = InputNames.of_action(action)
+	if _portal != null:
 		_update_text()
 
 
@@ -75,14 +82,3 @@ func _on_pressed() -> void:
 
 func _update_text() -> void:
 	_button.text = tr(text_format) % tr(_portal.title)
-
-
-## The key of [member action] by its Latin letter, the way the other hints name the keys (WASD), whatever the layout.
-func _get_key_name() -> String:
-	if not InputMap.has_action(action):
-		return ""
-	for event in InputMap.action_get_events(action):
-		var key := event as InputEventKey
-		if key != null:
-			return OS.get_keycode_string(key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode)
-	return ""

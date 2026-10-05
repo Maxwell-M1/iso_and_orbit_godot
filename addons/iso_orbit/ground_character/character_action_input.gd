@@ -21,6 +21,13 @@ enum SprintMode {
 	TOGGLE,
 }
 
+const _MODIFIER_MASKS := {
+	KEY_SHIFT: KEY_MASK_SHIFT,
+	KEY_CTRL: KEY_MASK_CTRL,
+	KEY_ALT: KEY_MASK_ALT,
+	KEY_META: KEY_MASK_META,
+}
+
 ## The character to control.
 @export var character: GroundCharacter
 
@@ -37,8 +44,6 @@ enum SprintMode {
 		_sprint_toggled = false
 
 var _sprint_toggled := false
-# The modifier keys that sprint is on; empty if its keys include ordinary ones, and there is nothing to compare with.
-var _sprint_modifiers: Array[Key] = []
 
 
 func _init() -> void:
@@ -51,20 +56,23 @@ func _ready() -> void:
 	for action: StringName in [sprint_action, jump_action]:
 		if not InputMap.has_action(action):
 			push_error("CharacterActionInput: input action \"%s\" is missing in Project Settings > Input Map." % action)
-	_sprint_modifiers = _get_modifier_keys(sprint_action)
 
 
 ## Checks the held sprint against the real state of the modifier in the event (see the class description). The event
 ## of the sprint key itself is skipped: it changes the action state anyway, and on some systems (X11) it carries the
 ## modifiers from before the press.
 func _input(event: InputEvent) -> void:
-	if sprint_mode != SprintMode.HOLD or _sprint_modifiers.is_empty() or not _is_pressed(sprint_action):
+	if sprint_mode != SprintMode.HOLD or not _is_pressed(sprint_action):
 		return
 	var with_modifiers := event as InputEventWithModifiers
 	if with_modifiers == null or event.is_action(sprint_action):
 		return
-	for key: Key in _sprint_modifiers:
-		if _is_modifier_held(with_modifiers, key):
+	# Read the current bindings: the action or its keys may have changed since this node became ready.
+	var modifiers := _get_modifier_masks(sprint_action)
+	if modifiers.is_empty():
+		return
+	for mask: int in modifiers:
+		if (with_modifiers.get_modifiers_mask() & mask) == mask:
 			return
 	Input.action_release(sprint_action)
 
@@ -104,30 +112,22 @@ static func _is_pressed(action: StringName) -> bool:
 	return _has_action(action) and Input.is_action_pressed(action)
 
 
-## The modifier keys of the action [param action]; empty if it has a key that is not a modifier, or an event that is not
-## a key.
-static func _get_modifier_keys(action: StringName) -> Array[Key]:
-	var keys: Array[Key] = []
+## The required modifier mask of each binding, including its main key; empty if any binding has a key that is not a
+## modifier or an event that is not a key, whose state cannot be inferred from another event's modifiers.
+static func _get_modifier_masks(action: StringName) -> Array[int]:
+	var masks: Array[int] = []
 	if not InputMap.has_action(action):
-		return keys
+		return masks
 	for event: InputEvent in InputMap.action_get_events(action):
 		var key_event := event as InputEventKey
-		var key := Key.KEY_NONE
-		if key_event != null:
-			key = key_event.physical_keycode if key_event.physical_keycode != KEY_NONE else key_event.keycode
-		if key not in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]:
-			return [] as Array[Key]
-		keys.append(key)
-	return keys
-
-
-static func _is_modifier_held(event: InputEventWithModifiers, key: Key) -> bool:
-	match key:
-		KEY_SHIFT:
-			return event.shift_pressed
-		KEY_CTRL:
-			return event.ctrl_pressed
-		KEY_ALT:
-			return event.alt_pressed
-		_:
-			return event.meta_pressed
+		if key_event == null:
+			return [] as Array[int]
+		var key := key_event.keycode
+		if key == KEY_NONE:
+			key = key_event.physical_keycode
+		if key == KEY_NONE:
+			key = key_event.key_label
+		if not _MODIFIER_MASKS.has(key):
+			return [] as Array[int]
+		masks.append(_MODIFIER_MASKS[key] | key_event.get_modifiers_mask())
+	return masks

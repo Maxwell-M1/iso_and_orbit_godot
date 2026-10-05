@@ -9,41 +9,41 @@ msgstr ""
 
 #: gdscript/main.tscn
 msgid ""
-"LMB on the ground — run there\n"
-"Hold LMB — run after the cursor\n"
-"RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera\n"
-"Hold RMB, then LMB — run where the camera looks"
+"{move_to_cursor} on the ground — run there\n"
+"Hold {move_to_cursor} — run after the cursor\n"
+"{camera_rotate} + mouse — orbit the camera\n"
+"{camera_zoom_in/camera_zoom_out} — lower or raise the camera\n"
+"Hold {camera_rotate}, then {move_to_cursor} — run where the camera looks"
 msgstr ""
-"地面を左クリック：そこへ走る\n"
-"左ボタン長押し：カーソルを追って走る\n"
-"右ボタン + マウス：カメラを回す\n"
-"ホイール：カメラを下げる/上げる\n"
-"右ボタンを押したまま左ボタン：カメラの向きへ走る"
+"{move_to_cursor}で地面をクリック：そこへ走る\n"
+"{move_to_cursor}長押し：カーソルを追って走る\n"
+"{camera_rotate} + マウス：カメラを回す\n"
+"{camera_zoom_in/camera_zoom_out}：カメラを下げる/上げる\n"
+"{camera_rotate}を押したまま{move_to_cursor}：カメラの向きへ走る"
 
 #: gdscript/main.tscn
-msgid "Hold LMB, then RMB — look around on the run"
-msgstr "左ボタンを押したまま右ボタン：走りながら見回す"
+msgid "Hold {move_to_cursor}, then {camera_rotate} — look around on the run"
+msgstr "{move_to_cursor}を押したまま{camera_rotate}：走りながら見回す"
 
 #: gdscript/main.tscn
-msgid "RMB + WASD — move relative to the camera"
-msgstr "右ボタン + WASD：カメラ基準で移動"
+msgid "{camera_rotate} + {move_forward+move_left+move_back+move_right} — move relative to the camera"
+msgstr "{camera_rotate} + {move_forward+move_left+move_back+move_right}：カメラ基準で移動"
 
 #: gdscript/main.tscn
-msgid "LMB + RMB + A/D — run diagonally"
-msgstr "左右ボタン + A/D：斜めに走る"
+msgid "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — run diagonally"
+msgstr "{move_to_cursor} + {camera_rotate} + {move_left/move_right}：斜めに走る"
 
 #: gdscript/main.tscn
-msgid "Shift — run faster"
-msgstr "Shift：速く走る"
+msgid "{sprint} — run faster"
+msgstr "{sprint}：速く走る"
 
 #: gdscript/main.tscn
-msgid "Space — jump"
-msgstr "スペース：ジャンプ"
+msgid "{jump} — jump"
+msgstr "{jump}：ジャンプ"
 
 #: gdscript/main.tscn
-msgid "F10 — settings"
-msgstr "F10：設定"
+msgid "{toggle_settings} — settings"
+msgstr "{toggle_settings}：設定"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Settings"
@@ -54,8 +54,8 @@ msgid "Controls"
 msgstr "操作"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Held LMB"
-msgstr "左ボタン長押し"
+msgid "Held {move_to_cursor}"
+msgstr "{move_to_cursor}長押し"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Straight to the cursor"
@@ -66,24 +66,16 @@ msgid "To the point along a path"
 msgstr "経路に沿って地点へ"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB + WASD"
-msgstr "右ボタン + WASD"
-
-#: gdscript/ui/settings/settings_screen.tscn
 msgid "Off"
 msgstr "オフ"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sidestep: face forward, S backs up"
-msgstr "横移動：前を向いたまま、Sで後退"
+msgid "Sidestep: face forward, {move_back} backs up"
+msgstr "横移動：前を向いたまま、{move_back}で後退"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Turn: face the way you go, S toward the camera"
-msgstr "旋回：進む方向を向く、Sでカメラ側へ"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB + RMB + A/D"
-msgstr "左右ボタン + A/D"
+msgid "Turn: face the way you go, {move_back} toward the camera"
+msgstr "旋回：進む方向を向く、{move_back}でカメラ側へ"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Sidestep: face forward"
@@ -94,28 +86,28 @@ msgid "Diagonal: face the way you go"
 msgstr "斜め：進む方向を向く"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Backing up (S) slower by"
-msgstr "後退（S）の減速"
+msgid "Backing up ({move_back}) slower by"
+msgstr "後退（{move_back}）の減速"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
-msgstr "右ボタンを押すと、Wでカメラの向きへ進みます。横移動ではキャラクターはカメラと同じ方向を向き、A/Dで横へ、Sで後退します。旋回では進む方向を向き、A/Dで左右へ、Sでカメラ側へ進みます。両ボタンを押すと、A/Dで斜め前へ走ります。"
+msgid "With {camera_rotate}, {move_forward} leads where the camera looks. Sidestepping, the character faces the way the camera does: {move_left} and {move_right} step aside, {move_back} backs up. Turning, the character faces the way they go: {move_left} and {move_right} go left and right, {move_back} toward the camera. With {move_to_cursor} + {camera_rotate}, {move_left} and {move_right} veer the run diagonally forward."
+msgstr "{camera_rotate}を押すと、{move_forward}でカメラの向きへ進みます。横移動ではキャラクターはカメラと同じ方向を向き、{move_left}/{move_right}で横へ、{move_back}で後退します。旋回では進む方向を向き、{move_left}/{move_right}で左右へ、{move_back}でカメラ側へ進みます。{move_to_cursor} + {camera_rotate}を押すと、{move_left}/{move_right}で斜め前へ走ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Hide the cursor while running with LMB held"
-msgstr "左ボタン長押しで走る間はカーソルを隠す"
+msgid "Hide the cursor while running with {move_to_cursor} held"
+msgstr "{move_to_cursor}長押しで走る間はカーソルを隠す"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "押下が長押しと判定された時点でカーソルが消え、離すと狙った位置に戻ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB during an LMB run only turns the camera"
-msgstr "左ボタンで走行中の右ボタンはカメラを回すだけ"
+msgid "{camera_rotate} while running with {move_to_cursor} only turns the camera"
+msgstr "{move_to_cursor}で走行中の{camera_rotate}はカメラを回すだけ"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
-msgstr "左ボタン→右ボタン：キャラクターは進路を保ったまま、周りを見回せます。離した後は、狙っていた位置からマウスで操作を続けます。右ボタンが先、または同時押し：カメラの向きへ走ります。オフ：押す順に関係なく、両ボタンでカメラの向きへ走ります。"
+msgid "{move_to_cursor}, then {camera_rotate}: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. {camera_rotate} first, or both together: run where the camera looks. Off: {move_to_cursor} and {camera_rotate} run where the camera looks in any order."
+msgstr "{move_to_cursor}→{camera_rotate}：キャラクターは進路を保ったまま、周りを見回せます。離した後は、狙っていた位置からマウスで操作を続けます。{camera_rotate}が先、または同時押し：カメラの向きへ走ります。オフ：押す順に関係なく、{move_to_cursor}と{camera_rotate}でカメラの向きへ走ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"
@@ -146,8 +138,8 @@ msgid "At an edge the character stops, or slides along it when running at an ang
 msgstr "縁ではキャラクターが止まり、斜めに走っていれば壁と同じように縁に沿って滑ります。低い段差は降りられます。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Jump (Space)"
-msgstr "ジャンプ（スペース）"
+msgid "Jump ({jump})"
+msgstr "ジャンプ（{jump}）"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Jump height"
@@ -158,12 +150,8 @@ msgid "%.1f m"
 msgstr "%.1f m"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sprint (Shift)"
-msgstr "ダッシュ（Shift）"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "Shift"
-msgstr "Shift"
+msgid "Sprint ({sprint})"
+msgstr "ダッシュ（{sprint}）"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Hold"
@@ -194,12 +182,12 @@ msgid "Camera"
 msgstr "カメラ"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB tilts the camera up and down"
-msgstr "右ボタンでカメラを上下に傾ける"
+msgid "{camera_rotate} tilts the camera up and down"
+msgstr "{camera_rotate}でカメラを上下に傾ける"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
-msgstr "オフ：右ボタン + マウスはキャラクターの周りでカメラを回すだけで、高さと傾きはホイールで決めます。"
+msgid "Off: {camera_rotate} with the mouse only orbits the camera around the character, and {camera_zoom_in/camera_zoom_out} sets its height and tilt."
+msgstr "オフ：{camera_rotate} + マウスはキャラクターの周りでカメラを回すだけで、高さと傾きは{camera_zoom_in/camera_zoom_out}で決めます。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn the camera to follow the run"
@@ -218,8 +206,8 @@ msgid "Align the tilt in"
 msgstr "傾きの調整時間"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
-msgstr "キャラクターが走る間、カメラは徐々にこの傾きになります。ホイール（傾ける設定なら右ボタンも）でいつも通り傾きを変えられ、走るとまた徐々に戻ります。"
+msgid "While the character runs, the camera eases to this tilt. {camera_zoom_in/camera_zoom_out} (and {camera_rotate}, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "キャラクターが走る間、カメラは徐々にこの傾きになります。{camera_zoom_in/camera_zoom_out}（傾ける設定なら{camera_rotate}も）でいつも通り傾きを変えられ、走るとまた徐々に戻ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn in"
@@ -254,20 +242,20 @@ msgid "Align the height in"
 msgstr "高さの調整時間"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
-msgstr "キャラクターが走る間、カメラは徐々にこの高さになります。0%は一番下、100%は一番上です。ホイールでいつも通り高さを変えられ、走るとまた徐々に戻ります。傾きも揃える場合、傾きはそのまま保たれます。"
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. {camera_zoom_in/camera_zoom_out} changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "キャラクターが走る間、カメラは徐々にこの高さになります。0%は一番下、100%は一番上です。{camera_zoom_in/camera_zoom_out}でいつも通り高さを変えられ、走るとまた徐々に戻ります。傾きも揃える場合、傾きはそのまま保たれます。"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
-msgstr "右ボタンでカメラを回した後は、キャラクターが止まるか左ボタンで新たに走り出すまで、カメラが自動で回転したり、傾いたり、高さを変えたりすることはありません。"
+msgid "After you turn the camera with {camera_rotate}, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with {move_to_cursor}."
+msgstr "{camera_rotate}でカメラを回した後は、キャラクターが止まるか{move_to_cursor}で新たに走り出すまで、カメラが自動で回転したり、傾いたり、高さを変えたりすることはありません。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"
 msgstr "カメラ回転中もカーソルが狙いを保つ"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
-msgstr "左ボタン長押し中はカーソルが世界と一緒に動き、キャラクターは狙った場所へ走ります。オフでは、カーソルは画面上で止まったままで、キャラクターはハンドルを切った車のようにそちらへ曲がります。"
+msgid "While {move_to_cursor} is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "{move_to_cursor}長押し中はカーソルが世界と一緒に動き、キャラクターは狙った場所へ走ります。オフでは、カーソルは画面上で止まったままで、キャラクターはハンドルを切った車のようにそちらへ曲がります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The camera stops at obstacles behind it"
@@ -586,28 +574,28 @@ msgid "Language"
 msgstr "言語"
 
 #: gdscript/main.tscn
-msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
-msgstr "左ボタンを押し続けると、主人公がカーソルを追って走ります。離すと止まります。"
+msgid "Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops."
+msgstr "{move_to_cursor}を押し続けると、主人公がカーソルを追って走ります。離すと止まります。"
 
 #: gdscript/main.tscn
-msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
-msgstr "右ボタンを押したままマウスを動かすとカメラが回ります。ホイールでカメラを上げ下げできます。"
+msgid "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it."
+msgstr "{camera_rotate}を押したままマウスを動かすとカメラが回ります。{camera_zoom_in/camera_zoom_out}でカメラを上げ下げできます。"
 
 #: gdscript/main.tscn
-msgid "Hold the right button, then the left one: the hero runs where the camera looks."
-msgstr "右ボタン、続けて左ボタンを押し続けると、主人公はカメラの向く方へ走ります。"
+msgid "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks."
+msgstr "{camera_rotate}、続けて{move_to_cursor}を押し続けると、主人公はカメラの向く方へ走ります。"
 
 #: gdscript/main.tscn
-msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
-msgstr "主人公がカーソルを追って走っている間に右ボタンを押し続けると、走る向きを保ったまま周りを見回せます。"
+msgid "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course."
+msgstr "主人公がカーソルを追って走っている間に{camera_rotate}を押し続けると、走る向きを保ったまま周りを見回せます。"
 
 #: gdscript/main.tscn
-msgid "Shift makes the hero run faster for as long as stamina lasts."
-msgstr "Shiftを押すと、スタミナが続く限り主人公は速く走ります。"
+msgid "{sprint} makes the hero run faster for as long as stamina lasts."
+msgstr "{sprint}を押すと、スタミナが続く限り主人公は速く走ります。"
 
 #: gdscript/main.tscn
-msgid "F10 opens the settings: controls, camera, display, sound and more."
-msgstr "F10で設定を開きます：操作、カメラ、表示、サウンドなど。"
+msgid "{toggle_settings} opens the settings: controls, camera, display, sound and more."
+msgstr "{toggle_settings}で設定を開きます：操作、カメラ、表示、サウンドなど。"
 
 #: gdscript/ui/travel_prompt.gd
 msgid "Teleport to %s"
@@ -624,3 +612,59 @@ msgstr "緑の谷"
 #: shared/world/island/island.tscn
 msgid "Hermit's Camp"
 msgstr "隠者の野営地"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "LMB"
+msgstr "左ボタン"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "RMB"
+msgstr "右ボタン"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "MMB"
+msgstr "中ボタン"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel up"
+msgstr "ホイール上"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel down"
+msgstr "ホイール下"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel left"
+msgstr "ホイール左"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel right"
+msgstr "ホイール右"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse back"
+msgstr "戻るボタン"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse forward"
+msgstr "進むボタン"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel"
+msgstr "ホイール"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Space"
+msgstr "スペース"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Unbound"
+msgstr "未割り当て"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Left %s"
+msgstr "左%s"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Right %s"
+msgstr "右%s"

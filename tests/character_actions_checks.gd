@@ -7,6 +7,8 @@ func _checks() -> Array[Callable]:
 	return [
 		_check_sprint,
 		_check_sprint_key_release,
+		_check_sprint_rebinding,
+		_check_sprint_modifier_chord,
 		_check_jump,
 		_check_fall_settings,
 		_check_character_events,
@@ -225,6 +227,112 @@ func _check_sprint_key_release() -> void:
 			"in the settings window and after TOGGLE")
 	_expect(lost_ok, "HOLD: a lost Shift release is caught by the modifier state of the next mouse event")
 	_player.stamina.refill()
+
+
+func _check_sprint_rebinding() -> void:
+	print("\n== sprint rebound at runtime: modifier releases use the current bindings")
+	var saved := InputMap.action_get_events(&"sprint")
+	var original_action := _actions.sprint_action
+	var original_mode := _actions.sprint_mode
+	_actions.sprint_mode = CharacterActionInput.SprintMode.HOLD
+	for key: Key in [KEY_CTRL, KEY_R, KEY_ALT]:
+		InputMap.action_erase_events(&"sprint")
+		var binding := InputEventKey.new()
+		binding.physical_keycode = key
+		InputMap.action_add_event(&"sprint", binding)
+		var press := binding.duplicate() as InputEventKey
+		press.keycode = key
+		press.pressed = true
+		press.ctrl_pressed = key == KEY_CTRL
+		press.alt_pressed = key == KEY_ALT
+		Input.parse_input_event(press)
+		await _ticks(2)
+		var mouse := InputEventMouseMotion.new()
+		mouse.ctrl_pressed = press.ctrl_pressed
+		mouse.alt_pressed = press.alt_pressed
+		Input.parse_input_event(mouse)
+		await _ticks(2)
+		var held := Input.is_action_pressed(&"sprint") and _player.sprint_requested
+		mouse = InputEventMouseMotion.new()
+		Input.parse_input_event(mouse)
+		await _ticks(2)
+		var remains_pressed := Input.is_action_pressed(&"sprint")
+		_expect(held and remains_pressed == (key == KEY_R) and _player.sprint_requested == remains_pressed,
+				"sprint on %s: stays held, then a missing modifier release is caught only for a modifier" % OS.get_keycode_string(key))
+		press.pressed = false
+		press.ctrl_pressed = false
+		press.alt_pressed = false
+		Input.parse_input_event(press)
+		Input.action_release(&"sprint")
+
+	var alternate := &"__alternate_sprint"
+	InputMap.add_action(alternate)
+	var alt_key := InputEventKey.new()
+	alt_key.keycode = KEY_ALT
+	InputMap.action_add_event(alternate, alt_key)
+	_actions.sprint_action = alternate
+	Input.action_press(alternate)
+	Input.parse_input_event(InputEventMouseMotion.new())
+	await _ticks(2)
+	_expect(not Input.is_action_pressed(alternate) and not _player.sprint_requested,
+			"changing the sprint action itself also updates the modifier release protection")
+	InputMap.erase_action(alternate)
+	_actions.sprint_action = original_action
+	_actions.sprint_mode = original_mode
+	InputMap.action_erase_events(&"sprint")
+	for event in saved:
+		InputMap.action_add_event(&"sprint", event)
+	await _ticks(2)
+
+
+func _check_sprint_modifier_chord() -> void:
+	print("\n== sprint bound to Ctrl+Shift: every required modifier must remain held")
+	var saved := InputMap.action_get_events(&"sprint")
+	var mode := _actions.sprint_mode
+	_actions.sprint_mode = CharacterActionInput.SprintMode.HOLD
+	InputMap.action_erase_events(&"sprint")
+	var binding := InputEventKey.new()
+	binding.physical_keycode = KEY_SHIFT
+	binding.ctrl_pressed = true
+	InputMap.action_add_event(&"sprint", binding)
+	var press := binding.duplicate() as InputEventKey
+	press.pressed = true
+	press.shift_pressed = true
+	Input.parse_input_event(press)
+	await _ticks(2)
+	var held := _player.sprint_requested
+	var release_ctrl := InputEventKey.new()
+	release_ctrl.physical_keycode = KEY_CTRL
+	release_ctrl.shift_pressed = true
+	Input.parse_input_event(release_ctrl)
+	await _ticks(2)
+	_expect(held and not Input.is_action_pressed(&"sprint") and not _player.sprint_requested,
+			"releasing Ctrl ends Ctrl+Shift sprint even while Shift remains pressed")
+	Input.action_release(&"sprint")
+	var alternative := InputEventKey.new()
+	alternative.keycode = KEY_ALT
+	InputMap.action_add_event(&"sprint", alternative)
+	Input.action_press(&"sprint")
+	var mouse := InputEventMouseMotion.new()
+	mouse.alt_pressed = true
+	Input.parse_input_event(mouse)
+	await _ticks(2)
+	_expect(_player.sprint_requested, "a held alternative modifier still keeps sprint active")
+	mouse = InputEventMouseMotion.new()
+	mouse.shift_pressed = true
+	Input.parse_input_event(mouse)
+	await _ticks(2)
+	_expect(not _player.sprint_requested, "Shift alone matches neither Ctrl+Shift nor the Alt alternative")
+	press.pressed = false
+	press.ctrl_pressed = false
+	press.shift_pressed = false
+	Input.parse_input_event(press)
+	Input.action_release(&"sprint")
+	InputMap.action_erase_events(&"sprint")
+	for event in saved:
+		InputMap.action_add_event(&"sprint", event)
+	_actions.sprint_mode = mode
+	await _ticks(2)
 
 
 ## Shift as a real keyboard event: the key itself has the modifier held while it is pressed (as on Windows).

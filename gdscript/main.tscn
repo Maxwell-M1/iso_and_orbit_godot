@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://c87pp147hwgur" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
 [ext_resource type="PackedScene" path="res://gdscript/ui/travel_prompt.tscn" id="16_prompt"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/levels/loading_screen.tscn" id="17_loading"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ui_screens/action_texts.gd" id="18_action_texts"]
 
 [node name="Main" type="Node3D" unique_id=94359211 node_paths=PackedStringArray("levels", "hero", "hud", "travel_prompt")]
 script = ExtResource("1_main")
@@ -46,35 +47,35 @@ mouse_filter = 2
 
 [node name="Help" type="Label" parent="Hud/Panel/Lines" unique_id=1635511370]
 layout_mode = 2
-text = "LMB on the ground — run there
-Hold LMB — run after the cursor
-RMB + mouse — orbit the camera
-Wheel — lower or raise the camera
-Hold RMB, then LMB — run where the camera looks"
+text = "{move_to_cursor} on the ground — run there
+Hold {move_to_cursor} — run after the cursor
+{camera_rotate} + mouse — orbit the camera
+{camera_zoom_in/camera_zoom_out} — lower or raise the camera
+Hold {camera_rotate}, then {move_to_cursor} — run where the camera looks"
 
 [node name="LookHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1063502185]
 layout_mode = 2
-text = "Hold LMB, then RMB — look around on the run"
+text = "Hold {move_to_cursor}, then {camera_rotate} — look around on the run"
 
 [node name="KeysHelp" type="Label" parent="Hud/Panel/Lines" unique_id=309071952]
 layout_mode = 2
-text = "RMB + WASD — move relative to the camera"
+text = "{camera_rotate} + {move_forward+move_left+move_back+move_right} — move relative to the camera"
 
 [node name="StrafeHelp" type="Label" parent="Hud/Panel/Lines" unique_id=134204790]
 layout_mode = 2
-text = "LMB + RMB + A/D — run diagonally"
+text = "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — run diagonally"
 
 [node name="SprintHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1022974947]
 layout_mode = 2
-text = "Shift — run faster"
+text = "{sprint} — run faster"
 
 [node name="JumpHelp" type="Label" parent="Hud/Panel/Lines" unique_id=415046652]
 layout_mode = 2
-text = "Space — jump"
+text = "{jump} — jump"
 
 [node name="MenuHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1126561867]
 layout_mode = 2
-text = "F10 — settings"
+text = "{toggle_settings} — settings"
 
 [node name="SpeedLabel" type="Label" parent="Hud/Panel/Lines" unique_id=1600821109]
 unique_name_in_owner = true
@@ -108,6 +109,9 @@ stamina = NodePath("../../Hero/Character/Stamina")
 
 [node name="TravelPrompt" parent="Hud" instance=ExtResource("16_prompt")]
 
+[node name="ActionTexts" type="Node" parent="Hud"]
+script = ExtResource("18_action_texts")
+
 [node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("hero", "help_panel", "fps_counter", "character_state", "look_help", "keys_help", "strafe_help", "sprint_help", "jump_help")]
 script = ExtResource("9_applier")
 hero = NodePath("../Hero")
@@ -123,4 +127,4 @@ jump_help = NodePath("../Hud/Panel/Lines/JumpHelp")
 [node name="UiRoot" parent="." unique_id=414458971 instance=ExtResource("10_ui_root")]
 
 [node name="LoadingScreen" parent="." instance=ExtResource("17_loading")]
-tips = PackedStringArray("Hold the left button and the hero runs after the cursor; let go, and it stops.", "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it.", "Hold the right button, then the left one: the hero runs where the camera looks.", "While the hero runs after the cursor, hold the right button to look around: the run keeps its course.", "Shift makes the hero run faster for as long as stamina lasts.", "F10 opens the settings: controls, camera, display, sound and more.")
+tips = PackedStringArray("Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops.", "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it.", "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks.", "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course.", "{sprint} makes the hero run faster for as long as stamina lasts.", "{toggle_settings} opens the settings: controls, camera, display, sound and more.")

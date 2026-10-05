@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://gdscript/ui/settings/setting_option_button.gd" id="3_option"]
 [ext_resource type="Script" path="res://gdscript/ui/settings/setting_slider.gd" id="4_slider"]
 [ext_resource type="Script" path="res://gdscript/ui/settings/setting_language_button.gd" id="5_language"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ui_screens/action_texts.gd" id="6_action_texts"]
 
 [node name="SettingsScreen" type="Control" node_paths=PackedStringArray("initial_focus")]
 layout_mode = 3
@@ -75,7 +76,7 @@ layout_mode = 2
 [node name="HoldModeLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/HoldModeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Held LMB"
+text = "Held {move_to_cursor}"
 
 [node name="HoldMode" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/HoldModeRow"]
 layout_mode = 2
@@ -94,7 +95,7 @@ layout_mode = 2
 [node name="CameraKeysLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraKeysRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "RMB + WASD"
+text = "{camera_rotate} + {move_forward+move_left+move_back+move_right}"
 
 [node name="CameraKeys" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraKeysRow"]
 layout_mode = 2
@@ -102,9 +103,9 @@ selected = 2
 item_count = 3
 popup/item_0/text = "Off"
 popup/item_0/id = 0
-popup/item_1/text = "Sidestep: face forward, S backs up"
+popup/item_1/text = "Sidestep: face forward, {move_back} backs up"
 popup/item_1/id = 1
-popup/item_2/text = "Turn: face the way you go, S toward the camera"
+popup/item_2/text = "Turn: face the way you go, {move_back} toward the camera"
 popup/item_2/id = 2
 script = ExtResource("3_option")
 key = &"gameplay/camera_keys_mode"
@@ -115,7 +116,7 @@ layout_mode = 2
 [node name="CameraSteerKeysLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraSteerKeysRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "LMB + RMB + A/D"
+text = "{move_to_cursor} + {camera_rotate} + {move_left/move_right}"
 
 [node name="CameraSteerKeys" type="OptionButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/CameraSteerKeysRow"]
 layout_mode = 2
@@ -137,7 +138,7 @@ layout_mode = 2
 [node name="BackwardSlowdownLabel" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/BackwardSlowdownRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Backing up (S) slower by"
+text = "Backing up ({move_back}) slower by"
 
 [node name="BackwardSlowdown" type="HSlider" parent="Center/Window/Layout/Tabs/Gameplay/Page/List/BackwardSlowdownRow" node_paths=PackedStringArray("value_label")]
 unique_name_in_owner = true
@@ -162,12 +163,12 @@ horizontal_alignment = 2
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
+text = "With {camera_rotate}, {move_forward} leads where the camera looks. Sidestepping, the character faces the way the camera does: {move_left} and {move_right} step aside, {move_back} backs up. Turning, the character faces the way they go: {move_left} and {move_right} go left and right, {move_back} toward the camera. With {move_to_cursor} + {camera_rotate}, {move_left} and {move_right} veer the run diagonally forward."
 autowrap_mode = 3
 
 [node name="HideCursor" type="CheckButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
 layout_mode = 2
-text = "Hide the cursor while running with LMB held"
+text = "Hide the cursor while running with {move_to_cursor} held"
 script = ExtResource("2_check")
 key = &"gameplay/hide_cursor_on_hold"
 
@@ -180,7 +181,7 @@ autowrap_mode = 3
 
 [node name="LookAround" type="CheckButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
 layout_mode = 2
-text = "RMB during an LMB run only turns the camera"
+text = "{camera_rotate} while running with {move_to_cursor} only turns the camera"
 script = ExtResource("2_check")
 key = &"gameplay/look_around"
 
@@ -188,7 +189,7 @@ key = &"gameplay/look_around"
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+text = "{move_to_cursor}, then {camera_rotate}: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. {camera_rotate} first, or both together: run where the camera looks. Off: {move_to_cursor} and {camera_rotate} run where the camera looks in any order."
 autowrap_mode = 3
 
 [node name="Character" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
@@ -279,7 +280,7 @@ autowrap_mode = 3
 
 [node name="Jump" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
 layout_mode = 2
-text = "Jump (Space)"
+text = "Jump ({jump})"
 script = ExtResource("2_check")
 key = &"character/jump"
 
@@ -314,7 +315,7 @@ horizontal_alignment = 2
 
 [node name="Sprint" type="CheckButton" parent="Center/Window/Layout/Tabs/Character/Page/List"]
 layout_mode = 2
-text = "Sprint (Shift)"
+text = "Sprint ({sprint})"
 script = ExtResource("2_check")
 key = &"character/sprint"
 
@@ -325,7 +326,7 @@ layout_mode = 2
 [node name="SprintModeLabel" type="Label" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintModeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Shift"
+text = "{sprint}"
 
 [node name="SprintMode" type="OptionButton" parent="Center/Window/Layout/Tabs/Character/Page/List/SprintModeRow"]
 unique_name_in_owner = true
@@ -423,7 +424,7 @@ theme_type_variation = &"SettingsList"
 
 [node name="MousePitch" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 layout_mode = 2
-text = "RMB tilts the camera up and down"
+text = "{camera_rotate} tilts the camera up and down"
 script = ExtResource("2_check")
 key = &"camera/mouse_pitch"
 
@@ -431,7 +432,7 @@ key = &"camera/mouse_pitch"
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
+text = "Off: {camera_rotate} with the mouse only orbits the camera around the character, and {camera_zoom_in/camera_zoom_out} sets its height and tilt."
 autowrap_mode = 3
 
 [node name="CameraFollow" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
@@ -578,7 +579,7 @@ horizontal_alignment = 2
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+text = "While the character runs, the camera eases to this tilt. {camera_zoom_in/camera_zoom_out} (and {camera_rotate}, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
 autowrap_mode = 3
 
 [node name="AlignHeight" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
@@ -647,14 +648,14 @@ horizontal_alignment = 2
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+text = "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. {camera_zoom_in/camera_zoom_out} changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
 autowrap_mode = 3
 
 [node name="FollowWaitHint" type="Label" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
+text = "After you turn the camera with {camera_rotate}, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with {move_to_cursor}."
 autowrap_mode = 3
 
 [node name="KeepAim" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
@@ -667,7 +668,7 @@ key = &"camera/keep_aim"
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_type_variation = &"HintLabel"
-text = "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+text = "While {move_to_cursor} is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
 autowrap_mode = 3
 
 [node name="KeepOut" type="CheckButton" parent="Center/Window/Layout/Tabs/Camera/Page/List"]
@@ -961,6 +962,9 @@ text = "Reset all"
 [node name="Close" type="Button" parent="Center/Window/Layout/Buttons"]
 layout_mode = 2
 text = "Close"
+
+[node name="ActionTexts" type="Node" parent="."]
+script = ExtResource("6_action_texts")
 
 [connection signal="pressed" from="Center/Window/Layout/Buttons/Reset" to="." method="_on_reset_pressed"]
 [connection signal="pressed" from="Center/Window/Layout/Buttons/Close" to="." method="request_close"]

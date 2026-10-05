@@ -9,41 +9,41 @@ msgstr ""
 
 #: gdscript/main.tscn
 msgid ""
-"LMB on the ground — run there\n"
-"Hold LMB — run after the cursor\n"
-"RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera\n"
-"Hold RMB, then LMB — run where the camera looks"
+"{move_to_cursor} on the ground — run there\n"
+"Hold {move_to_cursor} — run after the cursor\n"
+"{camera_rotate} + mouse — orbit the camera\n"
+"{camera_zoom_in/camera_zoom_out} — lower or raise the camera\n"
+"Hold {camera_rotate}, then {move_to_cursor} — run where the camera looks"
 msgstr ""
-"Zemine sol tık — oraya koş\n"
-"Sol tuş basılı — imlecin peşinden koş\n"
-"Sağ tuş + fare — kamerayı döndür\n"
-"Tekerlek — kamerayı alçalt veya yükselt\n"
-"Sağ tuş basılıyken sol tuş — kameranın baktığı yöne koş"
+"Zeminde {move_to_cursor} — oraya koş\n"
+"{move_to_cursor} basılı — imlecin peşinden koş\n"
+"{camera_rotate} + fare — kamerayı döndür\n"
+"{camera_zoom_in/camera_zoom_out} — kamerayı alçalt veya yükselt\n"
+"{camera_rotate} basılıyken {move_to_cursor} — kameranın baktığı yöne koş"
 
 #: gdscript/main.tscn
-msgid "Hold LMB, then RMB — look around on the run"
-msgstr "Sol tuş basılıyken sağ tuş — koşarken etrafa bak"
+msgid "Hold {move_to_cursor}, then {camera_rotate} — look around on the run"
+msgstr "{move_to_cursor} basılıyken {camera_rotate} — koşarken etrafa bak"
 
 #: gdscript/main.tscn
-msgid "RMB + WASD — move relative to the camera"
-msgstr "Sağ tuş + WASD — kameraya göre hareket et"
+msgid "{camera_rotate} + {move_forward+move_left+move_back+move_right} — move relative to the camera"
+msgstr "{camera_rotate} + {move_forward+move_left+move_back+move_right} — kameraya göre hareket et"
 
 #: gdscript/main.tscn
-msgid "LMB + RMB + A/D — run diagonally"
-msgstr "Sol + sağ tuş + A/D — çapraz koş"
+msgid "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — run diagonally"
+msgstr "{move_to_cursor} + {camera_rotate} + {move_left/move_right} — çapraz koş"
 
 #: gdscript/main.tscn
-msgid "Shift — run faster"
-msgstr "Shift — daha hızlı koş"
+msgid "{sprint} — run faster"
+msgstr "{sprint} — daha hızlı koş"
 
 #: gdscript/main.tscn
-msgid "Space — jump"
-msgstr "Boşluk — zıpla"
+msgid "{jump} — jump"
+msgstr "{jump} — zıpla"
 
 #: gdscript/main.tscn
-msgid "F10 — settings"
-msgstr "F10 — ayarlar"
+msgid "{toggle_settings} — settings"
+msgstr "{toggle_settings} — ayarlar"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Settings"
@@ -54,8 +54,8 @@ msgid "Controls"
 msgstr "Kontroller"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Held LMB"
-msgstr "Basılı sol tuş"
+msgid "Held {move_to_cursor}"
+msgstr "Basılı {move_to_cursor}"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Straight to the cursor"
@@ -66,24 +66,16 @@ msgid "To the point along a path"
 msgstr "Yol boyunca noktaya"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB + WASD"
-msgstr "Sağ tuş + WASD"
-
-#: gdscript/ui/settings/settings_screen.tscn
 msgid "Off"
 msgstr "Kapalı"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sidestep: face forward, S backs up"
-msgstr "Yana adım: yüz önde, S ile geri geri"
+msgid "Sidestep: face forward, {move_back} backs up"
+msgstr "Yana adım: yüz önde, {move_back} ile geri geri"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Turn: face the way you go, S toward the camera"
-msgstr "Dönüş: yüz gidiş yönünde, S kameraya doğru"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB + RMB + A/D"
-msgstr "Sol + sağ tuş + A/D"
+msgid "Turn: face the way you go, {move_back} toward the camera"
+msgstr "Dönüş: yüz gidiş yönünde, {move_back} kameraya doğru"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Sidestep: face forward"
@@ -94,28 +86,28 @@ msgid "Diagonal: face the way you go"
 msgstr "Çapraz: yüz gidiş yönünde"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Backing up (S) slower by"
-msgstr "Geri yürürken (S) yavaşlama"
+msgid "Backing up ({move_back}) slower by"
+msgstr "Geri yürürken ({move_back}) yavaşlama"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "With RMB, W leads where the camera looks. Sidestepping, the character faces the way the camera does: A and D step aside, S backs up. Turning, the character faces the way they go: A and D go left and right, S toward the camera. With both buttons, A and D veer the run diagonally forward."
-msgstr "Sağ tuşla W, kameranın baktığı yöne götürür. Yana adımda karakter kamerayla aynı yöne bakar: A ve D yana, S geri geri. Dönüşte karakter gittiği yöne bakar: A ve D sola ve sağa, S kameraya doğru. İki tuşla A ve D koşuyu çapraz ileriye saptırır."
+msgid "With {camera_rotate}, {move_forward} leads where the camera looks. Sidestepping, the character faces the way the camera does: {move_left} and {move_right} step aside, {move_back} backs up. Turning, the character faces the way they go: {move_left} and {move_right} go left and right, {move_back} toward the camera. With {move_to_cursor} + {camera_rotate}, {move_left} and {move_right} veer the run diagonally forward."
+msgstr "{camera_rotate} ile {move_forward}, kameranın baktığı yöne götürür. Yana adımda karakter kamerayla aynı yöne bakar: {move_left} ve {move_right} yana, {move_back} geri geri. Dönüşte karakter gittiği yöne bakar: {move_left} ve {move_right} sola ve sağa, {move_back} kameraya doğru. {move_to_cursor} + {camera_rotate} ile {move_left} ve {move_right} koşuyu çapraz ileriye saptırır."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Hide the cursor while running with LMB held"
-msgstr "Basılı sol tuşla koşarken imleci gizle"
+msgid "Hide the cursor while running with {move_to_cursor} held"
+msgstr "Basılı {move_to_cursor} ile koşarken imleci gizle"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "Basış, basılı tutmaya dönüştüğü anda imleç gizlenir; bırakınca nişan aldığınız yerde yeniden belirir."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB during an LMB run only turns the camera"
-msgstr "Sol tuşla koşarken sağ tuş yalnızca kamerayı döndürür"
+msgid "{camera_rotate} while running with {move_to_cursor} only turns the camera"
+msgstr "{move_to_cursor} ile koşarken {camera_rotate} yalnızca kamerayı döndürür"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
-msgstr "Önce sol, sonra sağ tuş: karakter rotasını korurken etrafa bakın; ardından fare, nişan aldığınız yerden yönlendirmeye devam eder. Önce sağ tuş ya da ikisi birlikte: kameranın baktığı yöne koşu. Kapalı: iki tuş hangi sırayla basılırsa basılsın kameranın baktığı yöne koşar."
+msgid "{move_to_cursor}, then {camera_rotate}: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. {camera_rotate} first, or both together: run where the camera looks. Off: {move_to_cursor} and {camera_rotate} run where the camera looks in any order."
+msgstr "Önce {move_to_cursor}, sonra {camera_rotate}: karakter rotasını korurken etrafa bakın; ardından fare, nişan aldığınız yerden yönlendirmeye devam eder. Önce {camera_rotate} ya da ikisi birlikte: kameranın baktığı yöne koşu. Kapalı: {move_to_cursor} ve {camera_rotate} hangi sırayla basılırsa basılsın kameranın baktığı yöne koşar."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"
@@ -146,8 +138,8 @@ msgid "At an edge the character stops, or slides along it when running at an ang
 msgstr "Kenarda karakter durur; kenara açılı koşuyorsa duvar boyunca kayar gibi kenar boyunca kayar. Alçak basamaklardan yine de inilebilir."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Jump (Space)"
-msgstr "Zıplama (Boşluk)"
+msgid "Jump ({jump})"
+msgstr "Zıplama ({jump})"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Jump height"
@@ -158,12 +150,8 @@ msgid "%.1f m"
 msgstr "%.1f m"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Sprint (Shift)"
-msgstr "Depar (Shift)"
-
-#: gdscript/ui/settings/settings_screen.tscn
-msgid "Shift"
-msgstr "Shift"
+msgid "Sprint ({sprint})"
+msgstr "Depar ({sprint})"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Hold"
@@ -194,12 +182,12 @@ msgid "Camera"
 msgstr "Kamera"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "RMB tilts the camera up and down"
-msgstr "Sağ tuş kamerayı yukarı ve aşağı eğer"
+msgid "{camera_rotate} tilts the camera up and down"
+msgstr "{camera_rotate} kamerayı yukarı ve aşağı eğer"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "Off: RMB with the mouse only orbits the camera around the character, and the wheel sets its height and tilt."
-msgstr "Kapalıyken sağ tuş ve fare kamerayı yalnızca karakterin etrafında döndürür; yüksekliği ve eğimi tekerlek belirler."
+msgid "Off: {camera_rotate} with the mouse only orbits the camera around the character, and {camera_zoom_in/camera_zoom_out} sets its height and tilt."
+msgstr "Kapalıyken {camera_rotate} ve fare kamerayı yalnızca karakterin etrafında döndürür; yüksekliği ve eğimi {camera_zoom_in/camera_zoom_out} belirler."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn the camera to follow the run"
@@ -218,8 +206,8 @@ msgid "Align the tilt in"
 msgstr "Eğim hizalama süresi"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this tilt. The wheel (and RMB, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
-msgstr "Karakter koşarken kamera yavaşça bu eğime gelir. Tekerlek (ve kamerayı eğiyorsa sağ tuş) eğimi her zamanki gibi değiştirir; koşarken eğim yavaşça geri döner."
+msgid "While the character runs, the camera eases to this tilt. {camera_zoom_in/camera_zoom_out} (and {camera_rotate}, if it tilts the camera) changes the tilt as usual, and on the run it eases back."
+msgstr "Karakter koşarken kamera yavaşça bu eğime gelir. {camera_zoom_in/camera_zoom_out} (ve kamerayı eğiyorsa {camera_rotate}) eğimi her zamanki gibi değiştirir; koşarken eğim yavaşça geri döner."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Turn in"
@@ -254,20 +242,20 @@ msgid "Align the height in"
 msgstr "Yükseklik hizalama süresi"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. The wheel changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
-msgstr "Karakter koşarken kamera yavaşça bu yüksekliğe gelir: %0 en alçak, %100 en yüksek konumdur. Tekerlek yüksekliği her zamanki gibi değiştirir; koşarken yükseklik yavaşça geri döner. Eğim de hizalanıyorsa eğim değişmez."
+msgid "While the character runs, the camera eases to this height: 0% is lowered all the way, 100% raised all the way. {camera_zoom_in/camera_zoom_out} changes the height as usual, and on the run it eases back. With the tilt aligned too, the tilt stays as it is."
+msgstr "Karakter koşarken kamera yavaşça bu yüksekliğe gelir: %0 en alçak, %100 en yüksek konumdur. {camera_zoom_in/camera_zoom_out} yüksekliği her zamanki gibi değiştirir; koşarken yükseklik yavaşça geri döner. Eğim de hizalanıyorsa eğim değişmez."
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "After you turn the camera with RMB, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with LMB."
-msgstr "Kamerayı sağ tuşla çevirdikten sonra kamera, karakter durana ya da sol tuşla yeni bir koşuya başlayana kadar kendiliğinden dönmez, eğilmez ve yüksekliğini değiştirmez."
+msgid "After you turn the camera with {camera_rotate}, it neither turns, tilts nor changes height on its own until the character stops or you start a new run with {move_to_cursor}."
+msgstr "Kamerayı {camera_rotate} ile çevirdikten sonra kamera, karakter durana ya da {move_to_cursor} ile yeni bir koşuya başlayana kadar kendiliğinden dönmez, eğilmez ve yüksekliğini değiştirmez."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor keeps its aim while the camera turns"
 msgstr "Kamera dönerken imleç hedefini korur"
 
 #: gdscript/ui/settings/settings_screen.tscn
-msgid "While LMB is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
-msgstr "Sol tuş basılıyken imleç dünyayla birlikte hareket eder ve karakter nişan aldığınız yere koşar. Bu olmadan imleç ekranda yerinde kalır ve karakter, direksiyonu kırılan bir araba gibi ona doğru döner."
+msgid "While {move_to_cursor} is held, the cursor moves with the world and the character runs where you aimed. Without this the cursor stays put on the screen and the character veers toward it, like a steered car."
+msgstr "{move_to_cursor} basılıyken imleç dünyayla birlikte hareket eder ve karakter nişan aldığınız yere koşar. Bu olmadan imleç ekranda yerinde kalır ve karakter, direksiyonu kırılan bir araba gibi ona doğru döner."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The camera stops at obstacles behind it"
@@ -586,28 +574,28 @@ msgid "Language"
 msgstr "Dil"
 
 #: gdscript/main.tscn
-msgid "Hold the left button and the hero runs after the cursor; let go, and it stops."
-msgstr "Sol tuşu basılı tutun, kahraman imleci takip ederek koşar; bırakın, durur."
+msgid "Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops."
+msgstr "{move_to_cursor} basılı tutun, kahraman imleci takip ederek koşar; bırakın, durur."
 
 #: gdscript/main.tscn
-msgid "Hold the right button and move the mouse to turn the camera; the wheel lowers and raises it."
-msgstr "Kamerayı döndürmek için sağ tuşu basılı tutup fareyi hareket ettirin; tekerlek onu alçaltır ve yükseltir."
+msgid "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it."
+msgstr "Kamerayı döndürmek için {camera_rotate} basılı tutup fareyi hareket ettirin; {camera_zoom_in/camera_zoom_out} onu alçaltır ve yükseltir."
 
 #: gdscript/main.tscn
-msgid "Hold the right button, then the left one: the hero runs where the camera looks."
-msgstr "Önce sağ, sonra sol tuşu basılı tutun: kahraman kameranın baktığı yöne koşar."
+msgid "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks."
+msgstr "Önce {camera_rotate}, sonra {move_to_cursor} basılı tutun: kahraman kameranın baktığı yöne koşar."
 
 #: gdscript/main.tscn
-msgid "While the hero runs after the cursor, hold the right button to look around: the run keeps its course."
-msgstr "Kahraman imleci takip ederek koşarken etrafa bakmak için sağ tuşu basılı tutun: koşu yönünü korur."
+msgid "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course."
+msgstr "Kahraman imleci takip ederek koşarken etrafa bakmak için {camera_rotate} basılı tutun: koşu yönünü korur."
 
 #: gdscript/main.tscn
-msgid "Shift makes the hero run faster for as long as stamina lasts."
-msgstr "Shift, dayanıklılık yettiği sürece kahramanın daha hızlı koşmasını sağlar."
+msgid "{sprint} makes the hero run faster for as long as stamina lasts."
+msgstr "{sprint}, dayanıklılık yettiği sürece kahramanın daha hızlı koşmasını sağlar."
 
 #: gdscript/main.tscn
-msgid "F10 opens the settings: controls, camera, display, sound and more."
-msgstr "F10 ayarları açar: kontroller, kamera, görüntü, ses ve daha fazlası."
+msgid "{toggle_settings} opens the settings: controls, camera, display, sound and more."
+msgstr "{toggle_settings} ayarları açar: kontroller, kamera, görüntü, ses ve daha fazlası."
 
 #: gdscript/ui/travel_prompt.gd
 msgid "Teleport to %s"
@@ -624,3 +612,59 @@ msgstr "Yeşil Vadi"
 #: shared/world/island/island.tscn
 msgid "Hermit's Camp"
 msgstr "Münzevinin Kampı"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "LMB"
+msgstr "Sol tuş"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "RMB"
+msgstr "Sağ tuş"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "MMB"
+msgstr "Orta tuş"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel up"
+msgstr "Tekerlek yukarı"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel down"
+msgstr "Tekerlek aşağı"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel left"
+msgstr "Tekerlek sola"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel right"
+msgstr "Tekerlek sağa"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse back"
+msgstr "Geri tuşu"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Mouse forward"
+msgstr "İleri tuşu"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Wheel"
+msgstr "Tekerlek"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Space"
+msgstr "Boşluk"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Unbound"
+msgstr "Atanmamış"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Left %s"
+msgstr "Sol %s"
+
+#: addons/iso_orbit/ui_screens/input_names.gd
+msgid "Right %s"
+msgstr "Sağ %s"

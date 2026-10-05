@@ -12,7 +12,7 @@ extends CanvasLayer
 ## and, by unique name, the [TextureRect] [code]Background[/code], the [Label]s [code]Title[/code] and [code]Tip[/code]
 ## and the [ProgressBar] [code]Bar[/code].
 
-## Tips shown one after another, in a random order; each is translated.
+## Tips shown one after another, in a random order; each is translated, then passed through [member tip_format].
 @export var tips: PackedStringArray
 
 ## How long each tip stays.
@@ -26,6 +26,10 @@ extends CanvasLayer
 
 ## How long the background takes to come [member zoom] closer.
 @export_range(1.0, 60.0, 0.5, "suffix:s") var zoom_time := 12.0
+
+## Turns a translated tip into the text shown, for example [method InputNames.format] (from the UI Screens component)
+## to name the keys bound now; empty: the tip is shown as translated.
+var tip_format: Callable
 
 var _open := false
 # The progress set and the part of the bar filled; the bar catches up with the progress, never ahead of it.
@@ -52,6 +56,8 @@ func _init() -> void:
 func _ready() -> void:
 	visible = false
 	_root.modulate.a = 0.0
+	# The tip is translated before tip_format, not after it.
+	_tip.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	set_process(false)
 	set_process_input(false)
 
@@ -106,9 +112,19 @@ func get_shown_progress() -> float:
 	return _shown
 
 
-## The tip shown now; empty if there are no tips.
+## The tip shown now, as written in [member tips]; empty if there are no tips.
 func get_tip() -> String:
 	return tips[_tip_index] if _tip_index >= 0 and _tip_index < tips.size() else ""
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		refresh()
+
+
+## Format the current tip again without changing the tip or restarting its timer or animation.
+func refresh() -> void:
+	_tip.text = _get_tip_text(get_tip())
 
 
 func _input(_event: InputEvent) -> void:
@@ -163,13 +179,18 @@ func _show_tip(animated: bool) -> void:
 		index = (index + 1) % tips.size()
 	_tip_index = index
 	if not animated:
-		_tip.text = tips[index]
+		_tip.text = _get_tip_text(tips[index])
 		_tip.modulate.a = 1.0
 		return
 	var tween := create_tween().set_ignore_time_scale()
 	tween.tween_property(_tip, ^"modulate:a", 0.0, 0.25)
-	tween.tween_callback(func() -> void: _tip.text = tips[_tip_index])
+	tween.tween_callback(func() -> void: _tip.text = _get_tip_text(tips[_tip_index]))
 	tween.tween_property(_tip, ^"modulate:a", 1.0, 0.25)
+
+
+func _get_tip_text(tip: String) -> String:
+	var text := tr(tip)
+	return tip_format.call(text) if tip_format.is_valid() else text
 
 
 func _start_zoom() -> void:

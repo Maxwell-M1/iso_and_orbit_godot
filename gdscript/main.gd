@@ -24,6 +24,10 @@ func _ready() -> void:
 	levels.level_change_finished.connect(_on_level_change_finished)
 	levels.level_change_failed.connect(_on_level_change_failed)
 	travel_prompt.confirmed.connect(_on_travel_confirmed)
+	if levels.loading_screen != null:
+		# The tips name the keys bound now.
+		levels.loading_screen.tip_format = InputNames.format
+		levels.loading_screen.add_to_group(ActionTexts.GROUP)
 	var level := levels.get_current_level()
 	if level == null:
 		return
