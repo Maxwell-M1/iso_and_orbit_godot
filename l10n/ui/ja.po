@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "地面を左クリック：そこへ走る\n"
 "左ボタン長押し：カーソルを追って走る\n"
-"左右ボタン長押し：カメラの向きへ走る\n"
 "右ボタン + マウス：カメラを回す\n"
-"ホイール：カメラを下げる/上げる"
+"ホイール：カメラを下げる/上げる\n"
+"右ボタンを押したまま左ボタン：カメラの向きへ走る"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "左ボタンを押したまま右ボタン：走りながら見回す"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "左ボタン長押しで走る間はカーソルを隠す"
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "押下が長押しと判定された時点でカーソルが消え、離すと狙った位置に戻ります。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "左ボタンで走行中の右ボタンはカメラを回すだけ"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "左ボタン→右ボタン：キャラクターは進路を保ったまま、周りを見回せます。離した後は、狙っていた位置からマウスで操作を続けます。右ボタンが先、または同時押し：カメラの向きへ走ります。オフ：押す順に関係なく、両ボタンでカメラの向きへ走ります。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

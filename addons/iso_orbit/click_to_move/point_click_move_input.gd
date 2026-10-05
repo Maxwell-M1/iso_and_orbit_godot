@@ -1,8 +1,8 @@
 class_name PointClickMoveInput
 extends Node
 ## Mouse controls familiar from isometric RPGs: a click on the ground runs to that point, a held button runs after
-## the cursor, and the same button together with the camera button runs where the camera looks. The WASD keys also
-## work with the camera button.
+## the cursor, and the camera button held first, then this button too, runs where the camera looks; pressed during a
+## run after the cursor, the camera button only turns the camera. The WASD keys also work with the camera button.
 ##
 ## The component only translates input into [NavigationMover] commands; it moves nothing itself.
 ##
@@ -17,12 +17,14 @@ extends Node
 ##   points ahead, and the character runs while the button is held. If the camera turns on its own meanwhile, the
 ##   cursor stays over the same ground point ([member keep_aim_on_camera_turn]). While running, the cursor is hidden
 ##   ([member hide_cursor_while_held]).
-## - Holding together with [member camera_steer_action] (RMB by default, which rotates the camera): straight where
-##   the camera looks; turn the camera, and the character turns too. The left and right keys (A, D) send the run
-##   diagonally forward, facing forward or facing the direction of movement ([member keys_with_camera_steer]). When
-##   RMB is released first, the run keeps going where the camera looked until the mouse moves, and then the cursor
-##   steers it from straight ahead ([member keep_camera_course]): the buttons released one after the other stop the
-##   character as if released together.
+## - Holding together with [member camera_steer_action] (RMB by default, which rotates the camera), RMB pressed first
+##   or before the press becomes a hold: straight where the camera looks; turn the camera, and the character turns
+##   too. The left and right keys (A, D) send the run diagonally forward, facing forward or facing the direction of
+##   movement ([member keys_with_camera_steer]). When RMB is released first, the run keeps going where the camera
+##   looked until the mouse moves, and then the cursor steers it from straight ahead ([member keep_camera_course]): the
+##   buttons released one after the other stop the character as if released together.
+## - RMB pressed while the hold already runs after the cursor only turns the camera, to look around: the run keeps its
+##   course, and afterwards the mouse steers it on from where it aimed ([member look_around_while_held]).
 ## - Only [member camera_steer_action] and the WASD keys: walk relative to the camera ([member keys_with_camera]),
 ##   sideways (facing forward: A and D move sideways, S moves backward, back first) or with turning (facing the
 ##   direction of movement: A and D move left and right, S moves toward the camera). Releasing the keys or RMB stops.
@@ -57,11 +59,12 @@ enum KeysMode {
 	## The keys do not work.
 	OFF,
 	## Sideways: the character always faces where the camera looks. With RMB: W is forward, A and D are sideways, S is
-	## backward (back first). With both buttons: A and D send the run diagonally forward, facing forward.
+	## backward (back first). With both buttons, running where the camera looks: A and D send the run diagonally
+	## forward, facing forward.
 	SIDESTEP,
 	## With turning: the character faces where it walks. With RMB: W is forward, A and D are left and right, S is
-	## toward the camera, facing it. With both buttons: A and D send the run diagonally forward, facing the direction of
-	## movement.
+	## toward the camera, facing it. With both buttons, running where the camera looks: A and D send the run diagonally
+	## forward, facing the direction of movement.
 	TURN,
 }
 
@@ -82,10 +85,12 @@ const _EDGE_MARGIN := 8.0
 ## How long after the system cursor is moved mouse positions from before the move may still arrive: in the editor's
 ## Game view on macOS the cursor moves a frame or two later.
 const _LATE_POSITIONS_MSEC := 250
-## How far, px, the mouse has to move to take over a run that keeps the camera's course ([member keep_camera_course]):
-## a hand releasing a button moves the mouse a little.
+## How far, px, the mouse has to move to take over a run that keeps the camera's course ([member keep_camera_course]),
+## or in the FOLLOW_POINT mode the point it went to before looking around ([member look_around_while_held]): a hand
+## releasing a button moves the mouse a little.
 const _CURSOR_TAKEOVER_DISTANCE := 8.0
-## How far ahead of the character, m, the cursor is put when it takes over the camera's course.
+## How far ahead of the character, m, the cursor is put when it takes over the camera's course; also the aim when there
+## was none, and the farthest an aim off the screen is brought back to after looking around.
 const _AIM_AHEAD := 4.0
 
 ## What to drive.
@@ -100,10 +105,11 @@ const _AIM_AHEAD := 4.0
 ## How the character runs while [member move_action] is held.
 @export var hold_mode := HoldMode.STEER
 
-## While the button is pressed and the camera turns on its own (following the run) or zooms, move the cursor together
-## with the world: it stays over the same ground point, the character runs where it was aimed, and the mouse turns it
-## as usual. If turned off, the cursor stays in place on the screen, and a camera turn turns the character: it runs
-## along an arc until the cursor is right in front of it.
+## While the button is pressed and the camera turns on its own (following the run), is turned to look around
+## ([member look_around_while_held]) or zooms, move the cursor together with the world: it stays over the same ground
+## point, the character runs where it was aimed, and the mouse turns it as usual. If turned off, the cursor stays in
+## place on the screen, and a camera turn turns the character: it runs along an arc until the cursor is right in front
+## of it.
 ## This requires moving the cursor ([method Viewport.warp_mouse]); where the system cannot do that, the cursor stays in
 ## place, but the running direction is still kept.
 @export var keep_aim_on_camera_turn := true
@@ -113,9 +119,30 @@ const _AIM_AHEAD := 4.0
 ## hidden cursor does not leave the window, and after the button is released it appears where the aim was.
 @export var hide_cursor_while_held := true
 
-## The action that, together with holding [member move_action], drives the character where the camera looks.
-## An empty name disables it.
+## The action that rotates the camera (with [OrbitCameraRig], its [member OrbitCameraRig.rotate_action]). Held first,
+## or pressed before the press of [member move_action] becomes a hold, it drives the run where the camera looks; pressed
+## during a hold that runs after the cursor, it only turns the camera ([member look_around_while_held]). An empty name
+## disables both.
 @export var camera_steer_action := &"camera_rotate"
+
+## When [member camera_steer_action] is pressed while a hold already runs after the cursor, it only turns the camera
+## (the action also rotates it), to look around: the run keeps its course, and the cursor stays over the ground spot it
+## aimed at, as when the camera turns on its own ([member keep_aim_on_camera_turn]; without that the cursor stays in
+## place on the screen, and the camera turn turns the run too). After the action is released, the mouse steers on from
+## that spot. In the [constant HoldMode.FOLLOW_POINT] mode the point the run goes to stays where it was relative to the
+## character until the mouse moves after the release (as with [member keep_camera_course]): from another side the
+## cursor may be over a slope or a platform that point is not on. The keys do nothing meanwhile: the hold drives the
+## run. Pressed first, or before the press of [member move_action] becomes a hold, the action still sends the run where
+## the camera looks, and so does pressing it again while the run still keeps the camera's course. Off: both buttons run
+## where the camera looks in any order.
+## This relies on the action turning the camera, as [member OrbitCameraRig.rotate_action] does: while it is held, the
+## mouse does not move the aim.
+@export var look_around_while_held := true:
+	set(value):
+		look_around_while_held = value
+		if not value:
+			_looking = false
+			_look_point = null
 
 ## When [member camera_steer_action] is released while both buttons drive the run, keep running where the camera looked
 ## until the mouse moves; then the cursor takes the run over, put ahead of the character along the run. If
@@ -125,8 +152,9 @@ const _AIM_AHEAD := 4.0
 ## release).
 @export var keep_camera_course := true
 
-## With [member keep_camera_course]: mouse movement in this time after [member camera_steer_action] is released does not
-## hand the run to the cursor yet: the hand may still be turning the camera.
+## With [member keep_camera_course], and after looking around in the [constant HoldMode.FOLLOW_POINT] mode
+## ([member look_around_while_held]): mouse movement in this time after [member camera_steer_action] is released does
+## not hand the run to the cursor yet: the hand may still be turning the camera.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var cursor_takeover_delay := 0.2
 
 ## Physics layers that can be clicked. The character layer must not be included.
@@ -150,7 +178,8 @@ const _AIM_AHEAD := 4.0
 @export_group("Keys")
 ## How the WASD keys walk with [member camera_steer_action] held (without [member move_action]).
 @export var keys_with_camera := KeysMode.SIDESTEP
-## How the left and right keys steer the run with [member move_action] and [member camera_steer_action] held.
+## How the left and right keys steer the run with [member move_action] and [member camera_steer_action] held, when it
+## goes where the camera looks (not while looking around, [member look_around_while_held]).
 @export var keys_with_camera_steer := KeysMode.SIDESTEP
 ## The "forward" input action (W): where the camera looks.
 @export var move_forward_action := &"move_forward"
@@ -192,11 +221,20 @@ var _late_until_msec := 0
 var _keys_steering := false
 # keep_camera_course: where the hold went with the camera button in its last tick, and where the character faced; after
 # the button is released, the run keeps this course until the cursor takes over (ZERO: no course). How long ago the
-# button was released, s, and how far the mouse has moved since cursor_takeover_delay, px.
+# button was released, s, and how far the mouse has moved since cursor_takeover_delay, px (also for _look_point).
 var _course := Vector3.ZERO
 var _course_facing := Vector3.ZERO
 var _course_age := 0.0
 var _course_drift := Vector2.ZERO
+# look_around_while_held: the camera button was pressed while the hold ran after the cursor, and until it is released it
+# only turns the camera. Whether it was pressed when last checked, to catch the press. In the FOLLOW_POINT mode, the
+# point the run goes to, relative to the character's feet, until the cursor takes over again (null: none).
+var _looking := false
+var _camera_was_pressed := false
+var _look_point: Variant = null
+# The hold ended while the camera held the cursor (looking around): the hidden cursor appears where the aim is when the
+# camera lets it go, not where the camera puts it back.
+var _reveal_pending := false
 
 
 func _init() -> void:
@@ -220,6 +258,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	_holding = false
 	_click_point = null
 	_course = Vector3.ZERO
+	_looking = false
+	_look_point = null
+	_reveal_pending = false
 	if _is_camera_steer_pressed():
 		# The camera button is already held: run after the camera right away, without clicking a point.
 		_click_pending = false
@@ -240,10 +281,15 @@ func _notification(what: int) -> void:
 	# cursor is needed right away, not after the button is released.
 	if what in [NOTIFICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_EXIT_TREE]:
 		_show_cursor()
+		_reveal_pending = false
 
 
 func _process(delta: float) -> void:
 	_update_cursor_visibility()
+	_update_looking()
+	if (_looking or _reveal_pending) and keep_aim_on_camera_turn:
+		_carry_aim()
+		return
 	if _is_cursor_captured():
 		# The camera is being rotated: the cursor is captured and sits in the center of the window. Afterwards the
 		# camera returns it where it was, and the aim starts anew from _cursor.
@@ -270,13 +316,14 @@ func _process(delta: float) -> void:
 			_cursor = _clamp_to_window(mouse)
 			if _cursor != mouse:
 				get_viewport().warp_mouse(_cursor)
-	if on_course:
+	if on_course or (_look_point != null and not _looking):
 		_course_age += delta
 		if _course_age > cursor_takeover_delay:
 			_course_drift += moved
 			if _course_drift.length() > _CURSOR_TAKEOVER_DISTANCE:
 				# The player steers with the mouse again: the cursor takes the run over.
 				_course = Vector3.ZERO
+				_look_point = null
 
 
 func _physics_process(delta: float) -> void:
@@ -286,6 +333,8 @@ func _physics_process(delta: float) -> void:
 		_click_pending = false
 		_click_point = _pick_point(_click_position, false)
 
+	# Before the hold is updated: the camera button pressed in the same tick as the press becomes a hold steers the run.
+	_update_looking()
 	var was_holding := _holding
 	if _held:
 		_update_hold(delta)
@@ -317,7 +366,7 @@ func _update_hold(delta: float) -> void:
 
 
 func _steer_while_held() -> void:
-	if _is_camera_steer_pressed():
+	if _is_camera_steer_pressed() and not _looking:
 		var strafe := 0.0
 		if keys_with_camera_steer != KeysMode.OFF:
 			strafe = Input.get_axis(move_left_action, move_right_action)
@@ -335,7 +384,7 @@ func _steer_while_held() -> void:
 	elif hold_mode == HoldMode.STEER:
 		_steer(_get_cursor_direction())
 	else:
-		var aimed: Variant = _pick_point(_cursor, true)
+		var aimed: Variant = _get_aimed_point()
 		if aimed != null:
 			mover.move_to(aimed)
 
@@ -369,6 +418,8 @@ func _get_keys() -> Vector2:
 func _release() -> void:
 	_held = false
 	_course = Vector3.ZERO
+	_looking = false
+	_look_point = null
 	_set_hold_pending(false)
 	if not _holding:
 		_run_to_click_point()
@@ -453,6 +504,82 @@ func _aim_ahead(mouse: Vector2) -> void:
 	_mouse_seen = get_viewport().get_mouse_position()
 
 
+## [member look_around_while_held]: catches the press of the camera button while the hold runs after the cursor (not on
+## the camera's course: then the button steers the run again) and its release. Called every frame and every tick, so
+## that the press is caught by whichever comes first: in a frame without a tick the aim would otherwise be lost.
+func _update_looking() -> void:
+	var pressed := _is_camera_steer_pressed()
+	if pressed and not _camera_was_pressed and look_around_while_held and _holding and _course == Vector3.ZERO:
+		_looking = true
+		_keep_look_point()
+	elif not pressed and _looking:
+		_looking = false
+		_end_look()
+	_camera_was_pressed = pressed
+
+
+## [member look_around_while_held] in the [constant HoldMode.FOLLOW_POINT] mode with [member keep_aim_on_camera_turn]:
+## the point the run goes to now stays where it is relative to the character's feet. The point under the cursor
+## changes as the camera turns, even with the cursor over the same ground spot: from another side the ray from the
+## camera may hit a slope or a platform in front of it. With no point (the character has arrived), the run is left as
+## it is.
+func _keep_look_point() -> void:
+	_look_point = null
+	if hold_mode == HoldMode.FOLLOW_POINT and keep_aim_on_camera_turn and mover.has_destination():
+		_look_point = mover.get_destination() - mover.get_body().global_position
+
+
+## [member look_around_while_held] with [member keep_aim_on_camera_turn]: while the camera is turned to look around, the
+## aim stays over its ground spot (relative to the character's feet), and the cursor follows it on the screen: the
+## mouse turns only the camera. Also after the hold has ended this way, until the cursor is shown.
+func _carry_aim() -> void:
+	if not _is_cursor_captured():
+		# Where the camera does not capture the cursor, it moves with the mouse too: that is not aiming.
+		_mouse_seen = get_viewport().get_mouse_position()
+	var view := _get_camera()
+	if view == null:
+		return
+	if not _has_aim:
+		# There was no aim (the cursor above the horizon): aim ahead along the run.
+		_aim_offset = mover.get_heading() * _AIM_AHEAD
+		_has_aim = true
+	var aim := mover.get_body().get_global_transform_interpolated().origin + _aim_offset
+	if _is_on_screen(view, aim):
+		_cursor = view.unproject_position(aim)
+
+
+## [member look_around_while_held]: the camera button is released after looking around, and the mouse steers on from the
+## aim. In the [constant HoldMode.FOLLOW_POINT] mode the aim goes under the point the run goes to, as the camera now
+## sees it, so that the cursor picks that point again when it takes over. An aim off the screen would stop the cursor
+## at the window edge and turn the run toward it, so it comes closer along the same direction.
+func _end_look() -> void:
+	# The cursor takes the run over from the point (_look_point) after cursor_takeover_delay, counted from now.
+	_course_age = 0.0
+	_course_drift = Vector2.ZERO
+	var view := _get_camera()
+	if view == null or not (keep_aim_on_camera_turn and _has_aim):
+		return
+	var feet := mover.get_body().get_global_transform_interpolated().origin
+	if _look_point != null and not view.is_position_behind(feet + (_look_point as Vector3)):
+		var under: Variant = _ground_point(view.unproject_position(feet + (_look_point as Vector3)), feet.y)
+		if under != null:
+			_aim_offset = (under as Vector3) - feet
+	var direction := _flat(_aim_offset).normalized()
+	var distance := _flat(_aim_offset).length()
+	while not _is_on_screen(view, feet + direction * distance) and distance > maxf(steer_dead_zone, 0.1):
+		distance = minf(distance * 0.5, _AIM_AHEAD)
+	_aim_offset = direction * distance
+	# A tick may come before the next frame puts the cursor there.
+	if not view.is_position_behind(feet + _aim_offset):
+		_cursor = _clamp_to_window(view.unproject_position(feet + _aim_offset))
+
+
+## Looking around with the aim kept over its ground spot ([member look_around_while_held],
+## [member keep_aim_on_camera_turn]).
+func _is_looking_with_aim() -> bool:
+	return _looking and keep_aim_on_camera_turn and _has_aim
+
+
 ## The mouse movement since the previous frame. After [method _recenter_system_cursor], a position closer to where the
 ## system cursor was before the move is a late one. Its movement is not counted: the move puts the cursor in the center
 ## anyway, and that movement is lost; counted, it would turn the aim there and back.
@@ -482,18 +609,26 @@ func _is_cursor_roaming() -> bool:
 	return _cursor_hidden and Input.mouse_mode == _hidden_mouse_mode
 
 
-## Hides the cursor while running with the button held ([member hide_cursor_while_held]) and shows it afterward. Only
-## a visible cursor is hidden: a captured one (the camera is being rotated) is left alone, and when the camera releases
-## it (and makes it visible), it is hidden again if the button is still held.
+## Hides the cursor while running with the button held ([member hide_cursor_while_held]) and shows it afterward, where
+## the aim is. Only a visible cursor is hidden: a captured one (the camera is being rotated) is left alone, and when the
+## camera releases it (and makes it visible), it is hidden again if the button is still held, or else appears where the
+## aim is.
 func _update_cursor_visibility() -> void:
 	if not (_holding and hide_cursor_while_held):
-		if _is_cursor_roaming():
-			# The system cursor was not following the aim: it appears where the aim is.
+		if _cursor_hidden and not _is_cursor_captured():
+			# The system cursor was not following the aim, or the camera has just put it back where it was when it
+			# captured it.
 			get_viewport().warp_mouse(_cursor)
+		elif _cursor_hidden and keep_aim_on_camera_turn:
+			# The camera holds the cursor (looking around): it appears when the camera lets it go.
+			_reveal_pending = true
 		_show_cursor()
 	elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 		Input.mouse_mode = _hidden_mouse_mode
 		_cursor_hidden = true
+	if _reveal_pending and not _is_cursor_captured():
+		_reveal_pending = false
+		get_viewport().warp_mouse(_cursor)
 
 
 func _show_cursor() -> void:
@@ -533,6 +668,10 @@ func _get_cursor_direction() -> Vector3:
 	var view := _get_camera()
 	if view == null:
 		return Vector3.ZERO
+	if _is_looking_with_aim():
+		# Looking around: the aim may be off the screen, where the cursor cannot follow it.
+		var aimed := _flat(_aim_offset)
+		return aimed.normalized() if aimed.length() >= steer_dead_zone else Vector3.ZERO
 	var feet := mover.get_body().global_position
 	var hit: Variant = _ground_point(_cursor, feet.y)
 	if hit == null:
@@ -540,6 +679,24 @@ func _get_cursor_direction() -> Vector3:
 		return _flat(view.project_ray_normal(_cursor)).normalized()
 	var offset := _flat((hit as Vector3) - feet)
 	return offset.normalized() if offset.length() >= steer_dead_zone else Vector3.ZERO
+
+
+## Where the hold runs in the [constant HoldMode.FOLLOW_POINT] mode: the ground under the cursor, or, while looking
+## around and after it until the mouse moves, the point it went to ([method _keep_look_point]); [code]null[/code] while
+## looking around without such a point.
+func _get_aimed_point() -> Variant:
+	if _look_point != null:
+		return mover.get_body().global_position + (_look_point as Vector3)
+	if _looking and keep_aim_on_camera_turn:
+		return null
+	return _pick_point(_cursor, true)
+
+
+## [param point] is in front of the camera and inside the window, away from its edges.
+func _is_on_screen(view: Camera3D, point: Vector3) -> bool:
+	if view.is_position_behind(point):
+		return false
+	return get_viewport().get_visible_rect().grow(-_EDGE_MARGIN).has_point(view.unproject_position(point))
 
 
 ## Where the ray from the camera through [param screen_position] intersects the horizontal plane at height

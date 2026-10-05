@@ -44,7 +44,9 @@ func _check_settings_window() -> void:
 	(screen.find_child("PhysicsInterpolation") as CheckButton).button_pressed = not interpolation_default
 	(screen.find_child("FpsCounter") as CheckButton).button_pressed = false
 	(screen.find_child("HideCursor") as CheckButton).button_pressed = false
+	(screen.find_child("LookAround") as CheckButton).button_pressed = false
 	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var look_help: Control = _main.get_node("Hud/Panel/Lines/LookHelp")
 	var follow_time := screen.find_child("FollowTime") as HSlider
 	var follow_time_text := screen.find_child("FollowTimeValue") as Label
 	var slider_locked := not follow_time.editable
@@ -71,6 +73,8 @@ func _check_settings_window() -> void:
 	_expect(_tree.physics_interpolation != interpolation_default, "the physics interpolation switch reaches the engine")
 	_expect(not fps_counter.visible, "the FPS counter hides")
 	_expect(not input.hide_cursor_while_held, "the hide-cursor switch reaches the input")
+	_expect(not input.look_around_while_held and not look_help.visible,
+			"the look-around switch reaches the input, and its hint line hides")
 	_expect(slider_locked and follow_time.editable and _rig.follow_movement and _rig.follow_time == 0.0
 			and follow_time_text.text == "instant", "camera follow and its speed reach the camera")
 	print(("pitch: sliders locked while off %s, unlocked by it %s (the turn's speed still locked %s), follow_pitch %s " +
@@ -260,6 +264,8 @@ func _check_settings_window() -> void:
 			and _tree.physics_interpolation == interpolation_default
 			and fps_counter.visible
 			and not _rig.follow_movement and not _rig.follow_pitch and input.hide_cursor_while_held
+			and input.look_around_while_held == GameSettings.DEFAULTS[GameSettings.LOOK_AROUND]
+			and look_help.visible == GameSettings.DEFAULTS[GameSettings.LOOK_AROUND]
 			and max_fps.get_selected_id() == 0 and not pitch_angle.editable and not pitch_time.editable
 			and not follow_time.editable
 			and is_equal_approx(_rig.follow_pitch_time, GameSettings.DEFAULTS[GameSettings.CAMERA_ALIGN_PITCH_TIME])

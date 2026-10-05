@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "BEM no chão — correr até lá\n"
 "Segurar BEM — correr atrás do cursor\n"
-"Segurar BEM + BDM — correr para onde a câmera olha\n"
 "BDM + mouse — girar a câmera\n"
-"Roda — abaixar ou erguer a câmera"
+"Roda — abaixar ou erguer a câmera\n"
+"Segurar BDM e depois BEM — correr para onde a câmera olha"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "Segurar BEM e depois BDM — olhar em volta correndo"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "Ocultar o cursor ao correr segurando o BEM"
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "O cursor some quando o botão passa a ser segurado e volta ao soltar, onde você mirou."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "O BDM durante a corrida com o BEM só gira a câmera"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "BEM e depois BDM: olhe em volta enquanto o personagem mantém o rumo; depois o mouse continua guiando de onde você mirava. BDM primeiro, ou os dois juntos: correr para onde a câmera olha. Desligado: os dois botões correm para onde a câmera olha em qualquer ordem."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

@@ -73,9 +73,13 @@ mouse_filter = 2
 layout_mode = 2
 text = "LMB on the ground — run there
 Hold LMB — run after the cursor
-Hold LMB + RMB — run where the camera looks
 RMB + mouse — orbit the camera
-Wheel — lower or raise the camera"
+Wheel — lower or raise the camera
+Hold RMB, then LMB — run where the camera looks"
+
+[node name="LookHelp" type="Label" parent="Hud/Panel/Lines" unique_id=1063502185]
+layout_mode = 2
+text = "Hold LMB, then RMB — look around on the run"
 
 [node name="KeysHelp" type="Label" parent="Hud/Panel/Lines" unique_id=309071952]
 layout_mode = 2
@@ -127,7 +131,7 @@ character = NodePath("../../../Player")
 [node name="StaminaBar" parent="Hud" unique_id=301746729 node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
 stamina = NodePath("../../Player/Stamina")
 
-[node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "player_appearance", "player_hover", "player_silhouette", "path_view", "help_panel", "fps_counter", "character_state", "keys_help", "strafe_help", "sprint_help", "jump_help")]
+[node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("player", "player_actions", "ledge_guard", "player_input", "camera_rig", "camera_arm", "character_sounds", "player_appearance", "player_hover", "player_silhouette", "path_view", "help_panel", "fps_counter", "character_state", "look_help", "keys_help", "strafe_help", "sprint_help", "jump_help")]
 script = ExtResource("9_applier")
 player = NodePath("../Player")
 player_actions = NodePath("../PlayerActionInput")
@@ -143,6 +147,7 @@ path_view = NodePath("../PathView")
 help_panel = NodePath("../Hud/Panel")
 fps_counter = NodePath("../Hud/FpsCounter")
 character_state = NodePath("../Hud/CharacterState")
+look_help = NodePath("../Hud/Panel/Lines/LookHelp")
 keys_help = NodePath("../Hud/Panel/Lines/KeysHelp")
 strafe_help = NodePath("../Hud/Panel/Lines/StrafeHelp")
 sprint_help = NodePath("../Hud/Panel/Lines/SprintHelp")

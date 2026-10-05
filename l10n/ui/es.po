@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "Clic izq. en el suelo — correr allí\n"
 "Mantener clic izq. — correr tras el cursor\n"
-"Mantener clic izq. + der. — correr adonde mira la cámara\n"
 "Clic der. + mouse — orbitar la cámara\n"
-"Rueda — bajar o subir la cámara"
+"Rueda — bajar o subir la cámara\n"
+"Mantener clic der. y luego izq. — correr adonde mira la cámara"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "Mantener clic izq. y luego der. — mirar alrededor al correr"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "Ocultar cursor al correr con clic izq. mantenido"
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "El cursor se oculta en cuanto la pulsación pasa a ser mantenida y reaparece al soltar, donde apuntaste."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "El clic der. al correr con clic izq. solo gira la cámara"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "Clic izq. y luego der.: mira alrededor mientras el personaje mantiene el rumbo; después el mouse sigue guiando desde donde apuntabas. Clic der. primero, o ambos a la vez: correr adonde mira la cámara. Desactivado: ambos botones corren adonde mira la cámara en cualquier orden."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

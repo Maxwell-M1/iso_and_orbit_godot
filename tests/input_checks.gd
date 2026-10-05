@@ -1,7 +1,7 @@
 extends "res://tests/check_suite.gd"
 ## Mouse and keys with real input events: a click, an LMB hold in both modes, LMB + RMB (and RMB released a moment
-## before LMB), RMB + WASD and LMB + RMB + A/D in all modes, keys dropping the run to a click point, the signal of a new
-## run, the cursor hiding while running with LMB held.
+## before LMB), RMB over a run after the cursor looking around, RMB + WASD and LMB + RMB + A/D in all modes, keys
+## dropping the run to a click point, the signal of a new run, the cursor hiding while running with LMB held.
 
 
 func _checks() -> Array[Callable]:
@@ -13,6 +13,8 @@ func _checks() -> Array[Callable]:
 		_check_camera_steer_up_the_ramp,
 		_check_camera_steer_turn,
 		_check_camera_steer_release,
+		_check_look_around,
+		_check_look_around_order,
 		_check_camera_keys,
 		_check_keys_drop_click_point,
 		_check_run_requested,
@@ -282,6 +284,219 @@ func _release_camera_steer_first(ticks: int, nudge := Vector2.ZERO) -> Dictionar
 			stop = (i + 1) * DT
 			break
 	return {turn = turn, stop = stop}
+
+
+## LMB held runs after the cursor, and RMB pressed then only turns the camera, to look around: the run keeps its
+## course while the camera turns and after RMB is released, in both modes, and the mouse then steers it on from where it
+## aimed, a little for a small movement. In FOLLOW_POINT beside the ramp, the camera turned so that the ramp is in front
+## of the point the run goes to: the run does not turn onto the ramp. An aim far ahead that ends up behind the camera
+## comes closer, and the course stays. Without look_around_while_held, RMB sends the run where the camera looks; without
+## keep_aim_on_camera_turn, the cursor stays in place on the screen, and the camera turn turns the run.
+func _check_look_around() -> void:
+	print("\n== the left button runs after the cursor, then the right one: looking around, the run keeps its course")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var report := PackedStringArray()
+	var kept := true
+	for mode: int in [PointClickMoveInput.HoldMode.STEER, PointClickMoveInput.HoldMode.FOLLOW_POINT]:
+		input.hold_mode = mode as PointClickMoveInput.HoldMode
+		var look := await _look_around(Vector3.FORWARD, Vector3(6, 0, 0), Vector2(-360, 0))
+		kept = kept and look.during < 2.0 and look.after < 2.0 and look.camera > 80.0
+		report.append("%s: the camera turned %.0f deg, the run %.2f deg, after RMB %.2f deg" % [
+			PointClickMoveInput.HoldMode.keys()[mode], look.camera, look.during, look.after])
+	var ramp := await _look_around(Vector3.FORWARD, Vector3(8, 0, 2), Vector2(-480, 0), Vector2.ZERO,
+			Vector3(10, 0, 18))
+	input.hold_mode = PointClickMoveInput.HoldMode.STEER
+	var nudged := await _look_around(Vector3.FORWARD, Vector3(6, 0, 0), Vector2(-360, 0), Vector2(40, 0))
+	var far := await _look_around(Vector3.RIGHT, Vector3(14, 0, 0), Vector2(720, 0))
+	input.look_around_while_held = false
+	var steered := await _look_around(Vector3.FORWARD, Vector3(6, 0, 0), Vector2(-360, 0))
+	input.look_around_while_held = true
+	input.keep_aim_on_camera_turn = false
+	var curled := await _look_around(Vector3.FORWARD, Vector3(6, 0, 0), Vector2(-360, 0))
+	input.keep_aim_on_camera_turn = true
+	print(("%s; FOLLOW_POINT beside the ramp, the camera turned %.0f deg: the run %.2f deg, after RMB %.2f deg, rose " +
+			"%.2f m; the mouse 40 px to the right after RMB: the run turned %.1f deg; an aim 14 m ahead, the camera " +
+			"turned %.0f deg: the run %.2f deg, after RMB %.2f deg; look_around_while_held off: %.1f deg; " +
+			"keep_aim_on_camera_turn off: %.1f deg") % ["; ".join(report), ramp.camera, ramp.during, ramp.after,
+		ramp.rise, nudged.nudge, far.camera, far.during, far.after, steered.during, curled.during])
+	_expect(kept, "RMB over a run after the cursor only turns the camera: the run keeps its course, in both modes")
+	_expect(ramp.during < 2.0 and ramp.after < 5.0 and ramp.rise < 0.05,
+			"FOLLOW_POINT: the point under the cursor seen from another side does not send the run onto the ramp")
+	_expect(nudged.nudge > 2.0 and nudged.nudge < 30.0, "after RMB the mouse steers on from where the run aimed")
+	_expect(far.camera > 170.0 and far.during < 2.0 and far.after < 2.0,
+			"an aim that ends up behind the camera comes closer, and the run keeps its course")
+	_expect(steered.during > 45.0, "look_around_while_held off: RMB sends the run where the camera looks")
+	_expect(curled.during > 45.0,
+			"keep_aim_on_camera_turn off: the cursor stays in place on the screen, and the camera turn turns the run")
+
+
+## From [param from], the camera looking along [param view]: LMB is held over the ground at [param aim] from the
+## character, and the run goes after the cursor; RMB turns the camera by [param orbit] (px) and is released, LMB held
+## on for 1 s. With [param nudge], the mouse moves by it after that. Returns how far the camera turned
+## ([code]camera[/code]), the largest turn of the run from its direction at the RMB press while RMB is held
+## ([code]during[/code]) and after it is released ([code]after[/code]), and the turn the nudge made
+## ([code]nudge[/code]), in degrees; how far the character rose after the release ([code]rise[/code], m).
+func _look_around(view: Vector3, aim: Vector3, orbit: Vector2, nudge := Vector2.ZERO,
+		from := Vector3(-8, 0, 0)) -> Dictionary:
+	await _teleport(from)
+	_rig.look_along(view)
+	await _settle_camera()
+	var screen := _camera.unproject_position(_player.global_position + aim)
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(40)
+	var heading := _mover.get_heading()
+	var camera_before := _camera_forward()
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _ticks(2)
+	_send_motion(screen, orbit)
+	var during := 0.0
+	for i in 40:
+		await _tree.physics_frame
+		during = maxf(during, _flat_angle(heading, _mover.get_heading()))
+	var camera := _flat_angle(camera_before, _camera_forward())
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	var after := 0.0
+	var ground := _player.global_position.y
+	var rise := 0.0
+	for i in 60:
+		await _tree.physics_frame
+		after = maxf(after, _flat_angle(heading, _mover.get_heading()))
+		rise = maxf(rise, _player.global_position.y - ground)
+	var turn := 0.0
+	if nudge != Vector2.ZERO:
+		var before := _mover.get_heading()
+		_send_motion(screen + nudge, nudge)
+		await _ticks(20)
+		turn = _flat_angle(before, _mover.get_heading())
+	_send_button(MOUSE_BUTTON_LEFT, false, screen + nudge)
+	await _ticks_until_stopped(120)
+	return {camera = camera, during = during, after = after, nudge = turn, rise = rise}
+
+
+## Which press order looks around and which runs where the camera looks: RMB pressed within hold_delay of LMB (both
+## together) runs where the camera looks; RMB pressed again while the run still keeps the camera's course steers it
+## again, and after the cursor has taken the run over it looks around. While looking around the keys do nothing, and
+## LMB released stops the run. In FOLLOW_POINT, a hold with the cursor at the feet, which only creeps after its point,
+## does not run off when RMB looks around.
+func _check_look_around_order() -> void:
+	print("\n== the press order: looking around or running where the camera looks")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	var center := _tree.root.get_visible_rect().size / 2.0
+
+	# Both together: LMB, and RMB within hold_delay. The camera looks north, the cursor is to the east.
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	var east := _camera.unproject_position(_player.global_position + Vector3(6, 0, 0))
+	_send_motion(east, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, east)
+	await _ticks(6)
+	_send_button(MOUSE_BUTTON_RIGHT, true, east)
+	await _ticks(40)
+	var chord := _flat_angle(_mover.get_heading(), _camera_forward())
+	_send_button(MOUSE_BUTTON_LEFT, false, east)
+	_send_button(MOUSE_BUTTON_RIGHT, false, east)
+	await _ticks_until_stopped(120)
+
+	# RMB, then LMB: the run goes where the camera looks; RMB released and pressed again before the mouse moves.
+	var again := await _press_right_again(false)
+	# The same, but the mouse moves after the release, and the cursor takes the run over first.
+	var after_cursor := await _press_right_again(true)
+
+	# Looking around: D held for 0.5 s, then LMB released with RMB still held.
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	east = _camera.unproject_position(_player.global_position + Vector3(6, 0, 0))
+	_send_motion(east, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, east)
+	await _ticks(40)
+	var heading := _mover.get_heading()
+	_send_button(MOUSE_BUTTON_RIGHT, true, east)
+	await _ticks(2)
+	Input.action_press(&"move_right")
+	await _ticks(30)
+	var keys_turn := _flat_angle(heading, _mover.get_heading())
+	Input.action_release(&"move_right")
+	await _ticks(2)
+	_send_button(MOUSE_BUTTON_LEFT, false, east)
+	var stop := await _ticks_until_stopped(60)
+	_send_button(MOUSE_BUTTON_RIGHT, false, east)
+	await _ticks(2)
+
+	# FOLLOW_POINT with the cursor at the feet: the character creeps after the point that moves with it; RMB does not
+	# send it off.
+	input.hold_mode = PointClickMoveInput.HoldMode.FOLLOW_POINT
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	var feet := _camera.unproject_position(_player.global_position + Vector3(0.05, 0, 0))
+	_send_motion(feet, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, feet)
+	await _ticks(20)
+	var speed_before := 0.0
+	for i in 20:
+		await _tree.physics_frame
+		speed_before = maxf(speed_before, _mover.get_speed())
+	_send_button(MOUSE_BUTTON_RIGHT, true, feet)
+	var fastest := 0.0
+	for i in 40:
+		await _tree.physics_frame
+		fastest = maxf(fastest, _mover.get_speed())
+	_send_button(MOUSE_BUTTON_RIGHT, false, feet)
+	for i in 30:
+		await _tree.physics_frame
+		fastest = maxf(fastest, _mover.get_speed())
+	_send_button(MOUSE_BUTTON_LEFT, false, feet)
+	input.hold_mode = PointClickMoveInput.HoldMode.STEER
+	await _ticks_until_stopped(120)
+	_send_motion(center, Vector2.ZERO)
+
+	print(("LMB, RMB 0.1 s later: the run %.2f deg off the camera; RMB pressed again on the camera's course: the run " +
+			"turned %.1f deg with the camera, after the cursor took over: %.2f deg; looking around, D for 0.5 s: " +
+			"turned %.2f deg; LMB released: stopped in %.2f s; FOLLOW_POINT at the feet: at most %.2f m/s before RMB, " +
+			"%.2f m/s after") % [chord, again, after_cursor, keys_turn, stop, speed_before, fastest])
+	_expect(chord < 2.0, "LMB and RMB pressed together (within hold_delay): the run goes where the camera looks")
+	_expect(again > 45.0, "RMB pressed again while the run keeps the camera's course: it steers by the camera again")
+	_expect(after_cursor < 2.0, "RMB pressed after the cursor has taken the run over: looking around")
+	_expect(keys_turn < 1.0, "while looking around the keys do nothing")
+	_expect(stop >= 0.0 and stop <= _mover.settings.stop_time + 0.1, "LMB released while looking around stops the run")
+	_expect(speed_before < 1.0 and fastest < speed_before + 0.1,
+			"FOLLOW_POINT: a hold with the cursor at the feet does not run off when RMB looks around")
+
+
+## From (-8, 0, 0), the camera looking east: RMB, then LMB, the run goes where the camera looks; RMB is released, and
+## 0.33 s later pressed again and the camera turned by 90°. With [param mouse_first], the mouse moves 40 px before that,
+## and the cursor takes the run over. Returns how far the run turned while RMB was held again, degrees.
+func _press_right_again(mouse_first: bool) -> float:
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	var screen := _tree.root.get_visible_rect().size / 2.0
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(30)
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	await _ticks(20)
+	if mouse_first:
+		_send_motion(screen + Vector2(0, -40), Vector2(0, -40))
+		screen += Vector2(0, -40)
+		await _ticks(10)
+	var heading := _mover.get_heading()
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _ticks(2)
+	_send_motion(screen, Vector2(-360, 0))
+	var turn := 0.0
+	for i in 40:
+		await _tree.physics_frame
+		turn = maxf(turn, _flat_angle(heading, _mover.get_heading()))
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks_until_stopped(120)
+	return turn
 
 
 ## RMB + WASD and LMB + RMB + A/D in both modes (sidestep and turn). The keys go through input actions.

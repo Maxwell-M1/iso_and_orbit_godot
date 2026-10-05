@@ -1,9 +1,9 @@
 extends "res://tests/check_suite.gd"
 ## Camera: the follow (smooth, without going past the run, still for a run toward the camera, within the speed limit,
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
-## run, and while it is not yet clear whether it is a click or a hold), the cursor keeping its aim while the camera
-## turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning the pitch and the height on the
-## run, gliding up the stairs.
+## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
+## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
+## the pitch and the height on the run, gliding up the stairs.
 
 
 func _checks() -> Array[Callable]:
@@ -13,6 +13,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_follow_stairs,
 		_check_camera_follow_pauses,
 		_check_camera_waits_after_rotate,
+		_check_look_around_waits,
 		_check_camera,
 		_check_camera_pitch_follow,
 		_check_camera_zoom_follow,
@@ -449,6 +450,59 @@ func _check_camera_waits_after_rotate() -> void:
 	_expect(off_ends and snap_ends and teleport_ends, "turning the setting off, snap() and a teleport end the wait")
 	_expect(waits_on_hold and ends_at_stop,
 			"a hold that goes on after the right button is not a new run: the wait lasts until the stop")
+
+
+## The follow turns the camera behind a run after the cursor. RMB pressed over that run looks around, and after it is
+## released, LMB held on, the camera stays where it was left while the run keeps its course; a new hold, started before
+## the character stops, brings the follow back.
+func _check_look_around_waits() -> void:
+	print("\n== looking around on a run after the cursor with the follow on: the camera waits after the right button")
+	var default_time := _rig.follow_time
+	_rig.follow_movement = true
+	_rig.follow_time = 0.5
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	var screen := _camera.unproject_position(_player.global_position + Vector3(6, 0, 0))
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(60)
+	var behind := _camera_angle_to(Vector3.RIGHT)
+	var heading := _mover.get_heading()
+	_send_button(MOUSE_BUTTON_RIGHT, true, screen)
+	await _ticks(2)
+	# 240 px to the left at 0.25 °/px: the camera looks 60° to the left of the run.
+	_send_motion(screen, Vector2(-240, 0))
+	await _ticks(30)
+	_send_button(MOUSE_BUTTON_RIGHT, false, screen)
+	await _ticks(10)
+	var left_at := _camera_angle_to(Vector3.RIGHT)
+	await _ticks(60)
+	var stays := _camera_angle_to(Vector3.RIGHT)
+	var run_turn := _flat_angle(heading, _mover.get_heading())
+	var waiting := _rig.is_follow_waiting()
+	# A new hold while the character still brakes: the follow comes back without waiting for the stop.
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(2)
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(14)
+	var speed_at_new_run := _mover.get_speed()
+	var waiting_on_new_run := _rig.is_follow_waiting()
+	await _ticks(60)
+	var new_run_lag := _flat_angle(_camera_forward(), _mover.get_heading())
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks_until_stopped(60)
+	_rig.follow_movement = false
+	_rig.follow_time = default_time
+	print(("the camera %.1f deg off the run before RMB; left %.1f deg off, 1 s later %.1f deg, waiting %s, the run " +
+			"turned %.2f deg from before RMB; a new hold at %.1f m/s: waiting %s, the camera %.1f deg off the run " +
+			"1 s later") % [behind, left_at, stays, waiting, run_turn, speed_at_new_run, waiting_on_new_run,
+		new_run_lag])
+	_expect(behind < 5.0, "the follow turns the camera behind the run after the cursor")
+	_expect(left_at > 50.0 and absf(stays - left_at) < 1.0 and waiting and run_turn < 2.0,
+			"after looking around, the camera stays where it was left while the run keeps its course with LMB held")
+	_expect(speed_at_new_run > _rig.follow_min_speed and not waiting_on_new_run and new_run_lag < 5.0,
+			"a new hold before the stop brings the follow back")
 
 
 ## Presses the right button for [param ticks] ticks without moving the mouse. Returns whether the follow waits after

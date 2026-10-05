@@ -31,7 +31,8 @@ extends Node
 ## The panel with the character's state and events.
 @export var character_state: Control
 
-## Hint lines about the keys with RMB, sprint and jump: they hide when these are turned off.
+## Hint lines about looking around on the run, the keys with RMB, sprint and jump: they hide when these are turned off.
+@export var look_help: Control
 @export var keys_help: Control
 @export var strafe_help: Control
 @export var sprint_help: Control
@@ -65,6 +66,11 @@ func _apply(key: StringName, value: Variant) -> void:
 				player_input.keys_with_camera_steer = int(value) as PointClickMoveInput.KeysMode
 			if strafe_help != null:
 				strafe_help.visible = int(value) != PointClickMoveInput.KeysMode.OFF
+		GameSettings.LOOK_AROUND:
+			if player_input != null:
+				player_input.look_around_while_held = value
+			if look_help != null:
+				look_help.visible = value
 		GameSettings.BACKWARD_SLOWDOWN:
 			if player != null:
 				player.mover.settings.backward_speed_multiplier = 1.0 - value / 100.0

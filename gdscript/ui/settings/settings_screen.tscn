@@ -178,6 +178,19 @@ theme_type_variation = &"HintLabel"
 text = "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 autowrap_mode = 3
 
+[node name="LookAround" type="CheckButton" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+layout_mode = 2
+text = "RMB during an LMB run only turns the camera"
+script = ExtResource("2_check")
+key = &"gameplay/look_around"
+
+[node name="LookAroundHint" type="Label" parent="Center/Window/Layout/Tabs/Gameplay/Page/List"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+autowrap_mode = 3
+
 [node name="Character" type="ScrollContainer" parent="Center/Window/Layout/Tabs"]
 visible = false
 layout_mode = 2

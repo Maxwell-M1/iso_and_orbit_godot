@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "左键点击地面 — 跑向该点\n"
 "按住左键 — 跟随光标奔跑\n"
-"按住左键 + 右键 — 向相机所看方向奔跑\n"
 "右键 + 鼠标 — 环绕旋转相机\n"
-"滚轮 — 降低或升高相机"
+"滚轮 — 降低或升高相机\n"
+"按住右键再按左键 — 向相机所看方向奔跑"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "按住左键再按右键 — 奔跑时环顾四周"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "按住左键奔跑时隐藏光标"
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "按下一旦变为按住，光标即隐藏；松开后光标在你瞄准的位置重新出现。"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "按住左键奔跑时，右键只旋转相机"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "先左键后右键：角色保持路线，你可以环顾四周；松开后鼠标从你瞄准的位置继续引导。先右键或两键同时：向相机所看方向奔跑。关闭：无论按键顺序，两键都向相机所看方向奔跑。"
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

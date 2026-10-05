@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "Zemine sol tık — oraya koş\n"
 "Sol tuş basılı — imlecin peşinden koş\n"
-"Sol + sağ tuş basılı — kameranın baktığı yöne koş\n"
 "Sağ tuş + fare — kamerayı döndür\n"
-"Tekerlek — kamerayı alçalt veya yükselt"
+"Tekerlek — kamerayı alçalt veya yükselt\n"
+"Sağ tuş basılıyken sol tuş — kameranın baktığı yöne koş"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "Sol tuş basılıyken sağ tuş — koşarken etrafa bak"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "Basılı sol tuşla koşarken imleci gizle"
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "Basış, basılı tutmaya dönüştüğü anda imleç gizlenir; bırakınca nişan aldığınız yerde yeniden belirir."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "Sol tuşla koşarken sağ tuş yalnızca kamerayı döndürür"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "Önce sol, sonra sağ tuş: karakter rotasını korurken etrafa bakın; ardından fare, nişan aldığınız yerden yönlendirmeye devam eder. Önce sağ tuş ya da ikisi birlikte: kameranın baktığı yöne koşu. Kapalı: iki tuş hangi sırayla basılırsa basılsın kameranın baktığı yöne koşar."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

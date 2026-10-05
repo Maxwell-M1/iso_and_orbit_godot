@@ -11,15 +11,19 @@ msgstr ""
 msgid ""
 "LMB on the ground — run there\n"
 "Hold LMB — run after the cursor\n"
-"Hold LMB + RMB — run where the camera looks\n"
 "RMB + mouse — orbit the camera\n"
-"Wheel — lower or raise the camera"
+"Wheel — lower or raise the camera\n"
+"Hold RMB, then LMB — run where the camera looks"
 msgstr ""
 "ЛКМ по земле — бежать в точку\n"
 "Зажатая ЛКМ — бежать за курсором\n"
-"Зажатые ЛКМ + ПКМ — бежать, куда смотрит камера\n"
 "ПКМ + мышь — вращать камеру\n"
-"Колесо — опустить или поднять камеру"
+"Колесо — опустить или поднять камеру\n"
+"Зажатая ПКМ, затем ЛКМ — бежать, куда смотрит камера"
+
+#: gdscript/main.tscn
+msgid "Hold LMB, then RMB — look around on the run"
+msgstr "Зажатая ЛКМ, затем ПКМ — осмотреться на бегу"
 
 #: gdscript/main.tscn
 msgid "RMB + WASD — move relative to the camera"
@@ -104,6 +108,14 @@ msgstr "Прятать курсор, пока бежишь с зажатой Л�
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "The cursor hides as soon as a press becomes a hold and comes back on release, where you aimed."
 msgstr "Курсор пропадает, как только нажатие стало удержанием, и появляется после отпускания кнопки — там, куда целились."
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "RMB during an LMB run only turns the camera"
+msgstr "ПКМ на бегу с ЛКМ только поворачивает камеру"
+
+#: gdscript/ui/settings/settings_screen.tscn
+msgid "LMB, then RMB: look around while the character keeps its course; afterwards the mouse steers on from where you aimed. RMB first, or both together: run where the camera looks. Off: both buttons run where the camera looks in any order."
+msgstr "ЛКМ, потом ПКМ — осмотреться, пока персонаж держит курс; после этого мышь ведёт его дальше оттуда, куда вы целились. Сначала ПКМ или обе сразу — бег туда, куда смотрит камера. Выключено: обе кнопки в любом порядке — бег туда, куда смотрит камера."
 
 #: gdscript/ui/settings/settings_screen.tscn
 msgid "Character"

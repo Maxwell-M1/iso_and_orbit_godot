@@ -22,6 +22,8 @@ const HIDE_CURSOR_ON_HOLD := &"gameplay/hide_cursor_on_hold"
 const CAMERA_KEYS_MODE := &"gameplay/camera_keys_mode"
 ## LMB + RMB + A/D: off, sidestep or diagonal (PointClickMoveInput.KeysMode).
 const CAMERA_STEER_KEYS_MODE := &"gameplay/camera_steer_keys_mode"
+## RMB pressed during a run with LMB held only turns the camera (PointClickMoveInput.look_around_while_held).
+const LOOK_AROUND := &"gameplay/look_around"
 ## How much slower, in percent, the character walks backward.
 const BACKWARD_SLOWDOWN := &"gameplay/backward_slowdown"
 const JUMP := &"character/jump"
@@ -91,6 +93,7 @@ const DEFAULTS := {
 	HIDE_CURSOR_ON_HOLD: true,
 	CAMERA_KEYS_MODE: 2,  # PointClickMoveInput.KeysMode.TURN
 	CAMERA_STEER_KEYS_MODE: 2,  # PointClickMoveInput.KeysMode.TURN
+	LOOK_AROUND: true,
 	BACKWARD_SLOWDOWN: 30.0,  # LocomotionSettings.backward_speed_multiplier = 0.7
 	JUMP: true,
 	JUMP_HEIGHT: 1.0,
