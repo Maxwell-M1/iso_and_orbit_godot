@@ -29,9 +29,10 @@ extends Node3D
 ## while it stands, none in the air or while it does not float.
 ##
 ## Runs in the physics tick after the character (its priority is higher), so physics interpolation smooths the model
-## just as it smooths the body. When the character is teleported and its physics interpolation is reset
-## ([method Node.reset_physics_interpolation]), the model is put in place at once. A mistake in the setup is printed as
-## a warning when the node enters the tree ([method get_setup_warnings]).
+## just as it smooths the body. When the character is teleported ([method GroundCharacter.teleport]), the model is put
+## in place at once, with physics interpolation on or off; so is it when the character's physics interpolation is
+## reset ([method Node.reset_physics_interpolation], which does nothing while the interpolation is off). A mistake in
+## the setup is printed as a warning when the node enters the tree ([method get_setup_warnings]).
 
 ## The model started to rise ([param floating] is [code]true[/code]) or has settled back onto the ground.
 signal floating_changed(floating: bool)
@@ -181,6 +182,7 @@ func _ready() -> void:
 	_bob_phase = randf() if random_bob_phase else 0.0
 	character.touched_floor.connect(_on_touched_floor)
 	character.jumped.connect(_on_jumped)
+	character.teleported.connect(snap)
 	snap()
 
 
@@ -197,7 +199,8 @@ func _exit_tree() -> void:
 
 
 func _notification(what: int) -> void:
-	# The character was teleported and its interpolation reset (the notification goes down to its children).
+	# The character's physics interpolation was reset (the notification goes down to its children, and only while the
+	# interpolation is on). A teleport comes as its own signal too.
 	if what == NOTIFICATION_RESET_PHYSICS_INTERPOLATION and not _snapping and is_node_ready():
 		snap()
 
@@ -233,9 +236,10 @@ func get_hover_height() -> float:
 	return _height_now
 
 
-## Puts the model in its place at once, without the rise, the glide and the springs: after the character is
-## teleported, for example. Resetting the character's physics interpolation does it too, and so does a move of more
-## than a meter in one tick. Floating or not follows [member enabled].
+## Puts the model in its place at once, without the rise, the glide and the springs. A teleport
+## ([method GroundCharacter.teleport]) does it by itself, and so do resetting the character's physics interpolation
+## (while the interpolation is on) and a move of more than a meter in one tick. Floating or not follows
+## [member enabled].
 func snap() -> void:
 	if character == null:
 		return

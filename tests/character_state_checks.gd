@@ -4,9 +4,9 @@ extends "res://tests/check_suite.gd"
 ## cycle, the steps switch, a teleport mid-run, a body turned in the level. Stairs and slopes: up and down a staircase
 ## without leaving the ground with the real height of every stair, a block too high, a gentle and a steep slope. Routes
 ## on the level without a false take-off. Floating (CharacterHover): the height and the sway, no steps, a glide over the
-## stairs, a ramp without lag, a jump, a ledge and a wall, a slower fall, turning it off and on. While time stands
-## still, the running hero stays as it is. The monitor panel shows the state and the latest events. The demo's
-## character is set up without warnings.
+## stairs, a ramp without lag, a jump, a ledge and a wall, a slower fall, turning it off and on, a short teleport with
+## physics interpolation on and off. While time stands still, the running hero stays as it is. The monitor panel shows
+## the state and the latest events. The demo's character is set up without warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
 const STRIP_Z := 34.0
@@ -29,6 +29,7 @@ func _checks() -> Array[Callable]:
 		_check_hover,
 		_check_hover_fall,
 		_check_hover_toggle,
+		_check_hover_teleport,
 		_check_time_stopped,
 		_check_monitor,
 	]
@@ -966,6 +967,39 @@ func _check_turned_body() -> void:
 	_expect(running < 3.0 and absf(local.x) < 0.05 and local.y > 0.9,
 			"on the run the model faces the run, which counts as running forward")
 	_expect(teleported < 1.0 and kept < 1.0, "a teleport with a facing turns the model there at once, and it stays")
+
+
+## A floating character teleported a short way (0.8 m aside, onto a block 0.2 m high), with physics interpolation on and
+## off: the floating model is put in place at once, instead of sinking into the block and rising after it. The hover
+## hears the teleport by its signal: resetting the interpolation sends nothing while the interpolation is off.
+func _check_hover_teleport() -> void:
+	print("\n== a short teleport of a floating character, physics interpolation on and off")
+	var settings: GameSettings = _tree.root.get_node(^"Settings")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	settings.set_value(GameSettings.CHARACTER_HOVER, true)
+	var box := BoxShape3D.new()
+	box.size = Vector3(2, 0.2, 3)
+	var block := await _add_body(box, Vector3(-9, 0.1, STRIP_Z))
+	var report := PackedStringArray()
+	var in_place := true
+	for interpolation: bool in [true, false]:
+		_tree.physics_interpolation = interpolation
+		await _teleport(Vector3(-10.6, 0, STRIP_Z))
+		await _ticks(90)
+		var settled := hover.global_position.y - _player.global_position.y
+		_player.teleport(Vector3(-9.8, 0.2, STRIP_Z))
+		await _tree.physics_frame
+		var after := hover.global_position.y - _player.global_position.y
+		report.append("interpolation %s: %.3f m over the feet, %.3f m right after the teleport" % [interpolation,
+				settled, after])
+		in_place = in_place and absf(after - settled) < 0.05
+	_tree.physics_interpolation = settings.get_value(GameSettings.PHYSICS_INTERPOLATION)
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	_free_body(block)
+	await _ticks(60)
+	await _teleport(Vector3.ZERO)
+	print("; ".join(report))
+	_expect(in_place, "a short teleport puts the floating model in place at once, with physics interpolation on and off")
 
 
 ## Time stands still (Engine.time_scale 0): the physics ticks go on with a zero step. The running hero stays as it is,
