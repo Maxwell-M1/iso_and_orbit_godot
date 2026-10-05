@@ -133,7 +133,8 @@ func _check_hold_follow_point(stop_on_release: bool) -> void:
 	print("   target ahead of the player (every 10th tick), m: %s" % _fmt(_every(lead, 10)))
 	print("after release: ran %.2f m more in %.2f s, speeds (every 3rd): %s" % [
 		_flat_distance(release_position, _player.global_position), after.size() * DT, _fmt(_every(after, 3))])
-	# The character starts running when the press becomes a hold (hold_delay 0.2 s) and accelerates for 0.35 s.
+	# The character starts running when the press becomes a hold (hold_delay 0.2 s) and reaches full speed in
+	# acceleration_time.
 	_expect(_min(speeds.slice(45)) > 0.9 * _mover.settings.max_speed, "keeps running while held")
 	_expect(not _mover.has_destination() and _mover.get_speed() == 0.0, "stops after release")
 	if stop_on_release:
@@ -462,7 +463,7 @@ func _check_look_around_order() -> void:
 	_expect(after_cursor < 2.0, "RMB pressed after the cursor has taken the run over: looking around")
 	_expect(keys_turn < 1.0, "while looking around the keys do nothing")
 	_expect(stop >= 0.0 and stop <= _mover.settings.stop_time + 0.1, "LMB released while looking around stops the run")
-	_expect(speed_before < 1.0 and fastest < speed_before + 0.1,
+	_expect(speed_before < 0.5 * _mover.settings.max_speed and fastest < speed_before + 0.1,
 			"FOLLOW_POINT: a hold with the cursor at the feet does not run off when RMB looks around")
 
 

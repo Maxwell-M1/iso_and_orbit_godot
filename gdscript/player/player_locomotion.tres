@@ -4,6 +4,4 @@
 
 [resource]
 script = ExtResource("1_settings")
-acceleration_time = 0.35000000000000003
-stop_time = 0.4
 turn_speed = 12.566371
