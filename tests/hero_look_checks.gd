@@ -133,7 +133,7 @@ func _check_hand_sway() -> void:
 	await _teleport(Vector3.ZERO)
 
 
-## Hero look from the settings: the battle mage (10) by default; any of the ten options goes on on the fly: the old
+## Hero look from the settings: the necromancer (8) by default; any of the ten options goes on on the fly: the old
 ## model is removed, the staff in the new model's hand sways in step with the strides, the silhouette sits on its
 ## meshes.
 func _check_appearance() -> void:

@@ -102,7 +102,7 @@ const DEFAULTS := {
 	SPRINT_BONUS: 50.0,  # LocomotionSettings.sprint_speed_multiplier = 1.5
 	FATIGUE: true,
 	SPRINT_DURATION: 5.0,
-	CHARACTER_LOOK: 10,  # battle mage
+	CHARACTER_LOOK: 8,  # necromancer
 	CHARACTER_HOVER: false,
 	CAMERA_MOUSE_PITCH: false,
 	CAMERA_FOLLOW: false,

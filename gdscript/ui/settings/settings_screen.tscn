@@ -219,7 +219,7 @@ text = "Hero look"
 [node name="Look" type="OptionButton" parent="Center/Window/Layout/Tabs/Character/Page/List/LookRow"]
 unique_name_in_owner = true
 layout_mode = 2
-selected = 9
+selected = 7
 item_count = 10
 popup/item_0/text = "1 · Storm Mage"
 popup/item_0/id = 1
