@@ -10,9 +10,10 @@ extends Node3D
 ## - The follow: while the target runs, the camera on its own turns behind it ([member follow_movement]), brings its
 ##   pitch to [member follow_pitch_angle] ([member follow_pitch]) and its height (the zoom) to
 ##   [member follow_zoom_level] ([member follow_zoom]), each in its own time. Every one of these moves starts and ends
-##   smoothly, the turn is never faster than [member follow_max_turn_speed], and a run that comes at the camera within
-##   [member follow_toward_camera_angle] of straight does not turn it. While the camera is rotated with the mouse, it
-##   does not follow, and afterwards it waits until the target stops or a new run starts
+##   smoothly, and the turn is never faster than [member follow_max_turn_speed]. A run that comes at the camera within
+##   [member follow_toward_camera_angle] of straight does not turn it, and neither does the run's direction in a sharp
+##   turn or a turnaround ([member sharp_turn_speed]): the camera follows where the run goes after it. While the camera
+##   is rotated with the mouse, it does not follow, and afterwards it waits until the target stops or a new run starts
 ##   ([member follow_wait_after_rotate]).
 ##
 ## The node is placed in the scene next to the target, not inside it. Its child is a [CameraArm] with a [Camera3D] at
@@ -25,8 +26,26 @@ extends Node3D
 # The direction of the target's run is smoothed over about this time, s: on stairs the body is put onto every stair at
 # once, and the direction would shake the camera.
 const _HEADING_SMOOTHING := 0.1
+# How fast the direction of the run turns is told two ways, and the larger counts (sharp_turn_speed): its rate in the
+# latest ticks, smoothed over about _TURN_RATE_SMOOTHING s, catches a fast turn almost at once (in its first tick at
+# 60 ticks a second); its average over the latest _SHARP_TURN_WINDOW s of running catches a turn just faster than
+# sharp_turn_speed. The jerks of the direction on stairs or at a door frame stay below both. For the average the
+# direction is sampled _TURN_SAMPLES times a window, however short the ticks are (in slow motion too).
+const _TURN_RATE_SMOOTHING := 0.02
+const _SHARP_TURN_WINDOW := 0.05
+const _TURN_SAMPLES := 4
+# A run slower than this, m/s, has no direction to tell a turn by.
+const _MIN_DIRECTION_SPEED := 0.1
+# In about this time, s, the follow turn lets go of the direction from before a sharp turn, and after the turn it takes
+# up the new direction: the camera neither stops dead nor starts with the whole angle of the turn at once.
+const _SHARP_TURN_FADE := 0.15
 # (1 + x)·exp(−x) = 0.05 at x ≈ 4.74: a critically damped spring at rest settles 95% of the way in 4.74 / ω seconds.
 const _SETTLE := 4.74
+# A spring of the follow is computed in steps of this ω·h or shorter: short enough that it moves alike at any frame
+# rate (within about 1%). A very fast spring at a low frame rate takes no more than _SPRING_MAX_STEPS steps a frame,
+# and they are longer then.
+const _SPRING_STEP := 0.02
+const _SPRING_MAX_STEPS := 64
 # A press of the rotate button shorter than this, s, during which the mouse moved less than _TAP_MOTION, px, is a tap:
 # the camera was not rotated, and the follow does not wait after it (follow_wait_after_rotate).
 const _TAP_TIME := 0.2
@@ -41,9 +60,10 @@ class _FollowSpring:
 
 	## One frame. The goal is [param error] away; at full pull the spring settles 95% of the way there in
 	## [param time] seconds from rest. It pulls with the share [param pull] of its stiffness. [param running] (0 to 1)
-	## blends its damping from [param brake] (how fast a move brakes when the target stops or the follow is paused,
-	## 1/s; INF stops it at once) to that of the running spring. The speed stays within [param max_speed] (0: no
-	## limit). Returns how far the value moves. The spring is computed in short steps, so it stays calm at any FPS.
+	## blends the time constant of its damping from that of [param brake] (how fast a move brakes when the target stops
+	## or the follow is paused, 1/s; INF stops it at once) to that of the running spring. The speed stays within
+	## [param max_speed] (0: no limit). Returns how far the value moves. The spring is computed in short steps
+	## ([constant _SPRING_STEP]), so it moves alike at any frame rate.
 	func step(error: float, time: float, pull: float, running: float, brake: float, max_speed: float,
 			delta: float) -> float:
 		if delta <= 0.0:
@@ -57,9 +77,13 @@ class _FollowSpring:
 			if pull <= 0.0:
 				return 0.0
 			return clampf(error, -max_speed * delta, max_speed * delta) if max_speed > 0.0 else error
-		var steps := maxi(1, ceili(omega * delta / 0.2))
+		var steps := clampi(ceili(omega * delta / _SPRING_STEP), 1, _SPRING_MAX_STEPS)
 		var h := delta / steps
-		var damping := lerpf(exp(-brake * h), exp(-2.0 * omega * h), running)
+		# The time constants of the damping blend, not its factors for a step: the damping does not depend on the
+		# length of the step then, and an infinite brake (a time constant of 0) blends too: it stops the spring at once
+		# only when the follow lets go entirely.
+		var time_constant := lerpf(1.0 / brake, 0.5 / omega, running)
+		var damping := exp(-h / time_constant) if time_constant > 0.0 else 0.0
 		var moved := 0.0
 		for i in steps:
 			speed = speed * damping + pull * omega * omega * error * h
@@ -132,8 +156,8 @@ class _FollowSpring:
 
 @export_group("Follow")
 ## Turn on its own toward the target's running direction, gradually moving behind it. Does not turn while the camera
-## is rotated with the mouse, after that until the target stops or runs anew ([member follow_wait_after_rotate]), and
-## while the follow is paused ([method set_follow_paused]).
+## is rotated with the mouse, after that until the target stops or runs anew ([member follow_wait_after_rotate]), while
+## the follow is paused ([method set_follow_paused]) and while the target turns sharply ([member sharp_turn_speed]).
 @export var follow_movement := false
 ## In how many seconds the camera almost finishes a turn behind the run (95% of the angle): the turn starts and ends
 ## smoothly, without overshooting. 0 is instant.
@@ -142,15 +166,26 @@ class _FollowSpring:
 ## ([member follow_time] 0) turns at this speed all the way. 0 is no limit.
 @export_range(0.0, 1440.0, 1.0, "radians_as_degrees") var follow_max_turn_speed := 0.0
 ## A run that comes at the camera straight or within this angle of straight does not turn it: the camera does not whip
-## around when the target runs toward it. Within twice the angle the turn gains strength smoothly; a run farther from
-## straight at the camera turns it fully. 0 turns it behind any run.
+## around when the target runs toward it, also when it turns around on the run ([member sharp_turn_speed]). Within
+## twice the angle the turn gains strength smoothly; a run farther from straight at the camera turns it fully. 0 turns
+## it behind any run.
 @export_range(0.0, 60.0, 0.5, "radians_as_degrees") var follow_toward_camera_angle := deg_to_rad(30.0)
 ## A target that moves faster than this between two physics ticks is taken to have been teleported: the jump is not a
 ## run, and the follow does not turn toward it.
 @export_range(1.0, 1000.0, 1.0, "or_greater", "suffix:m/s") var teleport_speed := 50.0
+## A run whose direction turns faster than this makes a sharp turn or a turnaround: its direction is unreliable until
+## the turn ends. Meanwhile the follow lets go smoothly of the direction from before the turn, and afterwards it takes
+## up the new direction smoothly. This way a turnaround toward the camera does not turn the camera
+## ([member follow_toward_camera_angle]) at any frame rate, and a corner does not swing it toward the passing
+## directions; slower turns are curves, and the camera follows them as they go. Keep it at half the turn speed of the
+## character or lower (in the template, [code]LocomotionSettings.turn_speed[/code] is 720°/s): closer to that speed a
+## turnaround still moves the camera by up to about 2°, and from that speed up a turn is no longer reliably sharp. 0:
+## every turn is followed, also through a turnaround.
+@export_range(0.0, 3600.0, 1.0, "radians_as_degrees") var sharp_turn_speed := deg_to_rad(360.0)
 ## While the target runs, gradually bring the camera pitch to [member follow_pitch_angle], in
-## [member follow_pitch_time], in the same cases as the follow turn. Works without [member follow_movement] too. The
-## wheel (and the mouse with [member mouse_pitch]) changes the pitch as usual, and while running it is adjusted again.
+## [member follow_pitch_time], in the same cases as the follow turn, also in a sharp turn of the target (the pitch does
+## not depend on the direction). Works without [member follow_movement] too. The wheel (and the mouse with
+## [member mouse_pitch]) changes the pitch as usual, and while running it is adjusted again.
 ## Turning this off returns the camera to the pitch of the wheel, unless [member mouse_pitch] is on.
 @export var follow_pitch := false:
 	set(value):
@@ -165,15 +200,16 @@ class _FollowSpring:
 @export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_pitch_time := 1.5
 ## While the target runs, gradually bring the camera height (the zoom: the distance, and the pitch with it unless
 ## [member follow_pitch] holds the pitch) to [member follow_zoom_level], in [member follow_zoom_time], in the same
-## cases as the follow turn. Works without the turn and the pitch too. The wheel changes the height as usual, and while
-## running it is adjusted again.
+## cases as the follow turn, also in a sharp turn of the target. Works without the turn and the pitch too. The wheel
+## changes the height as usual, and while running it is adjusted again.
 @export var follow_zoom := false
 ## The height to adjust toward, as the zoom: 0 is the camera lowered all the way, 1 raised all the way.
 @export_range(0.0, 1.0, 0.01) var follow_zoom_level := 0.55
 ## In how many seconds the camera almost reaches [member follow_zoom_level] (95% of the way), smoothly. 0 is instant.
 @export_range(0.0, 20.0, 0.05, "or_greater", "suffix:s") var follow_zoom_time := 1.5
-## Below this speed, the camera does not follow the target: when standing, starting, or turning around, the movement
-## direction is unreliable. From this speed to twice that, the follow smoothly gains strength.
+## Below this speed, the camera does not follow the target: standing, starting or turning around on the spot, its
+## direction is unreliable (a turn on the run is [member sharp_turn_speed]). From this speed to twice that, the follow
+## smoothly gains strength.
 @export_range(0.0, 10.0, 0.05, "suffix:m/s") var follow_min_speed := 1.0
 ## After the camera has been rotated with the mouse, the follow (the turn, the pitch and the height) waits: the camera
 ## stays where the mouse left it until the target stops (slows below [member follow_min_speed]) or a new run starts
@@ -219,6 +255,18 @@ var _target_velocity := Vector3.ZERO
 var _heading := Vector2.ZERO
 var _last_target_position := Vector3.ZERO
 var _has_target_position := false
+# A sharp turn of the target (sharp_turn_speed): whether it is under way; how firmly the follow turn goes by the
+# direction of the run, from 0 to 1 (it lets go during a sharp turn and takes it up again after it, in
+# _SHARP_TURN_FADE); how fast the direction turned in the latest ticks, rad/s, smoothed; the run in the latest tick;
+# the directions sampled for the average over the window and the time of the running they were taken at, back to the
+# latest one at least _SHARP_TURN_WINDOW old; and that time.
+var _sharp_turn := false
+var _heading_trust := 1.0
+var _turn_rate := 0.0
+var _last_run := Vector2.ZERO
+var _turn_samples := PackedVector2Array()
+var _turn_sample_times := PackedFloat64Array()
+var _run_time := 0.0
 # The three moves of the follow.
 var _turn := _FollowSpring.new()
 var _pitch_follow := _FollowSpring.new()
@@ -354,6 +402,12 @@ func is_follow_waiting() -> bool:
 	return _follow_waiting
 
 
+## The target makes a sharp turn or a turnaround now ([member sharp_turn_speed]): the follow does not turn toward its
+## run until the turn ends.
+func is_target_turning_sharply() -> bool:
+	return _sharp_turn
+
+
 func _begin_rotate() -> void:
 	_rotating = true
 	_rotate_time = 0.0
@@ -388,8 +442,9 @@ func _apply_mouse_motion() -> void:
 
 
 ## The target velocity, from its displacement per physics tick, so any [Node3D] works, not only a [CharacterBody3D];
-## and the direction of the run, smoothed a little, so that it does not shake on a staircase. A move faster than
-## [member teleport_speed] is a teleport, not a run.
+## the direction of the run, smoothed a little, so that it does not shake on a staircase; and a sharp turn
+## ([method _track_sharp_turn]). A move faster than [member teleport_speed] is a teleport, not a run. A target too slow
+## to have a direction has ended its run: the next one starts afresh.
 func _track_target_motion(delta: float) -> void:
 	if target == null:
 		_forget_target_motion()
@@ -406,9 +461,60 @@ func _track_target_motion(delta: float) -> void:
 			_forget_target_motion()
 		else:
 			_target_velocity = velocity
-			_heading = _heading.lerp(run, 1.0 - exp(-delta / _HEADING_SMOOTHING))
+			var was_sharp := _sharp_turn
+			_track_sharp_turn(run, delta)
+			if run.length() < _MIN_DIRECTION_SPEED:
+				# Standing or barely moving: the direction from before is over. Kept, it would pull the camera back when
+				# the target goes off another way, along a camera turned meanwhile.
+				_heading = Vector2.ZERO
+			elif was_sharp and not _sharp_turn:
+				# The turn is over: the new direction at once, unsmoothed, so that the smoothing does not drag the
+				# passing directions of the turn after it.
+				_heading = run
+			elif not _sharp_turn:
+				_heading = _heading.lerp(run, 1.0 - exp(-delta / _HEADING_SMOOTHING))
+			# In a sharp turn the direction from before it stays, and the follow lets go of it smoothly.
 	_last_target_position = target_position
 	_has_target_position = true
+
+
+## Whether the target makes a sharp turn ([member sharp_turn_speed]): it starts when the direction of the run turns
+## faster than that, in the latest ticks or on average over the latest [constant _SHARP_TURN_WINDOW] seconds of
+## running, and ends when it turns at less than half that speed both ways. A target too slow to have a direction makes
+## no turn, and what it turned before is forgotten. How firmly the follow goes by the direction fades out during the
+## turn and in after it ([constant _SHARP_TURN_FADE]).
+func _track_sharp_turn(run: Vector2, delta: float) -> void:
+	if sharp_turn_speed <= 0.0 or run.length() < _MIN_DIRECTION_SPEED:
+		_forget_turning()
+	else:
+		var tick_rate := absf(_last_run.angle_to(run)) / delta if _last_run != Vector2.ZERO else 0.0
+		_last_run = run
+		_turn_rate = lerpf(_turn_rate, tick_rate, 1.0 - exp(-delta / _TURN_RATE_SMOOTHING))
+		_run_time += delta
+		if _turn_samples.is_empty() or _run_time - _turn_sample_times[-1] >= _SHARP_TURN_WINDOW / _TURN_SAMPLES:
+			_turn_samples.append(run)
+			_turn_sample_times.append(_run_time)
+		# The oldest sample kept is the latest one at least the window old.
+		while _turn_samples.size() > 1 and _run_time - _turn_sample_times[1] >= _SHARP_TURN_WINDOW:
+			_turn_samples.remove_at(0)
+			_turn_sample_times.remove_at(0)
+		var span := _run_time - _turn_sample_times[0]
+		var average := absf(_turn_samples[0].angle_to(run)) / span if span > 0.0 else 0.0
+		var rate := maxf(_turn_rate, average)
+		if rate > sharp_turn_speed:
+			_sharp_turn = true
+		elif rate < 0.5 * sharp_turn_speed:
+			_sharp_turn = false
+	_heading_trust = move_toward(_heading_trust, 0.0 if _sharp_turn else 1.0, delta / _SHARP_TURN_FADE)
+
+
+## No sharp turn, and how the direction of the run turned before is forgotten.
+func _forget_turning() -> void:
+	_sharp_turn = false
+	_turn_rate = 0.0
+	_last_run = Vector2.ZERO
+	_turn_samples.clear()
+	_turn_sample_times.clear()
 
 
 ## The follow forgets how the target moved, and its moves stop where they are: after a teleport, a new target or a
@@ -417,6 +523,8 @@ func _forget_target_motion() -> void:
 	_has_target_position = false
 	_target_velocity = Vector3.ZERO
 	_heading = Vector2.ZERO
+	_forget_turning()
+	_heading_trust = 1.0
 	_follow_waiting = false
 	for spring: _FollowSpring in [_turn, _pitch_follow, _zoom_follow]:
 		spring.speed = 0.0
@@ -425,7 +533,9 @@ func _forget_target_motion() -> void:
 ## The follow: the height, the pitch and the turn move toward their goals, each on its spring ([_FollowSpring]),
 ## pulled as strongly as the target runs ([method _get_follow_strength]). When the target stops, while the mouse turns
 ## the camera, while the follow waits after that and while it is paused, they do not pull, and a move under way brakes
-## as fast as the smoothing of the mouse and the wheel settles.
+## as fast as the smoothing of the mouse and the wheel settles. During a sharp turn of the target
+## ([member sharp_turn_speed]) the turn lets go of the direction of the run smoothly and takes it up again after the
+## turn.
 func _follow_movement(delta: float) -> void:
 	var running := _get_follow_strength()
 	if running <= 0.0:
@@ -462,8 +572,11 @@ func _follow_movement(delta: float) -> void:
 		if not _heading.is_zero_approx():
 			error = angle_difference(_target_yaw, atan2(-_heading.x, -_heading.y))
 			weight = _get_turn_weight(absf(error))
-		var turn := _turn.step(error, follow_time, strength * weight, strength, rotation_brake, follow_max_turn_speed,
-				delta)
+		# In a sharp turn the direction of the run is unreliable: the turn lets go of the direction from before it and,
+		# after the turn, takes up the new one, both smoothly (_heading_trust). A turn under way runs out as on the run:
+		# a brake would jerk the camera at every corner.
+		var pull := strength * weight * smoothstep(0.0, 1.0, _heading_trust)
+		var turn := _turn.step(error, follow_time, pull, strength, rotation_brake, follow_max_turn_speed, delta)
 		_target_yaw += turn
 		_yaw += turn
 

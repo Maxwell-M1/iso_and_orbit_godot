@@ -159,8 +159,7 @@ func _check_wall_at_camera() -> void:
 ## A tall fence halfway between the camera and the character, with enough room for the camera behind the fence; then
 ## a fence right at the character, a thin pole and a pole right next to the arm.
 func _check_occlusion() -> void:
-	print("
-== camera arm and a fence that hides the player")
+	print("\n== camera arm and a fence that hides the player")
 	await _stand()
 	var full := _arm.length
 	var near_face := _arm_point(full * 0.5).z

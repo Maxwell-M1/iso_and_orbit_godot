@@ -50,6 +50,24 @@ var _actions_mode := Node.PROCESS_MODE_INHERIT
 func _ready() -> void:
 	assert(character != null and input != null and camera_rig != null,
 			"PlayableHero needs the character, input and camera_rig properties set.")
+	for warning in get_setup_warnings():
+		push_warning("%s: %s" % [name, warning])
+
+
+## Problems in how the parts of the hero work together, one line each; empty if there are none. The same lines are
+## printed as warnings when the hero enters the tree.
+func get_setup_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null or character.mover == null or camera_rig == null:
+		return warnings
+	var locomotion := character.mover.settings
+	if locomotion != null and camera_rig.follow_toward_camera_angle > 0.0 and camera_rig.sharp_turn_speed > 0.0 \
+			and camera_rig.sharp_turn_speed >= locomotion.turn_speed:
+		warnings.append(("%s.sharp_turn_speed (%.0f°/s) is not below the character's turn speed (%.0f°/s): the "
+				+ "character's turns are no longer reliably sharp, and a turnaround toward the camera turns the camera. "
+				+ "Keep it at half the turn speed or lower.") % [camera_rig.name, rad_to_deg(camera_rig.sharp_turn_speed),
+				rad_to_deg(locomotion.turn_speed)])
+	return warnings
 
 
 func set_controls_enabled(enabled: bool) -> void:

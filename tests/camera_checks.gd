@@ -1,5 +1,6 @@
 extends "res://tests/check_suite.gd"
-## Camera: the follow (smooth, without going past the run, still for a run toward the camera, within the speed limit,
+## Camera: the follow (smooth, without going past the run, still for a run toward the camera, also after a turnaround
+## on the run, not swung by the passing directions of a sharp turn, the same at any frame rate, within the speed limit,
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
 ## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
 ## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
@@ -11,6 +12,12 @@ func _checks() -> Array[Callable]:
 	return [
 		_check_camera_follow,
 		_check_camera_follow_toward,
+		_check_camera_follow_reversal,
+		_check_camera_follow_sharp_turn,
+		_check_follow_after_stop,
+		_check_follow_frame_rates,
+		_check_follow_slow_without_smoothing,
+		_check_sharp_turn_setup,
 		_check_camera_follow_stairs,
 		_check_camera_follow_pauses,
 		_check_camera_waits_after_rotate,
@@ -92,8 +99,7 @@ func _turn_motion(angles: PackedFloat32Array) -> Dictionary:
 ## follow_max_turn_speed the camera never turns faster, also when the turn is instant. A teleport is not a run: the
 ## camera does not turn toward the jump.
 func _check_camera_follow_toward() -> void:
-	print("
-== the follow toward the camera, the speed limit, a teleport")
+	print("\n== the follow toward the camera, the speed limit, a teleport")
 	var angle := _rig.follow_toward_camera_angle
 	var straight := await _turn_toward_camera(0.0, 1.0)
 	var inside := await _turn_toward_camera(rad_to_deg(angle) * 0.6, 1.0)
@@ -134,6 +140,356 @@ func _check_camera_follow_toward() -> void:
 	_expect(teleport_turn < 0.5, "a teleport is not a run: the camera does not turn toward the jump")
 
 
+## A turnaround on the run toward the camera does not turn it. The character runs away from the camera at full speed
+## and turns straight back: by steering (as the keys or an AI do), by a click behind it, and with the left button held,
+## the cursor jerked from ahead of it to below it, toward the camera, as a player does. The turn sweeps through the
+## sides at full speed: without sharp turns (sharp_turn_speed 0) the camera takes the sweep for a run to the side and
+## turns, by about 27° at the demo's follow time, so that a small move of the mouse then swings it round (at 30 FPS,
+## or with a shorter follow time, it swung right round by itself); with them it stays, at the demo's follow time and at
+## 0, 0.5 and 2.5 s. After the turnaround a run 20° off straight at the camera keeps it still, and one 45° off turns it
+## behind the run.
+func _check_camera_follow_reversal() -> void:
+	print("\n== a turnaround on the run toward the camera")
+	var default_time := _rig.follow_time
+	var default_sharp := _rig.sharp_turn_speed
+	var turns := PackedStringArray()
+	var worst := 0.0
+	for follow_time: float in [default_time, 0.0, 0.5, 2.5]:
+		_rig.follow_time = follow_time
+		for way: String in ["steer", "click"]:
+			var turned: float = (await _turn_back_at_camera(way)).turned
+			worst = maxf(worst, turned)
+			turns.append("%s at %.1f s %.2f" % [way, follow_time, turned])
+	_rig.follow_time = default_time
+	var held := await _turn_back_at_camera("hold")
+	_rig.sharp_turn_speed = 0.0
+	var unguarded := await _turn_back_at_camera("steer")
+	_rig.sharp_turn_speed = default_sharp
+	var inside := await _turn_back_at_camera("steer", 20.0)
+	var outside := await _turn_back_at_camera("steer", 45.0)
+	print(("the camera turned at most (deg): %s; with the left button held and the cursor jerked back %.2f, the run " +
+			"%.1f deg off straight at the camera") % [", ".join(turns), held.turned, held.off_straight])
+	print(("sharp_turn_speed 0: the turnaround turned the camera %.1f deg; after the turnaround a run 20 deg off " +
+			"straight turned it %.1f deg in 2 s, 45 deg off %.1f deg") % [unguarded.turned, inside.after,
+		outside.after])
+	_expect(worst < 0.5 and held.turned < 0.5 and held.off_straight < 5.0,
+			"a turnaround toward the camera does not turn it, at any follow time, also with the left button held")
+	_expect(unguarded.turned > 10.0, "sharp_turn_speed 0: the turnaround turns the camera, as without sharp turns")
+	_expect(inside.after < 1.0 and outside.after > 90.0,
+			"after a turnaround a run within the angle keeps the camera still, a run farther off turns it")
+
+
+## On the strip by the south fence the character runs east for 1.2 s, the camera behind it, then turns straight back
+## west, toward the camera: [param way] is "steer", "click" (a point 12 m behind it) or "hold" (the left button held
+## with the cursor 4 m ahead, jerked in 5 frames to 1.5 m behind the character, toward the camera). With
+## [param off_straight] above 0, 1.5 s after the turnaround it runs that many degrees off straight at the camera, to the
+## north, for 2 s. Returns how far the camera turned at most in the 1.5 s after the turnaround and how far it turned in
+## those 2 s, and how far off straight at the camera the run was 1.5 s after the turnaround (degrees).
+func _turn_back_at_camera(way: String, off_straight := 0.0) -> Dictionary:
+	_rig.follow_movement = false
+	await _teleport(Vector3(-8, 0, 34))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	_rig.follow_movement = true
+	var screen := _camera.unproject_position(_player.global_position + Vector3.RIGHT * 4.0)
+	if way == "click":
+		_mover.move_to(Vector3(12, 0, 34))
+	elif way == "hold":
+		_send_motion(screen, Vector2.ZERO)
+		_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	for i in 72:
+		if way == "steer":
+			_mover.steer(Vector3.RIGHT)
+		await _tree.physics_frame
+	var yaw := _rig.global_rotation.y
+	if way == "click":
+		_mover.move_to(_player.global_position + Vector3.LEFT * 12.0)
+	elif way == "hold":
+		var window := _tree.root.get_visible_rect().size - Vector2.ONE
+		var back := _camera.unproject_position(_player.global_position + Vector3.LEFT * 1.5).clamp(Vector2.ZERO, window)
+		var step := (back - screen) / 5.0
+		for i in 5:
+			screen += step
+			_send_motion(screen, step)
+			await _tree.process_frame
+	var turned := 0.0
+	for i in 90:
+		if way == "steer":
+			_mover.steer(Vector3.LEFT)
+		await _tree.physics_frame
+		turned = maxf(turned, absf(rad_to_deg(angle_difference(yaw, _rig.global_rotation.y))))
+	var off := _flat_angle(-_camera_forward(), _player.velocity)
+	var after := 0.0
+	if off_straight > 0.0:
+		var course := Vector3.LEFT.rotated(Vector3.UP, -deg_to_rad(off_straight))
+		var before := _rig.global_rotation.y
+		for i in 120:
+			_mover.steer(course)
+			await _tree.physics_frame
+		after = absf(rad_to_deg(angle_difference(before, _rig.global_rotation.y)))
+	if way == "hold":
+		_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	_mover.stop()
+	_rig.follow_movement = false
+	await _ticks_until_stopped(120)
+	return {turned = turned, off_straight = off, after = after}
+
+
+## A sharp turn on the run: on the strip by the south fence the character runs east, the camera behind it, and turns
+## north (90°, at the 720°/s of its locomotion). While it turns, the rig takes the run for a sharp turn, and the camera
+## does not turn toward the passing directions; then it turns behind the new run, starting smoothly and without going
+## past it. A curve at 90°/s is no sharp turn: the camera follows it all the way.
+func _check_camera_follow_sharp_turn() -> void:
+	print("\n== a sharp turn on the run, and a curve")
+	_rig.follow_movement = false
+	await _teleport(Vector3(-8, 0, 34))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	_rig.follow_movement = true
+	for i in 60:
+		_mover.steer(Vector3.RIGHT)
+		await _tree.physics_frame
+	var yaw := _rig.global_rotation.y
+	var sharp_ticks := 0
+	var while_sharp := 0.0
+	var angles := PackedFloat32Array()
+	for i in 150:
+		_mover.steer(Vector3.FORWARD)
+		await _tree.physics_frame
+		if _rig.is_target_turning_sharply():
+			sharp_ticks += 1
+			while_sharp = maxf(while_sharp, absf(rad_to_deg(angle_difference(yaw, _rig.global_rotation.y))))
+		angles.append(_camera_angle_to(Vector3.FORWARD))
+	var motion := _turn_motion(angles)
+	_mover.stop()
+	_rig.follow_movement = false
+	await _ticks_until_stopped(120)
+
+	await _teleport(Vector3(-8, 0, 30))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	_rig.follow_movement = true
+	var direction := Vector3.RIGHT
+	var curve_sharp := 0
+	var curve_from := _rig.global_rotation.y
+	for i in 150:
+		if i >= 30:
+			direction = direction.rotated(Vector3.UP, deg_to_rad(90.0) * DT)
+		_mover.steer(direction)
+		await _tree.physics_frame
+		if _rig.is_target_turning_sharply():
+			curve_sharp += 1
+	var curve_turn := absf(rad_to_deg(angle_difference(curve_from, _rig.global_rotation.y)))
+	_mover.stop()
+	_rig.follow_movement = false
+	await _ticks_until_stopped(120)
+	print(("a 90 deg turn: sharp for %.2f s, meanwhile the camera turned %.2f deg; then 95%% behind the new run in " +
+			"%.2f s, %.2f deg off after 2.5 s, its turn speed changing by up to %.0f deg/s^2, back up to %.3f deg; a " +
+			"curve at 90 deg/s: sharp for %.2f s, the camera turned %.0f deg of 180") % [sharp_ticks * DT, while_sharp,
+		_first_time_at_most(angles, 4.5), angles[-1], motion.sharpest, motion.back, curve_sharp * DT, curve_turn])
+	_expect(sharp_ticks >= 5 and sharp_ticks <= 20 and while_sharp < 0.5,
+			"a sharp turn: while it lasts, the camera does not turn toward the passing directions")
+	_expect(angles[-1] < 1.0 and motion.sharpest < 2000.0 and motion.back < 0.05,
+			"after a sharp turn the camera turns behind the new run smoothly, without going past it")
+	_expect(curve_sharp == 0 and curve_turn > 100.0, "a curve is no sharp turn: the camera follows it")
+
+
+## A run after a stop: the hero runs north and stops, the camera is turned east meanwhile (look_along, as an orbit with
+## the right button turns it), and 0.1 s later the hero runs off east, along the camera. The direction from before the
+## stop is over and does not pull the camera back, at the demo's follow time and instant (kept, it flicked the instant
+## camera 90° north for a few frames). A sharp turn cut short by a stop is over while the hero stands.
+func _check_follow_after_stop() -> void:
+	print("\n== a run after a stop, along a camera turned meanwhile")
+	var default_time := _rig.follow_time
+	var turns := PackedStringArray()
+	var worst := 0.0
+	for follow_time: float in [default_time, 0.0]:
+		_rig.follow_time = follow_time
+		_rig.follow_movement = false
+		await _teleport(Vector3(-8, 0, 30))
+		_rig.look_along(Vector3.FORWARD)
+		await _settle_camera()
+		_rig.follow_movement = true
+		for i in 60:
+			_mover.steer(Vector3.FORWARD)
+			await _tree.physics_frame
+		_mover.stop()
+		await _ticks_until_stopped(60)
+		await _ticks(6)
+		_rig.look_along(Vector3.RIGHT)
+		# The rig turns its node in the frame.
+		await _frames(2)
+		var yaw := _rig.global_rotation.y
+		var most := 0.0
+		for i in 60:
+			_mover.steer(Vector3.RIGHT)
+			await _tree.physics_frame
+			most = maxf(most, absf(rad_to_deg(angle_difference(yaw, _rig.global_rotation.y))))
+		worst = maxf(worst, most)
+		turns.append("at %.1f s %.2f deg" % [follow_time, most])
+		_mover.stop()
+		await _ticks_until_stopped(120)
+	_rig.follow_time = default_time
+
+	# A 90 deg turn at full speed, halted in its middle.
+	_rig.follow_movement = false
+	await _teleport(Vector3(-8, 0, 34))
+	_rig.look_along(Vector3.RIGHT)
+	await _settle_camera()
+	_rig.follow_movement = true
+	for i in 60:
+		_mover.steer(Vector3.RIGHT)
+		await _tree.physics_frame
+	for i in 4:
+		_mover.steer(Vector3.FORWARD)
+		await _tree.physics_frame
+	var sharp_midway := _rig.is_target_turning_sharply()
+	_mover.halt()
+	await _ticks(30)
+	var sharp_standing := _rig.is_target_turning_sharply()
+	_rig.follow_movement = false
+	print(("going off along the camera after a stop, the camera turned at most %s; a sharp turn halted midway: " +
+			"sharp %s, 0.5 s later standing %s") % [", ".join(turns), sharp_midway, sharp_standing])
+	_expect(worst < 0.5, "after a stop the direction from before it does not pull the camera back, also instant")
+	_expect(sharp_midway and not sharp_standing, "a sharp turn cut short by a stop is over while the hero stands")
+
+
+## The follow at other frame rates and physics tick rates, on a rig of its own that the check drives by hand, tick by
+## tick and frame by frame as the engine would: its target runs with the template's locomotion ([GroundMotion], turns
+## at 720°/s) away from the camera and then straight back at it, or to the side. At 30, 60, 144 and 240 frames per
+## second with 60 physics ticks, and at 30 and 120 ticks with 60 frames, with the follow time 1.1 s and 0: the
+## turnaround does not turn the camera, and after a 90° turn the camera is behind the run at all rates alike (with the
+## spring computed in long steps at a low frame rate, 1 s after the turn it was 7.6° off the run at 30 FPS and 13.3° at
+## 240 FPS).
+func _check_follow_frame_rates() -> void:
+	print("\n== the follow at other frame rates and physics tick rates")
+	var rig := _hand_driven_rig()
+	var back_worst := 0.0
+	var side_worst := 0.0
+	var side_at_one := PackedFloat32Array()
+	var rows := PackedStringArray()
+	for rates: Vector2i in [Vector2i(30, 60), Vector2i(60, 60), Vector2i(144, 60), Vector2i(240, 60), Vector2i(60, 30),
+			Vector2i(60, 120)]:
+		for follow_time: float in [1.1, 0.0]:
+			rig.follow_time = follow_time
+			var back := _drive_rig(rig, rates.x, rates.y, Vector3.LEFT)
+			var side := _drive_rig(rig, rates.x, rates.y, Vector3.FORWARD)
+			back_worst = maxf(back_worst, back.most)
+			side_worst = maxf(side_worst, side.at_end)
+			if follow_time > 0.0:
+				side_at_one.append(side.at_one)
+			rows.append("%d fps/%d tps, %.1f s: back %.2f, side %.1f -> %.2f" % [rates.x, rates.y, follow_time,
+				back.most, side.at_one, side.at_end])
+	rig.target.queue_free()
+	rig.queue_free()
+	var spread := _max(side_at_one) - _min(side_at_one)
+	print("the camera turned (deg) on a turnaround / its angle to the run 1 s and 2.5 s after a 90 deg turn:\n  %s" % [
+		"\n  ".join(rows)])
+	print("at 1.1 s, 1 s after the 90 deg turn the camera is %.1f..%.1f deg off the run" % [_min(side_at_one),
+		_max(side_at_one)])
+	_expect(back_worst < 0.5, "a turnaround toward the camera does not turn it at any frame or physics rate")
+	_expect(side_worst < 1.0 and spread < 2.5, "after a 90 deg turn the camera is behind the run at all rates alike")
+
+
+## A slow walk, between follow_min_speed and twice that (1.5 m/s), is followed with part of the strength, also when
+## the mouse turns the camera without smoothing (rotation_sharpness 0, a brake that stops a move at once): the time
+## constants of the damping blend, and the camera comes round about as with the default smoothing. With the rates
+## blended it stood almost still, 80° of 90° left after 3 s. On a rig driven by hand at 60 frames a second.
+func _check_follow_slow_without_smoothing() -> void:
+	print("\n== a slow walk followed without the smoothing of the mouse")
+	var rig := _hand_driven_rig()
+	rig.follow_time = 1.1
+	var left := PackedFloat32Array()
+	for sharpness: float in [rig.rotation_sharpness, 0.0]:
+		rig.rotation_sharpness = sharpness
+		rig.target.position = Vector3.ZERO
+		rig.look_along(Vector3.FORWARD)
+		rig.snap()
+		for i in 180:
+			rig.target.position += Vector3.RIGHT * 1.5 * DT
+			rig._physics_process(DT)
+			rig._process(DT)
+		left.append(_flat_angle(-rig.global_basis.z, Vector3.RIGHT))
+	rig.target.queue_free()
+	rig.queue_free()
+	print("walking at 1.5 m/s, 3 s after the start the camera is %.1f deg off the walk with the smoothing, %.1f without"
+			% [left[0], left[1]])
+	_expect(left[1] < 30.0 and absf(left[1] - left[0]) < 10.0,
+			"a slow walk is followed without the smoothing of the mouse about as with it")
+
+
+## A rig of its own for the checks that drive it by hand ([method _drive_rig]): a [Camera3D] child, a plain [Node3D]
+## target, the follow turn on, and neither of them processes by itself.
+func _hand_driven_rig() -> OrbitCameraRig:
+	var target := Node3D.new()
+	target.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	var rig := OrbitCameraRig.new()
+	rig.add_child(Camera3D.new())
+	rig.target = target
+	rig.follow_movement = true
+	# The checks call its _physics_process() and _process() themselves.
+	rig.process_mode = Node.PROCESS_MODE_DISABLED
+	_main.add_child(target)
+	_main.add_child(rig)
+	return rig
+
+
+## Drives [param rig] by hand at [param fps] frames and [param tps] physics ticks per second: its target runs east for
+## 1.2 s, the camera looking along, then toward [param then] for 2.5 s. Returns how far the camera turned at most in
+## the 1.5 s after the turn began, and its angle to the new run 1 s and 2.5 s after it (degrees).
+func _drive_rig(rig: OrbitCameraRig, fps: int, tps: int, then: Vector3) -> Dictionary:
+	var target := rig.target
+	target.position = Vector3.ZERO
+	rig.look_along(Vector3.RIGHT)
+	rig.snap()
+	var motion := GroundMotion.new(LocomotionSettings.new())
+	motion.face(Vector3.RIGHT)
+	var tick := 1.0 / tps
+	var frame := 1.0 / fps
+	var time := 0.0
+	var ticks := 0
+	var yaw_at_turn := NAN
+	var most := 0.0
+	var at_one := NAN
+	while time < 3.7 - frame / 2.0:
+		time += frame
+		while (ticks + 1) * tick <= time + 0.000001:
+			ticks += 1
+			var course := Vector3.RIGHT if ticks * tick <= 1.2 + 0.000001 else then
+			target.position += motion.step(course, INF, tick) * tick
+			rig._physics_process(tick)
+		rig._process(frame)
+		if ticks * tick > 1.2 + 0.000001:
+			if is_nan(yaw_at_turn):
+				yaw_at_turn = rig.global_rotation.y
+			if time <= 2.7:
+				most = maxf(most, absf(rad_to_deg(angle_difference(yaw_at_turn, rig.global_rotation.y))))
+			if is_nan(at_one) and time >= 2.2:
+				at_one = _flat_angle(-rig.global_basis.z, then)
+	return {most = most, at_one = at_one, at_end = _flat_angle(-rig.global_basis.z, then)}
+
+
+## The playable hero warns when the camera's sharp_turn_speed is not below the character's turn speed: the character's
+## turns would no longer be reliably sharp, and a turnaround toward the camera would turn it. The demo has no warning,
+## and 0 (no sharp turns) is a choice, not a mistake. The warning concerns a run toward the camera, so the check keeps
+## the exception for it on.
+func _check_sharp_turn_setup() -> void:
+	print("\n== sharp turns: the warning of the playable hero")
+	var default_sharp := _rig.sharp_turn_speed
+	var default_angle := _rig.follow_toward_camera_angle
+	_rig.follow_toward_camera_angle = deg_to_rad(30.0)
+	var demo := _hero.get_setup_warnings()
+	_rig.sharp_turn_speed = _mover.settings.turn_speed
+	var too_fast := _hero.get_setup_warnings()
+	_rig.sharp_turn_speed = 0.0
+	var off := _hero.get_setup_warnings()
+	_rig.sharp_turn_speed = default_sharp
+	_rig.follow_toward_camera_angle = default_angle
+	print("warnings: the demo %s; sharp_turn_speed at the character's turn speed %s; 0 %s" % [demo, too_fast, off])
+	_expect(demo.is_empty() and too_fast.size() == 1 and off.is_empty(),
+			"the hero warns when the camera's sharp turns cannot catch the character's turns")
+
+
 ## The character at the west end of the strip by the south fence runs east; the camera looks west, turned by
 ## [param off_straight] degrees: 0 is straight at it. Returns how many degrees the camera turned in [param seconds].
 func _turn_toward_camera(off_straight: float, seconds: float) -> float:
@@ -154,7 +510,8 @@ func _turn_toward_camera(off_straight: float, seconds: float) -> float:
 
 
 ## Up the stairs east of the platform with the follow on, the camera looking along the run: the body is put onto every
-## stair at once, and still the camera turns smoothly.
+## stair at once, and still the camera turns smoothly; the jerks of the direction on the stairs are no sharp turn (a
+## sharp turn counts while the run itself goes straight: the mover's heading has not turned for 0.1 s).
 func _check_camera_follow_stairs() -> void:
 	print("\n== the follow up the stairs")
 	await _teleport(Vector3(36, 0, 18))
@@ -164,17 +521,25 @@ func _check_camera_follow_stairs() -> void:
 	_arrived = false
 	_mover.move_to(Vector3(26, 1.6, 18))
 	var yaws := PackedFloat32Array()
+	var sharp := false
+	var heading := _mover.get_heading()
+	var straight_ticks := 0
 	while not _arrived and yaws.size() < 300:
 		await _tree.physics_frame
 		yaws.append(rad_to_deg(_rig.rotation.y))
+		var now := _mover.get_heading()
+		straight_ticks = straight_ticks + 1 if now.angle_to(heading) < 0.001 else 0
+		heading = now
+		sharp = sharp or (_rig.is_target_turning_sharply() and straight_ticks >= 6)
 	_rig.follow_movement = false
 	var sharpest := 0.0
 	for i in range(2, yaws.size()):
 		var rate := angle_difference(deg_to_rad(yaws[i - 1]), deg_to_rad(yaws[i])) / DT
 		var previous := angle_difference(deg_to_rad(yaws[i - 2]), deg_to_rad(yaws[i - 1])) / DT
 		sharpest = maxf(sharpest, rad_to_deg(absf(rate - previous)) / DT)
-	print("up the stairs: arrived %s; the camera's turn speed changing by up to %.0f deg/s^2" % [_arrived, sharpest])
-	_expect(_arrived and sharpest < 200.0, "up the stairs the camera turns smoothly")
+	print("up the stairs: arrived %s; the camera's turn speed changing by up to %.0f deg/s^2; a sharp turn %s" % [
+		_arrived, sharpest, sharp])
+	_expect(_arrived and sharpest < 200.0 and not sharp, "up the stairs the camera turns smoothly, without sharp turns")
 
 
 ## The character stands at (-8, 0, 0) with the camera looking north, then runs east. Returns the angle between the
