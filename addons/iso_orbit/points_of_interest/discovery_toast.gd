@@ -1,7 +1,7 @@
 class_name DiscoveryToast
 extends Label
 ## A "Discovered: …" caption for a few seconds when the player finds a [PointOfInterest]. It finds the places
-## at startup by the group [constant PointOfInterest.GROUP].
+## at startup by the group [constant PointOfInterest.GROUP], and those added later too: a level loaded during the game.
 
 ## How to write it: a format string with the place name. Both the string and the name are translated.
 @export var text_format := "Discovered: %s"
@@ -21,7 +21,8 @@ func _ready() -> void:
 	auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	modulate.a = 0.0
 	for place: Node in get_tree().get_nodes_in_group(PointOfInterest.GROUP):
-		(place as PointOfInterest).discovered.connect(show_discovery)
+		_watch(place as PointOfInterest)
+	get_tree().node_added.connect(_on_node_added)
 
 
 ## Show the caption about the place [param title].
@@ -43,3 +44,14 @@ func _notification(what: int) -> void:
 
 func _update_text() -> void:
 	text = tr(text_format) % tr(_title)
+
+
+func _on_node_added(node: Node) -> void:
+	if node is PointOfInterest:
+		_watch(node)
+
+
+func _watch(place: PointOfInterest) -> void:
+	# A place that leaves the tree and comes back keeps its connection.
+	if not place.discovered.is_connected(show_discovery):
+		place.discovered.connect(show_discovery)

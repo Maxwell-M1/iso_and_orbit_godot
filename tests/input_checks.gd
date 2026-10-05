@@ -1,7 +1,8 @@
 extends "res://tests/check_suite.gd"
 ## Mouse and keys with real input events: a click, an LMB hold in both modes, LMB + RMB (and RMB released a moment
 ## before LMB), RMB over a run after the cursor looking around, RMB + WASD and LMB + RMB + A/D in all modes, keys
-## dropping the run to a click point, the signal of a new run, the cursor hiding while running with LMB held.
+## dropping the run to a click point, the signal of a new run, the cursor hiding while running with LMB held, the press
+## under way cancelled.
 
 
 func _checks() -> Array[Callable]:
@@ -19,6 +20,7 @@ func _checks() -> Array[Callable]:
 		_check_keys_drop_click_point,
 		_check_run_requested,
 		_check_hold_hides_cursor,
+		_check_cancel,
 	]
 
 
@@ -838,3 +840,58 @@ func _check_hold_hides_cursor() -> void:
 	_expect(hidden_while_held and not hidden_after_release, "hidden while held, shown after release")
 	_expect(not hidden_in_menu and hidden_after_menu, "shown in the menu, hidden again if the button is still held")
 	_expect(not hidden_when_off, "hide_cursor_while_held off: the cursor stays")
+
+
+## cancel(): a click not yet released does not run, and a hold run stops as on release, the cursor shown. The button
+## still held does nothing, nor does its release; the next click runs as usual.
+func _check_cancel() -> void:
+	print("\n== cancel: a pending click is dropped, a hold run stops, the cursor comes back")
+	var input: PointClickMoveInput = _main.get_node("PlayerInput")
+	input.hold_mode = PointClickMoveInput.HoldMode.STEER
+	await _teleport(Vector3.ZERO)
+	await _settle_camera()
+	var picked := [0]
+	var on_picked := func(_point: Vector3) -> void: picked[0] += 1
+	input.destination_picked.connect(on_picked)
+	var pending: Array[bool] = []
+	var on_pending := func(value: bool) -> void: pending.append(value)
+	input.hold_pending_changed.connect(on_pending)
+	var screen := _camera.unproject_position(Vector3(3, 0, 3))
+	_send_motion(screen, Vector2.ZERO)
+
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(4)
+	input.cancel()
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(20)
+	var click_dropped: bool = not _mover.is_moving() and _mover.get_speed() == 0.0 and picked[0] == 0
+	var pending_on_click := pending.duplicate()
+
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _ticks(30)
+	var running := _mover.is_steering() and _mover.get_speed() > 1.0 and input.is_cursor_hidden()
+	input.cancel()
+	var shown := not input.is_cursor_hidden()
+	var stop_time := await _ticks_until_stopped(120)
+	await _ticks(20)
+	var stayed := not _mover.is_moving() and _mover.get_speed() == 0.0
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(3)
+	var stayed_after_release: bool = not _mover.is_moving() and picked[0] == 0
+
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	await _tree.physics_frame
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks(3)
+	var next_click: bool = _mover.has_destination() and picked[0] == 1
+	await _ticks_until_stopped(600)
+	input.destination_picked.disconnect(on_picked)
+	input.hold_pending_changed.disconnect(on_pending)
+	print(("a click cancelled before its release: dropped %s, pending %s; a hold run: running %s, the cursor shown " +
+			"%s, stopped in %.2f s, stayed while held %s and after the release %s; the next click runs %s") % [
+			click_dropped, pending_on_click, running, shown, stop_time, stayed, stayed_after_release, next_click])
+	_expect(click_dropped and pending_on_click == [true, false],
+			"a click cancelled before its release does not run, and it is no longer pending")
+	_expect(running and shown and stop_time > 0.0, "a hold run cancelled stops as on release, the cursor is shown")
+	_expect(stayed and stayed_after_release, "the button still held does not run after cancel, nor does its release")
+	_expect(next_click, "the next click runs as usual")

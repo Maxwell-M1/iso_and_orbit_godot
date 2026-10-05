@@ -1,13 +1,14 @@
 extends "res://tests/check_suite.gd"
-## World: the mountain with a trail and "Windswept Peak", places (camp, hamlet, ruins) discovered with a message,
-## characters standing at the places and not letting anyone through, a line of hero mage options with a free walkway
-## along it; paths climb exactly the stairs the character steps onto.
+## World: the mountain with a trail and "Windswept Peak", places (camp, hamlet, ruins) discovered with a message, places
+## added during the game, characters standing at the places and not letting anyone through, a line of hero mage
+## options with a free walkway along it; paths climb exactly the stairs the character steps onto.
 
 
 func _checks() -> Array[Callable]:
 	return [
 		_check_mountain,
 		_check_places,
+		_check_places_added_later,
 		_check_route.bind("around the knight at the hamlet", Vector3(-26.6, 0, 22.6), Vector3(-32.6, 0, 22.6), 15.0),
 		_check_characters_at_places,
 		_check_mage_options,
@@ -106,6 +107,52 @@ func _check_places() -> void:
 	_expect(report.size() == 3 and ok,
 			"the camp, the hamlet and the ruins are discovered on arrival and named in the message")
 	await _teleport(Vector3.ZERO)
+
+
+## A place added during the game, as with a level loaded later, is announced too; one marked as found beforehand
+## (mark_discovered) stays silent.
+func _check_places_added_later() -> void:
+	print("\n== places added during the game: announced; one marked as found stays silent")
+	var toast: DiscoveryToast = _main.get_node("Hud/DiscoveryToast")
+	await _wait_until(func() -> bool: return toast.modulate.a == 0.0, 600)
+	var level: Node3D = _main.get_node("World")
+	var announced := _add_place(level, "Lookout", Vector3(-8, 0, 0))
+	var known := _add_place(level, "Old Well", Vector3(-8, 0, 6))
+	known.mark_discovered()
+	var signals := [0]
+	var on_discovered := func(_title: String) -> void: signals[0] += 1
+	known.discovered.connect(on_discovered)
+	await _teleport(known.global_position)
+	await _frames(45)
+	var silent: bool = signals[0] == 0 and toast.modulate.a == 0.0
+	await _teleport(announced.global_position)
+	await _frames(45)
+	var message := toast.text
+	var shown := announced.is_discovered() and toast.modulate.a > 0.9
+	print("marked as found: signals %d, message shown %s; added later: discovered %s, message \"%s\"" % [
+		signals[0], not silent, announced.is_discovered(), message])
+	_expect(silent, "a place marked as found does not announce itself")
+	_expect(shown and message == "Discovered: Lookout", "a place added during the game is announced")
+	await _teleport(Vector3.ZERO)
+	announced.queue_free()
+	known.queue_free()
+	await _wait_until(func() -> bool: return toast.modulate.a == 0.0, 600)
+
+
+## A place of interest with a sphere of radius 1.5 m at [param at], added under [param level].
+func _add_place(level: Node3D, title: String, at: Vector3) -> PointOfInterest:
+	var place := PointOfInterest.new()
+	place.title = title
+	place.collision_layer = 0
+	place.collision_mask = 2
+	var shape := CollisionShape3D.new()
+	var sphere := SphereShape3D.new()
+	sphere.radius = 1.5
+	shape.shape = sphere
+	place.add_child(shape)
+	place.position = level.to_local(at)
+	level.add_child(place)
+	return place
 
 
 ## Characters stand at the points of interest: every place has someone, all of them on the ground (the wizard on the

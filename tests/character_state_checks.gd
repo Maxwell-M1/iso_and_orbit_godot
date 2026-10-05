@@ -1,11 +1,11 @@
 extends "res://tests/check_suite.gd"
-## What the character reports about itself, for animations and the interface: the state and its changes, the blend
-## of speeds, movement and acceleration in the model's axes, turning, floor contact and time in the air, feet and the
-## gait cycle, the steps switch. Stairs and slopes: up and down a staircase without leaving the ground with the real
-## height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a false take-off.
-## Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without lag, a jump,
-## a ledge and a wall, a slower fall, turning it off and on. The monitor panel shows the state and the latest events. The demo's
-## character is set up without warnings.
+## What the character reports about itself, for animations and the interface: the state and its changes, the blend of
+## speeds, movement and acceleration in the model's axes, turning, floor contact and time in the air, feet and the gait
+## cycle, the steps switch, a teleport mid-run. Stairs and slopes: up and down a staircase without leaving the ground
+## with the real height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a
+## false take-off. Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without
+## lag, a jump, a ledge and a wall, a slower fall, turning it off and on. The monitor panel shows the state and the
+## latest events. The demo's character is set up without warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
 const STRIP_Z := 34.0
@@ -20,6 +20,7 @@ func _checks() -> Array[Callable]:
 		_check_steps_switch,
 		_check_sidestep_and_turn,
 		_check_acceleration,
+		_check_teleport,
 		_check_stairs,
 		_check_slopes_and_high_block,
 		_check_level_routes,
@@ -328,6 +329,53 @@ func _check_acceleration() -> void:
 	_expect(_min(sideways) < -0.3 * speed_up and _max(sideways) < 0.1 * speed_up, "a left turn: to the left")
 	_expect(absf(_min(braking) + slow_down) < 0.05 * slow_down and _max(braking) < 0.01,
 			"braking: backward at the mover's deceleration")
+
+
+## A teleport in the middle of a run, with a jump just pressed: the character stands at the new place at once, on screen
+## too, faces where it was told, does not jump, and what follows its movement sees no jerk; the signal comes once.
+## Without a facing it keeps facing where it faced.
+func _check_teleport() -> void:
+	print("\n== a teleport mid-run: stands at once, faces where told, no jerk")
+	var teleports := [0]
+	var on_teleport := func() -> void: teleports[0] += 1
+	_player.teleported.connect(on_teleport)
+	await _teleport(Vector3(-30, 0, STRIP_Z))
+	_mover.steer(Vector3.RIGHT)
+	await _ticks(60)
+	var speed_before := _player.get_move_speed()
+	var target := Vector3(-18, 0, STRIP_Z)
+	_player.jump()
+	# Against the run: the model would otherwise take a while to turn around.
+	_player.teleport(target, Vector3.LEFT)
+	var shown_at := _player.get_global_transform_interpolated().origin
+	var facing_at_once := _flat_angle(_visual_forward(), Vector3.LEFT)
+	var heading_at_once := _flat_angle(_mover.get_heading(), Vector3.LEFT)
+	var jerk := 0.0
+	var turn := 0.0
+	var drift := 0.0
+	var left_floor := false
+	for i in 30:
+		await _tree.physics_frame
+		jerk = maxf(jerk, _player.get_local_acceleration().length())
+		turn = maxf(turn, absf(_player.get_turn_rate()))
+		drift = maxf(drift, _player.global_position.distance_to(target))
+		left_floor = left_floor or not _player.is_on_floor()
+	var facing_after := _flat_angle(_visual_forward(), Vector3.LEFT)
+	_player.teleport(target + Vector3(0, 0, -3))
+	await _ticks(10)
+	var kept_facing := _flat_angle(_visual_forward(), Vector3.LEFT)
+	_player.teleported.disconnect(on_teleport)
+	print(("running at %.1f m/s, teleported: shown %.3f m from the target at once, model %.1f° and heading %.1f° from " +
+			"the facing; next 0.5 s: acceleration up to %.2f m/s², turning up to %.1f°/s, drift %.3f m, left the " +
+			"ground %s, model %.1f° from the facing; signals %d; without a facing: %.1f°") % [speed_before,
+			shown_at.distance_to(target), facing_at_once, heading_at_once, jerk, rad_to_deg(turn), drift, left_floor,
+			facing_after, teleports[0], kept_facing])
+	_expect(speed_before > 5.0 and shown_at.distance_to(target) < 0.001 and drift < 0.001 and not left_floor,
+			"the character stands at the new place at once, on screen too, and the jump pressed before is forgotten")
+	_expect(facing_at_once < 0.5 and heading_at_once < 0.5 and facing_after < 0.5,
+			"the model and the heading face where they were told at once")
+	_expect(jerk < 0.01 and turn < 0.01, "no acceleration and no turning after the teleport")
+	_expect(teleports[0] == 2 and kept_facing < 0.5, "teleported comes once per teleport; without a facing it is kept")
 
 
 ## The staircase east of the platform (0.2 m stairs): a click on the platform leads up the stairs and back down

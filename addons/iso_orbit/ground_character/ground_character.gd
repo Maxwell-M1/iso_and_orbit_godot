@@ -5,12 +5,13 @@ extends CharacterBody3D
 ##
 ## It does not matter who gives the commands: the player through [PointClickMoveInput] and [CharacterActionInput], an
 ## AI or a script call [method NavigationMover.move_to] and [method jump] and set [member sprint_requested]. So the
-## same scene works for both the player and NPCs.
+## same scene works for both the player and NPCs. [method teleport] puts the character elsewhere at once: at a spawn
+## point, on another level.
 ##
 ## The character tells what it is doing, so that animations, sounds, effects and the interface do not compute it
 ## themselves (the character itself knows nothing about them):
 ## - signals for moments: [signal state_changed], [signal stepped], [signal jumped], [signal left_floor],
-##   [signal touched_floor], [signal landed], [signal sprint_changed], [signal stair_taken];
+##   [signal touched_floor], [signal landed], [signal sprint_changed], [signal stair_taken], [signal teleported];
 ## - queries for what changes every tick (read them in [code]_process[/code] or [code]_physics_process[/code]):
 ##   [method get_state], [method get_move_velocity], [method get_move_speed], [method get_locomotion_blend],
 ##   [method get_local_movement], [method get_local_acceleration], [method get_turn_rate], [method get_air_time],
@@ -58,6 +59,9 @@ signal landed(impact_speed: float)
 ## ([member CharacterBody3D.floor_snap_length]) passes without the signal. It is for sounds and animations: the body
 ## is put onto the stair at once, and smoothing that on screen is up to the model ([CharacterHover]) or the camera.
 signal stair_taken(height: float)
+## [method teleport] has put the character elsewhere: what follows it (a camera, a trail) should jump there too, not
+## travel.
+signal teleported
 
 ## What the character is doing ([method get_state]).
 enum State {
@@ -271,6 +275,33 @@ func jump() -> void:
 	if not can_jump:
 		return
 	_jump_buffer_left = jump_buffer_time if jump_buffer_time > 0.0 else get_physics_process_delta_time()
+
+
+## Puts the character at [param position] at once (a spawn point, another level) and, if [param facing] is given, turns
+## it and the model there (the horizontal part). It stops dead ([method NavigationMover.halt]), and what follows its
+## movement sees no jerk: the speed, the acceleration ([method get_local_acceleration]) and the turn rate are zero, and
+## the smoothing between physics ticks starts anew at the new place ([method Node.reset_physics_interpolation]), where a
+## floating model ([CharacterHover]) snaps too. A jump pressed before is forgotten; stamina is kept. Whether the
+## character stands on the ground stays as it was, so put the feet on the ground: above it the character falls. Then
+## [signal teleported].
+func teleport(position: Vector3, facing := Vector3.ZERO) -> void:
+	mover.halt()
+	var flat_facing := Vector3(facing.x, 0.0, facing.z)
+	if not flat_facing.is_zero_approx():
+		mover.face(flat_facing)
+		if visual != null:
+			# As in _turn_visual(): the node faces along −Z.
+			visual.rotation.y = atan2(-flat_facing.x, -flat_facing.z)
+	velocity = Vector3.ZERO
+	_move_velocity = Vector3.ZERO
+	_driven_velocity = Vector3.ZERO
+	_acceleration = Vector3.ZERO
+	_turn_rate = 0.0
+	_jump_buffer_left = 0.0
+	global_position = position
+	_model_yaw = _get_model_yaw()
+	reset_physics_interpolation()
+	teleported.emit()
 
 
 ## Stops the steps for [param source] (a component, such as [CharacterHover] while the character floats) while

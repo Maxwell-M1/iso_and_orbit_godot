@@ -351,6 +351,33 @@ func is_cursor_hidden() -> bool:
 	return _cursor_hidden
 
 
+## Forget the press under way: a click not yet released does not run to its point, and a run that the held button or
+## the keys with [member camera_steer_action] drive stops smoothly, as on their release. A hidden cursor appears where
+## the aim was. A button that stays held counts only from its next press; the keys with the camera button are read
+## every tick and walk again at once. For example, before the character is put elsewhere
+## ([method GroundCharacter.teleport]) or when the controls are taken away. A run to a clicked point is the mover's and
+## goes on: [method NavigationMover.halt] stops it too.
+func cancel() -> void:
+	var driving := _holding or _keys_steering
+	_held = false
+	_holding = false
+	_click_pending = false
+	_click_point = null
+	_course = Vector3.ZERO
+	_looking = false
+	_look_point = null
+	_has_aim = false
+	_keys_steering = false
+	_set_hold_pending(false)
+	if driving:
+		mover.stop()
+	if _cursor_hidden and not _is_cursor_captured():
+		get_viewport().warp_mouse(_cursor)
+	# A cursor that the camera holds now comes back where the camera puts it.
+	_reveal_pending = false
+	_show_cursor()
+
+
 ## The button is held: released means a click or the end of a hold; held longer than [member hold_delay] means a hold.
 func _update_hold(delta: float) -> void:
 	if not Input.is_action_pressed(move_action):

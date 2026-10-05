@@ -34,6 +34,13 @@ func is_discovered() -> bool:
 	return _discovered
 
 
+## Count the place as found without [signal discovered]: the player found it before, on an earlier visit to a level
+## loaded again or in a saved game. The place itself remembers only while it exists, so keeping what was found across
+## levels is up to the game.
+func mark_discovered() -> void:
+	_discovered = true
+
+
 func _on_body_entered(body: Node3D) -> void:
 	if _discovered or not body.is_in_group(player_group):
 		return

@@ -120,6 +120,17 @@ func halt() -> void:
 	_motion.halt()
 
 
+## Turn the character to [param direction] (its horizontal part) at once, without running: where it faces
+## ([method get_facing]) and where it last ran ([method get_heading]). For a character that stands, at a spawn point or
+## after a teleport ([method GroundCharacter.teleport]); a run under way turns back to where it goes.
+func face(direction: Vector3) -> void:
+	var flat := _flat(direction)
+	if flat.is_zero_approx():
+		return
+	_facing = Vector3.ZERO
+	_motion.face(flat)
+
+
 ## Horizontal velocity for this tick. Call once per physics tick, before [method CharacterBody3D.move_and_slide].
 func compute_velocity(delta: float) -> Vector3:
 	_motion.speed_scale = (settings.sprint_speed_multiplier if sprinting else 1.0) * _get_backward_scale()
