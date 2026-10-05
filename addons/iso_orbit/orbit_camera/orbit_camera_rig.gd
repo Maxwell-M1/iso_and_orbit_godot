@@ -46,6 +46,10 @@ class _FollowSpring:
 	## limit). Returns how far the value moves. The spring is computed in short steps, so it stays calm at any FPS.
 	func step(error: float, time: float, pull: float, running: float, brake: float, max_speed: float,
 			delta: float) -> float:
+		if delta <= 0.0:
+			# A frame of zero length (Engine.time_scale 0) moves nothing, and the speed stays: an instant spring or
+			# brake (INF) would give INF · 0 below.
+			return 0.0
 		var omega := _SETTLE / time if time > 0.0 else INF
 		if omega * delta > 6.0:
 			# Instant, or so fast that it is the same: straight to the goal, or as far as max_speed lets.

@@ -3,7 +3,7 @@ extends "res://tests/check_suite.gd"
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
 ## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
 ## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
-## the pitch and the height on the run, gliding up the stairs.
+## the pitch and the height on the run, gliding up the stairs, the follow while time stands still.
 
 
 func _checks() -> Array[Callable]:
@@ -18,6 +18,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_pitch_follow,
 		_check_camera_zoom_follow,
 		_check_height_follow,
+		_check_follow_time_stopped,
 	]
 
 
@@ -796,3 +797,74 @@ func _check_height_follow() -> void:
 			"with the demo's height_follow_time the camera glides up the stairs")
 	_expect(is_equal_approx(ends[0], _rig.focus_height) and is_equal_approx(ends[1], _rig.focus_height),
 			"after the stairs the camera is at its height over the character")
+
+
+## Time stands still (Engine.time_scale 0) while the camera follows a run with its turn, pitch and height: with the
+## follow instant (times 0), and with the demo's times and no smoothing of the mouse and the wheel (sharpness 0). The
+## camera stays where it is, no node of the scene gets a non-finite transform, and no errors come; when time goes on,
+## the camera, turned away meanwhile, turns behind the run again.
+func _check_follow_time_stopped() -> void:
+	print("\n== time stands still while the camera follows the run")
+	var defaults := [_rig.follow_movement, _rig.follow_pitch, _rig.follow_zoom, _rig.follow_time,
+			_rig.follow_pitch_time, _rig.follow_zoom_time, _rig.follow_zoom_level, _rig.rotation_sharpness,
+			_rig.zoom_sharpness]
+	await _teleport(Vector3(-30, 0, 34))
+	await _settle_camera()
+	_rig.follow_movement = true
+	_rig.follow_pitch = true
+	_rig.follow_zoom = true
+	# The height stays where it is: the move is computed all the same.
+	_rig.follow_zoom_level = _rig.get_zoom()
+	var report := PackedStringArray()
+	var still := true
+	var clean := true
+	var follows := true
+	for instant: bool in [true, false]:
+		_rig.follow_time = 0.0 if instant else defaults[3]
+		_rig.follow_pitch_time = 0.0 if instant else defaults[4]
+		_rig.follow_zoom_time = 0.0 if instant else defaults[5]
+		_rig.rotation_sharpness = defaults[7] if instant else 0.0
+		_rig.zoom_sharpness = defaults[8] if instant else 0.0
+		await _teleport(Vector3(-30, 0, 34))
+		_mover.steer(Vector3.RIGHT)
+		await _ticks(40)
+		Engine.time_scale = 0.0
+		var errors := _error_count()
+		var broken := {}
+		var before := []
+		for i in 8:
+			await _tree.physics_frame
+			_find_non_finite(broken)
+			if i == 1:
+				# The frame in which the scale changed ran at full speed, and the first frame without time caught up
+				# with its tick: from here on the camera stays.
+				before = [_rig.global_transform, _camera.global_transform]
+		var kept := _same_values([_rig.global_transform, _camera.global_transform], before)
+		errors = _error_count() - errors
+		# Turned away from the run: when time goes on, the follow turns the camera behind it again.
+		_rig.look_along(Vector3.FORWARD)
+		Engine.time_scale = 1.0
+		await _ticks(90)
+		var behind := _camera_angle_to(Vector3.RIGHT)
+		_find_non_finite(broken)
+		_mover.stop()
+		await _ticks_until_stopped(60)
+		report.append("%s: kept %s, non-finite %s, errors %d; then %.1f deg from behind the run" % [
+			"instant" if instant else "no smoothing", kept, broken.keys(), errors, behind])
+		still = still and kept
+		clean = clean and broken.is_empty() and errors == 0
+		follows = follows and behind < 15.0
+	_rig.follow_movement = defaults[0]
+	_rig.follow_pitch = defaults[1]
+	_rig.follow_zoom = defaults[2]
+	_rig.follow_time = defaults[3]
+	_rig.follow_pitch_time = defaults[4]
+	_rig.follow_zoom_time = defaults[5]
+	_rig.follow_zoom_level = defaults[6]
+	_rig.rotation_sharpness = defaults[7]
+	_rig.zoom_sharpness = defaults[8]
+	await _teleport(Vector3.ZERO)
+	print("; ".join(report))
+	_expect(still, "time stopped: the following camera stays where it is, also instant and without smoothing")
+	_expect(clean, "no node gets a non-finite transform, and no errors come")
+	_expect(follows, "when time goes on, the camera turns behind the run again")

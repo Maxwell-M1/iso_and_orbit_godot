@@ -353,7 +353,8 @@ func get_state() -> State:
 
 ## The actual horizontal velocity, m/s: how the body really moves (a wall stops it), on the ground and in the air.
 ## Unlike [method CharacterBody3D.get_real_velocity] it also counts a stair up, where the body is put on the stair
-## past [method move_and_slide].
+## past [method move_and_slide], and in a tick of zero length ([member Engine.time_scale] 0) it keeps its value instead
+## of 0 / 0.
 func get_move_velocity() -> Vector3:
 	return _move_velocity
 
@@ -557,8 +558,11 @@ func _move_body(delta: float, jumping: bool) -> void:
 		return
 	var start := global_transform
 	move_and_slide()
-	var real := get_real_velocity()
-	_move_velocity = Vector3(real.x, 0.0, real.z)
+	# The real velocity is the movement of the tick divided by its length: a tick of zero length (Engine.time_scale 0)
+	# has none (0 / 0), and the body keeps the velocity it moved with.
+	if delta > 0.0:
+		var real := get_real_velocity()
+		_move_velocity = Vector3(real.x, 0.0, real.z)
 	if not jumping:
 		_step_down(horizontal, start)
 

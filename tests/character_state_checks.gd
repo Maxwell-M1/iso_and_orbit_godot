@@ -4,8 +4,9 @@ extends "res://tests/check_suite.gd"
 ## cycle, the steps switch, a teleport mid-run. Stairs and slopes: up and down a staircase without leaving the ground
 ## with the real height of every stair, a block too high, a gentle and a steep slope. Routes on the level without a
 ## false take-off. Floating (CharacterHover): the height and the sway, no steps, a glide over the stairs, a ramp without
-## lag, a jump, a ledge and a wall, a slower fall, turning it off and on. The monitor panel shows the state and the
-## latest events. The demo's character is set up without warnings.
+## lag, a jump, a ledge and a wall, a slower fall, turning it off and on. While time stands still, the running hero
+## stays as it is. The monitor panel shows the state and the latest events. The demo's character is set up without
+## warnings.
 
 ## A clear strip along the south fence: the character runs here, and the checks put their obstacles here.
 const STRIP_Z := 34.0
@@ -27,6 +28,7 @@ func _checks() -> Array[Callable]:
 		_check_hover,
 		_check_hover_fall,
 		_check_hover_toggle,
+		_check_time_stopped,
 		_check_monitor,
 	]
 
@@ -927,6 +929,77 @@ func _check_hover_toggle() -> void:
 	_expect(absf(at_once - hover.height) <= height_range and absf(after_tick - hover.height) <= height_range
 			and fall_at_once and let_go and taken_back,
 			"a hover turned on before its first tick floats at once; out of the tree it lets the steps and the fall go")
+
+
+## Time stands still (Engine.time_scale 0): the physics ticks go on with a zero step. The running hero stays as it is,
+## on foot and floating: its place, speed, state and step rhythm, the staff in its hand and the floating model do not
+## change, no node of the scene gets a non-finite transform, and no errors come. When time goes on, the hero runs on,
+## on foot in step with the staff swaying.
+func _check_time_stopped() -> void:
+	print("\n== time stands still: the running hero stays as it is and runs on afterwards")
+	var settings: GameSettings = _tree.root.get_node(^"Settings")
+	var hover: CharacterHover = _player.get_node("Visual/Hover")
+	var hand: Node3D = _player.get_node("Visual/Hover/Model/RightHand")
+	var steps := [0]
+	var on_step := func(_sprinting: bool) -> void: steps[0] += 1
+	_player.stepped.connect(on_step)
+	var report := PackedStringArray()
+	var still := true
+	var clean := true
+	var runs_on := true
+	for floating: bool in [false, true]:
+		settings.set_value(GameSettings.CHARACTER_HOVER, floating)
+		await _teleport(Vector3(-30, 0, STRIP_Z))
+		_mover.steer(Vector3.RIGHT)
+		await _ticks(40)
+		Engine.time_scale = 0.0
+		# The tick in which the scale changes still runs at full speed.
+		await _tree.physics_frame
+		var before := _get_frozen_state(hover, hand)
+		var errors := _error_count()
+		var broken := {}
+		for i in 6:
+			await _tree.physics_frame
+			_find_non_finite(broken)
+		var kept := _same_values(_get_frozen_state(hover, hand), before)
+		errors = _error_count() - errors
+		Engine.time_scale = 1.0
+		steps[0] = 0
+		var start := _player.global_position
+		var rest := hand.transform
+		var swing := 0.0
+		for i in 60:
+			await _tree.physics_frame
+			swing = maxf(swing, hand.transform.origin.distance_to(rest.origin))
+			_find_non_finite(broken)
+		var ran := _flat_distance(start, _player.global_position)
+		_mover.stop()
+		await _ticks_until_stopped(60)
+		report.append(("%s: at %.2f m/s %s, kept %s, non-finite %s, errors %d; then ran %.2f m, %d steps, the hand " +
+				"swung %.3f m, step rhythm %.2f") % ["floating" if floating else "on foot", before[1].length(),
+				GroundCharacter.State.keys()[before[2]], kept, broken.keys(), errors, ran, steps[0], swing,
+				_player.get_step_phase()])
+		still = still and kept and before[1].length() > 5.0
+		clean = clean and broken.is_empty() and errors == 0
+		runs_on = runs_on and ran > 4.5 and is_finite(_player.get_step_phase())
+		if not floating:
+			runs_on = runs_on and steps[0] >= 2 and swing > 0.02
+	_player.stepped.disconnect(on_step)
+	settings.set_value(GameSettings.CHARACTER_HOVER, false)
+	await _ticks(60)
+	await _teleport(Vector3.ZERO)
+	print("; ".join(report))
+	_expect(still, "time stopped: the running hero keeps its place, speed, state and step rhythm, the staff and the "
+			+ "floating model stay where they are")
+	_expect(clean, "no node gets a non-finite transform, and no errors come")
+	_expect(runs_on, "when time goes on, the hero runs on, on foot in step with the staff swaying")
+
+
+## What a zero step must not change ([method _check_time_stopped]): the body's place, velocity, state and step rhythm,
+## the hand and the floating model.
+func _get_frozen_state(hover: CharacterHover, hand: Node3D) -> Array:
+	return [_player.global_position, _player.get_move_velocity(), _player.get_state(), _player.get_step_phase(),
+		hand.transform, hover.transform]
 
 
 ## The monitor panel: hidden by default, the setting shows it; it names the state and lists the latest events.

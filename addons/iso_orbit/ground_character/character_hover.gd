@@ -330,6 +330,9 @@ func _update_ground(delta: float, previous_feet: float) -> void:
 		_base_unknown = false
 		return
 	var weight := 1.0 - exp(-delta / time)
+	if weight <= 0.0:
+		# A tick of zero length (Engine.time_scale 0) moves nothing, and the lead below would be 0 / 0.
+		return
 	if on_floor:
 		# Looking ahead as far as the smoothing lags behind cancels its lag on a ramp. Moved by a share of the way each
 		# tick, it lags behind a steady climb by delta * (1 - weight) / weight seconds, a little less than the time.

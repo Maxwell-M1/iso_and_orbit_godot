@@ -56,6 +56,9 @@ func run_checks() -> void:
 	_mover.arrived.connect(_on_arrived)
 	for check: Callable in _checks():
 		await check.call()
+		# A check that slows or stops time sets it back itself, but a crashed one cannot: the next check runs at
+		# full speed.
+		Engine.time_scale = 1.0
 	_mover.arrived.disconnect(_on_arrived)
 
 
@@ -147,6 +150,20 @@ func _frames(count: int) -> void:
 		await _tree.process_frame
 
 
+## How many engine and script errors have come so far ([code]tests/run_checks.gd[/code] counts them, except the
+## expected ones).
+func _error_count() -> int:
+	return _tree.call(&"get_error_count")
+
+
+## Adds to [param found] the 3D nodes of the main scene whose transform is not finite (INF or NaN): their paths from
+## the scene as keys.
+func _find_non_finite(found: Dictionary) -> void:
+	for node: Node in _main.find_children("*", "Node3D", true, false):
+		if not (node as Node3D).transform.is_finite():
+			found[str(_main.get_path_to(node))] = true
+
+
 ## Waits for physics ticks until [param condition] becomes true, but no more than [param max_ticks].
 func _wait_until(condition: Callable, max_ticks: int) -> void:
 	for i in max_ticks:
@@ -233,6 +250,17 @@ func _expect(condition: bool, what: String) -> void:
 	else:
 		failures += 1
 		print("  FAIL: ", what)
+
+
+## Whether [param a] and [param b] hold the same values, one by one. Unlike [code]==[/code] between arrays, it does not
+## take a NaN for the same as a NaN.
+static func _same_values(a: Array, b: Array) -> bool:
+	if a.size() != b.size():
+		return false
+	for i in a.size():
+		if a[i] != b[i]:
+			return false
+	return true
 
 
 static func _flat_distance(a: Vector3, b: Vector3) -> float:

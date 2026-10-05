@@ -116,6 +116,12 @@ func take_expected_errors() -> Array[String]:
 	return left
 
 
+## How many engine and script errors have come so far, except the expected ones: a check compares the count before and
+## after what it does.
+func get_error_count() -> int:
+	return _errors.errors
+
+
 func _on_timeout() -> void:
 	print("\nTIMEOUT: the check did not finish in %d s of game time" % TIMEOUT)
 	_failures += 1
