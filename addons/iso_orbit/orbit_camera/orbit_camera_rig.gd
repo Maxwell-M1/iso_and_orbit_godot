@@ -391,8 +391,12 @@ func _apply_mouse_motion() -> void:
 ## and the direction of the run, smoothed a little, so that it does not shake on a staircase. A move faster than
 ## [member teleport_speed] is a teleport, not a run.
 func _track_target_motion(delta: float) -> void:
-	if target == null or delta <= 0.0:
+	if target == null:
 		_forget_target_motion()
+		return
+	if delta <= 0.0:
+		# A tick of zero length (Engine.time_scale 0) moves nothing, and the follow keeps what it knows: the run, the
+		# moves under way and a wait after an orbit go on when time goes on.
 		return
 	var target_position := target.global_position
 	if _has_target_position:

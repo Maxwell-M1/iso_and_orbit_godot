@@ -3,7 +3,8 @@ extends "res://tests/check_suite.gd"
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
 ## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
 ## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
-## the pitch and the height on the run, gliding up the stairs, the follow while time stands still, a turned hero.
+## the pitch and the height on the run, gliding up the stairs, the follow and its wait while time stands still, a
+## turned hero.
 
 
 func _checks() -> Array[Callable]:
@@ -19,6 +20,7 @@ func _checks() -> Array[Callable]:
 		_check_camera_zoom_follow,
 		_check_height_follow,
 		_check_follow_time_stopped,
+		_check_wait_time_stopped,
 		_check_turned_hero,
 	]
 
@@ -869,6 +871,39 @@ func _check_follow_time_stopped() -> void:
 	_expect(still, "time stopped: the following camera stays where it is, also instant and without smoothing")
 	_expect(clean, "no node gets a non-finite transform, and no errors come")
 	_expect(follows, "when time goes on, the camera turns behind the run again")
+
+
+## Time stands still (Engine.time_scale 0) while the follow waits after an orbit and the run goes on: when time goes on,
+## the follow still waits and the camera stays where the mouse left it, until the stop, which ends the wait as always.
+func _check_wait_time_stopped() -> void:
+	print("\n== time stands still while the follow waits after an orbit")
+	_rig.follow_movement = true
+	await _teleport(Vector3(-30, 0, 34))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	# A run to the east with the camera looking north: without the wait the follow would turn the camera behind it.
+	_mover.steer(Vector3.RIGHT)
+	await _ticks(10)
+	var waiting_before := await _press_right(15)
+	var forward := _camera_forward()
+	Engine.time_scale = 0.0
+	for i in 8:
+		await _tree.physics_frame
+	Engine.time_scale = 1.0
+	await _ticks(30)
+	var waiting_after := _rig.is_follow_waiting()
+	var turned := _flat_angle(_camera_forward(), forward)
+	_mover.stop()
+	await _ticks_until_stopped(60)
+	await _ticks(2)
+	var ends_at_stop := not _rig.is_follow_waiting()
+	_rig.follow_movement = false
+	await _teleport(Vector3.ZERO)
+	print("waiting before %s, after time stood still %s, the camera turned %.1f deg meanwhile; over at the stop %s" % [
+			waiting_before, waiting_after, turned, ends_at_stop])
+	_expect(waiting_before and waiting_after and turned < 1.0,
+			"after time stood still the follow still waits, and the camera stays where the mouse left it")
+	_expect(ends_at_stop, "the stop ends the wait, as always")
 
 
 ## The hero's root turned (in the editor, or here by code by 120°): the camera turns in the world's axes, so a teleport
