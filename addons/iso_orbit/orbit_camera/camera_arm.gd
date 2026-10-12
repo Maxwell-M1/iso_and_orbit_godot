@@ -125,10 +125,16 @@ var _fade := 0.0
 var _debug_mesh: MeshInstance3D
 var _debug_lines := PackedVector3Array()
 var _debug_colors := PackedColorArray()
+# In the editor (_preview_in_editor): the distance an OrbitCameraRig shows the camera at (below 0: the length), the
+# camera placed for the preview and its transform as loaded, put back for saving.
+var _preview_length := -1.0
+var _preview_camera: Camera3D
+var _camera_transform := Transform3D.IDENTITY
 
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
+		_preview_in_editor()
 		return
 	if camera == null:
 		camera = _find_camera()
@@ -142,8 +148,19 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
+		_preview_in_editor()
 		return
 	_update(delta, false)
+
+
+func _notification(what: int) -> void:
+	if not Engine.is_editor_hint():
+		return
+	# The game places the camera itself: the scene keeps the camera's transform as it was loaded.
+	if what == NOTIFICATION_EDITOR_PRE_SAVE:
+		_restore_camera()
+	elif what == NOTIFICATION_EDITOR_POST_SAVE:
+		_preview_in_editor()
 
 
 ## Snap into place immediately, without delays or a smooth return: for example, after the target teleports.
@@ -503,6 +520,15 @@ func _draw_debug() -> void:
 	mesh.surface_end()
 
 
+## In the editor: show the camera this far from the start of the arm instead of at [member length], where the holder of
+## the arm (an [OrbitCameraRig]) puts it when the game starts. Only the view in the editor changes, nothing that is
+## saved. Below 0: at [member length] again.
+func set_preview_length(distance: float) -> void:
+	_preview_length = distance
+	if Engine.is_editor_hint():
+		_preview_in_editor()
+
+
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	if _find_camera() == null:
@@ -519,3 +545,32 @@ func _find_camera() -> Camera3D:
 		if child is Camera3D:
 			return child
 	return null
+
+
+# In the editor, every frame: the camera where the game puts it at the start. It is written only when it is elsewhere
+# (moved by hand, or the length changed), so a moved camera comes back at once.
+func _preview_in_editor() -> void:
+	if not is_inside_tree():
+		return
+	var view := _find_camera()
+	if view != _preview_camera:
+		# Another camera, or none: the previous one gets its own transform back.
+		_restore_camera()
+		_preview_camera = view
+		if view != null:
+			_camera_transform = view.transform
+	if view == null:
+		return
+	var placed := Transform3D(Basis.IDENTITY, Vector3(0.0, 0.0, _preview_length if _preview_length >= 0.0 else length))
+	if not view.transform.is_equal_approx(placed):
+		view.transform = placed
+
+
+func _restore_camera() -> void:
+	if is_instance_valid(_preview_camera):
+		_preview_camera.transform = _camera_transform
+
+
+func _validate_property(property: Dictionary) -> void:
+	if property.name == "length" and get_parent() is OrbitCameraRig:
+		property.usage |= PROPERTY_USAGE_READ_ONLY

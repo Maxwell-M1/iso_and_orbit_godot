@@ -302,10 +302,20 @@ var _zoom_follow := _FollowSpring.new()
 # The target's height that the camera follows (height_follow_time).
 var _follow_height := 0.0
 var _has_follow_height := false
+# In the editor (_preview_in_editor): the rig's transform as loaded, put back for saving, with the position placed by
+# hand while there is no target to frame; whether the preview frames a target; the camera the rig places without an
+# arm and its transform as loaded; the arm the rig shows its start distance on.
+var _authored_transform := Transform3D.IDENTITY
+var _authored_transform_known := false
+var _framing_target := false
+var _preview_camera: Camera3D
+var _camera_transform := Transform3D.IDENTITY
+var _preview_arm: CameraArm
 
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
+		_preview_in_editor()
 		return
 	# Move in _process along the already interpolated target (see the class description); children inherit the mode.
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -354,6 +364,11 @@ static func _has_action(action: StringName) -> bool:
 
 func _notification(what: int) -> void:
 	if Engine.is_editor_hint():
+		# The game places the rig and its camera itself: the scene keeps them as they were loaded.
+		if what == NOTIFICATION_EDITOR_PRE_SAVE:
+			_restore_authored_state()
+		elif what == NOTIFICATION_EDITOR_POST_SAVE:
+			_preview_in_editor()
 		return
 	# The window lost focus or the game was paused (a menu opened) in the middle of rotating: the button release may
 	# not reach the node, and the cursor must not be left captured.
@@ -369,6 +384,7 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
+		_preview_in_editor()
 		return
 	if _rotating:
 		_rotate_time += delta
@@ -742,3 +758,72 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 static func _is_camera_holder(node: Node) -> bool:
 	return node is CameraArm or node is Camera3D
+
+
+# In the editor, every frame: the rig and its camera where the game starts them (start_zoom, start_yaw, the target's
+# position). Only what is elsewhere is written: a rig or camera moved by hand comes back at once.
+func _preview_in_editor() -> void:
+	if not is_inside_tree():
+		return
+	if not _authored_transform_known:
+		_authored_transform = transform
+		_authored_transform_known = true
+	var framing := is_instance_valid(target) and target.is_inside_tree()
+	if framing != _framing_target:
+		_framing_target = framing
+		if framing:
+			# From now on the preview sets the position: the one placed by hand is kept for saving.
+			_authored_transform.origin = transform.origin
+		else:
+			transform.origin = _authored_transform.origin
+	var placed := global_transform
+	var pitch := clampf(_get_base_pitch(start_zoom), min_pitch, max_pitch)
+	placed.basis = Basis.from_euler(Vector3(pitch, start_yaw, 0.0)) * Basis.from_scale(placed.basis.get_scale())
+	if framing:
+		placed.origin = target.global_position + Vector3.UP * focus_height
+	if not placed.is_equal_approx(global_transform):
+		global_transform = placed
+	var distance := lerpf(near_distance, far_distance, start_zoom)
+	var holder := arm if arm != null else _find_child(func(child: Node) -> bool: return child is CameraArm) as CameraArm
+	if holder != null and not (holder.get_script() as Script).is_tool():
+		# The arm's script does not run in the editor (it extends CameraArm without @tool): the rig places the camera.
+		holder = null
+	if holder != _preview_arm:
+		if is_instance_valid(_preview_arm):
+			_preview_arm.set_preview_length(-1.0)
+		_preview_arm = holder
+	var view: Camera3D = null
+	if holder != null:
+		holder.set_preview_length(distance)
+	elif camera != null:
+		view = camera
+	else:
+		view = _find_child(func(child: Node) -> bool: return child is Camera3D) as Camera3D
+	if view != _preview_camera:
+		# Another camera, or none: the previous one gets its own transform back.
+		_restore_camera()
+		_preview_camera = view
+		if view != null:
+			_camera_transform = view.transform
+	if view != null:
+		var at_distance := Transform3D(Basis.IDENTITY, Vector3(0.0, 0.0, distance))
+		if not view.transform.is_equal_approx(at_distance):
+			view.transform = at_distance
+
+
+func _restore_authored_state() -> void:
+	if _authored_transform_known:
+		var restored := _authored_transform
+		if not _framing_target:
+			restored.origin = transform.origin
+		# The preview sets the turn, not the scale: the scale is kept as it is now.
+		var turn := Basis(_authored_transform.basis.get_rotation_quaternion())
+		restored.basis = turn * Basis.from_scale(transform.basis.get_scale())
+		transform = restored
+	_restore_camera()
+
+
+func _restore_camera() -> void:
+	if is_instance_valid(_preview_camera):
+		_preview_camera.transform = _camera_transform
+

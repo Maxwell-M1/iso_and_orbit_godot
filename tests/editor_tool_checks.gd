@@ -36,6 +36,8 @@ func _run() -> void:
 	_check_input_warnings()
 	_check_portal_sign()
 	await _check_hover_switch()
+	await _check_camera_save()
+	await _check_arm_without_tool()
 	var failed := Array(results).any(func(result: String) -> bool: return result.begins_with("FAIL"))
 	status = "failed" if failed else "passed"
 	var file := FileAccess.open(OUT + "results.json", FileAccess.WRITE)
@@ -58,6 +60,11 @@ func _save(node: Node, path: String) -> void:
 	var packed := PackedScene.new()
 	_expect(packed.pack(node) == OK and ResourceSaver.save(packed, path) == OK, "save the isolated fixture")
 	node.propagate_notification(NOTIFICATION_EDITOR_POST_SAVE)
+
+
+func _load(path: String) -> Node:
+	var packed := ResourceLoader.load(path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP) as PackedScene
+	return packed.instantiate()
 
 
 func _warned(node: Node) -> void:
@@ -205,3 +212,133 @@ func _check_hover_switch() -> void:
 	_expect(hover.transform.is_equal_approx(placed),
 		"turning floating off and on in the editor leaves the model as set")
 	character.free()
+
+
+func _check_camera_save() -> void:
+	var fixture := Node3D.new()
+	fixture.name = "CameraFixture"
+	var target := Node3D.new()
+	target.name = "Target"
+	target.position = Vector3(5, 2, -3)
+	fixture.add_child(target)
+	target.owner = fixture
+	var rig := OrbitCameraRig.new()
+	rig.name = "Rig"
+	var authored_rig := Transform3D(Basis.from_euler(Vector3(0.1, 0.2, 0.3)), Vector3(-3, 1, 6))
+	rig.transform = authored_rig
+	rig.target = target
+	rig.near_distance = 4.0
+	rig.far_distance = 20.0
+	rig.start_zoom = 0.5
+	fixture.add_child(rig)
+	rig.owner = fixture
+	var arm := CameraArm.new()
+	arm.name = "Arm"
+	arm.length = 7.0
+	rig.add_child(arm)
+	arm.owner = fixture
+	rig.arm = arm
+	var view := Camera3D.new()
+	view.name = "View"
+	var authored_view := Transform3D(Basis.from_euler(Vector3(0.2, 0.3, 0.1)), Vector3(1, 2, 3))
+	view.transform = authored_view
+	arm.add_child(view)
+	view.owner = fixture
+	add_child(fixture)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var start := Vector3(0, 0, 12)
+	_expect(rig.global_position.is_equal_approx(target.global_position + Vector3.UP * rig.focus_height)
+		and view.position.is_equal_approx(start),
+		"the preview frames the target at the start distance of the game")
+	_expect(is_equal_approx(arm.length, 7.0), "the preview leaves the arm's own length as set")
+	var path := OUT + "camera.tscn"
+	_save(fixture, path)
+	var saved := _load(path)
+	_expect((saved.get_node("Rig") as Node3D).transform.is_equal_approx(authored_rig),
+		"saving keeps the rig's transform as it was loaded")
+	_expect(is_equal_approx((saved.get_node("Rig/Arm") as CameraArm).length, 7.0), "saving keeps the arm length")
+	_expect((saved.get_node("Rig/Arm/View") as Node3D).transform.is_equal_approx(authored_view),
+		"saving keeps the camera's transform as it was loaded")
+	_expect(not rig.transform.is_equal_approx(authored_rig) and view.position.is_equal_approx(start),
+		"after saving the preview is back at once")
+	saved.free()
+	view.transform = Transform3D(Basis.from_euler(Vector3(0.4, 0.1, 0.2)), Vector3(3, 4, 5))
+	rig.transform = Transform3D(Basis.IDENTITY, Vector3(9, 9, 9))
+	await get_tree().process_frame
+	_expect(view.transform.is_equal_approx(Transform3D(Basis.IDENTITY, start))
+		and rig.global_position.is_equal_approx(target.global_position + Vector3.UP * rig.focus_height),
+		"a rig or camera moved by hand goes back where the game puts it")
+	_save(fixture, path)
+	saved = _load(path)
+	_expect((saved.get_node("Rig") as Node3D).transform.is_equal_approx(authored_rig)
+		and (saved.get_node("Rig/Arm/View") as Node3D).transform.is_equal_approx(authored_view),
+		"a move by hand or its undo never becomes the saved transform")
+	saved.free()
+	rig.scale = Vector3.ONE * 1.5
+	await get_tree().process_frame
+	_save(fixture, path)
+	saved = _load(path)
+	var saved_basis := (saved.get_node("Rig") as Node3D).transform.basis
+	_expect(saved_basis.get_scale().is_equal_approx(Vector3.ONE * 1.5)
+		and saved_basis.orthonormalized().is_equal_approx(authored_rig.basis.orthonormalized()),
+		"a scale set by hand is saved, with the rig turned as loaded")
+	saved.free()
+	rig.scale = Vector3.ONE
+	rig.target = null
+	await get_tree().process_frame
+	_expect(rig.position.is_equal_approx(authored_rig.origin), "without a target the rig stands where it was placed")
+	rig.position = Vector3(2, 0, 2)
+	await get_tree().process_frame
+	_save(fixture, path)
+	saved = _load(path)
+	var saved_rig := (saved.get_node("Rig") as Node3D).transform
+	_expect(saved_rig.origin.is_equal_approx(Vector3(2, 0, 2)) and saved_rig.basis.is_equal_approx(authored_rig.basis),
+		"without a target the rig is saved where it is placed, turned as loaded")
+	saved.free()
+	rig.target = target
+	await get_tree().process_frame
+	_save(fixture, path)
+	saved = _load(path)
+	_expect((saved.get_node("Rig") as Node3D).position.is_equal_approx(Vector3(2, 0, 2)),
+		"framing a target again keeps the placed position for saving")
+	saved.free()
+	fixture.free()
+	# A rig without an arm places its camera itself.
+	var plain := OrbitCameraRig.new()
+	var direct := Camera3D.new()
+	direct.transform = authored_view
+	plain.add_child(direct)
+	add_child(plain)
+	await get_tree().process_frame
+	var distance := lerpf(plain.near_distance, plain.far_distance, plain.start_zoom)
+	_expect(direct.position.is_equal_approx(Vector3(0, 0, distance)), "a rig without an arm previews its camera")
+	plain.propagate_notification(NOTIFICATION_EDITOR_PRE_SAVE)
+	_expect(direct.transform.is_equal_approx(authored_view), "and gives it back its own transform for saving")
+	plain.propagate_notification(NOTIFICATION_EDITOR_POST_SAVE)
+	plain.free()
+
+
+## An arm whose script extends CameraArm without @tool does not run in the editor: the rig places the camera itself.
+func _check_arm_without_tool() -> void:
+	var script := GDScript.new()
+	script.source_code = "extends CameraArm\n"
+	_expect(script.reload() == OK, "a script that extends CameraArm without @tool")
+	var rig := OrbitCameraRig.new()
+	var arm := Node3D.new()
+	arm.set_script(script)
+	var view := Camera3D.new()
+	var authored_view := Transform3D(Basis.IDENTITY, Vector3(1, 2, 3))
+	view.transform = authored_view
+	arm.add_child(view)
+	rig.add_child(arm)
+	rig.camera = view
+	add_child(rig)
+	await get_tree().process_frame
+	var distance := lerpf(rig.near_distance, rig.far_distance, rig.start_zoom)
+	_expect(view.position.is_equal_approx(Vector3(0, 0, distance)),
+		"the rig shows the camera of an arm that is not a tool script")
+	rig.propagate_notification(NOTIFICATION_EDITOR_PRE_SAVE)
+	_expect(view.transform.is_equal_approx(authored_view), "and gives the camera back its own transform for saving")
+	rig.propagate_notification(NOTIFICATION_EDITOR_POST_SAVE)
+	rig.free()
