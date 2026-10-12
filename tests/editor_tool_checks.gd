@@ -6,6 +6,7 @@ extends Node3D
 ## the project and no player preference is written.
 
 const PILLAR := preload("res://shared/world/props/stone_pillar.tscn")
+const KNIGHT := preload("res://gdscript/npc/knight_patrol.tscn")
 const PAD := preload("res://shared/world/props/teleport_pad.tscn")
 const OUT := "res://.godot/editor_tool_checks/"
 
@@ -42,6 +43,10 @@ func _run() -> void:
 	await _check_saved_source()
 	await _check_inheritance()
 	await _check_live_authoring()
+	await _check_patrol_body_warning()
+	_check_patrol_actor_preview()
+	_check_copied_actor()
+	await _check_patrol_switch()
 	var failed := Array(results).any(func(result: String) -> bool: return result.begins_with("FAIL"))
 	status = "failed" if failed else "passed"
 	var file := FileAccess.open(OUT + "results.json", FileAccess.WRITE)
@@ -446,3 +451,67 @@ func _check_live_authoring() -> void:
 	_expect(later_shape.shape.get_debug_mesh().get_aabb().size.y > 1.5,
 		"a shape assigned after adding an empty collider participates in resizing")
 	prop.free()
+
+
+## A controller reads its siblings, which the Scene dock does not recheck: it listens to its body.
+func _check_patrol_body_warning() -> void:
+	get_tree().node_configuration_warning_changed.connect(_warned)
+	var body := CharacterBody3D.new()
+	var mover := NavigationMover.new()
+	var controller := PatrolController.new()
+	body.add_child(mover)
+	body.add_child(controller)
+	add_child(body)
+	await get_tree().process_frame
+	_expect(controller._get_configuration_warnings().is_empty(), "a controller beside the body's mover has no warning")
+	_warning_updates.clear()
+	body.remove_child(mover)
+	_expect(_warning_updates.get(controller, 0) > 0 and not controller._get_configuration_warnings().is_empty(),
+		"taking the mover from the body refreshes the controller's warning")
+	_warning_updates.clear()
+	body.add_child(mover)
+	_expect(_warning_updates.get(controller, 0) > 0 and controller._get_configuration_warnings().is_empty(),
+		"giving the body its mover back clears it")
+	body.free()
+	get_tree().node_configuration_warning_changed.disconnect(_warned)
+
+
+## The name over a patrolling character's head is a preview too: the scene keeps the label's own text.
+func _check_patrol_actor_preview() -> void:
+	var knight := KNIGHT.instantiate(PackedScene.GEN_EDIT_STATE_MAIN) as PatrolActor
+	add_child(knight)
+	_expect(knight.title.text == "Knight", "the patrol actor shows its name over the head in the editor")
+	_save(knight, OUT + "knight.tscn")
+	var text := FileAccess.get_file_as_string(OUT + "knight.tscn")
+	_expect(not text.contains("text =") and not text.contains('name="Title"'),
+		"saving the knight adds nothing to its inherited label")
+	_expect(knight.title.text == "Knight", "the name shows again after saving")
+	knight.free()
+
+
+## A copy of a patrolling character (Duplicate, copy and paste) makes its own model and does not copy the original's.
+func _check_copied_actor() -> void:
+	var knight := KNIGHT.instantiate(PackedScene.GEN_EDIT_STATE_MAIN) as PatrolActor
+	add_child(knight)
+	var copy := knight.duplicate() as PatrolActor
+	add_child(copy)
+	var models := copy.character.visual.get_children(true).filter(func(node: Node) -> bool: return node is Node3D)
+	_expect(models.size() == 1, "a copy of a patrolling character shows one model")
+	copy.free()
+	knight.free()
+
+
+## Walking is the game's: a patrol turned off and on in the editor starts nothing.
+func _check_patrol_switch() -> void:
+	var body := CharacterBody3D.new()
+	var mover := NavigationMover.new()
+	var controller := PatrolController.new()
+	body.add_child(mover)
+	body.add_child(controller)
+	add_child(body)
+	await get_tree().process_frame
+	controller.enabled = false
+	controller.enabled = true
+	_expect(controller.get_state() == PatrolController.State.IDLE,
+		"turning a patrol off and on in the editor starts nothing")
+	body.free()

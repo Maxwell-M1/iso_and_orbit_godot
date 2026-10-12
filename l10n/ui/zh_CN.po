@@ -668,3 +668,11 @@ msgstr "左%s"
 #: addons/iso_orbit/ui_screens/input_names.gd
 msgid "Right %s"
 msgstr "右%s"
+
+#: gdscript/npc/knight_patrol.tscn
+msgid "Let me through. Do you know who my father is?"
+msgstr "让开。你知道我父亲是谁吗？"
+
+#: gdscript/ui/subtitle_display.gd
+msgid "%s: %s"
+msgstr "%s：%s"

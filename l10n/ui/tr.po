@@ -668,3 +668,11 @@ msgstr "Sol %s"
 #: addons/iso_orbit/ui_screens/input_names.gd
 msgid "Right %s"
 msgstr "Sağ %s"
+
+#: gdscript/npc/knight_patrol.tscn
+msgid "Let me through. Do you know who my father is?"
+msgstr "Yol ver. Babamın kim olduğunu biliyor musun?"
+
+#: gdscript/ui/subtitle_display.gd
+msgid "%s: %s"
+msgstr "%s: %s"

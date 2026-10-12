@@ -14,13 +14,15 @@
 [ext_resource type="PackedScene" path="res://gdscript/ui/travel_prompt.tscn" id="16_prompt"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/levels/loading_screen.tscn" id="17_loading"]
 [ext_resource type="Script" uid="uid://bipgg8yaxnu45" path="res://addons/iso_orbit/ui_screens/action_texts.gd" id="18_action_texts"]
+[ext_resource type="PackedScene" path="res://gdscript/ui/subtitle_display.tscn" id="19_subtitles"]
 
-[node name="Main" type="Node3D" unique_id=94359211 node_paths=PackedStringArray("levels", "hero", "hud", "travel_prompt")]
+[node name="Main" type="Node3D" unique_id=94359211 node_paths=PackedStringArray("levels", "hero", "hud", "travel_prompt", "subtitles")]
 script = ExtResource("1_main")
 levels = NodePath("Levels")
 hero = NodePath("Hero")
 hud = NodePath("Hud")
 travel_prompt = NodePath("Hud/TravelPrompt")
+subtitles = NodePath("Hud/Subtitles")
 
 [node name="Levels" type="Node3D" parent="." unique_id=412706328 node_paths=PackedStringArray("initial_level", "loading_screen")]
 script = ExtResource("2_levels")
@@ -34,6 +36,8 @@ loading_screen = NodePath("../LoadingScreen")
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1610239526 node_paths=PackedStringArray("character")]
 script = ExtResource("7_hud")
 character = NodePath("../Hero/Character")
+
+[node name="Subtitles" parent="Hud" unique_id=539597410 instance=ExtResource("19_subtitles")]
 
 [node name="Panel" type="PanelContainer" parent="Hud" unique_id=883681759]
 offset_left = 12.0

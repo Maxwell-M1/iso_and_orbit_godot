@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" path="res://shared/world/props/teleport_pad.tscn" id="12_pad"]
 [ext_resource type="Script" uid="uid://0mvvysxf5llp" path="res://addons/iso_orbit/levels/spawn_point.gd" id="13_spawn"]
 [ext_resource type="Script" uid="uid://cgxh66rku8lid" path="res://addons/iso_orbit/points_of_interest/point_of_interest.gd" id="14_poi"]
+[ext_resource type="PackedScene" path="res://gdscript/npc/island_patrol.tscn" id="15_patrol"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_water"]
 material = ExtResource("3_water")
@@ -55,6 +56,15 @@ size = Vector3(4.2, 3, 0.6)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_camp"]
 radius = 5.0
+
+[sub_resource type="Curve3D" id="Curve3D_island_patrol"]
+resource_local_to_scene = true
+bake_interval = 0.1
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 7, 0, 0, 0, 0, 0, 0, -2, 0, 3),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
 
 [node name="Island" type="Node3D" unique_id=743329240]
 
@@ -208,6 +218,10 @@ transform = Transform3D(0.9563048, 0, 0.2923717, 0, 1, 0, -0.2923717, 0, 0.95630
 transform = Transform3D(0.6691307, 0, -0.7431448, 0, 1, 0, 0.7431448, 0, 0.6691307, 6.3, 0, -7.2)
 dimensions = Vector3(0.76, 0.855, 0.76)
 
+[node name="IslandPatrol" parent="NavigationRegion3D" unique_id=1571603919 node_paths=PackedStringArray("route") instance=ExtResource("15_patrol")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
+route = NodePath("../../Routes/IslandPatrol")
+
 [node name="Trees" type="Node3D" parent="NavigationRegion3D" unique_id=1984138810]
 
 [node name="Pine1" parent="NavigationRegion3D/Trees" unique_id=773216836 instance=ExtResource("5_pine")]
@@ -323,3 +337,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 8.6)
 target_level = "res://shared/world/world.tscn"
 target_spawn = &"from_island"
 title = "Green Vale"
+
+[node name="Routes" type="Node3D" parent="." unique_id=566365806]
+
+[node name="IslandPatrol" type="Path3D" parent="Routes" unique_id=1771036622]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.05, 2)
+curve = SubResource("Curve3D_island_patrol")
+debug_custom_color = Color(0.4, 0.75, 1, 1)

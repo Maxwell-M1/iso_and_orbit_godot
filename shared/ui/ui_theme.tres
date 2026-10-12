@@ -164,6 +164,17 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_subtitle"]
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
+bg_color = Color(0.025, 0.03, 0.04, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [resource]
 Button/styles/hover = SubResource("StyleBoxFlat_button_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_button")
@@ -201,6 +212,11 @@ StaminaBar/styles/background = SubResource("StyleBoxFlat_stamina_background")
 StaminaBar/styles/fill = SubResource("StyleBoxFlat_stamina_fill")
 StaminaBarExhausted/base_type = &"StaminaBar"
 StaminaBarExhausted/styles/fill = SubResource("StyleBoxFlat_stamina_exhausted")
+SubtitlePanel/base_type = &"PanelContainer"
+SubtitlePanel/styles/panel = SubResource("StyleBoxFlat_subtitle")
+SubtitleText/base_type = &"Label"
+SubtitleText/colors/font_color = Color(1, 0.97, 0.9, 1)
+SubtitleText/font_sizes/font_size = 22
 TabPage/base_type = &"MarginContainer"
 TabPage/constants/margin_bottom = 16
 TabPage/constants/margin_left = 16

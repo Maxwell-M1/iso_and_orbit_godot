@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://nil7vm2d42qn"]
+
+[ext_resource type="PackedScene" path="res://gdscript/npc/patrol_actor.tscn" id="1_actor"]
+[ext_resource type="PackedScene" path="res://shared/characters/models/knight.tscn" id="2_model"]
+
+[node name="Knight" unique_id=366496623 instance=ExtResource("1_actor")]
+model_scene = ExtResource("2_model")
+speaker_name = "Knight"
+blocked_line = "Let me through. Do you know who my father is?"
+
+[node name="PatrolController" parent="Character" index="4"]
+blocked_delay = 2.5

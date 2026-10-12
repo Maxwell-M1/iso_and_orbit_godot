@@ -26,6 +26,7 @@ const SUITES := [
 	preload("res://tests/settings_window_checks.gd"),
 	preload("res://tests/localization_checks.gd"),
 	preload("res://tests/level_checks.gd"),
+	preload("res://tests/patrol_checks.gd"),
 	preload("res://tests/editor_authoring_checks.gd"),
 ]
 const CheckSuite := preload("res://tests/check_suite.gd")
@@ -68,6 +69,9 @@ func _run() -> void:
 	settings.reset_to_defaults()
 	_main = load("res://gdscript/main.tscn").instantiate()
 	root.add_child(_main)
+	# Core checks use stationary fixtures; the patrol suite explicitly starts and exercises the moving NPCs.
+	_main.get_node("Levels").level_loaded.connect(func(level: Node3D, _spawn: Node3D): _stop_patrols(level))
+	_stop_patrols(_main)
 	print("viewport: ", root.get_visible_rect().size, " interpolation: ", physics_interpolation)
 	for i in 10:
 		await physics_frame
@@ -85,6 +89,12 @@ func _run() -> void:
 		_summary.append("%-28s ok %3d, failed %d" % [suite_name, suite.passed, suite.failures])
 
 	await _finish()
+
+
+func _stop_patrols(level: Node) -> void:
+	for actor: PatrolActor in get_nodes_in_group(PatrolActor.GROUP):
+		if level.is_ancestor_of(actor):
+			actor.controller.stop()
 
 
 func _finish() -> void:

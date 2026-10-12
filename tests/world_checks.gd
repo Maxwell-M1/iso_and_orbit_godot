@@ -9,7 +9,7 @@ func _checks() -> Array[Callable]:
 		_check_mountain,
 		_check_places,
 		_check_places_added_later,
-		_check_route.bind("around the knight at the hamlet", Vector3(-26.6, 0, 22.6), Vector3(-32.6, 0, 22.6), 15.0),
+		_check_route.bind("around the well at the hamlet", Vector3(-24.5, 0, 20), Vector3(-30.5, 0, 20), 15.0),
 		_check_characters_at_places,
 		_check_mage_options,
 		_check_navigation_climb,
@@ -176,12 +176,13 @@ func _check_characters_at_places() -> void:
 	var visited := {}
 	var report := PackedStringArray()
 	var complete := characters.get_child_count() == 5
-	for character: StaticBody3D in characters.get_children():
+	for actor: Node3D in characters.get_children():
+		var character := actor.character as PhysicsBody3D if actor is PatrolActor else actor as PhysicsBody3D
 		var gear := 0
 		for hand: Node in character.find_children("*Hand", "Node3D", true, false):
 			gear += hand.get_child_count()
 		var title: Label3D = character.get_node("Title")
-		var place := _place_of(character.global_position, places)
+		var place := _place_of(actor.global_position, places)
 		var query := PhysicsRayQueryParameters3D.create(character.global_position + Vector3.UP * 3.0,
 				character.global_position + Vector3.DOWN * 3.0, 1, [character.get_rid()])
 		var ground: Dictionary = space.intersect_ray(query)
@@ -192,16 +193,18 @@ func _check_characters_at_places() -> void:
 		if place != null:
 			visited[place] = true
 	print(", ".join(report))
-	_expect(complete, "five characters with titles and gear, each stands on the ground at a place of interest")
+	_expect(complete, "five characters with titles and gear, on the ground, with a home at a place of interest")
 	_expect(places.size() == 4 and visited.size() == places.size(), "every place of interest has a character")
-	var knight: Node3D = characters.get_node("Knight")
-	await _teleport(knight.global_position + Vector3(3, 0, 0))
+	var ranger: Node3D = characters.get_node("Ranger")
+	await _teleport(ranger.global_position + Vector3(3, 0, 0))
 	_mover.steer(Vector3.LEFT)
 	await _ticks(90)
 	_mover.stop()
-	var gap := _flat_distance(_player.global_position, knight.global_position)
-	print("ran straight at the knight: stopped %.2f m from the centre" % gap)
-	_expect(gap > 0.7, "the character cannot walk through a standing character")
+	var gap := _flat_distance(_player.global_position, ranger.global_position)
+	var body_radius := (_player.get_node("CollisionShape3D").shape as CapsuleShape3D).radius
+	var ranger_radius := (ranger.get_node("CollisionShape3D").shape as CapsuleShape3D).radius
+	print("ran straight at the ranger: stopped %.2f m from the centre" % gap)
+	_expect(gap >= body_radius + ranger_radius - 0.03, "the character cannot walk through a standing character")
 
 
 ## The place whose area contains [param position], or null.

@@ -8,6 +8,8 @@ extends "res://tests/check_suite.gd"
 const SCRIPT_STRINGS: Array[String] = [
 	"Speed: %.1f m/s",
 	" (%d Hz)",
+	# SubtitleDisplay: the name and the line.
+	"%s: %s",
 	"With V-Sync there are never more frames than the monitor's refresh rate%s, and an FPS limit above it has no "
 			+ "effect. The smoothest limits are those that divide this rate evenly.",
 	# CharacterMonitor: the character's state and events.
@@ -71,7 +73,9 @@ func _check_every_string_translated() -> void:
 		_add(strings, tip, loading)
 	var levels := _collect_levels(strings)
 	for text in SCRIPT_STRINGS:
-		_add(strings, text, null)
+		# Listed on purpose, also a text without letters: the way a name and a line are joined.
+		if not strings.has(text):
+			strings[text] = _where(null)
 	for text in InputNames.get_mouse_names():
 		_add(strings, text, null)
 	await _close_settings()
@@ -161,6 +165,9 @@ func _check_language_switch() -> void:
 
 
 func _collect(node: Node, strings: Dictionary) -> void:
+	if node is PatrolActor:
+		_add(strings, (node as PatrolActor).speaker_name, node)
+		_add(strings, (node as PatrolActor).blocked_line, node)
 	# A control that names keys (ActionTexts) shows its texts with the names in: the source texts are its templates.
 	for template: Variant in ActionTexts.get_templates(node).values():
 		for text: String in (template if template is PackedStringArray else PackedStringArray([template])):

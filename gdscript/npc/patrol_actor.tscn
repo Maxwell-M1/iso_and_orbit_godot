@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gdscript/npc/patrol_actor.gd" id="1_actor"]
+[ext_resource type="Script" path="res://addons/iso_orbit/ground_character/ground_character.gd" id="2_body"]
+[ext_resource type="Script" path="res://addons/iso_orbit/click_to_move/navigation_mover.gd" id="3_mover"]
+[ext_resource type="Script" path="res://addons/iso_orbit/click_to_move/patrol_controller.gd" id="4_patrol"]
+[ext_resource type="Script" path="res://addons/iso_orbit/click_to_move/locomotion_settings.gd" id="5_settings"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule_body"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="Resource" id="Locomotion_walk"]
+resource_local_to_scene = true
+script = ExtResource("5_settings")
+max_speed = 2.2
+
+[node name="PatrolActor" type="Node3D" node_paths=PackedStringArray("character", "controller", "title")]
+script = ExtResource("1_actor")
+character = NodePath("Character")
+controller = NodePath("Character/PatrolController")
+title = NodePath("Character/Title")
+
+[node name="Character" type="CharacterBody3D" parent="." node_paths=PackedStringArray("mover", "visual")]
+collision_layer = 2
+collision_mask = 11
+floor_constant_speed = true
+floor_snap_length = 0.05
+script = ExtResource("2_body")
+mover = NodePath("NavigationMover")
+visual = NodePath("Visual")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Character"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("Capsule_body")
+
+[node name="Visual" type="Node3D" parent="Character"]
+
+[node name="Title" type="Label3D" parent="Character"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+billboard = 1
+modulate = Color(1, 0.95, 0.85, 1)
+font_size = 48
+
+[node name="NavigationMover" type="Node" parent="Character"]
+script = ExtResource("3_mover")
+settings = SubResource("Locomotion_walk")
+
+[node name="PatrolController" type="Node" parent="Character"]
+script = ExtResource("4_patrol")

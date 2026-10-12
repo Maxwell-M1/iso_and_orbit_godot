@@ -668,3 +668,11 @@ msgstr "Левый %s"
 #: addons/iso_orbit/ui_screens/input_names.gd
 msgid "Right %s"
 msgstr "Правый %s"
+
+#: gdscript/npc/knight_patrol.tscn
+msgid "Let me through. Do you know who my father is?"
+msgstr "Дай пройти. Ты знаешь, кто мой отец?"
+
+#: gdscript/ui/subtitle_display.gd
+msgid "%s: %s"
+msgstr "%s: %s"

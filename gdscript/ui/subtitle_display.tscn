@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gdscript/ui/subtitle_display.gd" id="1_subtitle"]
+
+[node name="Subtitles" type="PanelContainer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = -72.0
+offset_right = -48.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"SubtitlePanel"
+script = ExtResource("1_subtitle")
+
+[node name="Caption" type="Label" parent="."]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"SubtitleText"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

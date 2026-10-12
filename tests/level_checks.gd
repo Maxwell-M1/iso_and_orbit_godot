@@ -365,11 +365,15 @@ func _check_auto_travel() -> void:
 	_levels.level_change_finished.connect(on_finished)
 	var pad := _get_portal()
 	pad.auto_travel = true
+	var start_events: Array[String] = []
+	var on_started_auto := func(path: String) -> void: start_events.append(path)
+	_levels.level_change_started.connect(on_started_auto)
 	await _teleport(pad.global_position)
 	await _ticks(2)
-	var started := _levels.is_changing()
+	var started := start_events == [ISLAND]
 	var offered := _prompt.visible
 	await _wait_for_change()
+	_levels.level_change_started.disconnect(on_started_auto)
 	var there := _levels.get_current_level().scene_file_path
 	var inside := [false]
 	var on_started := func(_path: String) -> void: inside[0] = true
