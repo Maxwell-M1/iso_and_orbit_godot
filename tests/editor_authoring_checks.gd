@@ -4,7 +4,7 @@ extends "res://tests/check_suite.gd"
 
 func _checks() -> Array[Callable]:
 	return [_check_contracts, _check_initial_level, _check_settings_path, _check_scene_settings,
-		_check_follow_exception]
+		_check_follow_exception, _check_settings_sharing]
 
 
 func _check_contracts() -> void:
@@ -126,3 +126,42 @@ func _check_follow_exception() -> void:
 	hero.free()
 	for key: StringName in keys:
 		settings.set_value(key, previous[key])
+
+
+func _check_settings_sharing() -> void:
+	print("\n== movers share their settings resource and take a new one at once")
+	var preset := LocomotionSettings.new()
+	var holder := Node3D.new()
+	var movers: Array[NavigationMover] = []
+	for i in 2:
+		var body := Node3D.new()
+		var mover := NavigationMover.new()
+		mover.settings = preset
+		mover.use_navigation = false
+		body.add_child(mover)
+		holder.add_child(body)
+		movers.append(mover)
+	_tree.root.add_child(holder)
+	_expect(movers[0].settings == preset and movers[1].settings == preset,
+		"in the game a mover uses the resource assigned to it, not a copy")
+	preset.max_speed = 2.0
+	for mover: NavigationMover in movers:
+		mover.steer(Vector3.RIGHT)
+	for i in 120:
+		for mover: NavigationMover in movers:
+			mover.compute_velocity(DT)
+	var limited := true
+	for mover: NavigationMover in movers:
+		limited = limited and mover.get_speed() > 1.9 and mover.get_speed() <= 2.001
+	_expect(limited, "a change of a shared resource during play reaches every mover that uses it")
+	var replacement := LocomotionSettings.new()
+	replacement.max_speed = 1.25
+	movers[0].settings = replacement
+	for i in 120:
+		movers[0].compute_velocity(DT)
+	_expect(movers[0].get_speed() > 1.2 and movers[0].get_speed() <= 1.251 and movers[1].settings == preset,
+		"a resource assigned during play takes effect at once, for that mover only")
+	movers[1].settings = null
+	_expect(movers[1].settings != null and movers[1].settings.max_speed == LocomotionSettings.new().max_speed,
+		"no resource assigned during play: the mover runs on the default settings")
+	holder.free()

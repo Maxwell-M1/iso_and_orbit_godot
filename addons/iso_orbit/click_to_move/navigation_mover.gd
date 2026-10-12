@@ -28,8 +28,15 @@ signal arrived
 ## stopped.
 signal destination_cancelled
 
-## Acceleration, braking and turning. If not set, the default settings are used.
-@export var settings: LocomotionSettings
+## Acceleration, braking and turning. If not set, the default settings are used. A resource assigned during play takes
+## effect at once.
+@export var settings: LocomotionSettings:
+	set(value):
+		settings = value
+		if _motion != null:
+			if settings == null:
+				settings = LocomotionSettings.new()
+			_motion.settings = settings
 
 ## Find the path on the navigation mesh. If disabled, or there is no mesh, run to the point directly.
 @export var use_navigation := true
