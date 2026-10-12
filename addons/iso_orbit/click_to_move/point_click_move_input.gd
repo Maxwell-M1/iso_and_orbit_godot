@@ -10,9 +10,9 @@ extends Node
 ## - Click: the point under the cursor at the moment of the press is found by a physics ray from the camera (layers
 ##   [member ground_mask]), and a path around obstacles is built to it. The character starts running there when the
 ##   button is released before [member hold_delay]: while it is not clear whether this is a click or a hold, the
-##   character keeps doing what it was doing, and the point marker and the path do not appear. Otherwise, during a
-##   hold, it would have time to turn onto the path to the press point, and the path may lead in a completely
-##   different direction than the cursor later does.
+##   character keeps doing what it was doing, the cursor stays where it is, and the point marker and the path do not
+##   appear. Otherwise, during a hold, it would have time to turn onto the path to the press point, and the path may
+##   lead in a completely different direction than the cursor later does.
 ## - Holding [member move_action] longer than [member hold_delay]: according to [member hold_mode], straight toward
 ##   the cursor or along a path to the point under the cursor. The camera follows the character, so the cursor always
 ##   points ahead, and the character runs while the button is held. If the camera turns on its own meanwhile, the
@@ -43,9 +43,11 @@ signal destination_picked(point: Vector3)
 ## The button is held longer than [member hold_delay]: the character runs after the cursor or after the camera.
 signal hold_started
 ## The button was pressed, and it is not yet clear whether this is a click or a hold ([param pending] =
-## [code]true[/code]); it became clear: released or held longer than [member hold_delay] ([code]false[/code]). While
-## it is unclear, the camera should not turn on its own ([method OrbitCameraRig.set_follow_paused]): a short click
-## must not move the cursor, and by the start of the hold the cursor must point where the press was.
+## [code]true[/code]); it became clear: released or held longer than [member hold_delay] ([code]false[/code]).
+## Meanwhile the character keeps doing what it was doing, and the cursor stays where the mouse puts it, also while the
+## camera turns on its own. The camera's follow need not wait for it: paused for it
+## ([method OrbitCameraRig.set_follow_paused]), the follow would stop a turn under way at every click and start it again
+## after the click.
 signal hold_pending_changed(pending: bool)
 ## The player sent the character on a new run: a click to a new point, a press that became a hold, or the keys with
 ## [member camera_steer_action] that started a walk. Not when the keys take over a hold that has just ended, nor for a
@@ -112,11 +114,12 @@ const _AIM_AHEAD := 4.0
 ## How the character runs while [member move_action] is held.
 @export var hold_mode := HoldMode.STEER
 
-## While the button is pressed and the camera turns on its own (following the run), is turned to look around
-## ([member look_around_while_held]) or zooms, move the cursor together with the world: it stays over the same ground
-## point, the character runs where it was aimed, and the mouse turns it as usual. If turned off, the cursor stays in
-## place on the screen, and a camera turn turns the character: it runs along an arc until the cursor is right in front
-## of it.
+## While the button is held (the press has become a hold, [member hold_delay]) and the camera turns on its own
+## (following the run), is turned to look around ([member look_around_while_held]) or zooms, move the cursor together
+## with the world: it stays over the same ground point, the character runs where it was aimed, and the mouse turns it as
+## usual. If turned off, the cursor stays in place on the screen, and a camera turn turns the character: it runs along
+## an arc until the cursor is right in front of it. A press that may still be a click leaves the cursor in place either
+## way: a click does not move it under the player's hand, and the hold aims from where the cursor is when it starts.
 ## This requires moving the cursor ([method Viewport.warp_mouse]); where the system cannot do that, the cursor stays in
 ## place, but the running direction is still kept.
 @export var keep_aim_on_camera_turn := true
@@ -333,9 +336,10 @@ func _process(delta: float) -> void:
 		_aim_ahead(mouse)
 		mouse = get_viewport().get_mouse_position()
 	var moved := Vector2.ZERO
-	# Track the aim from the press itself: in the frame where the click becomes a hold, the camera may already have
-	# turned.
-	if _held and keep_aim_on_camera_turn:
+	# Only a hold keeps the aim. A press that may still be a click leaves the cursor where the mouse puts it, also while
+	# the camera turns on its own: a click must not move the cursor under the player's hand. The hold aims from where
+	# the cursor is when it starts.
+	if _holding and keep_aim_on_camera_turn:
 		moved = _keep_aim(mouse)
 	else:
 		moved = mouse - _mouse_seen
@@ -525,8 +529,8 @@ func _keep_aim(mouse: Vector2) -> Vector2:
 	# The feet are where the camera sees them: the camera is placed by the interpolated position.
 	var feet := mover.get_body().get_global_transform_interpolated().origin
 	var moved := _mouse_moved(mouse)
-	# Without an aim (the press itself, right after the camera was rotated, the cursor above the horizon) the cursor
-	# moves on the screen.
+	# Without an aim (the hold has just started, the camera has just been rotated, the cursor is above the horizon) the
+	# cursor moves on the screen.
 	var cursor := _cursor + moved
 	if _has_aim and not view.is_position_behind(feet + _aim_offset):
 		# Where the aim ended up on the screen after the camera moved, plus the mouse movement during the frame.

@@ -434,9 +434,9 @@ func get_zoom() -> float:
 
 
 ## Pause or resume the follow: the turn, the pitch and the height ([member follow_movement], [member follow_pitch],
-## [member follow_zoom]). For example, while it is not yet clear whether this is a click or a hold of the mouse
-## button ([signal PointClickMoveInput.hold_pending_changed]). Paused, the follow does not pull, and a move under way
-## brakes as fast as the smoothing of the mouse and the wheel settles; resumed, it starts again smoothly.
+## [member follow_zoom]), for example while a dialogue is on the screen. Paused, the follow does not pull, and a move
+## under way brakes as fast as the smoothing of the mouse and the wheel settles; resumed, it starts again smoothly. So a
+## pause for a moment, such as for every click of the mouse, stops a turn under way, and the turn starts over after it.
 func set_follow_paused(paused: bool) -> void:
 	_follow_paused = paused
 

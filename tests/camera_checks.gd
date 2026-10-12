@@ -2,10 +2,10 @@ extends "res://tests/check_suite.gd"
 ## Camera: the follow (smooth, without going past the run, still for a run toward the camera, also after a turnaround
 ## on the run, not swung by the passing directions of a sharp turn, the same at any frame rate, within the speed limit,
 ## steady on the stairs, not fooled by a teleport) and its pauses (while RMB is held, after that until the stop or a new
-## run, also after looking around on a run, and while it is not yet clear whether it is a click or a hold), the cursor
-## keeping its aim while the camera turns, rotation and zoom with the mouse (RMB pitch only with the setting), aligning
-## the pitch and the height on the run, gliding up the stairs, the follow and its wait while time stands still, a
-## turned hero.
+## run, also after looking around on a run, and set_follow_paused), clicks that do not interrupt it, the cursor left in
+## place while a press may still be a click and keeping its aim in a hold while the camera turns, rotation and zoom with
+## the mouse (RMB pitch only with the setting), aligning the pitch and the height on the run, gliding up the stairs, the
+## follow and its wait while time stands still, a turned hero.
 
 
 func _checks() -> Array[Callable]:
@@ -20,6 +20,8 @@ func _checks() -> Array[Callable]:
 		_check_sharp_turn_setup,
 		_check_camera_follow_stairs,
 		_check_camera_follow_pauses,
+		_check_follow_through_clicks,
+		_check_press_leaves_cursor,
 		_check_camera_waits_after_rotate,
 		_check_look_around_waits,
 		_check_camera,
@@ -618,21 +620,29 @@ func _check_camera_follow_pauses() -> void:
 		if not _mover.has_destination():
 			break
 
-	# A short click: the camera waits only while the button is pressed.
-	var size := _tree.root.get_visible_rect().size
-	var click_at := Vector2(size.x * 0.4, size.y * 0.6)
-	_send_motion(click_at, Vector2.ZERO)
-	_send_button(MOUSE_BUTTON_LEFT, true, click_at)
-	await _tree.physics_frame
-	await _tree.physics_frame
-	var paused_on_click := _rig.is_follow_paused()
-	_send_button(MOUSE_BUTTON_LEFT, false, click_at)
-	for i in 3:
-		await _tree.physics_frame
-	var paused_after_click := _rig.is_follow_paused()
-	print("click: paused while pressed %s, after release %s" % [paused_on_click, paused_after_click])
-	_expect(paused_on_click and not paused_after_click,
-			"a click pauses the follow only while it is not clear: click or hold")
+	# set_follow_paused(): while paused, the follow does not pull, and a turn under way brakes; resumed, it turns on.
+	await _teleport(Vector3(-8, 0, 0))
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	_rig.follow_time = 1.1
+	var side := Vector3.RIGHT
+	_mover.move_to(Vector3(8, 0, 0))
+	await _ticks(20)
+	var before_pause := _camera_angle_to(side)
+	_rig.set_follow_paused(true)
+	await _ticks(15)
+	var paused := _rig.is_follow_paused()
+	var paused_at := _camera_angle_to(side)
+	await _ticks(15)
+	var paused_turn := absf(_camera_angle_to(side) - paused_at)
+	_rig.set_follow_paused(false)
+	await _ticks(30)
+	var resumed_turn := paused_at - _camera_angle_to(side)
+	print("paused mid-turn at %.1f deg off the run: %.2f deg in the next 0.25 s; resumed: %.1f deg in 0.5 s" % [
+		before_pause, paused_turn, resumed_turn])
+	_expect(paused and before_pause > 20.0 and paused_turn < 0.3,
+			"set_follow_paused: while paused, the camera does not turn behind the run")
+	_expect(not _rig.is_follow_paused() and resumed_turn > 5.0, "resumed, the camera turns behind the run again")
 	for i in 600:
 		await _tree.physics_frame
 		if not _mover.has_destination():
@@ -643,7 +653,8 @@ func _check_camera_follow_pauses() -> void:
 			"left %.1f of %.1f deg behind the run; heading turned %.2f deg; mouse +150 px turned the run %.1f deg, " +
 			"then drift %.2f deg") % [default_time, held.click_window_turn, held.camera_turn, held.camera_lag,
 			held.initial_lag, held.heading_turn, held.nudge_turn, held.nudge_drift])
-	_expect(held.paused_on_press and held.click_window_turn < 0.3, "camera waits while it is not clear: click or hold")
+	_expect(not held.paused_on_press and held.click_window_turn < 0.3,
+			"a press does not pause the follow, and the camera of the standing hero does not turn")
 	_expect(not held.paused_while_held and held.camera_lag < 0.25 * held.initial_lag,
 			"camera turns behind the run as soon as the hold starts")
 	_expect(held.heading_turn < 1.0, "the cursor keeps the aim: the run goes straight while the camera turns")
@@ -739,6 +750,173 @@ func _heading_turn_over(ticks: int) -> float:
 		turn += _flat_angle(previous, heading)
 		previous = heading
 	return turn
+
+
+## Clicks while the camera follows the run do not interrupt it: the turn, the pitch and the height go on as without
+## the clicks. The hero runs to a point to the side of the view with all three on, and the point is clicked again
+## every 0.4 s; the same run without the clicks (the mover sent to the points the clicks picked, at the same ticks)
+## moves the body the same, and the camera must move the same too. A follow paused while it was not clear whether a
+## press was a click or a hold stopped the camera at every click, and it started over.
+func _check_follow_through_clicks() -> void:
+	print("\n== clicks do not interrupt the follow: the turn, the pitch and the height")
+	var defaults := [_rig.follow_time, _rig.follow_pitch_angle, _rig.follow_pitch_time, _rig.follow_zoom_level,
+		_rig.follow_zoom_time]
+	var zoom_before := _rig.get_zoom()
+	_rig.follow_time = 1.1
+	_rig.follow_pitch_angle = -deg_to_rad(30.0)
+	_rig.follow_pitch_time = 1.1
+	_rig.follow_zoom_level = 0.3
+	_rig.follow_zoom_time = 1.1
+	var clicked := await _follow_with_clicks({})
+	var direct := await _follow_with_clicks(clicked.picked)
+	var apart := 0.0
+	var yaw := 0.0
+	var pitch := 0.0
+	var zoom := 0.0
+	for i in mini(clicked.yaw.size(), direct.yaw.size()):
+		apart = maxf(apart, clicked.position[i].distance_to(direct.position[i]))
+		yaw = maxf(yaw, absf(rad_to_deg(angle_difference(clicked.yaw[i], direct.yaw[i]))))
+		pitch = maxf(pitch, absf(rad_to_deg(clicked.pitch[i] - direct.pitch[i])))
+		zoom = maxf(zoom, absf(clicked.zoom[i] - direct.zoom[i]))
+	var turned := absf(rad_to_deg(angle_difference(direct.yaw[0], direct.yaw[-1])))
+	var pitched := absf(rad_to_deg(direct.pitch[-1] - direct.pitch[0]))
+	var zoomed := absf(direct.zoom[-1] - direct.zoom[0])
+	print(("%d clicks in 2 s, the bodies up to %.5f m apart; without the clicks the camera turned %.1f deg, pitched " +
+			"%.1f deg and zoomed %.3f; with them it differs by up to %.3f deg, %.3f deg and %.4f") % [
+			clicked.picked.size(), apart, turned, pitched, zoomed, yaw, pitch, zoom])
+	_expect(apart < 0.0001 and turned > 45.0 and pitched > 3.0 and zoomed > 0.05,
+			"the run goes the same with and without the clicks, and the camera turns, pitches and zooms on it")
+	_expect(yaw < 0.05 and pitch < 0.05 and zoom < 0.0005,
+			"clicks do not interrupt the follow: the turn, the pitch and the height go on as without them")
+	_rig.follow_movement = false
+	_rig.follow_pitch = false
+	_rig.follow_zoom = false
+	_rig.follow_time = defaults[0]
+	_rig.follow_pitch_angle = defaults[1]
+	_rig.follow_pitch_time = defaults[2]
+	_rig.follow_zoom_level = defaults[3]
+	_rig.follow_zoom_time = defaults[4]
+	await _zoom_to(zoom_before)
+
+
+## Runs 15 m to the side of the view with the turn, the pitch and the height following, and clicks that point again
+## every 0.4 s for 2 s; with [param replay] (tick -> point, as the clicks picked them) it sends the mover there instead.
+## Every run starts from the same view. Returns the camera's yaw, pitch and zoom and the body's position after every
+## tick, and the points the clicks picked.
+func _follow_with_clicks(replay: Dictionary) -> Dictionary:
+	_rig.follow_movement = false
+	# Off, the pitch goes back to that of the zoom.
+	_rig.follow_pitch = false
+	_rig.follow_zoom = false
+	_player.teleport(Vector3(-5, 0, 34), Vector3.RIGHT)
+	await _ticks(3)
+	_rig.look_along(Vector3.FORWARD)
+	await _zoom_to(0.55)
+	await _settle_camera()
+	_rig.follow_movement = true
+	_rig.follow_pitch = true
+	_rig.follow_zoom = true
+	var target := _player.global_position + Vector3.RIGHT * 15.0
+	var result := {yaw = PackedFloat32Array(), pitch = PackedFloat32Array(), zoom = PackedFloat32Array(),
+		position = PackedVector3Array(), picked = {}}
+	var now := [0]
+	# The input sends the run after the body has moved in its tick; the replay sends it before the body moves in the
+	# next one.
+	var on_picked := func(point: Vector3) -> void: result.picked[now[0] + 1] = point
+	_input.destination_picked.connect(on_picked)
+	var screen := Vector2.ZERO
+	for tick in 120:
+		now[0] = tick
+		if not replay.is_empty():
+			if replay.has(tick):
+				_mover.move_to(replay[tick])
+		elif tick % 24 == 0:
+			screen = _camera.unproject_position(target)
+			_send_motion(screen, Vector2.ZERO)
+			_send_button(MOUSE_BUTTON_LEFT, true, screen)
+		elif tick % 24 == 6:
+			_send_button(MOUSE_BUTTON_LEFT, false, screen)
+		await _tree.physics_frame
+		result.yaw.append(_rig.global_rotation.y)
+		result.pitch.append(_rig.global_rotation.x)
+		result.zoom.append(_rig.get_zoom())
+		result.position.append(_player.global_position)
+	_input.destination_picked.disconnect(on_picked)
+	_mover.stop()
+	await _ticks_until_stopped(120)
+	return result
+
+
+## Puts the camera at the zoom [param zoom] at once: a turn of the wheel of just that size, then snap().
+func _zoom_to(zoom: float) -> void:
+	_rig.snap()
+	var change := zoom - _rig.get_zoom()
+	if absf(change) > 0.00001:
+		var position := _tree.root.get_final_transform() * (_tree.root.get_visible_rect().size / 2.0)
+		for pressed: bool in [true, false]:
+			var event := InputEventMouseButton.new()
+			event.button_index = MOUSE_BUTTON_WHEEL_DOWN if change > 0.0 else MOUSE_BUTTON_WHEEL_UP
+			event.pressed = pressed
+			event.factor = absf(change) / _rig.zoom_step
+			event.position = position
+			event.global_position = position
+			Input.parse_input_event(event)
+		await _frames(2)
+	_rig.snap()
+
+
+## While a press may still be a click, the cursor stays where the mouse put it, also while the camera turns behind the
+## run: a click does not move it under the player's hand, and a hold aims from where the cursor is when it starts. The
+## hero runs to the side of the view with the follow on, and the button is pressed over the ground ahead and held. The
+## turning camera carries the pressed spot across the screen meanwhile, and the hold runs toward the ground under the
+## cursor where the hold starts, not toward the spot pressed.
+func _check_press_leaves_cursor() -> void:
+	print("\n== a press that may still be a click leaves the cursor in place while the camera turns")
+	var default_time := _rig.follow_time
+	_input.hold_mode = PointClickMoveInput.HoldMode.STEER
+	_input.keep_aim_on_camera_turn = true
+	_player.teleport(Vector3(-5, 0, 34), Vector3.RIGHT)
+	await _ticks(3)
+	_rig.look_along(Vector3.FORWARD)
+	await _settle_camera()
+	_rig.follow_movement = true
+	_rig.follow_time = 1.1
+	_mover.move_to(Vector3(10, 0, 34))
+	await _ticks(18)
+	var screen := _camera.unproject_position(_player.global_position + Vector3(3, 0, -3))
+	_send_motion(screen, Vector2.ZERO)
+	_send_button(MOUSE_BUTTON_LEFT, true, screen)
+	# The press reaches the input in the next tick.
+	await _tree.physics_frame
+	var view_at_press := _camera_forward()
+	var pressed_way := _flat(_ground_under(screen) - _player.global_position).normalized()
+	await _wait_until(func() -> bool: return _mover.is_steering(), 30)
+	var camera_turn := _flat_angle(view_at_press, _camera_forward())
+	var hold_way := _flat(_ground_under(screen) - _player.global_position).normalized()
+	await _ticks(20)
+	var heading := _mover.get_heading()
+	var off_hold := _flat_angle(heading, hold_way)
+	var off_press := _flat_angle(heading, pressed_way)
+	_send_button(MOUSE_BUTTON_LEFT, false, screen)
+	await _ticks_until_stopped(120)
+	_rig.follow_movement = false
+	_rig.follow_time = default_time
+	print(("while the press could still be a click the camera turned %.1f deg; the hold runs %.1f deg off the ground " +
+			"under the cursor where it started, %.1f deg off the spot pressed") % [camera_turn, off_hold, off_press])
+	_expect(camera_turn > 10.0, "the camera turns behind the run while a press may still be a click")
+	_expect(off_hold < 4.0 and off_press > 8.0,
+			"the cursor stayed in place: the hold runs toward the ground under it where it starts, not the spot pressed")
+
+
+## The ground at the height of the character's feet under [param screen] position.
+func _ground_under(screen: Vector2) -> Vector3:
+	var hit: Variant = Plane(Vector3.UP, _player.global_position.y).intersects_ray(
+			_camera.project_ray_origin(screen), _camera.project_ray_normal(screen))
+	return hit if hit != null else _player.global_position
+
+
+static func _flat(vector: Vector3) -> Vector3:
+	return Vector3(vector.x, 0.0, vector.z)
 
 
 ## After the camera has been rotated with the right button, the follow waits. RMB + D walks to the camera's right with

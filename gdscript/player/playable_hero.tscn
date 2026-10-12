@@ -64,7 +64,6 @@ script = ExtResource("8_path_view")
 mover = NodePath("../Character/NavigationMover")
 
 [connection signal="destination_picked" from="PlayerInput" to="ClickMarker" method="show_at"]
-[connection signal="hold_pending_changed" from="PlayerInput" to="CameraRig" method="set_follow_paused"]
 [connection signal="run_requested" from="PlayerInput" to="CameraRig" method="end_follow_wait"]
 [connection signal="hold_started" from="PlayerInput" to="ClickMarker" method="fade_out"]
 [connection signal="arrived" from="Character/NavigationMover" to="ClickMarker" method="fade_out"]
