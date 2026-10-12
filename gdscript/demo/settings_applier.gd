@@ -1,10 +1,20 @@
+@tool
 extends Node
 ## Applies the game settings (the [code]Settings[/code] autoload) to the demo nodes: at startup and on every change.
 ## The game components know nothing about settings: the "setting → property" mapping is gathered here.
 ## [GameSettings] applies the engine settings (FPS, V-Sync, interpolation, UI scale, language, volume) itself.
 
+## Apply the player's saved settings over the values set in the scene; the scene's values are also what the settings
+## window resets to. Off: the scene's nodes keep the values set in the scene, and the settings window does not change
+## them; [GameSettings] still applies the engine settings (full screen, frame rate, V-Sync, interpolation, interface
+## scale, language, volume).
+@export var use_saved_settings := true
+
 ## The hero the settings are for: its character with the character's parts, its input and its camera.
-@export var hero: PlayableHero
+@export var hero: PlayableHero:
+	set(value):
+		hero = value
+		update_configuration_warnings()
 
 ## The controls hint.
 @export var help_panel: Control
@@ -36,6 +46,8 @@ var _path_view: Node3D
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if hero != null:
 		_player = hero.character
 		_player_actions = hero.actions
@@ -48,6 +60,9 @@ func _ready() -> void:
 		_player_hover = hero.hover
 		_player_silhouette = hero.silhouette
 		_path_view = hero.path_view
+	if not use_saved_settings:
+		return
+	Settings.set_scene_defaults(_capture_scene_defaults())
 	for key: StringName in GameSettings.DEFAULTS:
 		_apply(key, Settings.get_value(key))
 	Settings.changed.connect(_apply)
@@ -141,6 +156,10 @@ func _apply(key: StringName, value: Variant) -> void:
 				# behind any run.
 				var on: bool = Settings.get_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD)
 				var angle: float = Settings.get_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE)
+				var valid_angle := _follow_exception_angle(angle)
+				if not is_equal_approx(angle, valid_angle):
+					Settings.set_value(GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE, valid_angle)
+				angle = valid_angle
 				_camera_rig.follow_toward_camera_angle = deg_to_rad(angle) if on else 0.0
 		GameSettings.CAMERA_ALIGN_PITCH_TIME:
 			if _camera_rig != null:
@@ -183,3 +202,79 @@ func _apply(key: StringName, value: Variant) -> void:
 		GameSettings.CHARACTER_STATE:
 			if character_state != null:
 				character_state.visible = value
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if hero == null:
+		warnings.append("Assign Hero in the Inspector.")
+	return warnings
+
+
+func _get_property_list() -> Array[Dictionary]:
+	return [{"name": "settings_source", "type": TYPE_STRING,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY}]
+
+
+func _get(property: StringName) -> Variant:
+	if property == &"settings_source":
+		return "Scene defaults, then saved Settings preferences" if use_saved_settings else "Authored scene values"
+	return null
+
+
+func _capture_scene_defaults() -> Dictionary:
+	var values := {}
+	if _ledge_guard != null:
+		values[GameSettings.LEDGE_GUARD] = _ledge_guard.enabled
+	if _player_input != null:
+		values.merge({GameSettings.HOLD_MODE: int(_player_input.hold_mode),
+			GameSettings.HIDE_CURSOR_ON_HOLD: _player_input.hide_cursor_while_held,
+			GameSettings.CAMERA_KEYS_MODE: int(_player_input.keys_with_camera),
+			GameSettings.CAMERA_STEER_KEYS_MODE: int(_player_input.keys_with_camera_steer),
+			GameSettings.LOOK_AROUND: _player_input.look_around_while_held,
+			GameSettings.CAMERA_KEEP_AIM: _player_input.keep_aim_on_camera_turn})
+	if _player != null:
+		values.merge({GameSettings.JUMP: _player.can_jump, GameSettings.SPRINT: _player.can_sprint,
+			GameSettings.JUMP_HEIGHT: _player.jump_height, GameSettings.FATIGUE: _player.sprint_tires,
+			GameSettings.SPRINT_DURATION: _player.sprint_duration,
+			GameSettings.SPRINT_BONUS: (_player.mover.settings.sprint_speed_multiplier - 1.0) * 100.0,
+			GameSettings.BACKWARD_SLOWDOWN: (1.0 - _player.mover.settings.backward_speed_multiplier) * 100.0})
+	if _player_actions != null:
+		values[GameSettings.SPRINT_MODE] = int(_player_actions.sprint_mode)
+	if _player_appearance != null:
+		values[GameSettings.CHARACTER_LOOK] = _player_appearance.get_look()
+	if _player_hover != null:
+		values[GameSettings.CHARACTER_HOVER] = _player_hover.enabled
+	if _player_silhouette != null:
+		values[GameSettings.SILHOUETTE_OUTLINE] = _player_silhouette.outline_enabled
+	if _camera_rig != null:
+		values.merge({GameSettings.CAMERA_MOUSE_PITCH: _camera_rig.mouse_pitch,
+			GameSettings.CAMERA_FOLLOW: _camera_rig.follow_movement,
+			GameSettings.CAMERA_FOLLOW_TIME: _camera_rig.follow_time,
+			GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD: _camera_rig.follow_toward_camera_angle > 0.0,
+			GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE:
+					_follow_exception_angle(rad_to_deg(_camera_rig.follow_toward_camera_angle)),
+			GameSettings.CAMERA_ALIGN_PITCH: _camera_rig.follow_pitch,
+			GameSettings.CAMERA_ALIGN_PITCH_ANGLE: -rad_to_deg(_camera_rig.follow_pitch_angle),
+			GameSettings.CAMERA_ALIGN_PITCH_TIME: _camera_rig.follow_pitch_time,
+			GameSettings.CAMERA_ALIGN_HEIGHT: _camera_rig.follow_zoom,
+			GameSettings.CAMERA_ALIGN_HEIGHT_LEVEL: _camera_rig.follow_zoom_level * 100.0,
+			GameSettings.CAMERA_ALIGN_HEIGHT_TIME: _camera_rig.follow_zoom_time})
+	if _camera_arm != null:
+		values[GameSettings.CAMERA_KEEP_OUT] = _camera_arm.keep_out_of_geometry
+		values[GameSettings.CAMERA_PULL_IN] = _camera_arm.pull_in_on_occlusion
+	if _character_sounds != null:
+		values.merge({GameSettings.SOUND_FOOTSTEPS: _character_sounds.footsteps_enabled,
+			GameSettings.SOUND_JUMP: _character_sounds.jump_enabled,
+			GameSettings.SOUND_SPRINT: _character_sounds.sprint_enabled})
+	for pair: Array in [[GameSettings.PATH_LINE, _path_view], [GameSettings.HELP, help_panel],
+			[GameSettings.FPS_COUNTER, fps_counter], [GameSettings.CHARACTER_STATE, character_state]]:
+		if pair[1] != null:
+			values[pair[0]] = pair[1].visible
+	return values
+
+
+## Keep a usable threshold even when the scene represents the disabled mode with zero.
+static func _follow_exception_angle(angle: float) -> float:
+	var usable: float = angle if angle > 0.0 else GameSettings.DEFAULTS[GameSettings.CAMERA_FOLLOW_EXCEPT_TOWARD_ANGLE]
+	return clampf(usable, 5.0, 60.0)

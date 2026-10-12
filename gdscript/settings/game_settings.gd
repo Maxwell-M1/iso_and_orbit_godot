@@ -151,10 +151,18 @@ var persistent := true
 
 var _config := ConfigFile.new()
 var _dirty := false
+var _loaded_path := ""
+# The values the scene was set up with, by key (set_scene_defaults).
+var _scene_defaults := {}
 
 
-func _init() -> void:
-	# Load before the _ready() of scene nodes: they need the settings from the first frame.
+# The file is read at its first use, not in _init: a path set in the scene arrives after _init.
+func _ensure_loaded() -> void:
+	if _loaded_path == path:
+		return
+	_config = ConfigFile.new()
+	_dirty = false
+	_loaded_path = path
 	var error := _config.load(path)
 	if error != OK and error != ERR_FILE_NOT_FOUND:
 		push_warning("Settings: can't read %s (%s), using defaults." % [path, error_string(error)])
@@ -165,6 +173,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	_ensure_loaded()
 	for key: StringName in DEFAULTS:
 		_apply_to_engine(key, get_value(key))
 
@@ -180,7 +189,8 @@ func has_setting(key: StringName) -> bool:
 
 func get_value(key: StringName) -> Variant:
 	assert(has_setting(key), "Unknown setting \"%s\"." % key)
-	var default: Variant = DEFAULTS[key]
+	_ensure_loaded()
+	var default: Variant = _scene_defaults.get(key, DEFAULTS[key])
 	var value: Variant = _config.get_value(_section(key), _name(key), default)
 	# The file may have been edited by hand: a value of the wrong type is replaced with the default value (an integer
 	# where a float is expected is converted).
@@ -203,9 +213,19 @@ func set_value(key: StringName, value: Variant) -> void:
 	changed.emit(key, value)
 
 
+## The values the scene was set up with, by key: they take the place of [constant DEFAULTS] where the player has saved
+## nothing, and [method reset_to_defaults] returns to them. The saved settings stay as they are; [signal changed] tells
+## the controls the value now in effect.
+func set_scene_defaults(values: Dictionary) -> void:
+	for key: StringName in values:
+		assert(has_setting(key), "Unknown setting \"%s\"." % key)
+		_scene_defaults[key] = values[key]
+		changed.emit(key, get_value(key))
+
+
 func reset_to_defaults() -> void:
 	for key: StringName in DEFAULTS:
-		set_value(key, DEFAULTS[key])
+		set_value(key, _scene_defaults.get(key, DEFAULTS[key]))
 
 
 ## Write the changes to disk. The settings window calls it on closing; on exiting the game, it happens by itself.
