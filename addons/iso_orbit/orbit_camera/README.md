@@ -33,7 +33,9 @@ Part of Iso & Orbit for Godot 4.7. MIT license (see `LICENSE`). This folder need
    ```
 
    The rig and arm find their first direct `CameraArm` and `Camera3D` children, respectively; you can also set the
-   exported `arm` and `camera` references. Leave `Camera3D` at its default local transform because the arm places it.
+   exported `arm` and `camera` references. Leave `Camera3D` at its default local transform because the arm places it;
+   in the editor the rig shows it where the game starts it (`start_zoom`, `start_yaw`), and saving keeps the scene's
+   own values.
    Make it current when this should be the active view. For the template's framing, set its FOV to 45° and far plane to
    300 world units.
 4. Put solid world collision on physics layer 1. The arm's default `collision_mask` is layers 1 and 3 (`0b101`); layer 3
@@ -53,10 +55,11 @@ degrees in the Inspector; in GDScript, assign radians with `deg_to_rad()`.
 
 With `follow_wait_after_rotate` on, follow stays paused after a deliberate mouse orbit until the target slows or a new
 run begins. If your input starts another run before the target stops, call `end_follow_wait()` then. The template
-connects `PointClickMoveInput.run_requested` to it, and `hold_pending_changed` to `set_follow_paused()`, in
-`gdscript/player/playable_hero.tscn`. If your target moves continuously and cannot report a new run, leave the wait
-option off. Keep `sharp_turn_speed` at half the character's turn speed or lower so a reversal does not pull the camera
-through passing directions; the template pairs 360°/s with the hero's 720°/s turn.
+connects `PointClickMoveInput.run_requested` to it in `gdscript/player/playable_hero.tscn`. It does not pause the follow
+for presses of the mouse button (`set_follow_paused()`): a click would stop a turn under way, and the turn would start
+over. If your target moves continuously and cannot report a new run, leave the wait option off. Keep `sharp_turn_speed`
+at half the character's turn speed or lower so a reversal does not pull the camera through passing directions; the
+template pairs 360°/s with the hero's 720°/s turn.
 
 Without an arm, a direct `Camera3D` child of the rig also works. It stays at the zoom distance and can pass through
 walls; obstacle response and fade require `CameraArm`.
@@ -68,4 +71,4 @@ For the zoom curve, all properties, occlusion behavior, and tested interactions,
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

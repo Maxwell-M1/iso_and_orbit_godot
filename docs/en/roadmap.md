@@ -5,8 +5,9 @@
 Planned work, in no particular order. Nothing here is implemented yet.
 
 - **`shared/` without GDScript.** The levels mark places, spawn points and portals with the components' scripts
-  (`point_of_interest.gd`, `spawn_point.gd`, `level_portal.gd`), and two prop scripts live in `shared/world/props/`.
-  They need a form that a C# version could use too. See [Known issues](known-issues.md#project-files).
+  (`point_of_interest.gd`, `spawn_point.gd`, `level_portal.gd`), place the demo's patrolling characters from
+  `gdscript/npc/`, and three prop scripts live in `shared/world/props/`. They need a form that a C# version could use
+  too. See [Known issues](known-issues.md#project-files).
 - **A C# example** in `csharp/`, with the same components and a game shell on top of the levels in `shared/world/`.
   Global class names of the C# version must differ from the GDScript ones: `class_name` and `[GlobalClass]` share one
   namespace.
@@ -16,4 +17,4 @@ Planned work, in no particular order. Nothing here is implemented yet.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

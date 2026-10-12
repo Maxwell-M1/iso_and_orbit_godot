@@ -1,5 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
-<!-- translation of docs/en/systems/camera.md @ pending -->
+<!-- translation of docs/en/systems/camera.md @ b33e90b57ed1 -->
 # Câmera
 
 [← Índice da documentação](../index.md)
@@ -33,11 +32,19 @@ ativa entrar na cena, volte a ativar esta quando o herói precisar controlar a v
 [Integração](../integration.md#só-a-câmera) para copiar a câmera ou o herói inteiro e
 [Configuração do projeto](../project-setup.md) para ações e camadas de física.
 
+No editor, o rig mostra a vista com que o jogo começa: fica no alvo, `focus_height` acima dele, girado por
+`start_yaw`, inclinado e afastado conforme `start_zoom`, e o braço mostra a câmera a essa distância. A transformação
+do rig, a da câmera e, sob um rig, o `length` do braço são definidos pelo jogo, então no editor são
+pré-visualizações: um rig ou uma câmera movidos à mão voltam ao lugar, o `length` do braço fica somente leitura sob um
+rig, e ao salvar ficam os valores com que a cena foi carregada. Um rig sem alvo mantém a posição que você lhe dá. Veja
+[Editando cenas no editor](../editor_authoring.md#a-câmera-no-editor).
+
 ## Quais valores estão ativos?
 
 Os valores dos scripts abaixo são padrões dos componentes reutilizáveis. `gdscript/player/playable_hero.tscn`
 substitui alguns; `SettingsApplier` da demo aplica depois os valores salvos em `Settings` quando a cena principal
-inicia. Uma cena do herói copiada funciona sem o autoload ou a janela da demo, usando os valores da cena.
+inicia (com o `use_saved_settings` dele desligado, ele mantém os valores da cena). Uma cena do herói copiada funciona
+sem o autoload ou a janela da demo, usando os valores da cena.
 
 | Ajuste | Padrão do script | Cena do herói / demo recém-iniciada |
 |---|---:|---:|
@@ -135,13 +142,15 @@ conecte o sinal `run_requested` da entrada a `end_follow_wait()` ao usar essa op
 move continuamente pode deixar a câmera esperando indefinidamente; desligue a opção se o jogo não puder informar
 novas corridas.
 
-`playable_hero.tscn` conecta também `PointClickMoveInput.hold_pending_changed` a `set_follow_paused()`. Isso pausa
-o acompanhamento nos primeiros 0.2 s do botão esquerdo, enquanto a entrada distingue clique de botão segurado.
-Seu `run_requested` encerra a espera após órbita em novo clique, botão segurado ou corrida com botão direito +
-tecla. Pressionar o direito durante uma corrida com o esquerdo permite olhar em volta; ao soltar o direito, essa
-mesma corrida não conta como nova, então a visão fica onde o jogador a deixou até parada ou nova corrida.
-`keep_aim_on_camera_turn` mantém o cursor apontado para o mesmo ponto global enquanto a câmera se move, evitando
-que a direção da corrida persiga a câmera.
+Cliques não interrompem o acompanhamento. Enquanto a entrada decide se um pressionamento do botão esquerdo é clique ou
+botão segurado (os primeiros 0.2 s), o giro, a inclinação e a altura continuam, e um clique num ponto novo apenas dá à
+corrida uma nova direção a seguir. Um acompanhamento pausado a cada pressionamento, com
+`PointClickMoveInput.hold_pending_changed` conectado a `set_follow_paused()` como o modelo fazia antes da 1.3.0, para o
+giro em curso a cada clique, e o giro recomeça. Em `playable_hero.tscn`, o `run_requested` da entrada encerra a espera
+após órbita em novo clique, botão segurado ou corrida com botão direito + tecla. Pressionar o direito durante uma
+corrida com o esquerdo permite olhar em volta; ao soltar o direito, essa mesma corrida não conta como nova, então a
+visão fica onde o jogador a deixou até parada ou nova corrida. `keep_aim_on_camera_turn` mantém o cursor apontado para o
+mesmo ponto global enquanto a câmera se move, evitando que a direção da corrida persiga a câmera.
 
 Quando `Engine.time_scale` é 0, os movimentos de acompanhamento mantêm seu estado e retomam quando o tempo
 avança. Se mover manualmente um alvo ou teleportá-lo por distância curta demais para acionar `teleport_speed`,
@@ -164,11 +173,13 @@ chame `snap()` para reposicionar câmera e braço e reiniciar o histórico de mo
 | Suavização | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Valores maiores alcançam mais rápido os destinos do mouse/roda; 0 é imediato |
 | Suavização | `height_follow_time` | 0 s | Tempo para cobrir cerca de 95% da mudança vertical do alvo; 0 segue exatamente |
 
-`look_along(direction)` aponta imediatamente a visão ao longo da parte horizontal de uma direção em **coordenadas
-globais** e interrompe um giro automático em curso. `snap()` aplica imediatamente giro, inclinação, zoom, posição
-do alvo e resposta do braço às colisões; use depois de teleportar. `get_zoom()` retorna zoom atual de 0–1.
+`look_along(direction)` aponta imediatamente a visão ao longo da parte horizontal de uma direção em
+**coordenadas globais** e interrompe um giro automático em curso. `snap()` aplica imediatamente giro, inclinação, zoom,
+posição do alvo e resposta do braço às colisões; use depois de teleportar. `get_zoom()` retorna zoom atual de 0–1.
 `is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` e `is_target_turning_sharply()` informam esses estados.
-`set_follow_paused(paused)` e `end_follow_wait()` controlam as pausas descritas acima.
+`set_follow_paused(paused)` pausa o acompanhamento até ser retomado, por exemplo enquanto um diálogo está na tela: um
+movimento em curso freia e, depois da pausa, recomeça, por isso não serve para momentos tão curtos quanto um clique.
+`end_follow_wait()` encerra a espera após a órbita descrita acima.
 
 O rig exige um filho braço ou câmera (ou propriedade explícita `arm`/`camera`); a falta gera assert em versão de
 depuração. Ele define a rotação global; assim, `start_yaw`, `look_along()` e o giro automático usam eixos globais
@@ -231,4 +242,4 @@ suavização vertical nos degraus, desvio de obstáculos, aproximação opcional
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

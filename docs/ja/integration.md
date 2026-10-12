@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 502ddfce7182 -->
+<!-- translation of docs/en/integration.md @ 8543b901c9a7 -->
 # プロジェクトへの組み込み
 
 [← ドキュメント目次](index.md)
@@ -21,7 +21,7 @@
 | アドオン | クラス | 必要なもの |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`、`CameraArm` | 入力アクション`camera_rotate`、`camera_zoom_in`、`camera_zoom_out`。アーム用の物理レイヤー |
-| `click_to_move` | `LocomotionSettings`、`GroundMotion`、`NavigationMover`、`PointClickMoveInput`、`ClickMarker`、`NavigationPathView` | ワールド内のベイク済み`NavigationRegion3D`（ないとキャラクターは地点へまっすぐ走る）。入力用：任意の`Camera3D`と、アクション`move_to_cursor`、`camera_rotate`、`move_forward`、`move_back`、`move_left`、`move_right` |
+| `click_to_move` | `LocomotionSettings`、`GroundMotion`、`NavigationMover`、`PointClickMoveInput`、`ClickMarker`、`NavigationPathView`、`PatrolController` | ワールド内のベイク済み`NavigationRegion3D`（ないとキャラクターは地点へまっすぐ走る）。入力用：任意の`Camera3D`と、アクション`move_to_cursor`、`camera_rotate`、`move_forward`、`move_back`、`move_left`、`move_right` |
 | `ground_character` | `GroundCharacter`、`FallSettings`、`LedgeGuard`、`Stamina`、`CharacterActionInput`、`CharacterSounds`、`HandSway`、`CharacterHover`、`DampedSpring`、`CharacterAppearance`、`StaminaBar` | `click_to_move`。キー用：アクション`sprint`と`jump`。サウンド用：独自のサウンド、または`shared/audio/character/`。手の振りと切り替え可能なモデル用：手のノードを持ち、−Zを向いたモデル |
 | `occluded_silhouette` | `OccludedSilhouette`とそのシェーダー、マテリアル | なし：どのモデルでも動作する |
 | `points_of_interest` | `PointOfInterest`、`DiscoveryToast` | `player`グループに属し、エリアが検出できる物理レイヤーにあるプレイヤーのボディ |
@@ -67,7 +67,7 @@ HUDウィジェット（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）の見�
 - `controls_enabled = false`は移動入力、ダッシュ、ジャンプを無効にします。カメラは操作でき、すでにクリックした目的地への走行も続きます。減速させるには`character.mover.stop()`を、水平移動を即座に止めるには`halt()`も呼びます。シーンツリーの一時停止は別の操作です。
 - 各部分は型付きプロパティの`character`、`input`、`actions`、`camera_rig`、`camera_arm`、`camera`、`click_marker`、`path_view`、およびキャラクターの`sounds`、`appearance`、`hover`、`silhouette`から参照できます。
 
-独自のモデルを使うには、シーンをコピーして`player.tscn`を自分のキャラクターに置き換えるか、各部分を手動で組み立てます。カメラに重要な接続は2つあります。`PointClickMoveInput.hold_pending_changed`から`OrbitCameraRig.set_follow_paused`への接続と、`PointClickMoveInput.run_requested`から`OrbitCameraRig.end_follow_wait`への接続です（オービット後のカメラは次の走行まで待機します）。残りの4つはクリックマーカーの表示と非表示を制御します。[アーキテクチャ](architecture.md#シーン内で行われる接続)を参照してください。カメラの`sharp_turn_speed`はキャラクターの旋回速度の半分以下にします。この関係を確認して警告を出すのは`PlayableHero`だけです。
+独自のモデルを使うには、シーンをコピーして`player.tscn`を自分のキャラクターに置き換えるか、各部分を手動で組み立てます。カメラに重要な接続は、`PointClickMoveInput.run_requested`から`OrbitCameraRig.end_follow_wait`への接続です（オービット後のカメラは次の走行まで待機します）。残りの4つはクリックマーカーの表示と非表示を制御します。[アーキテクチャ](architecture.md#シーン内で行われる接続)を参照してください。1.3.0より前のテンプレートのように`hold_pending_changed`を`set_follow_paused`へ接続しないでください。クリックのたびにカメラの旋回が止まります。カメラの`sharp_turn_speed`はキャラクターの旋回速度の半分以下にします。この関係を確認して警告を出すのは`PlayableHero`だけです。
 
 ## デモのヒーローを自分のプロジェクトへ移植する
 
@@ -85,7 +85,7 @@ HUDウィジェット（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）の見�
    - 入力アクション`move_to_cursor`、`camera_rotate`、`camera_zoom_in`、`camera_zoom_out`、`move_forward`、`move_back`、`move_left`、`move_right`、`sprint`、`jump`。欠けていると、そのアクションを使うコンポーネントが開始時に一度通知し、対応するキーやボタンが効きません。
    - `navigation/3d/default_cell_height`を0.025にします。次の手順のナビゲーションメッシュと合わせるためです。マップと、そこに割り当てるすべてのメッシュのセルサイズを一致させます。
    - 物理補間（`physics/common/physics_interpolation`）をオンにします。カメラが補間されたキャラクター位置を追います。ヒーローはJolt Physics（`physics/3d/physics_engine`）で確認されています。
-   - 物理レイヤーを設定します。ヒーローのボディはレイヤー2にあり、レイヤー1と4に衝突します。クリック用レイはレイヤー1の地面を探し、カメラアームはレイヤー1と3で止まります。名前ではなく番号が重要です。地面と壁をレイヤー1に置くか、コピーしたシーンのマスクを変更してください。
+   - 物理レイヤーを設定します。ヒーローのボディはレイヤー2にあり、レイヤー1、2、4に衝突します。クリック用レイはレイヤー1の地面を探し、カメラアームはレイヤー1と3で止まります。名前ではなく番号が重要です。地面と壁をレイヤー1に置くか、コピーしたシーンのマスクを変更してください。
 3. **テストレベルを作ります。** `NavigationRegion3D`の下に`StaticBody3D`の地面を置き、`BoxShape3D`と見える`BoxMesh`を付けます。どちらも20 × 1 × 20 m、中心は`(0, -0.5, 0)`とし、上面をY = 0にします。中心が`(0, 1, -4)`の2 × 2 × 2 mの箱型障害物を追加し、メッシュと衝突形状を合わせてレイヤー1に置きます。これでSpawnの`(0, 0, 4)`から`(0, 0, -8)`への直線を塞げます。ライトを追加し、必要なら中心`(5, 0.1, 0)`の3 × 0.2 × 3 mの段差も追加します。見えるメッシュだけでは衝突しません。
 4. **ナビゲーションメッシュを作成してベイクします。** リージョンを選び、新しい`NavigationMesh`を割り当て、次のように設定します。
 
@@ -139,7 +139,7 @@ HUDウィジェット（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）の見�
 | クリックしても動かない | Input Mapアクション、有効なカメラ、`PlayerInput.camera`、レイの`ground_mask`を確認する。重なったControlがマウス入力を消費している場合もある |
 | 壁を迂回せず突き当たる | リージョンの下にあるコライダーをベイクし、リージョンとムーバーのナビゲーションレイヤーおよび生成されたメッシュを確認する |
 | ヒーローが上れない段差を経路が横切る | 登坂高を`max_step_height`に合わせ、垂直セルを細かくして再ベイクし、実際の形状で試す |
-| 起動時にシーンの編集結果が消える | コピーした`SettingsApplier`が保存済み設定で上書きしている可能性がある。単独のヒーローには不要 |
+| 起動時にシーンの編集結果が消える | コピーした`SettingsApplier`が保存済み設定で上書きしている可能性がある。その`use_saved_settings`をオフにするか、単独のヒーローには不要なので外す |
 | 移動を変えた後、カメラが予期せず回る | キャラクターの`turn_speed`とカメラの`sharp_turn_speed`を比べる。[構成](configurations.md#構成を崩さずに調整する)を参照 |
 
 覚えておくこと：
@@ -151,7 +151,7 @@ HUDウィジェット（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）の見�
 
 ## レベル
 
-`addons/iso_orbit/levels/`をコピーします。メインシーンには、開始レベルだけを子として持つ`LevelHost`、その隣のヒーロー、`loading_screen.tscn`を配置します。メインスクリプトではホストのシグナルを接続します。`level_change_started`で操作を無効にし、`level_loaded(level, spawn)`でヒーローを`spawn`に置き、`level_change_finished`で操作を戻します。`level_change_failed`でも操作を戻します（レベルは残り、`level_change_finished`は来ません）。`portal_entered`と`portal_exited`では移動先の案内を表示・非表示にします。`gdscript/main.gd`がこの処理を実装しています。各レベルには`default`という名前の`SpawnPoint`が必要です。ポータルは行き先シーンのパスを持つ`LevelPortal`エリアです。
+`addons/iso_orbit/levels/`をコピーします。メインシーンには、開始レベルを子として持つ`LevelHost`（ほかにも3Dの子があるなら、開始レベルを`initial_level`で指定します）、その隣のヒーロー、`loading_screen.tscn`を配置します。メインスクリプトではホストのシグナルを接続します。`level_change_started`で操作を無効にし、`level_loaded(level, spawn)`でヒーローを`spawn`に置き、`level_change_finished`で操作を戻します。`level_change_failed`でも操作を戻します（レベルは残り、`level_change_finished`は来ません）。`portal_entered`と`portal_exited`では移動先の案内を表示・非表示にします。`gdscript/main.gd`がこの処理を実装しています。各レベルには`default`という名前の`SpawnPoint`が必要です。ポータルは行き先シーンのパスを持つ`LevelPortal`エリアです。
 
 独自のレベルシステムを使うなら、操作するヒーローだけを取り、レベルの準備ができたときに`place_at()`を呼びます。独自のキャラクターでは`GroundCharacter.teleport()`で同じように配置します。詳細、デフォルト値、設定の組み合わせは[レベル](systems/levels.md)を参照してください。
 
@@ -208,4 +208,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

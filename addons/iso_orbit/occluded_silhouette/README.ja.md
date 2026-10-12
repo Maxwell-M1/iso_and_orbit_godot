@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ bbedeba37f15 -->
 # 遮蔽時のシルエット
 
 [← ドキュメント目次（テンプレートのリポジトリ）](../../../docs/ja/index.md)
@@ -42,4 +42,4 @@ Godot 4.5以降で実験的機能であるステンシルバッファを使い�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

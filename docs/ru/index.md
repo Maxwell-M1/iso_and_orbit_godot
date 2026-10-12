@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # Документация
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · **Русский** · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -32,6 +32,8 @@ Godot 4.7, с двумя уровнями демо. Начните с [README](.
 - [Настройки](settings.md): каждый параметр окна настроек, его ключ, значение по умолчанию и что он меняет.
 - [Конфигурации](configurations.md): источники значений, точные пути узлов, три согласованных варианта и проверка
   результата.
+- [Работа со сценами в редакторе](editor_authoring.md): ссылки и предупреждения, начальный вид камеры, твёрдые
+  декорации и их размер, маршруты патрулей, отдельные проверки для редактора.
 
 ### Код
 
@@ -44,9 +46,9 @@ Godot 4.7, с двумя уровнями демо. Начните с [README](.
 
 ### Системы
 
-- [Передвижение](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`, что
-  персонаж сообщает для анимаций и интерфейса, `CharacterMonitor`, ступени и склоны, ускорение и запас сил, прыжок,
-  падение (`FallSettings`) и защита от обрывов.
+- [Передвижение](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, патрули
+  (`PatrolController`), `GroundCharacter`, что персонаж сообщает для анимаций и интерфейса, `CharacterMonitor`, ступени
+  и склоны, ускорение и запас сил, прыжок, падение (`FallSettings`) и защита от обрывов.
 - [Камера](systems/camera.md): `OrbitCameraRig` (вращение, кривая зума, следование) и `CameraArm` (препятствия,
   приближение, полупрозрачность).
 - [Ввод](systems/input.md): `PointClickMoveInput` (щелчок, удержание, клавиши, курсор) и `CharacterActionInput`.
@@ -76,4 +78,4 @@ Godot 4.7, с двумя уровнями демо. Начните с [README](.
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

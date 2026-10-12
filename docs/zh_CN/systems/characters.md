@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 48c5e73646e2 -->
+<!-- translation of docs/en/systems/characters.md @ bfea84438c4d -->
 # 角色
 
 [← 文档目录](../index.md)
@@ -204,4 +204,4 @@ Player (GroundCharacter)   演示中的 Hero/Character
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

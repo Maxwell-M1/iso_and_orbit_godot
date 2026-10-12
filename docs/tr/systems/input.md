@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 286e042594f2 -->
+<!-- translation of docs/en/systems/input.md @ 64c53fd9a7b2 -->
 # Girdi
 
 [← Belge dizini](../index.md)
@@ -83,9 +83,12 @@ Bir basış `hold_delay` (0,2 sn) sonrasında basılı tutmaya dönüşür. O za
   basılan noktaya doğru dönmez. Aksi hâlde o noktaya giden yola koyulurdu; engellerin etrafından dolanan bir yol ise
   imleçten bambaşka bir yere götürebilir.
 
-Bunun bedeli, tıklamanın bırakınca, yani basışa göre yaklaşık 0,1 sn daha geç etki etmesidir. Bir basışın tıklama mı
-basılı tutma mı olduğu belirsizken `hold_pending_changed(true)` kameranın takip modunu duraklatır
-(`playable_hero.tscn` içinde `OrbitCameraRig.set_follow_paused()` yöntemine bağlıdır); kısa tıklama kamerayı oynatmaz.
+Bunun bedeli, tıklamanın bırakınca, yani basışa göre yaklaşık 0,1 sn daha geç etki etmesidir. Bu sırada imleç, kamera
+koşunun arkasına dönerken bile farenin bıraktığı yerde kalır ve kamera takibi sürer: tıklama imleci kaydırmaz ve
+kameranın süren dönüşünü durdurmaz. Basılı tutmaya dönüşen bir basış, o anda imlecin bulunduğu yerden nişan alır.
+`hold_pending_changed(true)` böyle bir basışı bildirir; şablonun ona ihtiyacı yoktur. Onu, şablonun 1.3.0 öncesinde
+yaptığı gibi `OrbitCameraRig.set_follow_paused()` yöntemine bağlamayın: her tıklama kameranın dönüşünü durdurur ve dönüş
+baştan başlardı.
 
 Sol tuşa basıldığında sağ tuş zaten basılıysa tıklama olmaz: karakter hemen kameranın baktığı yöne koşar.
 
@@ -141,11 +144,11 @@ nişan alınan yerde belirir. Bileşen gizli imleci oyun penceresinde tutar. mac
 imleci yakalar; sol tuş hâlâ basılıyken sağ tuş bırakılırsa imleç yeniden gizlenir. Oyun duraklayınca veya pencere
 değişince hemen görünür. `is_cursor_hidden()` bileşenin gizleyip gizlemediğini söyler.
 
-**Hedefini korur** (`keep_aim_on_camera_turn`, varsayılan açık). Sol tuş basılıyken koşu yönü ekrandaki imleçten
-gelir. Kamera dönerken imleç ekranda sabit kalırsa altındaki zemin noktası değişir, karakter ona döner, kamera da
-karakteri izler; karakter daire çizer. Bu nedenle bileşen nişanı dünyayla birlikte taşır: kamera koşunun arkasına
-yumuşakça dönerken karakter gösterilen yöne koşar. Fare hareketi yine yönlendirir. Sağ tuşla koşarken etrafa
-bakmak da aynı nişanla yönü korur.
+**Hedefini korur** (`keep_aim_on_camera_turn`, varsayılan açık). Sol tuş basılıyken koşu yönü ekrandaki imleçten gelir.
+Kamera dönerken imleç ekranda sabit kalırsa altındaki zemin noktası değişir, karakter ona döner, kamera da karakteri
+izler; karakter daire çizer. Bu nedenle basış basılı tutmaya dönüşür dönüşmez bileşen nişanı dünyayla birlikte taşır:
+kamera koşunun arkasına yumuşakça dönerken karakter gösterilen yöne koşar. Fare hareketi yine yönlendirir. Sağ tuşla
+koşarken etrafa bakmak da aynı nişanla yönü korur. Bundan önce, basış henüz tıklama olabilecekken imleç yerinde kalır.
 
 Kapalıyken imleç araba direksiyonu gibi yönlendirir: karakterin sağına koyarsanız imleç tam önüne gelene kadar
 sağa döner. Sistem imleci taşıyamıyorsa (örneğin Wayland) koşu yönü yine korunur, imleç ekranda yerinde kalır.
@@ -224,4 +227,4 @@ kapsanır. Değiştirici olmayan depar tuşlarında yalnız olağan eylem durumu
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

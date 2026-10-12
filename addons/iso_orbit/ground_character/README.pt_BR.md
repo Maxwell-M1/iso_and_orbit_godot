@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 87915285e965 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ 51bf079322a3 -->
 # Personagem terrestre
 
 [← Índice da documentação (repositório do template)](../../../docs/pt_BR/index.md)
@@ -51,13 +51,14 @@ Precisa de `addons/iso_orbit/click_to_move`: o corpo é comandado por um `Naviga
    ```
 
    Defina `mover`, `visual`, `ledge_guard` e `stamina` do corpo. A demo ativa `floor_constant_speed` para manter a
-   velocidade nas rampas e põe o corpo na camada de física 2, separado do nível, colidindo com as camadas 1 e 4
-   (nível e muros invisíveis): `get_ground_height()` e, por padrão, `LedgeGuard` procuram chão com a mesma máscara.
-   O corpo sobe degraus de até `max_step_height` (0.3 m) e encostas até `floor_max_angle`. Para caminhos pelas
-   escadas, gere a malha com `agent_max_climb` igual à altura de degrau desejada e teste o caminho com a colisão
-   real. Mantenha `LedgeGuard.max_drop` pelo menos tão alto quanto `max_step_height` e `floor_snap_length` abaixo
-   dele se precisar de `stair_taken` ao descer degraus. O corpo pode começar girado no nível: o personagem gira
-   apenas `Visual` em relação ao corpo e inicialmente olha ao longo do −Z do corpo; depois,
+   velocidade nas rampas e põe o corpo na camada de física 2, separado do nível, colidindo com as camadas 1, 2 e 4
+   (nível, outros personagens e muros invisíveis): `get_ground_height()` e, por padrão, `LedgeGuard` procuram chão com a
+   mesma máscara, então outro personagem também conta como chão; defina `LedgeGuard.floor_mask` com as camadas 1 e 4
+   para deixar os personagens de fora. O corpo sobe degraus de até `max_step_height` (0.3 m) e encostas até
+   `floor_max_angle`. Para caminhos pelas escadas, gere a malha com `agent_max_climb` igual à altura de degrau desejada
+   e teste o caminho com a colisão real. Mantenha `LedgeGuard.max_drop` pelo menos tão alto quanto `max_step_height` e
+   `floor_snap_length` abaixo dele se precisar de `stair_taken` ao descer degraus. O corpo pode começar girado no nível:
+   o personagem gira apenas `Visual` em relação ao corpo e inicialmente olha ao longo do −Z do corpo; depois,
    `teleport(position, facing)` ou `NavigationMover.face()` mudam a direção.
 3. Para as teclas, adicione um `Node` com `character_action_input.gd` e defina o `character` dele. Ele precisa das
    ações `sprint` e `jump`; a falta de uma ação é informada uma vez no início, e ela não é lida depois.
@@ -89,4 +90,4 @@ No repositório do template: `docs/pt_BR/integration.md`, `docs/pt_BR/systems/lo
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

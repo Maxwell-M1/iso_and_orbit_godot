@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ a68235d39cbc -->
+<!-- translation of docs/en/getting-started.md @ a5bc6554ba04 -->
 # Primeros pasos
 
 [← Índice de documentación](index.md)
@@ -41,7 +41,8 @@ Lugares a los que ir:
 
 - **Círculo Antiguo**, el anillo de columnas al noroeste del punto de aparición. Camina entre las columnas y el héroe
   se verá como una silueta detrás de ellas.
-- **Campamento de Viajeros** al este y **Granja del Pozo** al suroeste, con NPC.
+- **Campamento de Viajeros** al este y **Granja del Pozo** al suroeste, con NPC. El Caballero hace una ronda desde la
+  granja por el laberinto de setos: ponte en su camino y, al cabo de un rato, te hablará.
 - **Cumbre de los Vientos**, la montaña del noreste: haz clic en la cima y el héroe toma el sendero en espiral.
 - El laberinto de setos, la plataforma con su rampa y su escalera, y la trampa en forma de U cerca del punto de
   aparición, para probar la búsqueda de rutas.
@@ -78,4 +79,4 @@ obtener el código de salida. En un clon nuevo, importa primero el proyecto una 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

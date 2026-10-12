@@ -1,11 +1,11 @@
-<!-- translation of README.md @ 84a666a02ac2 -->
+<!-- translation of README.md @ b3a8780c2051 -->
 # Iso & Orbit - Kamera ve Karakter Kontrolcüsü Şablonu
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · **Türkçe** · [简体中文](README.zh_CN.md)
 
 > Bu, [İngilizce orijinalin](README.md) çevirisidir; fark varsa İngilizce sürüm doğrudur.
 
-Sürüm 1.2.0 · Godot 4.7 (4.7.2 üzerinde test edildi) · GDScript · MIT
+Sürüm 1.3.0 · Godot 4.7 (4.7.2 üzerinde test edildi) · GDScript · MIT
 
 İzometrik ve yukarıdan bakışlı RPG'ler için tıklayarak hareket eden bir karakter kontrolcüsü ve bir yörünge kamerası.
 Zemine tıklayın, kahraman engellerin etrafından dolanarak oraya koşar; tuşu basılı tutun, kahraman imleci izler.
@@ -70,6 +70,8 @@ Tüm modlar ve ayarları: [Kontroller](docs/tr/controls.md).
 - 0,3 m'ye kadar basamaklar yerden kesilmeden çıkılır ve inilir; 45°'ye kadar eğimlerde yukarı yürünür.
 - İsteğe bağlı süzülme modu: kahraman yerden yüksekte durur, basamakların üzerinde süzülür, koşarken sallanıp
   eğilir; ayak sesi çıkarmaz ve zıplamadan yavaşça iner.
+- Devriyeler: bir karakter seviyede eğri olarak çizilmiş bir rotada yürür, turlar arasında kendi yerinde bekler ve
+  yoluna çıkan herkes için durur, ardından bunu bildirir; örneğin bir diyalog repliği için.
 
 **Kamera**
 
@@ -93,6 +95,14 @@ Tüm modlar ve ayarları: [Kontroller](docs/tr/controls.md).
 - Oyuncunun kontrol ettiği kahraman tek hazır sahnedir (`PlayableHero`): karakter, girdi, kamera, tıklama işareti
   ve onu istediğiniz yere koyan çağrılar.
 
+**Editörde**
+
+- Bileşenler kendi kurulumlarını denetler: boş bir bağlantı, yanlış yerdeki bir düğüm veya eksik bir girdi eylemi
+  Scene panelinde uyarı olarak görünür ve sorun giderilir giderilmez uyarı kaybolur.
+- Kamera başlangıç görüntüsünü, devriye gezen bir karakter modelini ve adını, bir portal da tabelasındaki başlığı
+  gösterir; katı dekor nesneleri bütün olarak, modelleri ve çarpışmalarıyla birlikte yeniden boyutlandırılır.
+  Sahnelere hiçbir önizleme kaydedilmez; bu yüzden diff'te yalnızca sizin değiştirdikleriniz görünür.
+
 **Ayrıca**
 
 - Kontroller, karakter, kamera, görüntü, arayüz ve ses sekmelerine sahip, `user://settings.cfg` dosyasına kaydedilen
@@ -104,9 +114,11 @@ Tüm modlar ve ayarları: [Kontroller](docs/tr/controls.md).
   Ayarlar → Arayüz bölümündeki panel, hepsini son olaylarla birlikte canlı olarak gösterir.
 - İki demo seviyesi: harabeler, kamp, çiftlik, çalı labirenti, rampalı ve merdivenli platform ve sarmal patikalı
   dağ içeren 80 × 80 m'lik çitli açıklık; ışınlanma platformuyla varılan göldeki küçük ada. Beş keşfedilecek yer:
-  açıklıkta beş NPC'nin beklediği dört yer, adada bir yer. On kahraman görünümü seçilebilir.
+  açıklıkta beş NPC'nin bulunduğu dört yer, adada bir yer; şövalye çalı labirentinden geçen bir tur atar ve yolunu
+  kesen herkese söyleyecek bir sözü vardır. On kahraman görünümü seçilebilir.
 - Hareket, girdi, zıplama, depar ve sesler, karakterin durumu, basamaklar ve eğimler, kamera ve kolu, kahraman
-  görünümleri, ayarlar penceresi ve çeviriler, seviyeler ve ışınlanma için penceresiz testler.
+  görünümleri, ayarlar penceresi ve çeviriler, seviyeler ve ışınlanma, devriyeler ve dekor nesneleri için penceresiz
+  testler; editör tarafının denetimleri editörde çalışır.
 
 **Dahil olmayanlar:** oyun kumandası desteği, oyun içi tuş yeniden atama menüsü ve iskelet animasyonları. Girdi
 eylemleri Project Settings içinde ayarlanabilir; arayüz geçerli atamaları okur. Modeller durağan ilkel şekillerdir.
@@ -189,7 +201,7 @@ bağımlılıklarını listeler.
 |---|---|
 | `addons/iso_orbit/` | Bileşenler; tek başına alınabilen her parça için bir klasör |
 | `gdscript/` | Bunları birleştiren demo: oyun kabuğu `main.tscn`, oynanabilir kahraman, ayarlar sistemi ve penceresi |
-| `shared/` | GDScript demosu ile gelecekteki C# örneğinin paylaşacağı demo içeriği: seviyeler, karakterler ve ekipman, dünya gölgelendiricileri ve dokuları, sesler, arayüz teması. Seviyelerin kullandığı iki küçük GDScript betiği de burada bulunur |
+| `shared/` | GDScript demosu ile gelecekteki C# örneğinin paylaşacağı demo içeriği: seviyeler, karakterler ve ekipman, dünya gölgelendiricileri ve dokuları, sesler, arayüz teması. Dekor nesnelerinin üç küçük GDScript betiği de burada bulunur ve seviyeler demonun `gdscript/npc/` içindeki devriye gezen karakterlerini yerleştirir |
 | `l10n/` | Arayüz çevirileri (gettext `.po`) |
 | `tests/` | Headless testler |
 | `docs/` | Belgeler |
@@ -218,4 +230,4 @@ MIT, bkz. [LICENSE](LICENSE). İstisna: `icon.svg`, Andrea Calabró'nun Godot lo
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

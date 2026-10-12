@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 262d20fd6cef -->
+<!-- translation of docs/en/settings.md @ 39df1e5739b5 -->
 # Configuración
 
 [← Índice de documentación](index.md)
@@ -13,7 +13,13 @@ a su valor por defecto.
 
 Los valores por defecto están en `DEFAULTS` en `gdscript/settings/game_settings.gd`. La demo los aplica a propiedades
 de nodos en `gdscript/demo/settings_applier.gd`; los valores por defecto de las propiedades de los propios componentes
-pueden ser distintos, como se indica abajo. Cómo funciona el sistema de configuración y cómo agregar una opción:
+pueden ser distintos, como se indica abajo. Para las opciones que aplica, `SettingsApplier` toma en su lugar como
+valores por defecto los establecidos en la escena (en la demo coinciden con `DEFAULTS`): un valor cambiado en la escena
+es con el que empieza el juego hasta que el jugador lo cambie, y al que vuelve **Restablecer todo**. Con
+`SettingsApplier.use_saved_settings` desactivado, los nodos de la escena conservan los valores establecidos en la
+escena y la ventana de configuración no los cambia; los ajustes del motor (pantalla completa, frecuencia de
+fotogramas, V-Sync, interpolación de física, escala de la interfaz, idioma, volumen) siguen viniendo de la
+configuración guardada y de la ventana. Cómo funciona el sistema de configuración y cómo agregar una opción:
 [Interfaz de usuario](systems/ui.md#configuración).
 
 Para una copia independiente del héroe, usa [Configuraciones](configurations.md) para encontrar sus propiedades
@@ -125,4 +131,4 @@ altura y tiempo sin alineación de altura, y sonido de pasos mientras flota el h
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

@@ -27,11 +27,19 @@ scene later, make this camera current when the hero should own the view. See
 [Integration](../integration.md#the-camera-alone) for copying the camera or the entire hero, and
 [Project setup](../project-setup.md) for input actions and physics layers.
 
+In the editor the rig shows the view the game starts with: it stands at the target, `focus_height` above it, turned by
+`start_yaw`, tilted and as far away as `start_zoom` sets, and the arm shows the camera at that distance. The rig's
+transform, the camera's transform and, under a rig, the arm's `length` are set by the game, so in the editor they are
+previews: a rig or a camera moved by hand goes back, the arm's `length` is read-only under a rig, and saving keeps the
+values the scene was loaded with. A rig without a target keeps the position you give it. See
+[Editing scenes in the editor](../editor_authoring.md#the-camera-in-the-editor).
+
 ## Which values are active?
 
 The script values below are reusable component defaults. `gdscript/player/playable_hero.tscn` overrides a few of them;
-the demo's `SettingsApplier` then applies saved `Settings` values when the main scene starts. A copied hero scene works
-without the demo settings window or autoload, using its scene values.
+the demo's `SettingsApplier` then applies saved `Settings` values when the main scene starts (with its
+`use_saved_settings` off it leaves the scene's values). A copied hero scene works without the demo settings window or
+autoload, using its scene values.
 
 | Setting | Script default | Playable hero scene / fresh demo |
 |---|---:|---:|
@@ -47,7 +55,7 @@ The turn, tilt, and zoom times and goals take effect only when their respective 
 choice saved in `user://settings.cfg` can replace the fresh defaults. The `SettingsApplier` converts the settings
 window's positive “tilt down” degrees to a negative pitch, and its 0–100% height to the rig's 0–1 zoom.
 
-Lengths and speeds are in Godot world units (metres when a scene uses the template's 1 unit = 1 m scale). Angles and
+Lengths and speeds are in Godot world units (meters when a scene uses the template's 1 unit = 1 m scale). Angles and
 angular speeds marked `radians_as_degrees` show degrees in the Inspector, but GDScript assigns radians: use
 `deg_to_rad(-22.0)` for `follow_pitch_angle` and `deg_to_rad(360.0)` for `sharp_turn_speed`. The serialized
 `-0.383972...` in `playable_hero.tscn` is −22°.
@@ -126,12 +134,14 @@ stops, so connect the input's `run_requested` signal to `end_follow_wait()` when
 signal, a continuously moving target can keep the camera waiting indefinitely; leave the option off if the game cannot
 report new runs.
 
-`playable_hero.tscn` also connects `PointClickMoveInput.hold_pending_changed` to `set_follow_paused()`. This pauses
-follow during the first 0.2 s of an LMB press, while the input decides whether it was a click or a hold. Its
-`run_requested` signal ends the post-orbit wait for a new click, hold, or RMB + key run. Pressing RMB during an existing
-LMB run can be used to look around; that run does not count as a new one after RMB is released, so the view remains
-where the player left it until a later stop or new run. The input's `keep_aim_on_camera_turn` keeps the cursor aimed at
-the same world point while the camera moves, preventing the running direction from chasing the camera.
+Clicks do not interrupt the follow. While the input decides whether an LMB press is a click or a hold (its first 0.2 s),
+the turn, the tilt and the height go on, and a click to a new point only gives the run a new direction to follow. A
+follow paused for every press, with `PointClickMoveInput.hold_pending_changed` connected to `set_follow_paused()` as the
+template did before 1.3.0, stops a turn under way at each click, and the turn starts over. In `playable_hero.tscn` the
+input's `run_requested` signal ends the post-orbit wait for a new click, hold, or RMB + key run. Pressing RMB during an
+existing LMB run can be used to look around; that run does not count as a new one after RMB is released, so the view
+remains where the player left it until a later stop or new run. The input's `keep_aim_on_camera_turn` keeps the cursor
+aimed at the same world point while the camera moves, preventing the running direction from chasing the camera.
 
 When `Engine.time_scale` is 0, follow motions hold their state and resume when time advances. If you move a target
 manually or teleport it a short distance that does not trigger the `teleport_speed` check, call `snap()` to put the
@@ -158,7 +168,9 @@ camera and arm into place and reset motion history.
 an automatic turn already under way. `snap()` immediately applies the current yaw, tilt, zoom, target position, and arm
 collision response; use it after teleporting. `get_zoom()` returns the current 0–1 zoom. `is_rotating()`,
 `is_follow_paused()`, `is_follow_waiting()`, and `is_target_turning_sharply()` report those states.
-`set_follow_paused(paused)` and `end_follow_wait()` control the pauses described above.
+`set_follow_paused(paused)` pauses the follow until it is resumed, for example while a dialogue is on the screen: a move
+under way brakes, and after the pause it starts over, so it is not for moments as short as a click. `end_follow_wait()`
+ends the wait after an orbit described above.
 
 The rig requires an arm or camera child (or an explicit `arm`/`camera` property); a missing one asserts in a debug
 build. It sets its global rotation, so `start_yaw`, `look_along()`, and automatic turning use world axes even if the
@@ -221,4 +233,4 @@ optional pull-in, ignored groups, and fading.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ui_screens/README.md @ f510902e02d8 -->
+<!-- translation of addons/iso_orbit/ui_screens/README.md @ 6e5afc9c199d -->
 # UI画面
 
 [← ドキュメント目次（テンプレートのリポジトリ）](../../../docs/ja/index.md)
@@ -42,4 +42,4 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

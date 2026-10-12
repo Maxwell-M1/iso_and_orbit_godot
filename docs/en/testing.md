@@ -37,16 +37,18 @@ change; use the full run before integrating changes across systems.
 | Suite | Main checks |
 |---|---|
 | `movement_checks.gd` | Acceleration, braking, retargeting, turning, reachable and unreachable destinations, routes around obstacles, ramps and ledges |
-| `world_checks.gd` | Navigation through the demo terrain, discovery areas, static NPC collisions and hero-display models |
+| `world_checks.gd` | Navigation through the demo terrain, discovery areas, collisions with the characters at the places and hero-display models |
 | `hero_look_checks.gd` | Switching all ten hero models, equipment placement, silhouettes and hand movement |
 | `character_actions_checks.gd` | Sprint and fatigue, hold/toggle input, rebinding and modifier release, jump buffering/coyote time, fall overrides, character signals and sounds |
 | `character_state_checks.gd` | Setup warnings, state and animation data, stairs/slopes, teleportation, floating, interpolation, stopped game time and the monitor panel |
 | `input_checks.gd` | Click versus hold, both-button order, both hold modes, key modes, cursor capture, cancellation and missing input actions |
-| `camera_checks.gd` | Orbit/zoom and follow at different frame/tick rates, sharp turns, runs toward the camera, manual-orbit wait, pitch/zoom/height alignment and teleportation |
+| `camera_checks.gd` | Orbit/zoom and follow at different frame/tick rates, sharp turns, runs toward the camera, manual-orbit wait, clicks that do not interrupt the follow, pitch/zoom/height alignment and teleportation |
 | `camera_arm_checks.gd` | Obstacle clearance, collision layers, ignored groups, optional occlusion pull-in and fading near the target |
 | `settings_window_checks.gd` | Pause and focus, every settings tab, property mapping, dependent controls, interface scale, reset and closing |
 | `localization_checks.gd` | Translation coverage, preserved action tokens, language changes, names for all 12 rebound actions, open tooltips/windows/loading tips and translation inheritance |
 | `level_checks.gd` | Spawn points, travel offers, loading progress and pause, scene replacement, preserved hero state and failure recovery |
+| `patrol_checks.gd` | The knight's round along the line drawn for his route, past each of its points, turning smoothly, the wait at home and the next round; the stop for the hero and the line after 2.5 s; a patrol stopped only by a character in front, a meter ahead and a little to the sides; the island's ranger and its stops; routes from turned and closed curves and from a script; a route's points on the drawn line with a long and a short Bake Interval, the stops at its control points; missing links |
+| `editor_authoring_checks.gd` | A movement settings resource shared by movers and replaced during play; the settings file's path and saved settings over the scene's values, and the scene's values kept with `use_saved_settings` off; the start level; setup warnings; whole props (moving, `dimensions` and its 0, a scaled root, Surface Material, added parts, a model, an animated part); the camera exception's switch with its angle |
 
 For the documented input/camera configurations, start with `movement`, `character_actions`, `input`, `camera` and
 `settings_window`. The filter `camera` selects both camera suites. When copying the hero into another project, also
@@ -55,8 +57,10 @@ suite does not prove that every required file and project setting was copied.
 
 ## How the tests behave
 
-- They run with the default settings and save nothing: the player's settings are reset to the defaults for the run
-  and never overwritten.
+- They run with the default settings and never touch the player's: the settings are reset to the defaults for the
+  run and never saved, and the one check that reads a settings file writes its own into `.godot/` and removes it.
+- The patrolling characters stand still in every suite but `patrol_checks.gd`, which starts them itself: a walking
+  knight would get in the way of other checks.
 - Each check restores what it changed. The suites run one after another on one main scene, while a suite run alone
   gets a fresh one, and a check must pass in both cases. After each check `Engine.time_scale` goes back to 1, so a
   check that crashed while time was slowed or stopped does not leave it so for the next ones.
@@ -76,6 +80,19 @@ suite does not prove that every required file and project setting was copied.
   so for the hidden cursor the tests read `PointClickMoveInput.is_cursor_hidden()`.
 - The limits are computed from the components' settings where possible, so tuning `LocomotionSettings` does not
   break the tests by itself.
+
+## Checks in the editor
+
+`tests/run_checks.gd` runs the game; the components' editor part runs only in the editor, and it has checks of its own:
+open `tests/editor_tool_checks.tscn` in the editor and press **Run Checks** in the Inspector. They cover what the game
+cannot show: that a warning updates while a scene is edited (a dependent node, a resource, a mover added to or taken
+from a patrol's body), that the camera, the props, the patrolling characters and a portal's sign show their previews in
+the editor while a saved scene keeps what was set, that an inherited prop keeps following its base, that the project's
+input actions count in the editor, where the input map holds only the editor's own, that switches of the game (floating,
+a patrol) change nothing in the editor, that a copied patrolling character shows one model, and that a camera arm whose
+script extends `CameraArm` without `@tool` still shows the start view. **Status** and **Results** in the Inspector show
+the outcome and are not saved with the scene; `.godot/editor_tool_checks/results.json` has it too, and the output gets
+the status line. The checks write their scenes only into `.godot/editor_tool_checks/`, which every run clears.
 
 ## Writing a check
 
@@ -103,4 +120,4 @@ for that run. Get the settings node with `_tree.root.get_node(^"Settings")` and 
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

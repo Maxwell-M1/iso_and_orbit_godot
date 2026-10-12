@@ -1,4 +1,4 @@
-<!-- translation of docs/en/roadmap.md @ 785e0b204d0a -->
+<!-- translation of docs/en/roadmap.md @ 3ff0c1d1d748 -->
 # Roteiro
 
 [← Índice da documentação](index.md)
@@ -8,9 +8,9 @@
 Trabalho planejado, sem ordem específica. Nada aqui foi implementado ainda.
 
 - **`shared/` sem GDScript.** Os níveis marcam lugares, pontos de entrada e portais com scripts dos componentes
-  (`point_of_interest.gd`, `spawn_point.gd`, `level_portal.gd`), e dois scripts de objetos ficam em
-  `shared/world/props/`. Precisam de uma forma que a versão em C# também possa usar. Veja
-  [Problemas conhecidos](known-issues.md#arquivos-do-projeto).
+  (`point_of_interest.gd`, `spawn_point.gd`, `level_portal.gd`), posicionam os personagens em patrulha da demo a
+  partir de `gdscript/npc/`, e três scripts de objetos ficam em `shared/world/props/`. Precisam de uma forma que a
+  versão em C# também possa usar. Veja [Problemas conhecidos](known-issues.md#arquivos-do-projeto).
 - **Um exemplo em C#** em `csharp/`, com os mesmos componentes e uma cena principal sobre os níveis em
   `shared/world/`.
   Os nomes de classes globais da versão em C# precisam ser diferentes dos de GDScript: `class_name` e `[GlobalClass]`
@@ -22,4 +22,4 @@ Trabalho planejado, sem ordem específica. Nada aqui foi implementado ainda.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

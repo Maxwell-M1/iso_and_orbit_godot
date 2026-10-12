@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ adf142a1b736 -->
+<!-- translation of docs/en/architecture.md @ 808ba6991a13 -->
 # Архитектура
 
 [← Оглавление документации](index.md)
@@ -19,7 +19,7 @@
 
 ```
 Main (Node3D, main.gd)   the game shell: connects the levels, the hero and the interface
-├── Levels             LevelHost: the current level, changed behind the loading screen
+├── Levels             LevelHost: the current level, changed behind the loading screen; initial_level = World
 │   └── World          shared/world/world.tscn: the start level, its navigation mesh, places, NPCs and the pad
 ├── Hero               gdscript/player/playable_hero.tscn: PlayableHero, the hero the player controls
 │   ├── Character          gdscript/player/player.tscn: GroundCharacter, group "player"
@@ -42,7 +42,7 @@ Main (Node3D, main.gd)   the game shell: connects the levels, the hero and the i
 │   ├── ClickMarker        the ring on the ground at a clicked point
 │   └── PathView           NavigationPathView: the debug path line, hidden by default
 ├── Hud                controls hint and speed, FpsCounter, CharacterState, DiscoveryToast, StaminaBar,
-│                      TravelPrompt (the offer to travel on a pad)
+│                      TravelPrompt (the offer to travel on a pad), Subtitles (what the characters say)
 ├── SettingsApplier    settings → node properties (demo only)
 ├── UiRoot             windows over the game: the settings window
 └── LoadingScreen      LoadingScreen: the screen while a level loads
@@ -125,6 +125,7 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | | `PointClickMoveInput` (Node) | Мышь и ПКМ + WASD → команды контроллеру перемещения; прячет курсор и удерживает его на цели |
 | | `ClickMarker` (Node3D) | Метка в точке щелчка (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Рисует оставшийся путь контроллера перемещения |
+| | `PatrolController` (Node) | Водит персонажа по маршруту, нарисованному на уровне (`Path3D`): ждёт, возвращается, останавливается перед персонажем на пути |
 | `ground_character` | `GroundCharacter` (CharacterBody3D) | Гравитация, прыжок, ускорение с запасом сил, ступени, `move_and_slide()`, поворот модели; сообщает о своём состоянии, шагах, отрывах от земли и приземлениях для анимаций, звуков и интерфейса |
 | | `FallSettings` (Resource) | Падение персонажа: гравитация, предел скорости и торможение до него. Один ресурс может использоваться несколькими персонажами |
 | | `LedgeGuard` (Node) | Останавливает тело у обрыва или ведёт его вдоль края |
@@ -161,6 +162,8 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `player/player.tscn`, `player_locomotion.tres` | Персонаж героя: `GroundCharacter` со всеми частями и его настройки бега |
 | `player/playable_hero.tscn`, `.gd` | `PlayableHero`: персонаж с вводом, камерой, маркером щелчка и линией пути, готовый для игровой сцены |
 | `ui/travel_prompt.tscn`, `.gd` | `TravelPrompt`: приглашение к переходу на площадке с клавишей и названием места |
+| `ui/subtitle_display.tscn`, `.gd` | `SubtitleDisplay`: что говорит персонаж, с его именем, внизу экрана |
+| `npc/patrol_actor.tscn`, `.gd`, `knight_patrol.tscn`, `island_patrol.tscn` | `PatrolActor`: персонаж, который ходит по маршруту уровня, с моделью и именем над головой; рыцарь и следопыт острова |
 | `demo/hud.gd` | Подсказка по управлению и показ скорости |
 | `demo/settings_applier.gd` | Применяет настройки к узлам демо, единое место для «настройка → свойство» |
 | `settings/game_settings.gd` | `GameSettings`, автозагрузка `Settings`: значения по умолчанию, `user://settings.cfg`, сигнал `changed`; настройки движка применяет сама |
@@ -183,10 +186,10 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `PlayerInput.hold_started` | `ClickMarker.fade_out` | Удержание заменяет щелчок, метка гаснет |
 | `Character/NavigationMover.arrived` | `ClickMarker.fade_out` | Персонаж дошёл до точки |
 | `Character/NavigationMover.destination_cancelled` | `ClickMarker.fade_out` | От точки отказались |
-| `PlayerInput.hold_pending_changed(pending)` | `CameraRig.set_follow_paused` | Камера не поворачивается сама, пока не ясно, щелчок это или удержание |
 | `PlayerInput.run_requested` | `CameraRig.end_follow_wait` | Новый бег: камера перестаёт ждать после ручного поворота и снова следует |
 
-`main.gd` соединяет хост уровней и приглашение к переходу в коде; см. [Уровни](systems/levels.md#оболочка-игры).
+`main.gd` соединяет хост уровней, приглашение к переходу и субтитры в коде; см.
+[Уровни](systems/levels.md#оболочка-игры).
 
 ## Настройки
 
@@ -217,6 +220,10 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
   физический тик, так что целью может быть любой `Node3D`. По этому же движению камера отличает резкий
   разворот от плавной дуги и не вращается за промежуточным направлением. Её пружины вычисляются короткими
   шагами и работают одинаково при любой частоте кадров.
+- **Компоненты проверяют себя в редакторе, а редактор сохраняет только то, что задали вы.** Их скрипты —
+  tool-скрипты: в редакторе они выдают предупреждения, пока чего-то не хватает или что-то настроено неверно, и
+  показывают в предпросмотре то, что игра настраивает при запуске (вид камеры, модель и имя персонажа), но игру там не
+  запускают, и предпросмотр никогда не записывается в сцену. См. [Работа со сценами в редакторе](editor_authoring.md).
 - **Компоненты ничего не знают о настройках.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` и остальные
   читают собственные свойства; с автозагрузкой `Settings` работают только `settings_applier.gd` и окно настроек.
   Компонент переносится в другой проект без системы настроек.
@@ -231,18 +238,19 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | Папка | Содержимое |
 |---|---|
 | `addons/iso_orbit/` | Переиспользуемые компоненты, по папке на каждую часть |
-| `gdscript/` | Демо на GDScript: главная сцена, герой, система и окно настроек, подсказка в HUD |
+| `gdscript/` | Демо на GDScript: главная сцена, герой, патрулирующие NPC, система и окно настроек, подсказка в HUD, субтитры |
 | `shared/` | Содержимое демо, не зависящее от языка скриптов: уровни, персонажи и снаряжение, шейдеры и текстуры мира, звуки, тема интерфейса |
 | `l10n/` | Переводы интерфейса |
 | `tests/` | Тесты в режиме headless, см. [Тесты](testing.md) |
 | `docs/` | Эта документация |
 
-`shared/` рассчитана на будущую версию демо на C#, которая получит свою папку рядом с `gdscript/`. Пока остаются два
+`shared/` рассчитана на будущую версию демо на C#, которая получит свою папку рядом с `gdscript/`. Пока остаются три
 исключения: уровни и площадка используют скрипты компонентов (`world.tscn`, `island.tscn` и `mountain.tscn`
-используют `point_of_interest.gd`, уровни — `spawn_point.gd`, а `teleport_pad.tscn` — `level_portal.gd`),
-два небольших скрипта декораций (`flicker.gd`, `hover_spin.gd`) лежат в `shared/world/props/`. См.
+используют `point_of_interest.gd`, уровни — `spawn_point.gd`, а `teleport_pad.tscn` — `level_portal.gd`), уровни
+расставляют патрулирующих персонажей демо (`gdscript/npc/knight_patrol.tscn`, `island_patrol.tscn`), а три скрипта
+декораций (`static_prop.gd`, `flicker.gd`, `hover_spin.gd`) лежат в `shared/world/props/`. См.
 [Известные проблемы](known-issues.md).
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

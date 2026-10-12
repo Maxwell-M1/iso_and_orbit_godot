@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ adf142a1b736 -->
+<!-- translation of docs/en/architecture.md @ 808ba6991a13 -->
 # Arquitetura
 
 [← Índice da documentação](index.md)
@@ -19,7 +19,7 @@ com `character` vazio usa o próprio pai.
 
 ```
 Main (Node3D, main.gd)   cena principal: conecta níveis, herói e interface
-├── Levels             LevelHost: nível atual, trocado atrás da tela de carregamento
+├── Levels             LevelHost: nível atual, trocado atrás da tela de carregamento; initial_level = World
 │   └── World          shared/world/world.tscn: nível inicial, malha de navegação, lugares, NPCs e plataforma
 ├── Hero               gdscript/player/playable_hero.tscn: PlayableHero, herói controlado pelo jogador
 │   ├── Character          gdscript/player/player.tscn: GroundCharacter, grupo "player"
@@ -42,7 +42,7 @@ Main (Node3D, main.gd)   cena principal: conecta níveis, herói e interface
 │   ├── ClickMarker        anel no chão no ponto clicado
 │   └── PathView           NavigationPathView: linha de caminho de depuração, oculta por padrão
 ├── Hud                dica de controles e velocidade, FpsCounter, CharacterState, DiscoveryToast, StaminaBar,
-│                      TravelPrompt (oferta de viagem na plataforma)
+│                      TravelPrompt (oferta de viagem na plataforma), Subtitles (o que os personagens dizem)
 ├── SettingsApplier    configurações → propriedades dos nós (só na demo)
 ├── UiRoot             janelas sobre o jogo: configurações
 └── LoadingScreen      LoadingScreen: tela durante a carga do nível
@@ -124,6 +124,7 @@ tem o nome da sua classe em snake case: `OrbitCameraRig` é `addons/iso_orbit/or
 | | `PointClickMoveInput` (Node) | Mouse e BDM + WASD → comandos ao movimentador; oculta o cursor e corrige a mira dele |
 | | `ClickMarker` (Node3D) | O marcador no ponto clicado (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Desenha o caminho restante do movimentador |
+| | `PatrolController` (Node) | Faz um personagem percorrer uma rota desenhada no nível (`Path3D`): espera, volta, se detém diante de um personagem no caminho |
 | `ground_character` | `GroundCharacter` (CharacterBody3D) | Gravidade, pulo, corrida rápida com fôlego, degraus, `move_and_slide()`, giro do modelo; informa seu estado, passos, saídas do chão e aterrissagens para animações, sons e a interface |
 | | `FallSettings` (Resource) | Gravidade da descida, velocidade máxima e frenagem até ela; recurso compartilhável entre personagens |
 | | `LedgeGuard` (Node) | Para o corpo num desnível ou o faz deslizar ao longo da borda |
@@ -160,6 +161,8 @@ A demo em `gdscript/` os monta:
 | `player/player.tscn`, `player_locomotion.tres` | O herói: um `GroundCharacter` com todas as suas partes, e suas configurações de corrida |
 | `player/playable_hero.tscn`, `.gd` | `PlayableHero`: personagem com entrada, câmera, marcador e linha do caminho, pronto para outra cena |
 | `ui/travel_prompt.tscn`, `.gd` | `TravelPrompt`: oferta de viagem com tecla e nome do lugar |
+| `ui/subtitle_display.tscn`, `.gd` | `SubtitleDisplay`: o que um personagem diz, com seu nome, na parte de baixo da tela |
+| `npc/patrol_actor.tscn`, `.gd`, `knight_patrol.tscn`, `island_patrol.tscn` | `PatrolActor`: um personagem que percorre uma rota do nível, com seu modelo e o nome sobre a cabeça; o cavaleiro e o patrulheiro da ilha |
 | `demo/hud.gd` | A dica de controles e a leitura da velocidade |
 | `demo/settings_applier.gd` | Aplica as configurações aos nós da demo, um só lugar para "configuração → propriedade" |
 | `settings/game_settings.gd` | `GameSettings`, o autoload `Settings`: padrões, `user://settings.cfg`, o sinal `changed`; aplica ele mesmo as configurações da engine |
@@ -182,10 +185,9 @@ As conexões de sinais em `playable_hero.tscn`:
 | `PlayerInput.hold_started` | `ClickMarker.fade_out` | O botão segurado substitui o clique, o marcador some |
 | `Character/NavigationMover.arrived` | `ClickMarker.fade_out` | O personagem chegou ao ponto |
 | `Character/NavigationMover.destination_cancelled` | `ClickMarker.fade_out` | O ponto foi abandonado |
-| `PlayerInput.hold_pending_changed(pending)` | `CameraRig.set_follow_paused` | A câmera não gira sozinha até se saber se o botão foi clicado ou está sendo segurado |
 | `PlayerInput.run_requested` | `CameraRig.end_follow_wait` | Nova corrida: a câmera em espera desde a órbita volta a acompanhar |
 
-`main.gd` conecta host e oferta de viagem no código; veja [Níveis](systems/levels.md#a-cena-principal).
+`main.gd` conecta host, oferta de viagem e legendas no código; veja [Níveis](systems/levels.md#a-cena-principal).
 
 ## Configurações
 
@@ -216,6 +218,10 @@ uma propriedade de nó. Os próprios componentes nunca leem configurações, vej
   movimento dele por tick de física, então qualquer `Node3D` serve como alvo. Desse movimento também distingue
   giro brusco de curva, sem dar a volta numa inversão de direção. As molas usam passos curtos e se comportam de
   modo semelhante em qualquer taxa de quadros.
+- **Os componentes se verificam no editor, e o editor salva só o que você define.** Seus scripts são scripts de
+  ferramenta (tool scripts): no editor mostram avisos enquanto algo falta ou está errado e pré-visualizam o que o jogo
+  configura no início (a vista da câmera, o modelo e o nome de um personagem), mas não rodam nenhum jogo ali, e uma
+  pré-visualização nunca é gravada numa cena. Veja [Editando cenas no editor](editor_authoring.md).
 - **Os componentes não sabem nada das configurações.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` e os
   outros leem as próprias propriedades; só o `settings_applier.gd` e a janela de configurações falam com o autoload
   `Settings`. Um componente vai para outro projeto sem o sistema de configurações.
@@ -230,18 +236,19 @@ uma propriedade de nó. Os próprios componentes nunca leem configurações, vej
 | Pasta | Conteúdo |
 |---|---|
 | `addons/iso_orbit/` | Os componentes reutilizáveis, uma pasta por parte |
-| `gdscript/` | A demo em GDScript: a cena principal, o herói, o sistema e a janela de configurações, a dica do HUD |
+| `gdscript/` | A demo em GDScript: a cena principal, o herói, os NPCs em patrulha, o sistema e a janela de configurações, a dica do HUD, as legendas |
 | `shared/` | Conteúdo da demo que não depende da linguagem de script: níveis, personagens e equipamentos, shaders e texturas do mundo, sons e tema da UI |
 | `l10n/` | Traduções da interface |
 | `tests/` | Testes headless, veja [Testes](testing.md) |
 | `docs/` | Esta documentação |
 
 `shared/` foi feito para ser reutilizado por uma futura versão em C# da demo, que teria a própria pasta ao lado de
-`gdscript/`. Por enquanto restam duas exceções: níveis e plataforma usam scripts dos componentes (`world.tscn`,
+`gdscript/`. Por enquanto restam três exceções: níveis e plataforma usam scripts dos componentes (`world.tscn`,
 `island.tscn` e `mountain.tscn` usam `point_of_interest.gd`, os níveis usam `spawn_point.gd` e
-`teleport_pad.tscn` usa `level_portal.gd`), e dois scripts de objetos (`flicker.gd`, `hover_spin.gd`) ficam em
-`shared/world/props/`. Veja [Problemas conhecidos](known-issues.md).
+`teleport_pad.tscn` usa `level_portal.gd`), os níveis posicionam os personagens em patrulha da demo
+(`gdscript/npc/knight_patrol.tscn`, `island_patrol.tscn`), e três scripts de objetos (`static_prop.gd`, `flicker.gd`,
+`hover_spin.gd`) ficam em `shared/world/props/`. Veja [Problemas conhecidos](known-issues.md).
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

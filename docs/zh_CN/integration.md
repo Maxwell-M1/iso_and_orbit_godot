@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 502ddfce7182 -->
+<!-- translation of docs/en/integration.md @ 8543b901c9a7 -->
 # 在你的项目中使用
 
 [← 文档目录](index.md)
@@ -21,7 +21,7 @@
 | 插件 | 类 | 需求 |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`、`CameraArm` | 输入动作 `camera_rotate`、`camera_zoom_in`、`camera_zoom_out`；供相机臂使用的物理层 |
-| `click_to_move` | `LocomotionSettings`、`GroundMotion`、`NavigationMover`、`PointClickMoveInput`、`ClickMarker`、`NavigationPathView` | 世界中有已烘焙的 `NavigationRegion3D`（没有的话，角色会直接朝目标点跑）。输入部分需要：任意 `Camera3D`，以及动作 `move_to_cursor`、`camera_rotate`、`move_forward`、`move_back`、`move_left`、`move_right` |
+| `click_to_move` | `LocomotionSettings`、`GroundMotion`、`NavigationMover`、`PointClickMoveInput`、`ClickMarker`、`NavigationPathView`、`PatrolController` | 世界中有已烘焙的 `NavigationRegion3D`（没有的话，角色会直接朝目标点跑）。输入部分需要：任意 `Camera3D`，以及动作 `move_to_cursor`、`camera_rotate`、`move_forward`、`move_back`、`move_left`、`move_right` |
 | `ground_character` | `GroundCharacter`、`FallSettings`、`LedgeGuard`、`Stamina`、`CharacterActionInput`、`CharacterSounds`、`HandSway`、`CharacterHover`、`DampedSpring`、`CharacterAppearance`、`StaminaBar` | `click_to_move`。按键需要动作 `sprint` 和 `jump`；声音可用自己的文件或 `shared/audio/character/`；手部摆动和可切换模型需要朝向 −Z、带有手部节点的模型 |
 | `occluded_silhouette` | `OccludedSilhouette` 及其着色器和材质 | 无：适用于任何模型 |
 | `points_of_interest` | `PointOfInterest`、`DiscoveryToast` | 玩家身体位于 `player` 分组中，且处在区域能检测到的物理层上 |
@@ -67,7 +67,7 @@ HUD 部件（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）的外观来自演
 - `controls_enabled = false` 禁用移动输入、冲刺和跳跃。玩家仍可操控相机，已有点击目标的奔跑也会继续。若需制动，还要调用 `character.mover.stop()`；若需立即停止水平移动，则调用 `halt()`。暂停场景树是另一回事。
 - 各组件以带类型的属性暴露：`character`、`input`、`actions`、`camera_rig`、`camera_arm`、`camera`、`click_marker`、`path_view`，以及角色的 `sounds`、`appearance`、`hover`、`silhouette`。
 
-要用自己的模型，可以复制此场景，用自己的角色替换 `player.tscn`，也可以手动装配。相机所需的两条关键连接是 `PointClickMoveInput.hold_pending_changed` 到 `OrbitCameraRig.set_follow_paused`，以及 `PointClickMoveInput.run_requested` 到 `OrbitCameraRig.end_follow_wait`（环绕后相机会等待新的奔跑）。其余四条连接负责显示和隐藏点击标记，见[架构](architecture.md#场景中建立的连接)。保持相机的 `sharp_turn_speed` 不高于角色转向速率的一半；目前只有 `PlayableHero` 会检查并对此发出警告。
+要用自己的模型，可以复制此场景，用自己的角色替换 `player.tscn`，也可以手动装配。相机所需的关键连接是 `PointClickMoveInput.run_requested` 到 `OrbitCameraRig.end_follow_wait`（环绕后相机会等待新的奔跑）。其余四条连接负责显示和隐藏点击标记，见[架构](architecture.md#场景中建立的连接)。不要像 1.3.0 之前的模板那样把 `hold_pending_changed` 连接到 `set_follow_paused`：否则每次点击都会让相机的转动停下。保持相机的 `sharp_turn_speed` 不高于角色转向速率的一半；目前只有 `PlayableHero` 会检查并对此发出警告。
 
 ## 将演示中的英雄迁移到你的项目
 
@@ -85,7 +85,7 @@ HUD 部件（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）的外观来自演
    - 输入动作 `move_to_cursor`、`camera_rotate`、`camera_zoom_in`、`camera_zoom_out`、`move_forward`、`move_back`、`move_left`、`move_right`、`sprint` 和 `jump`。缺少某个动作时，使用它的组件会在启动时报告一次，对应按键或鼠标操作不会生效；
    - 将 `navigation/3d/default_cell_height` 设为 0.025，以匹配下一步的导航网格。同一导航地图及其分配的所有网格都应采用匹配的单元尺寸；
    - 开启物理插值（`physics/common/physics_interpolation`）：相机跟随角色的插值位置。此英雄用 Jolt Physics（`physics/3d/physics_engine`）检查过；
-   - 物理层：英雄身体位于第 2 层，与第 1 和第 4 层碰撞；点击检测第 1 层地面；相机臂被第 1 和第 3 层阻挡。层名称无关紧要，层编号很重要：请将自己的地面和墙体放在第 1 层，或在复制的场景里修改这些掩码。
+   - 物理层：英雄身体位于第 2 层，与第 1、2 和 4 层碰撞；点击检测第 1 层地面；相机臂被第 1 和第 3 层阻挡。层名称无关紧要，层编号很重要：请将自己的地面和墙体放在第 1 层，或在复制的场景里修改这些掩码。
 3. **制作测试关卡。** 在 `NavigationRegion3D` 下，添加带 `BoxShape3D` 的 `StaticBody3D` 地面和可见的 `BoxMesh`；两者均为 20 × 1 × 20 米，中心在 `(0, -0.5, 0)`，使顶面位于 Y = 0。在 `(0, 1, -4)` 放置一个 2 × 2 × 2 米的方盒障碍物，其网格与碰撞形状相符，位于第 1 层。它会挡住 Spawn `(0, 0, 4)` 到 `(0, 0, -8)` 的直线路线。再加一盏灯，并可选地在 `(5, 0.1, 0)` 放一个 3 × 0.2 × 3 米的台阶。只有可见网格并不产生碰撞。
 4. **创建并烘焙导航网格。** 选中导航区域，指定新的 `NavigationMesh`，然后设置：
 
@@ -139,7 +139,7 @@ HUD 部件（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）的外观来自演
 | 点击没有反应 | 输入映射动作、当前相机、`PlayerInput.camera` 和射线的 `ground_mask`；重叠的 Control 也可能吞掉鼠标输入 |
 | 英雄撞墙而不绕墙 | 烘焙区域下的碰撞体，检查区域／移动器的导航层，并查看生成的网格 |
 | 路径穿过英雄无法攀爬的台阶 | 使最大攀爬高度与 `max_step_height` 匹配，使用精细的竖向单元并重新烘焙；在实际地形上测试 |
-| 场景改动在启动时消失 | 复制来的 `SettingsApplier` 可能会用已保存设置覆盖改动；单独使用英雄不需要它 |
+| 场景改动在启动时消失 | 复制来的 `SettingsApplier` 可能会用已保存设置覆盖改动：关闭其 `use_saved_settings`，或者不复制它，因为单独使用英雄不需要它 |
 | 修改移动后相机意外转动 | 对照角色的 `turn_speed` 和相机的 `sharp_turn_speed`；见[配置方案](configurations.md#调整参数而不破坏配置) |
 
 还需注意：
@@ -151,7 +151,7 @@ HUD 部件（`StaminaBar`、`DiscoveryToast`、`FpsCounter`）的外观来自演
 
 ## 关卡
 
-复制 `addons/iso_orbit/levels/`。主场景包含以初始关卡为唯一子节点的 `LevelHost`、位于旁边的英雄和 `loading_screen.tscn`。主脚本连接关卡容器的信号：`level_change_started` 时禁用英雄操控，`level_loaded(level, spawn)` 时将英雄放在 `spawn`，`level_change_finished` 时恢复操控；`level_change_failed` 时也须恢复（当前关卡保持不变，而且不会再发出 `level_change_finished`）；`portal_entered` 和 `portal_exited` 分别显示、隐藏旅行提示。`gdscript/main.gd` 正是这样做的。每个关卡需要一个名为 `default` 的 `SpawnPoint`；传送门是持有目标场景路径的 `LevelPortal` 区域。
+复制 `addons/iso_orbit/levels/`。主场景包含以初始关卡为子节点的 `LevelHost`（如果还有其他 3D 子节点，请在 `initial_level` 中指定它）、位于旁边的英雄和 `loading_screen.tscn`。主脚本连接关卡容器的信号：`level_change_started` 时禁用英雄操控，`level_loaded(level, spawn)` 时将英雄放在 `spawn`，`level_change_finished` 时恢复操控；`level_change_failed` 时也须恢复（当前关卡保持不变，而且不会再发出 `level_change_finished`）；`portal_entered` 和 `portal_exited` 分别显示、隐藏旅行提示。`gdscript/main.gd` 正是这样做的。每个关卡需要一个名为 `default` 的 `SpawnPoint`；传送门是持有目标场景路径的 `LevelPortal` 区域。
 
 如果你已有自己的关卡系统，只取可操控的英雄，并在关卡就绪时调用 `place_at()`；如果也有自己的角色，则调用 `GroundCharacter.teleport()` 达到相同效果。详细说明、默认值与各种设置组合见[关卡](systems/levels.md)。
 
@@ -208,4 +208,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

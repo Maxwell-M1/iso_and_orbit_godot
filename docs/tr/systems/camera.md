@@ -1,5 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
-<!-- translation of docs/en/systems/camera.md @ pending -->
+<!-- translation of docs/en/systems/camera.md @ b33e90b57ed1 -->
 # Kamera
 
 [← Belge dizini](../index.md)
@@ -31,12 +30,19 @@ bir etkin kamera girerse, görüntü kahramanın olacağı zaman bu kamerayı ye
 kahramanı kopyalamak için [Aktarma](../integration.md#kamera-tek-başına), eylem ve fizik katmanları için
 [Proje yapılandırması](../project-setup.md) sayfasına bakın.
 
+Editörde düzenek oyunun başladığı görüntüyü gösterir: hedefin konumunda, onun `focus_height` kadar üstünde durur,
+`start_yaw` kadar döner, `start_zoom` değerinin belirlediği kadar eğilir ve uzaklaşır; kol da kamerayı o uzaklıkta
+gösterir. Düzeneğin dönüşümünü, kameranın dönüşümünü ve bir düzeneğin altındaki kolun `length` değerini oyun ayarlar;
+bu yüzden editörde bunlar önizlemedir: elle taşınan bir düzenek veya kamera geri döner, düzeneğin altındaki kolun
+`length` değeri salt okunurdur ve kaydetme, sahnenin yüklendiği değerleri korur. Hedefi olmayan bir düzenek ona
+verdiğiniz konumu korur. Bkz. [Editörde sahne düzenleme](../editor_authoring.md#editörde-kamera).
+
 ## Etkin değerler hangileri?
 
 Aşağıdaki betik değerleri yeniden kullanılabilir bileşen varsayılanlarıdır.
 `gdscript/player/playable_hero.tscn` bunların birkaçını geçersiz kılar; demo başlarken `SettingsApplier` kaydedilmiş
-`Settings` değerlerini uygular. Kopyalanan kahraman sahnesi demo ayar penceresi veya otomatik yüklemesi olmadan,
-sahnedeki değerlerle çalışır.
+`Settings` değerlerini uygular (`use_saved_settings` kapalıysa sahnenin değerlerini bırakır). Kopyalanan kahraman
+sahnesi demo ayar penceresi veya otomatik yüklemesi olmadan, sahnedeki değerlerle çalışır.
 
 | Ayar | Betik varsayılanı | Oynanabilir kahraman sahnesi / yeni demo |
 |---|---:|---:|
@@ -133,13 +139,14 @@ Yeni koşu eskisi durmadan başlayabilir; bu seçenek kullanılıyorsa girdinin 
 `end_follow_wait()` yöntemine bağlayın. Böyle sinyal olmadan sürekli hareket eden hedef kamerayı sonsuza dek
 bekletebilir; oyununuz yeni koşuyu bildiremiyorsa seçeneği kapalı bırakın.
 
-`playable_hero.tscn`, `PointClickMoveInput.hold_pending_changed` sinyalini `set_follow_paused()` yöntemine de
-bağlar. Sol fare tuşuna basıldıktan sonraki ilk 0.2 sn'de, girdi bunun tıklama mı basılı tutma mı olduğuna karar
-verirken takibi duraklatır. `run_requested`, yeni tıklama, basılı tutma veya sağ tuş + tuş koşusunda döndürme sonrası
-beklemeyi bitirir. Süren sol tuş koşusunda sağ tuşa basıp etrafa bakabilirsiniz; sağ tuş bırakıldığında o koşu
-yeni sayılmaz. Görüntü sonraki duruşa veya yeni koşuya kadar seçildiği yerde kalır.
-`keep_aim_on_camera_turn`, kamera hareket ederken imlecin aynı dünya noktasını hedeflemesini sağlar; koşu yönü
-kamerayı kovalamaz.
+Tıklamalar takibi kesmez. Girdi, sol tuşa basışın tıklama mı basılı tutma mı olduğuna karar verirken (ilk 0.2 sn) dönüş,
+eğim ve yükseklik sürer; yeni bir noktaya tıklama koşuya yalnızca izlenecek yeni bir yön verir. Şablonun 1.3.0 öncesinde
+yaptığı gibi `PointClickMoveInput.hold_pending_changed` sinyali `set_follow_paused()` yöntemine bağlanarak her basışta
+duraklatılan takip, her tıklamada süren dönüşü durdurur ve dönüş baştan başlar. `playable_hero.tscn` içinde girdinin
+`run_requested` sinyali, yeni tıklama, basılı tutma veya sağ tuş + tuş koşusunda döndürme sonrası beklemeyi bitirir.
+Süren sol tuş koşusunda sağ tuşa basıp etrafa bakabilirsiniz; sağ tuş bırakıldığında o koşu yeni sayılmaz. Görüntü
+sonraki duruşa veya yeni koşuya kadar seçildiği yerde kalır. `keep_aim_on_camera_turn`, kamera hareket ederken imlecin
+aynı dünya noktasını hedeflemesini sağlar; koşu yönü kamerayı kovalamaz.
 
 `Engine.time_scale` 0 olduğunda takip hareketleri durumlarını korur; zaman ilerleyince sürer. Hedefi elle
 taşırsanız veya `teleport_speed` denetimini tetiklemeyecek kısa mesafeye ışınlarsanız kamerayı ve kolu yerine
@@ -164,9 +171,11 @@ oturtup hareket geçmişini sıfırlamak için `snap()` çağırın.
 
 `look_along(direction)`, **dünya uzayındaki** bir yönün yatay bileşeni boyunca görüntüyü anında döndürür ve süren
 otomatik dönüşü durdurur. `snap()`, geçerli yatay açıyı, eğimi, yakınlaştırmayı, hedef konumunu ve kolun çarpışma
-tepkisini hemen uygular; ışınlamadan sonra kullanın. `get_zoom()` güncel 0–1 yakınlaştırmayı döndürür.
-`is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` ve `is_target_turning_sharply()` ilgili durumları
-bildirir. `set_follow_paused(paused)` ve `end_follow_wait()` yukarıdaki duraklamaları yönetir.
+tepkisini hemen uygular; ışınlamadan sonra kullanın. `get_zoom()` güncel 0–1 yakınlaştırmayı döndürür. `is_rotating()`,
+`is_follow_paused()`, `is_follow_waiting()` ve `is_target_turning_sharply()` ilgili durumları bildirir.
+`set_follow_paused(paused)`, takibi yeniden başlatılana kadar duraklatır, örneğin ekranda bir diyalog varken: süren
+hareket frenlenir ve duraklamadan sonra baştan başlar; bu yüzden tıklama kadar kısa anlar için değildir.
+`end_follow_wait()`, yukarıda anlatılan döndürme sonrası beklemeyi bitirir.
 
 Düzenek bir kol veya kamera çocuğu (ya da açıkça atanmış `arm`/`camera`) ister; yoksa hata ayıklama derlemesinde
 assert çalışır. Küresel dönüşünü kendi ayarladığından `start_yaw`, `look_along()` ve otomatik dönüş, sabit kahraman
@@ -229,4 +238,4 @@ basamaklarda dikey yumuşatma, engellerden kaçınma, isteğe bağlı yaklaşma,
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

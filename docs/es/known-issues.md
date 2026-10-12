@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
+<!-- translation of docs/en/known-issues.md @ 66849ce12ecb -->
 # Problemas conocidos
 
 [← Índice de documentación](index.md)
@@ -27,10 +27,10 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
   y el foco de cámara y las comprobaciones del brazo siguen a la altura del cuerpo. Sobre un hueco, ambos caen.
 - **Arriba es +Y.** El personaje y sus componentes solo admiten `Vector3.UP` como dirección vertical.
 - **Sin evasión entre personajes.** `NavigationMover` sigue una ruta y no usa la evasión de navegación, así que los
-  personajes en movimiento no se esquivan entre sí. El cuerpo del jugador está en la capa 2 y solo colisiona con la
-  capas 1 y 4, así que dos personajes creados a partir de `player.tscn` se atraviesan; agrega la capa 2 a su
-  `collision_mask` si deben bloquearse entre sí. Los NPC de la demo están quietos y están horneados en la malla de
-  navegación como obstáculos.
+  personajes en movimiento no se esquivan entre sí. El cuerpo del jugador y los personajes que patrullan están en la
+  capa 2 y colisionan con las capas 1, 2 y 4, así que se bloquean entre sí: el que está en medio detiene al otro, y una
+  patrulla espera hasta que el camino quede libre. Los PNJ inmóviles están horneados en la malla de navegación como
+  obstáculos; el caballero y el explorador que patrullan no lo están, ya que se mueven.
 - **La malla de navegación se hornea de antemano.** Mover un obstáculo en tiempo de ejecución no cambia las rutas.
   Después de editar el nivel, vuelve a hornear la malla
   ([Mundo y navegación](systems/world-and-navigation.md#volver-a-hornear-la-malla-de-navegación)).
@@ -94,9 +94,10 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
   de los componentes: `world.tscn`, `island.tscn` y `mountain.tscn` usan
   `addons/iso_orbit/points_of_interest/point_of_interest.gd`; ambos niveles,
   `addons/iso_orbit/levels/spawn_point.gd`; y `shared/world/props/teleport_pad.tscn`,
-  `addons/iso_orbit/levels/level_portal.gd`. Otros dos scripts de objetos están en `shared/world/props/`.
-  Una versión en C# necesitaría scripts propios para lugares, puntos de aparición y portales, o una forma de
-  marcarlos solo desde la escena.
+  `addons/iso_orbit/levels/level_portal.gd`. Los niveles también colocan a los personajes que patrullan de la demo,
+  escenas de `gdscript/npc/`, y tres scripts de objetos están en `shared/world/props/` (`static_prop.gd`,
+  `flicker.gd`, `hover_spin.gd`). Una versión en C# necesitaría scripts propios para lugares, puntos de aparición,
+  portales, objetos y personajes que patrullan, o una forma de marcarlos solo desde la escena.
 - **Fugas de recursos informadas al salir.** Si un script sale justo después de que suenen pasos, el motor puede
   informar fugas de objetos `AudioStreamPlayback`: con `--fixed-fps` el tiempo de juego va por delante del tiempo
   real mientras los sonidos todavía suenan. Libera la escena y espera un momento antes de salir;
@@ -104,4 +105,4 @@ Limitaciones del proyecto y peculiaridades del motor que sortea. Cada entrada di
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

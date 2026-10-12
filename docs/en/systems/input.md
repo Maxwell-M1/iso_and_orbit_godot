@@ -89,9 +89,12 @@ or running where it was running), and there is no marker and no path to the pres
   pressed point first. Otherwise it would start along the path to that point, and a path around obstacles can lead
   somewhere else entirely than the cursor.
 
-The cost is that a click acts on release, about 0.1 s later than on press. While it is unclear whether a press is a
-click or a hold, `hold_pending_changed(true)` pauses the camera's follow mode (connected to
-`OrbitCameraRig.set_follow_paused()` in `playable_hero.tscn`), so a short click never moves the camera.
+The cost is that a click acts on release, about 0.1 s later than on press. Meanwhile the cursor stays where the mouse
+put it, also while the camera turns behind the run, and the camera goes on following: a click neither moves the cursor
+nor stops a turn of the camera under way. A press that becomes a hold aims from where the cursor is at that moment.
+`hold_pending_changed(true)` reports such a press, and the template needs nothing from it. Do not connect it to
+`OrbitCameraRig.set_follow_paused()`, as the template did before 1.3.0: every click would stop the camera's turn, and
+the turn would start over.
 
 If the right button is already held when the left one is pressed, there is no click: the character runs after the
 camera at once.
@@ -151,9 +154,10 @@ with the left one still held and the cursor is hidden again. Pausing or switchin
 **Keeps its aim** (`keep_aim_on_camera_turn`, on by default). While the left button is held, the running direction comes
 from the cursor, a point on the screen. If the camera turns while the cursor stays still on the screen, a different spot
 of ground is under the cursor, the character turns after it, the camera turns after the character, and the character
-runs in circles. So while the button is held, the component moves the aim with the world: the character keeps
-running where you pointed while the camera eases behind it. Moving the mouse still steers. The same aim keeps the
-course while the right button orbits the camera to look around on the run.
+runs in circles. So once the press has become a hold, the component moves the aim with the world: the character keeps
+running where you pointed while the camera eases behind it. Moving the mouse still steers. The same aim keeps the course
+while the right button orbits the camera to look around on the run. Before that, while the press may still be a click,
+the cursor stays where it is.
 
 Off, the cursor steers like a car: hold it to the right of the character and the character veers right until the
 cursor is straight ahead. Where the system cannot move the cursor (Wayland, for example), the running direction still
@@ -234,4 +238,4 @@ play is covered. For non-modifier sprint bindings, only the regular action state
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

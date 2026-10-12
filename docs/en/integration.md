@@ -21,7 +21,7 @@ same location inside Godot. Keep the supplied folder layout during the first wor
 | Addon | Classes | Needs |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`, `CameraArm` | Input actions `camera_rotate`, `camera_zoom_in`, `camera_zoom_out`; physics layers for the arm |
-| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView` | A baked `NavigationRegion3D` in the world (without one the character runs straight at the point). For the input: any `Camera3D` and the actions `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
+| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView`, `PatrolController` | A baked `NavigationRegion3D` in the world (without one the character runs straight at the point). For the input: any `Camera3D` and the actions `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
 | `ground_character` | `GroundCharacter`, `FallSettings`, `LedgeGuard`, `Stamina`, `CharacterActionInput`, `CharacterSounds`, `HandSway`, `CharacterHover`, `DampedSpring`, `CharacterAppearance`, `StaminaBar` | `click_to_move`. For the keys: the actions `sprint` and `jump`. For the sounds: your own, or `shared/audio/character/`. For the hand swing and switchable models: models facing −Z with a hand node |
 | `occluded_silhouette` | `OccludedSilhouette`, with its shaders and materials | Nothing: works on any model |
 | `points_of_interest` | `PointOfInterest`, `DiscoveryToast` | The player's body in the group `player`, on a physics layer the areas see |
@@ -93,11 +93,11 @@ into one of them. Its script, `playable_hero.gd`, uses only the addons' classes:
   `click_marker`, `path_view`, and the character's `sounds`, `appearance`, `hover`, `silhouette`.
 
 For your own model, make a copy of the scene with your character in place of `player.tscn`, or assemble the parts by
-hand. The connections that matter for the camera are two: `PointClickMoveInput.hold_pending_changed` to
-`OrbitCameraRig.set_follow_paused`, and `PointClickMoveInput.run_requested` to `OrbitCameraRig.end_follow_wait` (the
-camera waits after an orbit until a new run). The other four show and hide the click marker; see
-[Architecture](architecture.md#connections-made-in-the-scene). Keep the camera's `sharp_turn_speed` at half the
-character's turn speed or lower: only `PlayableHero` checks it and warns.
+hand. The connection that matters for the camera is `PointClickMoveInput.run_requested` to
+`OrbitCameraRig.end_follow_wait` (the camera waits after an orbit until a new run). The other four show and hide the
+click marker; see [Architecture](architecture.md#connections-made-in-the-scene). Do not connect `hold_pending_changed`
+to `set_follow_paused`, as the template did before 1.3.0: every click would stop the camera's turn. Keep the camera's
+`sharp_turn_speed` at half the character's turn speed or lower: only `PlayableHero` checks it and warns.
 
 ## Taking the demo's hero into your project
 
@@ -124,7 +124,7 @@ add your own models, levels and settings after the copied hero works there.
      mesh assigned to it must use matching cell sizes;
    - physics interpolation on (`physics/common/physics_interpolation`): the camera follows the character's interpolated
      position. The hero is checked with Jolt Physics (`physics/3d/physics_engine`);
-   - the physics layers: the hero's body is on layer 2 and collides with layers 1 and 4, a click looks for the ground
+   - the physics layers: the hero's body is on layer 2 and collides with layers 1, 2 and 4, a click looks for the ground
      on layer 1, the camera arm stops at layers 1 and 3. The names do not matter, the numbers do: put your ground and
      walls on layer 1, or change these masks in your copy of the scene.
 3. **Build a test level** under a `NavigationRegion3D`. Use a `StaticBody3D` ground with a `BoxShape3D` and a
@@ -198,7 +198,7 @@ Use [Configurations](configurations.md) for exact node paths, the different kind
 | Clicks do nothing | Input Map action, active camera, `PlayerInput.camera` and the ray's `ground_mask`; an overlapping Control can consume mouse input |
 | Hero walks into a wall instead of around it | Bake colliders under the region, check the region/mover navigation layers and inspect the resulting mesh |
 | Path crosses a step the hero cannot climb | Match climb to `max_step_height`, use fine vertical cells and rebake; test the actual geometry |
-| Scene edits disappear at startup | A copied `SettingsApplier` may overwrite them with saved settings; the standalone hero does not need it |
+| Scene edits disappear at startup | A copied `SettingsApplier` may overwrite them with saved settings: turn off its `use_saved_settings`, or leave it out, since the standalone hero does not need it |
 | Camera turns unexpectedly after changing movement | Compare the character's `turn_speed` and camera's `sharp_turn_speed`; see [Configurations](configurations.md#tuning-without-breaking-the-setup) |
 
 Good to know:
@@ -215,13 +215,13 @@ Good to know:
 
 ## Levels
 
-Copy `addons/iso_orbit/levels/`. The main scene holds a `LevelHost` with the start level as its only child, the hero
-next to it, and `loading_screen.tscn`. Your main script connects the host's signals: on `level_change_started` take the
-controls away, on `level_loaded(level, spawn)` put the hero at `spawn`, on `level_change_finished` give the controls
-back, on `level_change_failed` give them back too (the level stays, and `level_change_finished` does not come), and on
-`portal_entered` and `portal_exited` show and hide your offer to travel. `gdscript/main.gd` does exactly
-this. Each level needs a `SpawnPoint` named `default`; portals are `LevelPortal` areas with the path of the
-target scene.
+Copy `addons/iso_orbit/levels/`. The main scene holds a `LevelHost` with the start level as its child (with other 3D
+children, name it in `initial_level`), the hero next to it, and `loading_screen.tscn`. Your main script connects the
+host's signals: on `level_change_started` take the controls away, on `level_loaded(level, spawn)` put the hero at
+`spawn`, on `level_change_finished` give the controls back, on `level_change_failed` give them back too (the level
+stays, and `level_change_finished` does not come), and on `portal_entered` and `portal_exited` show and hide your offer
+to travel. `gdscript/main.gd` does exactly this. Each level needs a `SpawnPoint` named `default`; portals are
+`LevelPortal` areas with the path of the target scene.
 
 With your own level system, take only the playable hero and call `place_at()` where your levels are ready; with your
 own character, call `GroundCharacter.teleport()` for the same effect. Details, the defaults and the combinations of
@@ -299,4 +299,4 @@ your own, and take the controls from `gdscript/ui/settings/`; see [UI](systems/u
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

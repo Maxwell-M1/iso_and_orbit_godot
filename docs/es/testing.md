@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ fd518f56694a -->
+<!-- translation of docs/en/testing.md @ cce377f8600d -->
 # Pruebas
 
 [← Índice de documentación](index.md)
@@ -42,16 +42,18 @@ relacionadas con tu cambio; ejecuta todas antes de integrar cambios que afecten 
 | Suite | Qué cubre |
 |---|---|
 | `movement_checks.gd` | Aceleración y parada exacta, un clic nuevo durante el frenado, un giro durante el frenado, una inversión a toda velocidad. Recorridos: alrededor de la trampa, por el hueco del muro, el laberinto, subir y bajar la rampa, a la plataforma desde los lados de la rampa, un punto inalcanzable sobre una caja. La protección de bordes, y la caída sin ella |
-| `world_checks.gd` | La montaña: una ruta del suelo a la cima por el sendero, el lugar se descubre una vez con su mensaje, la ladera no se puede subir fuera del sendero, la protección aguanta en el sendero. El campamento, la granja y las ruinas se descubren con sus mensajes. Los NPC: cinco con equipo y etiquetas, alguien en cada lugar, todos de pie sobre el suelo, las rutas los rodean, nadie los atraviesa. Los aspectos del héroe: diez por número, cada uno con cuerpo, ojos y un bastón en la mano derecha; el pasillo a lo largo de la fila se puede recorrer a toda velocidad |
+| `world_checks.gd` | Navegación por el terreno de la demo, áreas de descubrimiento, colisiones con los personajes de los lugares y los modelos expuestos de los aspectos del héroe |
 | `hero_look_checks.gd` | El modelo del jugador: el bastón en la mano derecha al girar; cadenas de silueta separadas para el cuerpo y el equipo, también en mallas agregadas después; la opción del contorno. El balanceo de la mano: quieta al estar parado; balanceándose y bajando al correr, con los extremos en los pasos, alternando; retrasándose al acelerar; volviendo tras una parada; bajando al aterrizar. El aspecto del héroe: el predeterminado al iniciar; cada uno de los diez aplicado en tiempo de ejecución con un solo modelo, el bastón balanceándose en la nueva mano y la silueta en las nuevas mallas |
 | `character_actions_checks.gd` | Sprint y fatiga, modos mantener y alternar, reasignación y liberación de modificadores, búfer y tiempo de gracia del salto, sustituciones de caída, señales y sonidos |
 | `character_state_checks.gd` | Advertencias de configuración, estado y datos para animación, escaleras y pendientes, teletransporte, flotación, interpolación, tiempo detenido y panel de estado |
 | `input_checks.gd` | Clic frente a pulsación sostenida, orden de los dos botones, ambos modos de pulsación, modos de teclas, captura del cursor, cancelación y acciones ausentes |
-| `camera_checks.gd` | El modo de seguimiento (desactivado, al instante, por defecto, muy lento) y sus pausas (el botón derecho, una pulsación sin decidir). Mantener el botón izquierdo con y sin que el cursor mantenga la mira. Órbita y zoom con el mouse: por debajo de la mitad la rueda nivela la cámara rápido; por defecto el botón derecho no inclina, con la opción sí, y al desactivarla se restaura la inclinación de la rueda. Alineación de la inclinación al correr |
+| `camera_checks.gd` | Órbita, zoom y seguimiento a distintas frecuencias de fotogramas y ticks, giros bruscos, carreras hacia la cámara, espera tras una órbita manual, clics que no interrumpen el seguimiento, alineación de inclinación, zoom y altura, y teletransporte |
 | `camera_arm_checks.gd` | Espacio libre ante obstáculos, capas de colisión, grupos ignorados, acercamiento opcional al ocultarse el objetivo y transparencia de proximidad |
 | `settings_window_checks.gd` | Pausa y foco, pestañas de ajustes, aplicación a propiedades, controles dependientes, escala de interfaz, restablecimiento y cierre |
 | `localization_checks.gd` | Cobertura de traducciones, marcas de acción conservadas, cambio de idioma, nombres para las 12 acciones reasignadas, descripciones, ventanas y consejos de carga visibles, y herencia de traducción |
 | `level_checks.gd` | Puntos de aparición, invitaciones a viajar, progreso y pausa de la carga, cambio de escena, estado conservado del héroe y recuperación tras fallos |
+| `patrol_checks.gd` | La ronda del caballero por la línea dibujada para su recorrido, pasando por cada uno de sus puntos, girando con suavidad, la espera en el punto de partida y la ronda siguiente; la parada ante el héroe y la frase tras 2.5 s; una patrulla que solo detiene un personaje delante, a un metro y un poco a los lados; el explorador de la isla y sus paradas; recorridos a partir de curvas giradas y cerradas y desde un script; los puntos de un recorrido sobre la línea dibujada con un Bake Interval largo y uno corto, las paradas en sus puntos de control; referencias que faltan |
+| `editor_authoring_checks.gd` | Un recurso de ajustes de movimiento compartido por varios componentes de movimiento y sustituido durante la partida; la ruta del archivo de configuración y los ajustes guardados por encima de los valores de la escena, y los valores de la escena conservados con `use_saved_settings` desactivado; el nivel inicial; las advertencias de configuración; objetos enteros (mover, `dimensions` y su 0, una raíz escalada, Surface Material, partes agregadas, un modelo, una parte animada); el interruptor de la excepción de la cámara con su ángulo |
 
 Las suites nuevas también cubren sustituciones de caída y señales de escalones, flotación, teletransporte,
 interpolación y tiempo detenido del personaje; orden de los dos botones y cancelación de entrada; alineación de
@@ -65,8 +67,11 @@ que pasen las pruebas de este repositorio no demuestra que hayas copiado todos l
 
 ## Cómo se comportan las pruebas
 
-- Se ejecutan con la configuración por defecto y no guardan nada: la configuración del jugador se restablece a los
-  valores por defecto durante la ejecución y nunca se sobrescribe.
+- Se ejecutan con la configuración por defecto y nunca tocan la del jugador: la configuración se restablece a los
+  valores por defecto durante la ejecución y nunca se guarda, y la única comprobación que lee un archivo de
+  configuración escribe el suyo propio en `.godot/` y lo elimina.
+- Los personajes que patrullan se quedan quietos en todas las suites salvo `patrol_checks.gd`, que los pone en marcha
+  por sí misma: un caballero caminando estorbaría a otras comprobaciones.
 - Cada comprobación restaura sus cambios. Las suites comparten una escena principal, mientras una ejecutada sola
   recibe una nueva; una prueba debe pasar de ambas formas. Tras cada comprobación, `Engine.time_scale` vuelve a 1
   para que un fallo con el tiempo ralentizado o detenido no afecte a las demás.
@@ -89,6 +94,21 @@ que pasen las pruebas de este repositorio no demuestra que hayas copiado todos l
   `PointClickMoveInput.is_cursor_hidden()`.
 - Los límites se calculan a partir de la configuración de los componentes cuando es posible, así que ajustar
   `LocomotionSettings` no rompe las pruebas por sí solo.
+
+## Comprobaciones en el editor
+
+`tests/run_checks.gd` ejecuta el juego; la parte de los componentes para el editor solo se ejecuta en el editor, y
+tiene sus propias comprobaciones: abre `tests/editor_tool_checks.tscn` en el editor y pulsa **Run Checks** en el
+Inspector. Cubren lo que el juego no puede mostrar: que una advertencia se actualiza mientras se edita una escena (un
+nodo dependiente, un recurso, un componente de movimiento agregado al cuerpo de una patrulla o quitado de él), que la
+cámara, los objetos, los personajes que patrullan y el letrero de un portal muestran sus vistas previas en el editor
+mientras una escena guardada conserva lo establecido, que un objeto heredado sigue a su base, que las acciones de
+entrada del proyecto cuentan en el editor, donde el mapa de entrada solo contiene las del propio editor, que los
+interruptores del juego (flotación, una patrulla) no cambian nada en el editor, que un personaje que patrulla copiado
+muestra un solo modelo, y que un brazo de cámara cuyo script extiende `CameraArm` sin `@tool` sigue mostrando la
+vista inicial. **Status** y **Results** en el Inspector muestran el resultado y no se guardan con la escena;
+`.godot/editor_tool_checks/results.json` también lo contiene, y la salida recibe la línea de estado. Las
+comprobaciones escriben sus escenas solo en `.godot/editor_tool_checks/`, que se vacía en cada ejecución.
 
 ## Escribir una comprobación
 
@@ -117,4 +137,4 @@ que una clase así no compila y rompe todo el juego en esa ejecución. Obtén el
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

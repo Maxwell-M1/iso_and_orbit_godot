@@ -13,7 +13,10 @@ Terms as this documentation and the code use them.
 | **Camera-only body** | A body on physics layer 3 (`camera`): it stops the camera arm, but clicks, navigation and characters ignore it |
 | **Character state** | What the character is doing: standing, running, sprinting, jumping or falling (`GroundCharacter.get_state()`, the signal `state_changed`) |
 | **Click** | A press of the left button released within the hold delay. The character runs along a path to the point where the button was pressed |
+| **Configuration warning** | A warning sign next to a node in the Scene dock while the node is set up wrong: an empty link, a wrong parent, a missing input action. The components check themselves in the editor, and the warning goes away as soon as the setup is fixed |
 | **Coyote time** | A short time after walking off an edge when a jump still works (0.1 s) |
+| **Dimensions** | `StaticProp.dimensions`: the size of a solid prop, in meters along its own axes; its model and collision are resized together. 0 on an axis keeps the size of its parts |
+| **Editor preview** | What a component shows in the editor of what the game sets up at the start: the camera's start view, a patrolling character's model and name, the title on a portal's sign, a prop's size. It is never saved into the scene |
 | **Exhausted** | The state after stamina runs out: no sprinting until stamina recovers to `recover_ratio` (30%) |
 | **Facing** | Where the character looks, as opposed to where it moves. They differ when sidestepping or backing up. `NavigationMover.get_facing()` |
 | **Fall settings** | How the character comes down after the top of a jump or off an edge: the gravity of the fall, the fastest fall and how a faster fall slows down to it (`FallSettings`). The rise of a jump does not depend on them |
@@ -35,13 +38,16 @@ Terms as this documentation and the code use them.
 | **Mover** | `NavigationMover`: turns commands (`move_to`, `steer`, `stop`) into a horizontal velocity each tick. It never moves the body |
 | **Navigation mesh** | The walkable area baked from the level's collisions on layer 1 (on the island also the invisible walls on layer 4), stored in each level's scene. Paths are searched on it |
 | **Offer to travel** | `TravelPrompt`: the key and "Teleport to …" on screen while the hero stands on a portal that asks first, such as a teleport pad. E (the `interact` action) or a click on it travels; walking away hides it |
+| **Patrol** | A character walking a route of the level by itself, waiting at home between the rounds and stopping for anyone in the way (`PatrolController`): the knight on the meadow, the ranger on the island |
 | **Physics interpolation** | Drawing bodies between physics ticks at the display frame rate. On by default; a setting turns it off |
 | **Pitch, tilt** | How steeply the camera looks down. Negative angles in code, degrees down in the settings |
 | **Pivot** | Turning instantly from a standstill, below `pivot_speed` (1 m/s) |
 | **Place** | A `PointOfInterest`: an area that shows "Discovered: …" the first time the player enters it |
 | **Playable hero** | `PlayableHero` (`playable_hero.tscn`): the hero the player controls, with its input, camera, click marker and path line, put into the game scene next to the levels |
 | **Portal** | `LevelPortal`: an area that leads to another level; the demo's teleport pads are portals |
+| **Prop** | A solid object placed in a level, a scene with a `StaticProp` root: moved by the root, resized with its dimensions |
 | **Pull-in** | The camera moving in front of an obstacle that hides the character (`pull_in_on_occlusion`) |
+| **Route** | The `Path3D` of a level that a patrol walks: the line the editor draws for its curve |
 | **Sharp turn** | A turn of the run faster than `OrbitCameraRig.sharp_turn_speed` (360°/s), such as a turnaround: the camera does not follow the passing directions and takes up the new one after the turn |
 | **Shell** | The scene that stays while the game runs (`main.tscn` with `main.gd`): the level host, the hero, the interface and the loading screen |
 | **Sidestep** | A keys mode with the right button: the character keeps facing where the camera looks while moving sideways or backward |
@@ -50,8 +56,9 @@ Terms as this documentation and the code use them.
 | **Sprint** | Running faster (×1.5) while Shift is held or toggled, spending stamina |
 | **Stair height** | The highest stair the character steps onto without a jump: 0.3 m (`GroundCharacter.max_step_height`) |
 | **Stamina** | The sprint reserve (`Stamina`): spent while sprinting, recovers after a pause |
-| **Start level** | The level the game starts on, placed under the level host in the editor: `shared/world/world.tscn`, the fenced glade, also called the meadow. In the game it is named Green Vale (the title of the island's pad) |
+| **Start level** | The level the game starts on, placed under the level host in the editor and named in its `initial_level`: `shared/world/world.tscn`, the fenced glade, also called the meadow. In the game it is named Green Vale (the title of the island's pad) |
 | **Steer** | Running in a direction without a path: `NavigationMover.steer()`. Holding the button steers toward the cursor by default |
+| **Subtitles** | What a character says, at the bottom of the screen with its name (`SubtitleDisplay`) |
 | **Teleport** | Putting a character elsewhere at once, without a run and without a jerk: `GroundCharacter.teleport()`, `PlayableHero.teleport()` |
 | **Tick** | One physics step; 60 per second |
 | **Traveller** | A body that can use a portal: one in the portal's group `traveller_group` (`player` by default) |
@@ -62,4 +69,4 @@ Terms as this documentation and the code use them.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

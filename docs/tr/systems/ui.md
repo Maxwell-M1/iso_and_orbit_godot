@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 8fc9a768e40b -->
+<!-- translation of docs/en/systems/ui.md @ 9204acfc18b7 -->
 # Arayüz
 
 [← Belge dizini](../index.md)
@@ -41,11 +41,13 @@ tutar:
   içinde çalışırlar. Eğik çizgiden önceki kısım dosyadaki bölümdür.
 - `DEFAULTS` her anahtarı varsayılan değeriyle tutar; varsayılan değerin türü ayarın türüdür. Dosyada (elle
   düzenlenmiş) yanlış türde bir değer varsayılana döner.
-- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()` ve `changed(key, value)` sinyali.
-- Değerler herhangi bir sahne düğümünün `_ready()` çağrısından önce, `_init()` içinde yüklenir ve ayarlar penceresi
-  kapandığında ve oyundan çıkıldığında `user://settings.cfg` dosyasına kaydedilir. `persistent = false` kaydetmeyi
-  durdurur; testler bunu ayarlar ve her şeyi varsayılanlara sıfırlar, böylece oyuncunun ayarlarını yok sayar ve
-  hiçbir zaman üzerine yazmaz.
+- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()`, `set_scene_defaults(values)` ve
+  `changed(key, value)` sinyali. `set_scene_defaults()` bir sahnenin kurulduğu değerleri alır: oyuncunun hiçbir şey
+  kaydetmediği yerde bunlar `DEFAULTS` değerlerinin yerine geçer ve `reset_to_defaults()` bunlara döner.
+- Değerler ilk kullanımlarında, en geç otomatik yüklemenin `_ready()` çağrısında, herhangi bir sahne düğümünün
+  `_ready()` çağrısından önce `path` (`user://settings.cfg`) dosyasından yüklenir ve ayarlar penceresi kapandığında
+  ve oyundan çıkıldığında oraya kaydedilir. `persistent = false` kaydetmeyi durdurur; testler bunu ayarlar ve her
+  şeyi varsayılanlara sıfırlar, böylece oyuncunun ayarlarını yok sayar ve hiçbir zaman üzerine yazmaz.
 - `_OBSOLETE_KEYS` içinde listelenen anahtarlar yüklemede dosyadan kaldırılır.
 - Motor düzeyindeki ayarları sınıfın kendisi uygular (`_apply_to_engine()`): tam ekran, kare hızı sınırı ve V-Sync,
   fizik enterpolasyonu, arayüz ölçeği, dil, ses düzeyi. Sahne düğümlerinin ayarlarını sahne uygular: demoda
@@ -55,8 +57,8 @@ tutar:
 
 1. `GameSettings` içinde bir anahtar sabiti ve `DEFAULTS` içinde bir varsayılan değer.
 2. `settings_screen.tscn` içinde o anahtara bağlı bir arayüz öğesi (aşağıya bakın). Pencerenin kodu değişmez.
-3. `settings_applier.gd` içinde özelliği ayarlayan bir dal ya da ayarı motor uyguluyorsa
-   `GameSettings._apply_to_engine()` içinde.
+3. `settings_applier.gd` içinde özelliği ayarlayan bir dal ve onun `_capture_scene_defaults()` yönteminde özelliğin
+   sahnedeki değerini okuyan bir girdi ya da ayarı motor uyguluyorsa `GameSettings._apply_to_engine()` içinde bir dal.
 4. Metinlerinin çevirileri, bkz. [Çeviriler](#çeviriler).
 
 ### Ayarlar penceresi
@@ -99,6 +101,7 @@ Klavye ve tekerlek ölçeği hemen değiştirir.
 | `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | FPS sayacının altında: kahramanın ne yaptığı (durum, hız ve karışım, hareket, dönüş, yerde veya havada, adımlar ve ayaklar, dayanıklılık) ve son olaylar. Varsayılan olarak gizlidir. Bkz. [Hareket](locomotion.md#charactermonitor-metin-olarak-durum) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | Oyuncu `PointOfInterest` alanına ilk kez girdiğinde `show_time` (3.5 s) boyunca "Keşfedildi: …". `points_of_interest` grubundaki yerleri, sonradan yüklenen seviyedekileri de bulur (`watch_added_places` açık; kapalıysa yalnız başlangıçtakiler). `show_discovery(title)` elle gösterir |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Dayanıklılık harcanmaya başladığında belirir, karakter bitkinken kırmızıya döner (`StaminaBarExhausted` varyasyonu) ve yeniden dolunca 0,6 sn içinde solar |
+| `Hud/Subtitles` | `SubtitleDisplay` (PanelContainer), `gdscript/ui/subtitle_display.gd` | Bir karakterin söylediği, ekranın altında adıyla birlikte, `display_time` (5 sn) boyunca: kahraman yolunu kestiğinde şövalyenin repliği. `main.gd`, her seviyedeki karakterlerin `speech_requested` sinyalini `show_line()` yöntemine bağlar; seviye değişince replik silinir. Ad, replik ve bunların birleştirilme biçimi (`%s: %s`) çevrilir |
 | `Hud/TravelPrompt` | `TravelPrompt` (Control), `gdscript/ui/travel_prompt.gd` | Platformda, dayanıklılık çubuğu üstündeki yolculuk teklifi: `interact` tuşu rozet içinde (`InputNames.of_action()`), "... ışınlan" metni. Tuş veya tıklama `confirmed(portal)` verir; Shift gibi değiştirici basılıyken de işler. Düğme odağı almaz, Space zıplar. Pencere değildir; oyun sürer |
 
 Yükleme ekranı (`main.tscn` içindeki `LoadingScreen`, `levels` eklentisinden) HUD parçası değildir: seviye
@@ -110,9 +113,9 @@ değişirken oyunu örter; bkz. [Seviyeler](levels.md#yükleme-ekranı). Resmini
 
 `shared/ui/ui_theme.tres` proje temasıdır (`gui/theme/custom`): paneller, pencere, düğmeler ve şu tür
 varyasyonları: `WindowPanel`, `WindowLayout`, `TabPage`, `SettingsList`, `HintLabel`, `FpsCounter`, `DiscoveryToast`,
-`StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`. Düğümler stilleri tek tek geçersiz kılmak
-yerine `theme_type_variation` ile tür çeşidi seçer. Yükleme ekranı kendi eklentisindeki
-`loading_screen_theme.tres` temasını getirir; her projede aynı görünür.
+`StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`, `SubtitlePanel`, `SubtitleText`. Düğümler
+stilleri tek tek geçersiz kılmak yerine `theme_type_variation` ile tür çeşidi seçer. Yükleme ekranı kendi
+eklentisindeki `loading_screen_theme.tres` temasını getirir; her projede aynı görünür.
 
 ## Çeviriler
 
@@ -196,4 +199,4 @@ tuş yeniden atama sekmesi yoktur.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

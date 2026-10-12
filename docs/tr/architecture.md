@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ adf142a1b736 -->
+<!-- translation of docs/en/architecture.md @ 808ba6991a13 -->
 # Mimari
 
 [← Belge dizini](index.md)
@@ -18,7 +18,7 @@ bağlantılarıyla bağlanır. Kalan birkaç arama yapılandırılabilir: `Disco
 
 ```
 Main (Node3D, main.gd)   oyun kabuğu: seviyeleri, kahramanı ve arayüzü bağlar
-├── Levels             LevelHost: yükleme ekranının ardında değişen geçerli seviye
+├── Levels             LevelHost: yükleme ekranının ardında değişen geçerli seviye; initial_level = World
 │   └── World          shared/world/world.tscn: başlangıç seviyesi, örgüsü, yerleri, NPC'leri, platform
 ├── Hero               gdscript/player/playable_hero.tscn: PlayableHero, oyuncunun denetlediği kahraman
 │   ├── Character          gdscript/player/player.tscn: GroundCharacter, "player" grubu
@@ -41,7 +41,7 @@ Main (Node3D, main.gd)   oyun kabuğu: seviyeleri, kahramanı ve arayüzü bağl
 │   ├── ClickMarker        tıklanan noktadaki halka
 │   └── PathView           NavigationPathView: hata ayıklama yol çizgisi, varsayılan olarak gizli
 ├── Hud                kontrol ipuçları ve hız, FpsCounter, CharacterState, DiscoveryToast, StaminaBar,
-│                      TravelPrompt (platformdaki yolculuk teklifi)
+│                      TravelPrompt (platformdaki yolculuk teklifi), Subtitles (karakterlerin söyledikleri)
 ├── SettingsApplier    ayarlar → düğüm özellikleri (yalnız demo)
 ├── UiRoot             oyunun üstündeki pencereler: ayarlar penceresi
 └── LoadingScreen      LoadingScreen: seviye yüklenirken ekran
@@ -126,6 +126,7 @@ betik, sınıfının snake case biçimindeki adını taşır: `OrbitCameraRig` i
 | | `PointClickMoveInput` (Node) | Fare ve sağ tuş + WASD → hareketlendirici komutları; imleci gizler ve yeniden hedefler |
 | | `ClickMarker` (Node3D) | Tıklanan noktadaki işaretçi (`click_marker.tscn`) |
 | | `NavigationPathView` (MeshInstance3D) | Hareketlendiricinin kalan yolunu çizer |
+| | `PatrolController` (Node) | Bir karakteri seviyede çizilmiş bir rota (`Path3D`) boyunca yürütür: bekler, geri döner, yolundaki bir karakter için durur |
 | `ground_character` | `GroundCharacter` (CharacterBody3D) | Yerçekimi, zıplama, dayanıklılıkla depar, basamaklar, `move_and_slide()`, modeli döndürme; animasyonlar, sesler ve arayüz için durumunu, adımlarını, kalkışlarını ve inişlerini bildirir |
 | | `FallSettings` (Resource) | Düşüşün yerçekimi, hız sınırı ve ona frenlemesi. Bir kaynak birçok karakterce paylaşılabilir |
 | | `LedgeGuard` (Node) | Gövdeyi bir uçurumda durdurur ya da kenar boyunca kaydırır |
@@ -162,6 +163,8 @@ başka bir şeye ihtiyaç duymaz. Her birinin projeden beklediği: [Kendi projen
 | `player/player.tscn`, `player_locomotion.tres` | Kahraman: tüm parçalarıyla bir `GroundCharacter` ve koşu ayarları |
 | `player/playable_hero.tscn`, `.gd` | `PlayableHero`: karakteri, girdisi, kamerası, tıklama işareti ve yol çizgisiyle oyun sahnesine koymaya hazır |
 | `ui/travel_prompt.tscn`, `.gd` | `TravelPrompt`: platformdaki tuş ve yer adıyla yolculuk teklifi |
+| `ui/subtitle_display.tscn`, `.gd` | `SubtitleDisplay`: bir karakterin söylediği, adıyla birlikte ekranın altında |
+| `npc/patrol_actor.tscn`, `.gd`, `knight_patrol.tscn`, `island_patrol.tscn` | `PatrolActor`: seviyedeki bir rotada yürüyen, modeli ve başının üstündeki adıyla bir karakter; şövalye ve adanın korucusu |
 | `demo/hud.gd` | Kontrol ipuçları ve hız göstergesi |
 | `demo/settings_applier.gd` | Ayarları demonun düğümlerine uygular; "ayar → özellik" eşlemesi için tek yer |
 | `settings/game_settings.gd` | `GameSettings`, yani `Settings` otomatik yüklemesi: varsayılanlar, `user://settings.cfg`, `changed` sinyali; motor ayarlarını kendisi uygular |
@@ -184,10 +187,10 @@ Düğüm başvuruları, `main.tscn`, `playable_hero.tscn` ve `player.tscn` için
 | `PlayerInput.hold_started` | `ClickMarker.fade_out` | Basılı tutma tıklamanın yerini alır, işaretçi solar |
 | `Character/NavigationMover.arrived` | `ClickMarker.fade_out` | Karakter noktaya ulaştı |
 | `Character/NavigationMover.destination_cancelled` | `ClickMarker.fade_out` | Noktadan vazgeçildi |
-| `PlayerInput.hold_pending_changed(pending)` | `CameraRig.set_follow_paused` | Bir basışın tıklama mı basılı tutma mı olduğu anlaşılana kadar kamera kendiliğinden dönmez |
 | `PlayerInput.run_requested` | `CameraRig.end_follow_wait` | Yeni koşuda kamera, elle dönüşten sonraki beklemeyi bitirip yeniden takip eder |
 
-`main.gd`, seviye sunucusuyla yolculuk teklifini kodda bağlar; bkz. [Seviyeler](systems/levels.md#oyun-kabuğu).
+`main.gd`, seviye sunucusunu, yolculuk teklifini ve altyazıları kodda bağlar; bkz.
+[Seviyeler](systems/levels.md#oyun-kabuğu).
 
 ## Ayarlar
 
@@ -217,6 +220,10 @@ Bileşenlerin kendileri ayarları hiçbir zaman okumaz, bkz. [Ayarlar](settings.
   hızında akıcıdır. Takip modu için kamera hedefin hızını onun fizik tiki başına hareketinden hesaplar; bu yüzden
   herhangi bir `Node3D` hedef olabilir. Aynı hareketten keskin yön değişimini kavisli dönüşten ayırır; tersine
   dönüş kamerayı çevresinde döndürmez. Yayları kısa adımlarla hesaplanır, her kare hızında benzer biçimde hareket eder.
+- **Bileşenler editörde kendilerini denetler, editör de yalnızca sizin ayarladıklarınızı kaydeder.** Betikleri araç
+  (tool) betikleridir: editörde bir şey eksik ya da yanlış olduğu sürece uyarı gösterirler ve oyunun başlangıçta
+  kurduğunu önizlerler (kameranın görüntüsü, bir karakterin modeli ve adı); ancak orada oyun çalıştırmazlar ve bir
+  önizleme hiçbir zaman sahneye yazılmaz. Bkz. [Editörde sahne düzenleme](editor_authoring.md).
 - **Bileşenler ayarlar hakkında hiçbir şey bilmez.** `LedgeGuard`, `PointClickMoveInput`, `OrbitCameraRig` ve
   diğerleri kendi özelliklerini okur; `Settings` otomatik yüklemesiyle yalnızca `settings_applier.gd` ve ayarlar
   penceresi konuşur. Bir bileşen ayarlar sistemi olmadan başka bir projeye taşınabilir.
@@ -231,18 +238,19 @@ Bileşenlerin kendileri ayarları hiçbir zaman okumaz, bkz. [Ayarlar](settings.
 | Klasör | İçerik |
 |---|---|
 | `addons/iso_orbit/` | Yeniden kullanılabilir bileşenler, her parça için bir klasör |
-| `gdscript/` | GDScript ile yazılmış demo: ana sahne, kahraman, ayarlar sistemi ve penceresi, HUD ipucu |
+| `gdscript/` | GDScript ile yazılmış demo: ana sahne, kahraman, devriye gezen NPC'ler, ayarlar sistemi ve penceresi, HUD ipucu, altyazılar |
 | `shared/` | Betik dilinden bağımsız demo içeriği: seviyeler, karakterler ve ekipman, dünya gölgelendiricileri ve dokuları, sesler, arayüz teması |
 | `l10n/` | Arayüz çevirileri |
 | `tests/` | Headless testler, bkz. [Testler](testing.md) |
 | `docs/` | Bu belgeler |
 
 `shared/`, demonun gelecekteki bir C# sürümü tarafından yeniden kullanılmak üzere tasarlanmıştır; o sürüm
-`gdscript/` yanında kendi klasörünü alacaktır. Şimdilik iki istisna var: seviyeler ve platform bileşen betikleri
+`gdscript/` yanında kendi klasörünü alacaktır. Şimdilik üç istisna var: seviyeler ve platform bileşen betikleri
 kullanır (`world.tscn`, `island.tscn`, `mountain.tscn` için `point_of_interest.gd`; seviyeler için
-`spawn_point.gd`; `teleport_pad.tscn` için `level_portal.gd`), iki küçük dekor betiği (`flicker.gd`,
-`hover_spin.gd`) de `shared/world/props/` içindedir. Bkz. [Bilinen sorunlar](known-issues.md).
+`spawn_point.gd`; `teleport_pad.tscn` için `level_portal.gd`), seviyeler demonun devriye gezen karakterlerini
+yerleştirir (`gdscript/npc/knight_patrol.tscn`, `island_patrol.tscn`) ve üç dekor betiği (`static_prop.gd`,
+`flicker.gd`, `hover_spin.gd`) `shared/world/props/` içindedir. Bkz. [Bilinen sorunlar](known-issues.md).
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

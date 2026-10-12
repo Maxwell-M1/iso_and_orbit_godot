@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 70ad45747177 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 8647f511d8bb -->
 # Pontos de interesse
 
 [← Índice da documentação (repositório do template)](../../../docs/pt_BR/index.md)
@@ -44,4 +44,4 @@ No repositório do modelo: `docs/pt_BR/systems/world-and-navigation.md`, `docs/p
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

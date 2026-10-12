@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ bbedeba37f15 -->
 # Silhueta atrás de obstáculos
 
 [← Índice da documentação (repositório do template)](../../../docs/pt_BR/index.md)
@@ -56,4 +56,4 @@ No repositório do modelo: `docs/pt_BR/systems/characters.md` (inclusive troca d
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

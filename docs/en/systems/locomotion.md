@@ -59,9 +59,8 @@ The demo's `SettingsApplier` changes `sprint_speed_multiplier` and `backward_spe
 player changes a setting; saved settings can override the values above. The addon itself has no settings system. To
 tune a running demo, use Scene dock → Remote → `Hero/Character/NavigationMover` → `settings`. The code reads the
 resource fields every tick, but Remote inspector edits are not saved: copy the result into the `.tres` file. Use a
-separate resource per character when runtime changes should not affect others. Assign it before the mover enters the
-scene tree, or use **Make Unique** in the editor: after `_ready()`, `GroundMotion` holds the original resource, so
-replacing `mover.settings` then does not replace the motion settings. Edit fields of the existing resource at runtime.
+separate resource per character when runtime changes should not affect others: assign another resource, or use
+**Make Unique** in the editor. Replacing `mover.settings` during play takes effect at once.
 
 One resource can be shared by several characters, for example all NPCs of one kind.
 
@@ -119,6 +118,57 @@ the mover follows the path itself instead of using `NavigationAgent3D`.
 facing: straight back gets the full `backward_speed_multiplier`, diagonally back a part of it (S + D while
 sidestepping: 21% slower), sideways none. So the slowdown exists only in the sidestep mode of the keys, see
 [Input](input.md).
+
+## PatrolController: walking a route
+
+`PatrolController` walks a character along a route drawn in the level by leading its `NavigationMover`: the
+character's own script still moves the body. Along the route the character steers at a point of the line ahead of it,
+without pathfinding, so draw the line where the character fits; navigation leads it from its place to the route and
+back. The demo's knight and the island's ranger walk with it, see
+[World and navigation](world-and-navigation.md#places-and-npcs).
+
+The route is a `Path3D` of the level, outside the character, drawn with the editor's curve tools. The character walks
+the line the editor draws for it, the one a `PathFollow3D` follows too: the points, their handles and the curve's
+**Bake Interval** shape it. With empty handles and a short Bake Interval (the default is 0.2 m) the line goes straight
+from point to point; pull out a point's handles to round its corner. A Bake Interval longer than the sides makes the
+editor draw them round through the points, and the character walks them round. When a patrol starts (`restart()`, or
+the controller turned on), points are taken on that line every `sample_spacing`. The character walks along them
+without stopping, aiming at the point of the line `look_ahead` away from it, so it turns smoothly through the bends,
+cutting them a little, and stops exactly at the last point; then it comes back by the shortest way to where the patrol
+started (`return_to_start`), waits `cycle_wait` and goes again (`repeat`). Without
+`return_to_start` it waits at the last point and then walks to the first one. The ways from the character's place to
+the first point and back are not on the drawn line: to keep the character on it, put the character at the first point
+and close the curve (**Closed**). A changed curve is read at the next start. A script can give the points itself
+(`set_route_points()`); without a route the controller does nothing, so a character without one just stands.
+
+A character in front of the body stops the patrol: one in an area like the beam of a flashlight, from the front of the
+body up to `blocking_distance` ahead, as wide as the body there and widening by `blocking_angle` to each side. A
+character at the side or behind does not stop it. The patrol waits for the same point instead of skipping it and walks
+on when the way is free. After `blocked_delay` seconds without a break, `blocked_long_enough(blocker)` comes, once per
+stop; the demo's knight then says his line. To be stopped by other characters, the body's collision mask must include
+their layer: in the demo the characters are on layer 2, and the masks of the hero and of the knight include it.
+
+| Property | Default | Meaning |
+|---|---|---|
+| `character`, `mover` | empty: the parent, and its first `NavigationMover` child | The body to walk and its mover, a direct child of the body |
+| `route` | empty | The `Path3D` of the level to walk |
+| `sample_spacing` | 0.25 m | The longest step between the points taken on the route's line |
+| `look_ahead` | 0.75 m | How far along the line the character aims: longer turns more gently and cuts the bends more |
+| `enabled` | on | Off: the character stops where it is. On again: a new patrol starts from there |
+| `repeat`, `return_to_start` | on, on | Go again after a round; come back to the start after the last point |
+| `cycle_wait` | 10 s | The wait at the start after a round, in game time |
+| `waypoint_wait` | 0 s | The stop at each control point of the curve |
+| `blocked_delay` | 6 s | How long a character must stand in the way before `blocked_long_enough` |
+| `blocking_distance` | 1 m | How far in front of the body another character stops it |
+| `blocking_angle` | 25° | How much that area widens to each side |
+
+With navigation on (`NavigationMover.use_navigation`), a patrol waits for the navigation map before it starts.
+`stop()` stops the character at once and turns the patrol off. `get_state()`, `get_waypoint_index()`,
+`get_completed_cycles()` and `get_blocked_time()` tell what it does; `cycle_completed` comes after each round.
+
+The demo's `PatrolActor` (`gdscript/npc/patrol_actor.tscn`) is a ready character with such a controller, its model and
+the name over its head: put an instance into a level and set its **Route**, see
+[Editing scenes in the editor](../editor_authoring.md#patrols).
 
 ## GroundCharacter
 
@@ -494,4 +544,4 @@ The scene checks in `tests/movement_checks.gd`, `tests/character_actions_checks.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

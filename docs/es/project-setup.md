@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ e52ff77b332d -->
+<!-- translation of docs/en/project-setup.md @ 2f3486026502 -->
 # Preparación del proyecto
 
 [← Índice de documentación](index.md)
@@ -18,10 +18,10 @@ Autoload, tema, traducciones, pantalla y sistema de niveles de la demo son opcio
 
 | Capa | Nombre | Qué hay en ella | Quién la lee |
 |---|---|---|---|
-| 1 | `world` | Suelo, paredes, objetos, montaña y PNJ del nivel | Rayo del clic (`PointClickMoveInput.ground_mask`), cuerpo del jugador y su `LedgeGuard` (`floor_mask` 0 toma la máscara del cuerpo), `CameraArm.collision_mask` y horneado de navegación |
-| 2 | `characters` | Cuerpo del jugador (`collision_layer = 2`) | Áreas `PointOfInterest` y `LevelPortal` (`collision_mask = 2`); el brazo la ignora |
+| 1 | `world` | Suelo, paredes, objetos, montaña y PNJ del nivel | Rayo del clic (`PointClickMoveInput.ground_mask`), cuerpos del jugador y de los personajes que patrullan, el `LedgeGuard` del jugador (`floor_mask` 0 toma la máscara del cuerpo), `CameraArm.collision_mask` y horneado de navegación |
+| 2 | `characters` | Cuerpo del jugador y personajes que patrullan (`collision_layer = 2`) | Áreas `PointOfInterest` y `LevelPortal` (`collision_mask = 2`); los cuerpos del héroe y de los personajes que patrullan, para que se detengan entre sí, y, a través de la máscara del héroe, su `LedgeGuard`; el brazo la ignora |
 | 3 | `camera` | Cuerpos que solo detienen la cámara, como `RoofCameraBlocker` en `shared/world/props/house.tscn` | Solo `CameraArm.collision_mask` |
-| 4 | `bounds` | Paredes invisibles en el borde de un nivel, como `Edge` en la isla | Cuerpo del jugador (`collision_mask` = capas 1 y 4) y su `LedgeGuard`; horneado de malla donde se solicite, como la isla |
+| 4 | `bounds` | Paredes invisibles en el borde de un nivel, como `Edge` en la isla | Cuerpos del jugador y de los personajes que patrullan (`collision_mask` = capas 1, 2 y 4), el `LedgeGuard` del jugador; horneado de malla donde se solicite, como la isla |
 
 `CameraArm.collision_mask` incluye por defecto las capas 1 y 3 (`0b101`). Los personajes en la capa 2 nunca empujan
 la cámara. Un cuerpo en la capa 3 detiene la cámara pero es invisible para los clics, la navegación y los
@@ -32,8 +32,8 @@ agua tras una pared invisible no apunta a la propia pared.
 La capa de navegación 1 se llama `ground`; `NavigationMover.navigation_layers` la usa por defecto.
 Las capas de física y de navegación son independientes: la capa física de un colisionador determina qué rayos y
 cuerpos chocan, y las capas de una región determinan qué rutas puede consultar el componente de movimiento. En
-código son campos de bits: capas 1 y 4 son `1 | 8 = 9`; capas 1 y 3 son `1 | 4 = 5`. En el Inspector marca las
-casillas numeradas.
+código son campos de bits: capas 1, 2 y 4 son `1 | 2 | 8 = 11`; capas 1 y 3 son `1 | 4 = 5`. En el Inspector marca
+las casillas numeradas.
 
 ## Acciones de entrada
 
@@ -105,4 +105,4 @@ volver a los valores por defecto, o usa **Restablecer todo** en la ventana de co
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

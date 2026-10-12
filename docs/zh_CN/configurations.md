@@ -1,4 +1,4 @@
-<!-- translation of docs/en/configurations.md @ 2173d5158953 -->
+<!-- translation of docs/en/configurations.md @ ced3a1b9ab87 -->
 # 配置可操控的英雄
 
 [← 文档目录](index.md)
@@ -142,4 +142,4 @@ func _ready() -> void:
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

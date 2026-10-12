@@ -1,5 +1,4 @@
-<!-- translation of docs/en/systems/levels.md @ dc39dc2f669b -->
-<!-- translation of docs/en/systems/levels.md @ pending -->
+<!-- translation of docs/en/systems/levels.md @ 0382449aab6e -->
 # Seviyeler
 
 [← Belge dizini](../index.md)
@@ -17,10 +16,11 @@ onun kardeş düğümleridir. Böylece seviyeler onların çevresinde değişir.
 
 | Düğüm | Sınıf | Görev |
 |---|---|---|
-| `Levels` | `LevelHost` | Geçerli seviyeyi tek çocuğu olarak tutar ve değiştirir |
+| `Levels` | `LevelHost` | Geçerli seviyeyi tutar ve değiştirir; `initial_level` başlangıç seviyesini belirtir |
 | `Levels/World` | | Editörde yerleştirilen başlangıç seviyesi `shared/world/world.tscn` |
 | `Hero` | `PlayableHero` | Girdisi, kamerası, tıklama işareti ve yol çizgisiyle oyuncu karakteri |
 | `Hud/TravelPrompt` | `TravelPrompt` | Platformdaki yolculuk teklifi |
+| `Hud/Subtitles` | `SubtitleDisplay` | Seviyedeki karakterlerin söyledikleri |
 | `LoadingScreen` | `LoadingScreen` | Seviye yüklenirken gösterilen ekran |
 
 `gdscript/main.gd` bunları bağlar:
@@ -30,8 +30,8 @@ onun kardeş düğümleridir. Böylece seviyeler onların çevresinde değişir.
 | `LevelHost.portal_entered(portal)` | Portal otomatik geçirmiyorsa teklifini gösterir. İki portalın alanındayken son girilenin teklifini gösterir |
 | `LevelHost.portal_exited(portal)` | Bu teklifi gizler; kahraman başka portalda duruyorsa onun teklifini gösterir |
 | `TravelPrompt.confirmed(portal)` | `portal.travel()` |
-| `LevelHost.level_change_started` | Teklifi ve HUD'ı gizler, kahramanın kontrollerini kapatır |
-| `LevelHost.level_loaded(level, spawn)` | Daha önce bulunan yerleri bulundu olarak işaretler; kahramanı kamera arkasında olacak biçimde `spawn` noktasına koyar; ekranın altında HUD'ı gösterir |
+| `LevelHost.level_change_started` | Teklifi, altyazıları ve HUD'ı gizler, kahramanın kontrollerini kapatır |
+| `LevelHost.level_loaded(level, spawn)` | Daha önce bulunan yerleri bulundu olarak işaretler; seviyedeki karakterlerin söylediklerini altyazılara bağlar; kahramanı kamera arkasında olacak biçimde `spawn` noktasına koyar; ekranın altında HUD'ı gösterir |
 | `LevelHost.level_change_finished` | Kontrolleri yeniden açar |
 | `LevelHost.level_change_failed` | HUD'ı ve kontrolleri yeniden açar; kahraman hâlâ portaldaysa teklifini gösterir |
 
@@ -71,6 +71,7 @@ Seviye sunucusunun ayarları:
 
 | Özellik | Varsayılan | Anlamı |
 |---|---|---|
+| `initial_level` | boş; demo `World` atar | Oyunun başladığı seviye, sunucunun bir çocuğu. Boşsa `Node3D` olan ilk çocuk. Birden çok 3B çocuk varsa (bir işaretçi, bir ışık) ve hiçbiri atanmamışsa sunucu editörde uyarı gösterir |
 | `loading_screen` | boş; demo kendi `LoadingScreen` düğümünü atar | Yüklenirken oyunun üzerindeki ekran. Boşsa seviye oyuncunun gözünün önünde değişir |
 | `min_loading_time` | 0.6 s | Hızlı yüklemede bir anlık parlamayı önlemek için ekranın en kısa kalış süresi |
 | `warmup_frames` | 3 | Ekran kalkmadan arkasında çizilen kareler; yeni seviyenin gölgelendiricileri görünmeden derlenir |
@@ -90,7 +91,7 @@ Sinyaller ve yöntemler:
 | `is_changing()` | Kabul edilmiş `change_level()` çağrısından `level_change_finished` veya `level_change_failed` sinyaline kadar geçiş sürer |
 | `find_spawn_point(spawn_name = &"default", level = null)` | Seviyenin doğuş noktası; bkz. [Doğuş noktaları](#doğuş-noktaları) |
 
-Editörde yerleştirilen başlangıç seviyesi duyurulmaz: onun için `level_loaded` gelmez. Oyun,
+Başlangıç seviyesi (`initial_level` veya ilk 3B çocuk) duyurulmaz: onun için `level_loaded` gelmez. Oyun onu,
 `gdscript/main.gd` gibi, `_ready()` içinde `get_current_level()` ve `find_spawn_point()` ile kurar.
 
 Geçiş sürerken yeni istek reddedilir (`ERR_BUSY`); ikinci E basışı veya o sırada girilen portal etkisizdir.
@@ -122,7 +123,7 @@ seviyenin portallarını, örneğin görevden sonra eklenenleri de bağlar.
 | `target_level` | | Gidilecek seviyenin sahne dosyası. Yüklü sahne yerine yol olduğundan iki seviye birbirine açılabilir; Inspector'da seçilen `uid://` yolu da çalışır |
 | `target_spawn` | `default` | Varılacak doğuş noktası |
 | `title` | | Portalın götürdüğü yerin adı; teklif, yükleme ekranı ve tabela için. Gösterildiği yerde çevrilir |
-| `title_label` | | Portalın `title` değerini yazdığı üzerindeki `Label3D` |
+| `title_label` | | Portalın üzerinde `title` değerini gösteren `Label3D`; portal başlığı buna editörde de yazar, sahne ise tabelanın kendi metnini korur |
 | `traveller_group` | `player` | Geçebilenler: bu gruptaki gövdeler |
 | `auto_travel` | kapalı | Teklif olmadan, yolcu girer girmez geçiş |
 
@@ -193,10 +194,10 @@ biçimlendirir. Demo ekranı `ActionTexts.GROUP` içine ekler; böylece tuş adl
 
 ## Oynanabilir kahraman
 
-`gdscript/player/playable_hero.tscn`, oyun sahnesine koymaya hazır, oyuncunun denetlediği kahramandır:
-`player` grubundaki karakter (`player.tscn`), `PointClickMoveInput`, `CharacterActionInput`, koluyla ve
-kamerasıyla kamera düzeneği, tıklama işareti ve yol çizgisi; ayarları ve sahnedeki altı bağlantısıyla birlikte.
-Karakter sahnesi bu bileşenleri içermez; aynı `player.tscn` yapay zekâyla da sürülebilir.
+`gdscript/player/playable_hero.tscn`, oyun sahnesine koymaya hazır, oyuncunun denetlediği kahramandır: `player`
+grubundaki karakter (`player.tscn`), `PointClickMoveInput`, `CharacterActionInput`, koluyla ve kamerasıyla kamera
+düzeneği, tıklama işareti ve yol çizgisi; ayarları ve sahnedeki beş bağlantısıyla birlikte. Karakter sahnesi bu
+bileşenleri içermez; aynı `player.tscn` yapay zekâyla da sürülebilir.
 
 `PlayableHero` (`playable_hero.gd`) parçaları türlendirilmiş özellikler olarak sunar: `character`, `input`,
 `actions`, `camera_rig`, `camera_arm`, `camera`, `click_marker`, `path_view` ve karakterin `sounds`, `appearance`,
@@ -260,4 +261,4 @@ taş diskli, ışıklı kakmalı, baş yüksekliğinin üstünde dönen kristall
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

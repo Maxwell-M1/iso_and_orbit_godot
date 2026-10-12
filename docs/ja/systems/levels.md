@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/levels.md @ dc39dc2f669b -->
+<!-- translation of docs/en/systems/levels.md @ 0382449aab6e -->
 # レベル
 
 [← ドキュメント目次](../index.md)
@@ -13,10 +13,11 @@
 
 | ノード | クラス | 役割 |
 |---|---|---|
-| `Levels` | `LevelHost` | 現在のレベルを唯一の子として保持し、切り替える |
+| `Levels` | `LevelHost` | 現在のレベルを保持し、切り替える。`initial_level`で開始レベルを指定する |
 | `Levels/World` | | エディターで配置した開始レベル`shared/world/world.tscn` |
 | `Hero` | `PlayableHero` | 入力、カメラ、クリックマーカー、経路線を持つプレイヤーのキャラクター |
 | `Hud/TravelPrompt` | `TravelPrompt` | パッド上で表示する移動先の案内 |
+| `Hud/Subtitles` | `SubtitleDisplay` | レベルのキャラクターのセリフ |
 | `LoadingScreen` | `LoadingScreen` | レベル読み込み中の画面 |
 
 `gdscript/main.gd`がこれらを接続します。
@@ -26,8 +27,8 @@
 | `LevelHost.portal_entered(portal)` | ポータルが自動移動でなければ、その案内を表示する。2つのポータルに同時にいるときは、後から入った方を案内する |
 | `LevelHost.portal_exited(portal)` | その案内を隠す。ヒーローがもう一方のポータルにも立っていれば、その案内を表示する |
 | `TravelPrompt.confirmed(portal)` | `portal.travel()`を呼ぶ |
-| `LevelHost.level_change_started` | 案内とHUDを隠し、ヒーローの操作を無効にする |
-| `LevelHost.level_loaded(level, spawn)` | 以前見つけた場所を発見済みにし、カメラを後ろに向けてヒーローを`spawn`に置き、画面の背後でHUDを表示する |
+| `LevelHost.level_change_started` | 案内、字幕、HUDを隠し、ヒーローの操作を無効にする |
+| `LevelHost.level_loaded(level, spawn)` | 以前見つけた場所を発見済みにし、レベルのキャラクターのセリフを字幕へ接続し、カメラを後ろに向けてヒーローを`spawn`に置き、画面の背後でHUDを表示する |
 | `LevelHost.level_change_finished` | 操作を戻す |
 | `LevelHost.level_change_failed` | HUDと操作を戻し、ヒーローがまだポータル上にいれば案内を再表示する |
 
@@ -52,6 +53,7 @@
 
 | プロパティ | デフォルト | 意味 |
 |---|---|---|
+| `initial_level` | 空。デモでは`World`を設定 | ゲームが始まるレベルで、ホストの子。空なら`Node3D`である最初の子。3Dの子が複数あり（マーカー、ライトなど）、どれも設定されていなければ、ホストはエディターで警告を表示する |
 | `loading_screen` | 空。デモでは`LoadingScreen`を設定 | レベル読み込み中にゲームを覆う画面。空ならプレイヤーの目の前でレベルが切り替わる |
 | `min_loading_time` | 0.6 s | 画面の最短表示時間。素早い読み込みでも点滅しないようにする |
 | `warmup_frames` | 3 | 画面が消える前に背後で描画するフレーム数。新しいレベルのシェーダーを見えないところでコンパイルする |
@@ -71,7 +73,7 @@
 | `is_changing()` | 受け付けた`change_level()`から`level_change_finished`または`level_change_failed`までの切り替え中かどうか |
 | `find_spawn_point(spawn_name = &"default", level = null)` | レベル内のスポーン地点。[スポーン地点](#スポーン地点)を参照 |
 
-エディターで配置した開始レベルは通知されず、`level_loaded`も来ません。`gdscript/main.gd`と同様に、ゲームの`_ready()`で`get_current_level()`と`find_spawn_point()`を使って準備します。
+開始レベル（`initial_level`、または最初の3Dの子）は通知されず、`level_loaded`も来ません。`gdscript/main.gd`と同様に、ゲームの`_ready()`で`get_current_level()`と`find_spawn_point()`を使って準備します。
 
 切り替え中の要求は`ERR_BUSY`で拒否されるため、Eを再び押しても、その間にポータルへ入っても何も起きません。`change_level()`はファイルを直ちに確認します。存在しなければ`ERR_FILE_NOT_FOUND`、シーンファイルでなければ`ERR_INVALID_PARAMETER`を返し、何も変更しません。読み込みに失敗したシーンや、ルートが`Node3D`でないシーンでは、現在のレベルが残ります。出力にエラーが表示され、一時停止が解除され、`min_loading_time`を待たずに画面が消え、`level_change_failed`が届きます。失敗した読み込みは回収されるため、修正後などに再要求するとファイルを新たに読み込みます。
 
@@ -90,7 +92,7 @@
 | `target_level` | | 移動先レベルのシーンファイル。読み込み済みシーンではなくパスなので、2つのレベルを相互に接続できる。インスペクターで選んだ`uid://`パスも使える |
 | `target_spawn` | `default` | 到着先のスポーン地点 |
 | `title` | | 移動先の場所の名前。案内、ローディング画面、看板で使い、表示時に翻訳される |
-| `title_label` | | ポータル上の`Label3D`。ポータルが`title`を書き込む |
+| `title_label` | | ポータル上の`Label3D`。ポータルが`title`を書き込む。エディターでも書き込むが、シーンには看板自身のテキストが保たれる |
 | `traveller_group` | `player` | 移動できるボディが属するグループ |
 | `auto_travel` | オフ | 案内を出さず、移動者が入った時点で移動する |
 
@@ -130,7 +132,7 @@
 
 ## 操作するヒーロー
 
-`gdscript/player/playable_hero.tscn`は、ゲームシーンへすぐ配置できるプレイヤー用のヒーローです。キャラクター（`player.tscn`、`player`グループ）、`PointClickMoveInput`、`CharacterActionInput`、アームとカメラを持つカメラリグ、クリックマーカー、経路線が設定とともにあり、シーン内で6つの接続が行われています。キャラクターシーン自体にはこれらが含まれないので、同じ`player.tscn`をAIで操作することもできます。
+`gdscript/player/playable_hero.tscn`は、ゲームシーンへすぐ配置できるプレイヤー用のヒーローです。キャラクター（`player.tscn`、`player`グループ）、`PointClickMoveInput`、`CharacterActionInput`、アームとカメラを持つカメラリグ、クリックマーカー、経路線が設定とともにあり、シーン内で5つの接続が行われています。キャラクターシーン自体にはこれらが含まれないので、同じ`player.tscn`をAIで操作することもできます。
 
 `PlayableHero`（`playable_hero.gd`）は各部分を型付きプロパティ（`character`、`input`、`actions`、`camera_rig`、`camera_arm`、`camera`、`click_marker`、`path_view`、キャラクターの`sounds`、`appearance`、`hover`、`silhouette`）で公開し、次の3つの操作を提供します。
 
@@ -169,4 +171,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

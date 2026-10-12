@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ e52ff77b332d -->
+<!-- translation of docs/en/project-setup.md @ 2f3486026502 -->
 # Proje yapılandırması
 
 [← Belge dizini](index.md)
@@ -16,10 +16,10 @@ otomatik yüklemesi, arayüz teması, çevirileri, görüntü ayarları ve seviy
 
 | Katman | Ad | Üzerinde ne var | Kim okur |
 |---|---|---|---|
-| 1 | `world` | Zemin, duvarlar, dekor nesneleri, dağ, seviyede duran NPC'ler | Tıklama ışını (`PointClickMoveInput.ground_mask`), oyuncu gövdesi ve `LedgeGuard` (`floor_mask` 0 gövde maskesini alır), `CameraArm.collision_mask`, navigasyon örgüsü pişirme |
-| 2 | `characters` | Oyuncunun gövdesi (`collision_layer = 2`) | `PointOfInterest` ve `LevelPortal` alanları (`collision_mask = 2`); kamera kolu yok sayar |
+| 1 | `world` | Zemin, duvarlar, dekor nesneleri, dağ, seviyede duran NPC'ler | Tıklama ışını (`PointClickMoveInput.ground_mask`), oyuncunun ve devriye gezen karakterlerin gövdeleri, oyuncunun `LedgeGuard` düğümü (`floor_mask` 0 gövde maskesini alır), `CameraArm.collision_mask`, navigasyon örgüsü pişirme |
+| 2 | `characters` | Oyuncunun gövdesi ve devriye gezen karakterler (`collision_layer = 2`) | `PointOfInterest` ve `LevelPortal` alanları (`collision_mask = 2`); birbirlerini durdursunlar diye kahramanın ve devriye gezen karakterlerin gövdeleri, kahramanın maskesi üzerinden de onun `LedgeGuard` düğümü; kamera kolu yok sayar |
 | 3 | `camera` | Yalnızca kamerayı durduran gövdeler, örneğin `shared/world/props/house.tscn` içindeki `RoofCameraBlocker` | Yalnızca `CameraArm.collision_mask` |
-| 4 | `bounds` | Seviyenin kenarındaki görünmez duvarlar, adadaki `Edge` gibi | Oyuncu gövdesi (`collision_mask` = 1 ve 4. katmanlar) ve `LedgeGuard`; örgü istiyorsa navigasyon pişirme (adada) |
+| 4 | `bounds` | Seviyenin kenarındaki görünmez duvarlar, adadaki `Edge` gibi | Oyuncunun ve devriye gezen karakterlerin gövdeleri (`collision_mask` = 1, 2 ve 4. katmanlar), oyuncunun `LedgeGuard` düğümü; örgü istiyorsa navigasyon pişirme (adada) |
 
 `CameraArm.collision_mask` varsayılan olarak 1. ve 3. katmanlardır (`0b101`). 2. katmandaki karakterler kamerayı
 asla itmez. 3. katmandaki bir gövde kamerayı durdurur, ancak tıklamalar, navigasyon ve karakterler için görünmezdir;
@@ -30,7 +30,7 @@ tıklama duvara isabet etmez.
 Navigasyon katmanı 1'in adı `ground`; `NavigationMover.navigation_layers` varsayılan olarak bu katmanı kullanır.
 Fizik ve navigasyon katmanları ayrıdır: çarpışma gövdesinin fizik katmanı ışınların ve gövdelerin neye değdiğini,
 bölgenin navigasyon katmanı hareket düğümünün hangi yolu sorguladığını belirler. Kodda maskeler bit alanıdır:
-1 ve 4. katmanlar `1 | 8 = 9`, 1 ve 3. katmanlar `1 | 4 = 5`. Inspector'da numaralı kutuları seçin.
+1, 2 ve 4. katmanlar `1 | 2 | 8 = 11`, 1 ve 3. katmanlar `1 | 4 = 5`. Inspector'da numaralı kutuları seçin.
 
 ## Girdi eylemleri
 
@@ -101,4 +101,4 @@ penceresinde **Tümünü sıfırla** düğmesini kullanın.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

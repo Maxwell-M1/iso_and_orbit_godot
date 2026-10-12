@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
+<!-- translation of docs/en/systems/audio.md @ b72cbc1a1884 -->
 # 音频
 
 [← 文档目录](../index.md)
@@ -38,4 +38,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

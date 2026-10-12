@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 48c5e73646e2 -->
+<!-- translation of docs/en/systems/characters.md @ bfea84438c4d -->
 # Personagens
 
 [← Índice da documentação](../index.md)
@@ -340,4 +340,4 @@ qualquer outra cena.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

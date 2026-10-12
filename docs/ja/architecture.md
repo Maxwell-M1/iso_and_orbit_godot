@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ adf142a1b736 -->
+<!-- translation of docs/en/architecture.md @ 808ba6991a13 -->
 # アーキテクチャ
 
 [← ドキュメント目次](index.md)
@@ -11,7 +11,7 @@
 
 ```
 Main (Node3D, main.gd)   レベル、ヒーロー、UIをつなぐゲーム全体のシーン
-├── Levels             LevelHost：ローディング画面の背後で切り替わる現在のレベル
+├── Levels             LevelHost：ローディング画面の背後で切り替わる現在のレベル。initial_level = World
 │   └── World          shared/world/world.tscn：開始レベル、ナビゲーション、場所、NPC、パッド
 ├── Hero               gdscript/player/playable_hero.tscn：操作するヒーロー
 │   ├── Character          gdscript/player/player.tscn：GroundCharacter、グループ "player"
@@ -34,7 +34,7 @@ Main (Node3D, main.gd)   レベル、ヒーロー、UIをつなぐゲーム全�
 │   ├── ClickMarker        クリック地点の地面に出るリング
 │   └── PathView           NavigationPathView：デバッグ用の経路線、通常は非表示
 ├── Hud                操作ヒントと速度、FpsCounter、CharacterState、DiscoveryToast、StaminaBar、
-│                      TravelPrompt（パッド上での移動案内）
+│                      TravelPrompt（パッド上での移動案内）、Subtitles（キャラクターのセリフ）
 ├── SettingsApplier    設定 → ノードのプロパティ（デモのみ）
 ├── UiRoot             ゲーム上のウィンドウ：設定ウィンドウ
 └── LoadingScreen      LoadingScreen：レベル読み込み中の画面
@@ -102,6 +102,7 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | | `PointClickMoveInput`（Node） | マウスと右ボタン + WASD → ムーバーへのコマンド。カーソルを隠し、狙いを補正する |
 | | `ClickMarker`（Node3D） | クリックした地点のマーカー（`click_marker.tscn`） |
 | | `NavigationPathView`（MeshInstance3D） | ムーバーの残りの経路を描画する |
+| | `PatrolController`（Node） | レベルに描いたルート（`Path3D`）に沿ってキャラクターを歩かせる。待機し、始点へ戻り、行く手をふさぐキャラクターの前で止まる |
 | `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、ジャンプ、スタミナ付きダッシュ、階段、`move_and_slide()`、モデルの回転。アニメーション、サウンド、インターフェースのために状態、ステップ、踏み切り、着地を通知する |
 | | `FallSettings`（Resource） | 落下時の重力、速度上限、超過速度からの減速。複数のキャラクターで共有できる |
 | | `LedgeGuard`（Node） | 段差でボディを止めるか、縁に沿って滑らせる |
@@ -137,6 +138,8 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `player/player.tscn`、`player_locomotion.tres` | 主人公：すべてのパーツを備えた`GroundCharacter`と、その走行設定 |
 | `player/playable_hero.tscn`、`.gd` | `PlayableHero`。入力、カメラ、クリックマーカー、経路線付きのキャラクターで、ゲームシーンに配置できる |
 | `ui/travel_prompt.tscn`、`.gd` | `TravelPrompt`。キーと場所名を示す、パッド上の移動案内 |
+| `ui/subtitle_display.tscn`、`.gd` | `SubtitleDisplay`。キャラクターのセリフを、その名前とともに画面下部に表示する |
+| `npc/patrol_actor.tscn`、`.gd`、`knight_patrol.tscn`、`island_patrol.tscn` | `PatrolActor`。モデルと頭上の名前を持ち、レベルのルートを歩くキャラクター。騎士と島のレンジャー |
 | `demo/hud.gd` | 操作ヒントと速度表示 |
 | `demo/settings_applier.gd` | 設定をデモのノードに適用する。「設定 → プロパティ」の対応を1か所にまとめる |
 | `settings/game_settings.gd` | `GameSettings`（`Settings`自動読み込み）：デフォルト値、`user://settings.cfg`、`changed`シグナル。エンジンの設定は自身で適用する |
@@ -156,10 +159,9 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `PlayerInput.hold_started` | `ClickMarker.fade_out` | 長押しがクリックに取って代わり、マーカーが消えていく |
 | `Character/NavigationMover.arrived` | `ClickMarker.fade_out` | キャラクターが地点に到達した |
 | `Character/NavigationMover.destination_cancelled` | `ClickMarker.fade_out` | 地点が放棄された |
-| `PlayerInput.hold_pending_changed(pending)` | `CameraRig.set_follow_paused` | 押下がクリックか長押しか判明するまで、カメラは自動で回転しない |
 | `PlayerInput.run_requested` | `CameraRig.end_follow_wait` | 新しい走行で、オービット後に待っていたカメラの追従を再開する |
 
-`main.gd`はレベルホストと移動案内をコードで接続します。[レベル](systems/levels.md#ゲーム全体のシーン)を参照してください。
+`main.gd`はレベルホスト、移動案内、字幕をコードで接続します。[レベル](systems/levels.md#ゲーム全体のシーン)を参照してください。
 
 ## 設定
 
@@ -173,6 +175,7 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 - **ヒーローはレベル内ではなく、レベルホストの隣にいます。** レベルシーンには地面、小道具、ナビゲーション、光、ポータルだけを置きます。ヒーロー、カメラ、UIは切り替え中も残るため、新しいレベルにコピーする必要がなく、スタミナやカメラの高さも失われません。
 - **レベルホストはヒーローを知りません。** 切り替えの各段階をシグナルで通知し、ゲーム全体のシーンが新しいレベルの指定地点へヒーローを置きます。ヒーローはレベルホストなしでも動きます。
 - **カメラはキャラクターの子ではなく兄弟です**。`_process`でターゲットの補間位置へ移り、自身は補間されません。物理補間がオンなら（デフォルトでオン、設定 → 表示）、どのフレームレートでも滑らかです。追従モードでは物理ティックごとの移動から速度を計算するので任意の`Node3D`をターゲットにできます。同じ移動から急反転と緩やかなカーブを区別し、反転中には振り回されません。ばねは短いステップで計算するため、フレームレートが変わっても同様に動きます。
+- **コンポーネントはエディター内で自身をチェックし、エディターは設定した内容だけを保存します。** スクリプトはツールスクリプトです。エディターでは、何かが欠けているか誤っている間は警告を表示し、ゲームが開始時に整えるもの（カメラの視点、キャラクターのモデルと名前）をプレビューします。ただし、そこでゲームを動かすことはなく、プレビューがシーンに書き込まれることもありません。[エディターでのシーン編集](editor_authoring.md)を参照してください。
 - **コンポーネントは設定について何も知りません**。`LedgeGuard`、`PointClickMoveInput`、`OrbitCameraRig`などは自身のプロパティを読むだけで、`Settings`自動読み込みとやり取りするのは`settings_applier.gd`と設定ウィンドウだけです。コンポーネントは設定システムなしで別のプロジェクトへ移せます。
 - **ウィンドウはGodotの慣例に従います**。レイアウトにはコンテナだけを使い、見た目は各ノードのオーバーライドではなく、プロジェクトのテーマとそのタイプバリエーションから決まります。ウィンドウはシグナルで閉じるよう要求し、`UiRoot`がそれを閉じます（呼び出しはツリーを下り、シグナルは上る）。キーは入力アクションです。キーボードフォーカスはウィンドウを開いたときに設定され、閉じたときに元に戻ります。ウィンドウが開いている間はゲームが一時停止し（`UiRoot`は`PROCESS_MODE_ALWAYS`で動作）、カメラはキャプチャしたカーソルを解放します。
 
@@ -181,14 +184,14 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | フォルダ | 内容 |
 |---|---|
 | `addons/iso_orbit/` | 再利用可能なコンポーネント。パーツごとに1つのフォルダ |
-| `gdscript/` | GDScriptによるデモ：メインシーン、主人公、設定システムと設定ウィンドウ、HUDのヒント |
+| `gdscript/` | GDScriptによるデモ：メインシーン、主人公、巡回するNPC、設定システムと設定ウィンドウ、HUDのヒント、字幕 |
 | `shared/` | スクリプト言語に依存しないデモコンテンツ：レベル、キャラクターと装備、ワールドのシェーダーとテクスチャ、サウンド、UIテーマ |
 | `l10n/` | インターフェースの翻訳 |
 | `tests/` | ヘッドレステスト。[テスト](testing.md)を参照 |
 | `docs/` | このドキュメント |
 
-`shared/`は将来のC#版デモでも再利用する想定で、C#版は`gdscript/`の隣に専用フォルダを持ちます。現時点では2つ例外があります。レベルとパッドがコンポーネントのスクリプトを使うこと（`world.tscn`、`island.tscn`、`mountain.tscn`は`point_of_interest.gd`、各レベルは`spawn_point.gd`、`teleport_pad.tscn`は`level_portal.gd`）、そして小道具用の`flicker.gd`と`hover_spin.gd`が`shared/world/props/`にあることです。[既知の問題](known-issues.md)を参照してください。
+`shared/`は将来のC#版デモでも再利用する想定で、C#版は`gdscript/`の隣に専用フォルダを持ちます。現時点では3つ例外があります。レベルとパッドがコンポーネントのスクリプトを使うこと（`world.tscn`、`island.tscn`、`mountain.tscn`は`point_of_interest.gd`、各レベルは`spawn_point.gd`、`teleport_pad.tscn`は`level_portal.gd`）、レベルがデモの巡回するキャラクター（`gdscript/npc/knight_patrol.tscn`、`island_patrol.tscn`）を配置すること、そして小道具用の3つのスクリプト（`static_prop.gd`、`flicker.gd`、`hover_spin.gd`）が`shared/world/props/`にあることです。[既知の問題](known-issues.md)を参照してください。
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

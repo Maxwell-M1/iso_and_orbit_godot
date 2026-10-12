@@ -57,11 +57,11 @@ The mesh is baked in advance and stored right in each level's scene, `shared/wor
 it. After editing a level, rebake its mesh. Both use the same parameters, except the collision mask: the island's
 mesh is baked from layers 1 and 4.
 
-**When:** you moved, added, removed or resized anything with a collision shape on layer 1 (`world`): a rock, a crate,
-a wall, a tree, a prop, an NPC, the mountain; on the island also an invisible wall (layer 4, `bounds`). Not needed
-when only the look changed (a mesh, a
-material), or for bodies on layer 3 (`camera`), the player's character (layer 2) and areas (`Area3D`). If you forget,
-paths go through a moved object (the character runs into it and slides along) or around the empty spot where it stood.
+**When:** you moved, added, removed or resized anything with a collision shape on layer 1 (`world`): a rock, a crate, a
+wall, a tree, a prop (also by its `dimensions`), a standing NPC, the mountain; on the island also an invisible wall
+(layer 4, `bounds`). Not needed when only the look changed (a mesh, a material), or for bodies on layer 3 (`camera`),
+the characters that move (layer 2) and areas (`Area3D`). If you forget, paths go through a moved object (the character
+runs into it and slides along) or around the empty spot where it stood.
 
 **In the editor:**
 
@@ -95,26 +95,33 @@ character's path.
 - **The ten hero looks** in a row with their backs to the south wall, east of the gap (see
   [Characters](characters.md#hero-looks)).
 
-Edit the prop instances in the level scene to change the layout, then rebake navigation. The regression tests use
-specific routes and obstacle positions in this demo; use a separate level for your own layout, or update the tests
-alongside changes to their test geometry.
+Every solid prop has a `StaticProp` root: move it by the root and resize it with `dimensions`, which changes its model
+and collision together; the grove's trees and the rocks are instances of `grove_tree.tscn` and `rock.tscn` in different
+sizes. See [Editing scenes in the editor](../editor_authoring.md#solid-props). Edit the prop instances in the level
+scene to change the layout, then rebake navigation. The regression tests use specific routes and obstacle positions in
+this demo; use a separate level for your own layout, or update the tests alongside changes to their test geometry.
 
 ### Places and NPCs
 
 Four places are `PointOfInterest` areas. The first time the player enters one, "Discovered: …" appears at the top
-of the screen for a few seconds. NPCs stand at each place with name labels (`Label3D`) above their heads, facing
-its center; the Knight faces down the road.
+of the screen for a few seconds. NPCs stand at the places with name labels (`Label3D`) above their heads, facing
+their centers; the Knight walks a round from the farmstead.
 
 | Place | Where | Who is there |
 |---|---|---|
 | Windswept Peak | The top of the mountain in the north-east | The Wizard, by an altar with a crystal |
 | Travelers' Camp | East: tent, campfire, barrels | The Ranger and the Dwarf at the fire |
-| Farmstead by the Well | South-west: house, well | The Knight on guard by the road |
+| Farmstead by the Well | South-west: house, well | The Knight, who walks a round through the hedge maze and back |
 | Ancient Circle | The ring of columns north-west of the spawn | The Rogue by the altar |
 
-Each NPC is a `StaticBody3D` with a capsule on layer 1 (`World/NavigationRegion3D/Characters`): the navigation mesh
-goes around them and nobody walks through them. The camp, the farmstead and the ruins are under `World/Places`; the
-peak is in `mountain.tscn`.
+Each standing NPC is a `StaticBody3D` with a capsule on layer 1 (`World/NavigationRegion3D/Characters`): the navigation
+mesh goes around them and nobody walks through them. The Knight is a `PatrolActor`, a character on layer 2 that walks
+the route `World/Routes/KnightPatrol` through the maze and back to his place by the house and the well, waits there 10 s
+and goes again ([PatrolController](locomotion.md#patrolcontroller-walking-a-route)). He and the hero collide, and he
+stops when the hero stands in front of him, within a meter; at his sides and behind him the hero does not stop him. When
+the hero has stood in his way for 2.5 s, he asks about his father in the subtitles. On Lonely Isle a ranger walks a
+short round near the arrival point, stopping for a second at each point of his route. The camp, the farmstead and the
+ruins are under `World/Places`; the peak is in `mountain.tscn`.
 
 **A new place:** add a `PointOfInterest` (an `Area3D` whose `collision_mask` includes the characters' layer 2) with
 a collision shape and a `title` to any world scene. The toast finds every place through its group, also on a level
@@ -219,4 +226,4 @@ then shows as a silhouette (see [Characters](characters.md#occludedsilhouette-on
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

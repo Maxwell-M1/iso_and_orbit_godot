@@ -1,5 +1,4 @@
-<!-- translation of docs/en/controls.md @ 18ede9271cf7 -->
-<!-- translation of docs/en/controls.md @ pending -->
+<!-- translation of docs/en/controls.md @ a842ae064734 -->
 # Controles
 
 [← Índice da documentação](index.md)
@@ -39,7 +38,8 @@ Após 0.2 s o sistema decide se o botão foi clicado ou mantido pressionado.
 - **Botão segurado** (por mais tempo): o herói corre imediatamente atrás do cursor, sem desviar até o ponto
   original do pressionamento.
 
-Até a decisão, o herói continua o que já fazia.
+Até a decisão, o herói continua o que já fazia, o cursor fica onde você o deixou e uma câmera que acompanha a corrida
+continua girando.
 
 Como ele segue o botão segurado (Configurações → Controles → **BEM segurado**):
 
@@ -128,11 +128,11 @@ menu para remapear teclas durante o jogo.
 - **Zoom:** a roda muda distância e inclinação juntas. Abaixo da metade, a câmera se nivela rapidamente para
   mostrar o caminho à frente.
 - **Acompanhamento** (desligado por padrão): Configurações → Câmera → **Virar a câmera para seguir a corrida**,
-  **Alinhar a inclinação da câmera na corrida** e **Alinhar a altura da câmera na corrida**. A câmera não
-  acompanha com o direito pressionado nem durante os primeiros 0.2 s de um pressionamento do esquerdo. Depois
-  de girá-la com o direito, inclusive ao olhar em volta correndo, ela permanece como você deixou até o herói
-  parar ou começar outra corrida com o esquerdo (clique ou botão segurado). Assim não dá a volta durante a
-  frenagem nem numa corrida já iniciada por clique. Teclas exigem o direito, por isso não são acompanhadas.
+  **Alinhar a inclinação da câmera na corrida** e **Alinhar a altura da câmera na corrida**. A câmera não acompanha com
+  o direito pressionado; cliques não a interrompem. Depois de girá-la com o direito, inclusive ao olhar em volta
+  correndo, ela permanece como você deixou até o herói parar ou começar outra corrida com o esquerdo (clique ou botão
+  segurado). Assim não dá a volta durante a frenagem nem numa corrida já iniciada por clique. Teclas exigem o direito,
+  por isso não são acompanhadas.
 - **Obstáculos:** a câmera para antes de encosta, parede ou teto atrás dela. Opcionalmente, aproxima-se quando um
   obstáculo esconde o herói. Atrás de obstáculos, ele aparece como silhueta.
 
@@ -160,4 +160,4 @@ Detalhes: [Locomoção](systems/locomotion.md).
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

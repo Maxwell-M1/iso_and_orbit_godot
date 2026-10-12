@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 78c912e8971a -->
+<!-- translation of docs/en/systems/locomotion.md @ 9cb53e2dd91e -->
 # Locomoção
 
 [← Índice da documentação](../index.md)
@@ -65,10 +65,8 @@ clicado logo à frente pode usar `max_braking_multiplier` para parar mais cedo.
 um ajuste; valores salvos podem substituir os acima. O addon em si não tem sistema de configurações. Para ajustar
 a demo em execução, use Cena → Remote → `Hero/Character/NavigationMover` → `settings`. O código lê os campos do
 recurso a cada tick, mas alterações no inspetor Remote não são salvas: copie o resultado para o `.tres`. Use um
-recurso separado por personagem se mudanças em execução não devem afetar os demais. Atribua-o antes de o
-movimentador entrar na árvore ou use **Make Unique** no editor: após `_ready()`, `GroundMotion` retém o recurso
-original, então substituir `mover.settings` não altera seus ajustes. Durante o jogo, edite os campos do recurso
-existente.
+recurso separado por personagem se mudanças em execução não devem afetar os demais: atribua outro recurso ou use
+**Make Unique** no editor. Substituir `mover.settings` durante o jogo tem efeito imediato.
 
 Um recurso pode ser compartilhado por vários personagens, por exemplo todos os NPCs de um mesmo tipo.
 
@@ -126,6 +124,57 @@ tanto, e é por isso que o movimentador segue o caminho ele mesmo em vez de usar
 opõe à orientação: direto para trás recebe o `backward_speed_multiplier` inteiro, na diagonal para trás uma parte dele
 (S + D no modo lateral: 21% mais lento), de lado nada. Então a redução só existe no modo lateral das teclas, veja
 [Entrada](input.md).
+
+## PatrolController: percorrendo uma rota
+
+`PatrolController` faz um personagem percorrer uma rota desenhada no nível guiando o seu `NavigationMover`: o próprio
+script do personagem continua movendo o corpo. Na rota, o personagem segue em direção a um ponto da linha à frente dele,
+sem busca de caminho, então desenhe a linha onde o personagem caiba; a navegação o leva do seu lugar até a rota e de
+volta. O cavaleiro da demo e o patrulheiro da ilha andam com ele, veja
+[Mundo e navegação](world-and-navigation.md#locais-e-npcs).
+
+A rota é um `Path3D` do nível, fora do personagem, desenhado com as ferramentas de curva do editor. O personagem
+percorre a linha que o editor desenha para a rota, a mesma que um `PathFollow3D` segue: os pontos, as alças deles e o
+**Bake Interval** da curva lhe dão forma. Com as alças vazias e um Bake Interval curto (o padrão é 0.2 m), a linha vai
+reta de ponto a ponto; puxe as alças de um ponto para arredondar o canto dele. Um Bake Interval maior que os lados faz o
+editor desenhá-los curvos pelos pontos, e o personagem os percorre curvos. Quando uma patrulha começa (`restart()`, ou o
+controlador ligado), são tomados pontos nessa linha a cada `sample_spacing`. O personagem avança por eles sem parar,
+mirando o ponto da linha que fica a `look_ahead` dele, então vira suavemente nas curvas, cortando-as um pouco, e para
+exatamente no último ponto; então volta pelo caminho mais curto para onde a patrulha começou (`return_to_start`), espera
+`cycle_wait` e recomeça (`repeat`). Sem `return_to_start`, ele espera no último ponto e depois anda até o primeiro. Os
+caminhos do lugar do personagem até o primeiro ponto e de volta não estão na linha desenhada: para manter o personagem
+nela, coloque-o no primeiro ponto e feche a curva (**Closed**). Uma curva alterada é lida no próximo início. Um script
+pode fornecer os pontos ele mesmo (`set_route_points()`); sem rota, o controlador não faz nada, então um personagem sem
+rota apenas fica parado.
+
+Um personagem à frente do corpo detém a patrulha: um que esteja numa área como o facho de uma lanterna, da frente do
+corpo até `blocking_distance` adiante, tão larga quanto o corpo ali e que se abre `blocking_angle` para cada lado. Um
+personagem ao lado ou atrás não a detém. A patrulha espera pelo mesmo ponto em vez de pulá-lo e segue quando o caminho
+fica livre. Após `blocked_delay` segundos sem interrupção, vem `blocked_long_enough(blocker)`, uma vez por parada; o
+cavaleiro da demo então diz sua fala. Para ser parado por outros personagens, a máscara de colisão do corpo precisa
+incluir a camada deles: na demo, os personagens estão na camada 2, e as máscaras do herói e do cavaleiro a incluem.
+
+| Propriedade | Padrão | Significado |
+|---|---|---|
+| `character`, `mover` | vazio: o pai e seu primeiro filho `NavigationMover` | O corpo a conduzir e seu movimentador, filho direto do corpo |
+| `route` | vazio | O `Path3D` do nível a percorrer |
+| `sample_spacing` | 0.25 m | O maior passo entre os pontos tomados na linha da rota |
+| `look_ahead` | 0.75 m | A que distância na linha o personagem mira: mais longe vira com mais suavidade e corta mais as curvas |
+| `enabled` | ligado | Desligado: o personagem se detém onde está. Ligado de novo: uma nova patrulha começa dali |
+| `repeat`, `return_to_start` | ligado, ligado | Recomeçar após uma ronda; voltar ao início após o último ponto |
+| `cycle_wait` | 10 s | A espera no início após uma ronda, em tempo de jogo |
+| `waypoint_wait` | 0 s | A parada em cada ponto de controle da curva |
+| `blocked_delay` | 6 s | Quanto tempo um personagem precisa ficar no caminho antes de `blocked_long_enough` |
+| `blocking_distance` | 1 m | A que distância à frente do corpo outro personagem o detém |
+| `blocking_angle` | 25° | Quanto essa área se abre para cada lado |
+
+Com a navegação ligada (`NavigationMover.use_navigation`), uma patrulha espera pelo mapa de navegação antes de
+começar. `stop()` para o personagem na hora e desliga a patrulha. `get_state()`, `get_waypoint_index()`,
+`get_completed_cycles()` e `get_blocked_time()` dizem o que ela está fazendo; `cycle_completed` vem após cada ronda.
+
+O `PatrolActor` da demo (`gdscript/npc/patrol_actor.tscn`) é um personagem pronto com esse controlador, seu modelo e
+o nome sobre a cabeça: coloque uma instância num nível e defina sua **Route**, veja
+[Editando cenas no editor](../editor_authoring.md#patrulhas).
 
 ## GroundCharacter
 
@@ -501,4 +550,4 @@ Os testes de cena em `tests/movement_checks.gd`, `tests/character_actions_checks
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

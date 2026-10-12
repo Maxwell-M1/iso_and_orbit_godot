@@ -1,5 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 94f2d396a032 -->
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ pending -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 920ed88160c2 -->
 # Câmera orbital
 
 [← Índice da documentação (repositório do modelo)](../../../docs/pt_BR/index.md)
@@ -40,8 +39,10 @@ Parte do Iso & Orbit para Godot 4.7. Licença MIT (veja `LICENSE`). Sozinha, est
 
    Rig e braço encontram, respectivamente, seus primeiros filhos diretos `CameraArm` e `Camera3D`; também é
    possível definir as referências exportadas `arm` e `camera`. Deixe a transformação local de `Camera3D` no
-   padrão: o braço a posiciona. Ative a câmera se ela for a visão atual. Para o enquadramento do modelo, use campo
-   de visão de 45° e plano distante de 300 unidades do mundo.
+   padrão: o braço a posiciona; no editor, o rig a mostra onde o jogo a põe no início (`start_zoom`, `start_yaw`), e
+   ao salvar ficam os valores da própria cena.
+   Ative a câmera se ela for a visão atual. Para o enquadramento do modelo, use campo de visão de 45° e plano distante
+   de 300 unidades do mundo.
 4. Ponha a colisão sólida do mundo na camada de física 1. O `collision_mask` padrão do braço inclui as camadas 1
    e 3 (`0b101`); a 3 pode conter bloqueios só da câmera, como tetos. Deixe personagens fora dessa máscara para
    não empurrarem a câmera. Ponha `camera_ignore` num corpo ou ancestral para excluí-lo. Opcionalmente, defina
@@ -58,13 +59,14 @@ seus tempos e destinos tenham valores. Para o acompanhamento opcional ajustado n
 `follow_zoom` somente se quiser esses alinhamentos. O herói do modelo deixa os três desligados inicialmente. No
 Inspector, informe os ângulos em graus; em GDScript, atribua radianos com `deg_to_rad()`.
 
-Com `follow_wait_after_rotate` ativo, o acompanhamento fica em espera após girar a câmera de propósito com o mouse,
-até o alvo diminuir a velocidade ou começar outra corrida. Se a entrada iniciar nova corrida antes de o alvo parar,
-chame `end_follow_wait()`. O modelo conecta `PointClickMoveInput.run_requested` a esse método e
-`hold_pending_changed` a `set_follow_paused()` em `gdscript/player/playable_hero.tscn`. Se o alvo se move sem parar
-e não pode informar o início de outra corrida, desligue essa espera. Mantenha `sharp_turn_speed` na metade da
-velocidade de giro do personagem ou menos, para uma inversão não puxar a câmera por direções intermediárias; o
-modelo combina 360°/s com os 720°/s do herói.
+Com `follow_wait_after_rotate` ativo, o acompanhamento fica em espera após girar a câmera de propósito com o mouse, até
+o alvo diminuir a velocidade ou começar outra corrida. Se a entrada iniciar nova corrida antes de o alvo parar, chame
+`end_follow_wait()`. O modelo conecta `PointClickMoveInput.run_requested` a esse método em
+`gdscript/player/playable_hero.tscn`. Ele não pausa o acompanhamento nos pressionamentos do botão do mouse
+(`set_follow_paused()`): um clique pararia um giro em curso, e o giro recomeçaria. Se o alvo se move sem parar e não
+pode informar o início de outra corrida, desligue essa espera. Mantenha `sharp_turn_speed` na metade da velocidade de
+giro do personagem ou menos, para uma inversão não puxar a câmera por direções intermediárias; o modelo combina 360°/s
+com os 720°/s do herói.
 
 Sem braço, um `Camera3D` filho direto do rig também funciona. Ele permanece à distância do zoom e pode atravessar
 paredes; resposta a obstáculos e transparência exigem `CameraArm`.
@@ -76,4 +78,4 @@ Para curva de zoom, propriedades, ocultação e interações testadas, veja
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

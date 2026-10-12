@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 70ad45747177 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 8647f511d8bb -->
 # 兴趣点
 
 [← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
@@ -37,4 +37,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

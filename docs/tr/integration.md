@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 502ddfce7182 -->
+<!-- translation of docs/en/integration.md @ 8543b901c9a7 -->
 # Kendi projenizde kullanma
 
 [← Belge dizini](index.md)
@@ -24,7 +24,7 @@ aynı konumu belirtir. İlk çalışan kuruluma kadar sağlanan klasör düzenin
 | Eklenti | Sınıflar | Gereksinimler |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`, `CameraArm` | `camera_rotate`, `camera_zoom_in`, `camera_zoom_out` girdi eylemleri; kol için fizik katmanları |
-| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView` | Dünyada pişirilmiş bir `NavigationRegion3D` (yoksa karakter noktaya düz koşar). Girdi için: herhangi bir `Camera3D` ve `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` eylemleri |
+| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView`, `PatrolController` | Dünyada pişirilmiş bir `NavigationRegion3D` (yoksa karakter noktaya düz koşar). Girdi için: herhangi bir `Camera3D` ve `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` eylemleri |
 | `ground_character` | `GroundCharacter`, `FallSettings`, `LedgeGuard`, `Stamina`, `CharacterActionInput`, `CharacterSounds`, `HandSway`, `CharacterHover`, `DampedSpring`, `CharacterAppearance`, `StaminaBar` | `click_to_move`. Tuşlar için `sprint` ve `jump` eylemleri. Sesler için kendi dosyalarınız veya `shared/audio/character/`. El sallanması ve değiştirilebilir modeller için −Z yönüne bakan, el düğümü bulunan modeller |
 | `occluded_silhouette` | `OccludedSilhouette`, gölgelendiricileri ve malzemeleriyle | Hiçbir şey: her modelde çalışır |
 | `points_of_interest` | `PointOfInterest`, `DiscoveryToast` | Oyuncunun gövdesi `player` grubunda ve alanların gördüğü bir fizik katmanında |
@@ -104,12 +104,13 @@ değil, bir kez ekleyin. `playable_hero.gd` yalnızca eklenti sınıflarını ku
 - Parçalar türü belirtilmiş özelliklerdir: `character`, `input`, `actions`, `camera_rig`, `camera_arm`, `camera`,
   `click_marker`, `path_view` ve karakterin `sounds`, `appearance`, `hover`, `silhouette` alanları.
 
-Kendi modeliniz için `player.tscn` yerine kendi karakterinizin konduğu bir sahne kopyası oluşturun veya parçaları
-elle birleştirin. Kamera için önemli iki bağlantı: `PointClickMoveInput.hold_pending_changed` →
-`OrbitCameraRig.set_follow_paused` ve `PointClickMoveInput.run_requested` → `OrbitCameraRig.end_follow_wait`
+Kendi modeliniz için `player.tscn` yerine kendi karakterinizin konduğu bir sahne kopyası oluşturun veya parçaları elle
+birleştirin. Kamera için önemli bağlantı: `PointClickMoveInput.run_requested` → `OrbitCameraRig.end_follow_wait`
 (kamera, elle döndürmeden sonra yeni koşuyu bekler). Diğer dört bağlantı tıklama işaretini gösterip gizler; bkz.
-[Mimari](architecture.md#sahnede-kurulan-bağlantılar). Kameranın `sharp_turn_speed` değerini karakter dönüş hızının
-yarısında veya altında tutun; bunu yalnızca `PlayableHero` denetleyip uyarır.
+[Mimari](architecture.md#sahnede-kurulan-bağlantılar). Şablonun 1.3.0 öncesinde yaptığı gibi `hold_pending_changed`
+sinyalini `set_follow_paused` yöntemine bağlamayın: her tıklama kameranın dönüşünü durdururdu. Kameranın
+`sharp_turn_speed` değerini karakter dönüş hızının yarısında veya altında tutun; bunu yalnızca `PlayableHero` denetleyip
+uyarır.
 
 ## Demonun kahramanını projenize aktarma
 
@@ -136,7 +137,7 @@ başlayın; kendi modellerinizi, seviyelerinizi ve ayarlarınızı kopyalanan ka
      atanmış bütün örgüler aynı hücre boyutlarını kullanmalıdır.
    - Fizik enterpolasyonu açık (`physics/common/physics_interpolation`): kamera karakterin enterpolasyonlu konumunu
      izler. Kahraman Jolt Physics (`physics/3d/physics_engine`) ile denetlenmiştir.
-   - Fizik katmanları: kahraman gövdesi 2. katmanda, 1 ve 4 ile çarpışır; tıklama zemini 1. katmanda arar; kamera
+   - Fizik katmanları: kahraman gövdesi 2. katmanda, 1, 2 ve 4 ile çarpışır; tıklama zemini 1. katmanda arar; kamera
      kolu 1 ve 3'te durur. Adları değil, sayıları önemlidir: zemini ve duvarları 1. katmana koyun veya sahne
      kopyanızdaki maskeleri değiştirin.
 3. **Test seviyesi oluşturun.** Bir `NavigationRegion3D` altında `StaticBody3D` zemin kurun: görünür `BoxMesh` ve
@@ -210,7 +211,7 @@ sayfasına bakın.
 | Tıklama çalışmıyor | Input Map eylemi, etkin kamera, `PlayerInput.camera`, ışının `ground_mask` değeri; üstteki bir Control fare girdisini tüketebilir |
 | Kahraman duvarın çevresinden dolaşmıyor | Bölgenin altındaki çarpışmaları pişirin, bölge ve hareket düğümünün navigasyon katmanlarını kontrol edip oluşan örgüyü inceleyin |
 | Yol, çıkılamayan bir basamağın üzerinden geçiyor | Çıkılabilir yüksekliği `max_step_height` ile eşleştirip küçük dikey hücrelerle yeniden pişirin; gerçek geometriyi deneyin |
-| Sahne düzenlemeleri başlangıçta kayboluyor | Kopyalanmış `SettingsApplier` onları kaydedilmiş ayarlarla değiştirebilir; tek başına kahraman onu gerektirmez |
+| Sahne düzenlemeleri başlangıçta kayboluyor | Kopyalanmış `SettingsApplier` onları kaydedilmiş ayarlarla değiştirebilir: `use_saved_settings` özelliğini kapatın ya da onu hiç almayın, çünkü tek başına kahraman onu gerektirmez |
 | Hareket değişince kamera beklenmedik biçimde dönüyor | Karakterin `turn_speed` ve kameranın `sharp_turn_speed` değerlerini karşılaştırın; bkz. [Yapılandırmalar](configurations.md#yapılandırmayı-bozmadan-ince-ayar) |
 
 Bilmekte yarar var:
@@ -227,13 +228,14 @@ Bilmekte yarar var:
 
 ## Seviyeler
 
-`addons/iso_orbit/levels/` klasörünü kopyalayın. Ana sahnede başlangıç seviyesini tek çocuk olarak tutan
-`LevelHost`, yanında kahraman ve `loading_screen.tscn` bulunur. Ana betiğiniz sunucunun sinyallerini bağlar:
-`level_change_started` geldiğinde kontrolleri kapatın; `level_loaded(level, spawn)` geldiğinde kahramanı `spawn`
-noktasına koyun; `level_change_finished` geldiğinde kontrolleri açın. `level_change_failed` geldiğinde de açın
-(seviye yerinde kalır ve `level_change_finished` gelmez). `portal_entered` ve `portal_exited` ile yolculuk teklifini
-gösterip gizleyin. `gdscript/main.gd` tam olarak bunu yapar. Her seviyede `default` adlı bir `SpawnPoint` gerekir;
-portallar hedef sahne yolunu taşıyan `LevelPortal` alanlarıdır.
+`addons/iso_orbit/levels/` klasörünü kopyalayın. Ana sahnede başlangıç seviyesini çocuğu olarak tutan bir
+`LevelHost` (başka 3B çocukları da varsa başlangıç seviyesini `initial_level` alanında belirtin), yanında kahraman ve
+`loading_screen.tscn` bulunur. Ana betiğiniz sunucunun sinyallerini bağlar: `level_change_started` geldiğinde
+kontrolleri kapatın; `level_loaded(level, spawn)` geldiğinde kahramanı `spawn` noktasına koyun;
+`level_change_finished` geldiğinde kontrolleri açın. `level_change_failed` geldiğinde de açın (seviye yerinde kalır
+ve `level_change_finished` gelmez). `portal_entered` ve `portal_exited` ile yolculuk teklifini gösterip gizleyin.
+`gdscript/main.gd` tam olarak bunu yapar. Her seviyede `default` adlı bir `SpawnPoint` gerekir; portallar hedef
+sahne yolunu taşıyan `LevelPortal` alanlarıdır.
 
 Kendi seviye sisteminizle yalnızca oynanabilir kahramanı alıp seviyeler hazır olduğunda `place_at()` çağırın; kendi
 karakterinizde aynı etki için `GroundCharacter.teleport()` kullanın. Ayrıntılar, varsayılanlar ve ayar birleşimleri:
@@ -315,4 +317,4 @@ arayüz öğelerini `gdscript/ui/settings/` içinden alın; bkz. [Arayüz](syste
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

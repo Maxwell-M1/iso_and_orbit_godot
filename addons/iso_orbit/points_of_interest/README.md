@@ -41,4 +41,4 @@ In the template repository: `docs/en/systems/world-and-navigation.md`, `docs/en/
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ fd518f56694a -->
+<!-- translation of docs/en/testing.md @ cce377f8600d -->
 # Testler
 
 [← Belge dizini](index.md)
@@ -42,16 +42,18 @@ olanları seçin; sistemler arası değişimi bütünleştirmeden önce tam çal
 | Test paketi | Başlıca denemeler |
 |---|---|
 | `movement_checks.gd` | Hızlanma, frenleme, yeni hedef, dönüş, erişilir ve erişilmez hedefler, engellerin çevresindeki rotalar, rampalar ve kenarlar |
-| `world_checks.gd` | Demo arazisinde navigasyon, keşif alanları, statik NPC çarpışmaları ve sergilenen kahraman modelleri |
+| `world_checks.gd` | Demo arazisinde navigasyon, keşif alanları, yerlerdeki karakterlerle çarpışmalar ve sergilenen kahraman modelleri |
 | `hero_look_checks.gd` | On kahraman modelinin değiştirilmesi, ekipman yerleşimi, siluetler ve el hareketi |
 | `character_actions_checks.gd` | Depar ve yorgunluk, basılı/aç-kapa girdi, tuş ataması ve değiştiricinin bırakılması, zıplama tamponu/kenar sonrası süre, düşüş geçersiz kılmaları, sinyaller ve sesler |
 | `character_state_checks.gd` | Kurulum uyarıları, durum ve animasyon verisi, basamak/eğimler, ışınlama, süzülme, enterpolasyon, duran oyun zamanı ve izleme paneli |
 | `input_checks.gd` | Tıklama ve basılı tutma, iki tuşun sırası ve iki tutma modu, klavye modları, imleç yakalama, iptal ve eksik eylemler |
-| `camera_checks.gd` | Farklı kare/tik hızlarında kamera dönüşü, yakınlaştırma ve takip; keskin dönüş, kameraya doğru koşu, elle dönüş sonrası bekleme, eğim/yakınlaştırma/yükseklik hizalama ve ışınlama |
+| `camera_checks.gd` | Farklı kare/tik hızlarında kamera dönüşü, yakınlaştırma ve takip; keskin dönüş, kameraya doğru koşu, elle dönüş sonrası bekleme, takibi kesmeyen tıklamalar, eğim/yakınlaştırma/yükseklik hizalama ve ışınlama |
 | `camera_arm_checks.gd` | Engelden kaçınma, çarpışma katmanları, yok sayılan gruplar, isteğe bağlı örtülme yaklaşması ve yakında saydamlaşma |
 | `settings_window_checks.gd` | Duraklama ve odak, her ayar sekmesi, özellik eşleme, bağımlı kontroller, arayüz ölçeği, sıfırlama ve kapatma |
 | `localization_checks.gd` | Çeviri kapsamı, korunan eylem simgeleri, dil değişimi, yeniden atanmış 12 eylemin adı, açık araç ipucu/pencere/yükleme ipuçları ve çeviri kalıtımı |
 | `level_checks.gd` | Doğuş noktaları, yolculuk teklifleri, yükleme ilerlemesi ve duraklama, sahne değişimi, korunan kahraman durumu ve hatadan kurtarma |
+| `patrol_checks.gd` | Şövalyenin rotası için çizilen çizgi boyunca, rotanın her noktasından geçen ve yumuşakça dönen turu, kendi yerindeki bekleme ve sonraki tur; kahraman için duruş ve 2,5 sn sonraki replik; devriyeyi yalnızca önündeki, bir metre ileride ve biraz yanlardaki bir karakterin durdurması; adanın korucusu ve duruşları; döndürülmüş ve kapalı eğrilerden ve bir betikten gelen rotalar; uzun ve kısa bir Bake Interval ile rota noktalarının çizilen çizgi üzerinde olması, kontrol noktalarındaki duruşlar; eksik bağlantılar |
+| `editor_authoring_checks.gd` | Hareket düğümlerince paylaşılan ve oyun sırasında değiştirilen bir hareket ayarları kaynağı; ayarlar dosyasının yolu, sahnenin değerleri yerine geçen kaydedilmiş ayarlar ve `use_saved_settings` kapalıyken korunan sahne değerleri; başlangıç seviyesi; kurulum uyarıları; bütün olarak dekor nesneleri (taşıma, `dimensions` ve onun 0 değeri, ölçeklenmiş bir kök, Surface Material, eklenen parçalar, bir model, hareketli bir parça); kamera istisnasının anahtarı ve açısı |
 
 Belgelenen girdi/kamera yapılandırmaları için `movement`, `character_actions`, `input`, `camera` ve
 `settings_window` ile başlayın. `camera` filtresi iki kamera paketini de seçer. Kahramanı başka projeye taşırken
@@ -60,8 +62,11 @@ geçmek, gereken her dosya ve proje ayarının kopyalandığını kanıtlamaz.
 
 ## Testlerin davranışı
 
-- Varsayılan ayarlarla çalışırlar ve hiçbir şey kaydetmezler: oyuncunun ayarları çalıştırma süresince varsayılanlara
-  sıfırlanır ve hiçbir zaman üzerine yazılmaz.
+- Varsayılan ayarlarla çalışırlar ve oyuncunun ayarlarına hiç dokunmazlar: ayarlar çalıştırma süresince
+  varsayılanlara sıfırlanır ve hiç kaydedilmez; bir ayarlar dosyası okuyan tek denetim de kendi dosyasını `.godot/`
+  içine yazar ve sonra siler.
+- Devriye gezen karakterler `patrol_checks.gd` dışındaki her test paketinde yerinde durur; o paket onları kendisi
+  başlatır: yürüyen bir şövalye diğer denetimlerin yoluna çıkardı.
 - Her denetim değiştirdiği şeyi geri yükler. Test paketleri tek bir ana sahne üzerinde art arda çalışır, tek başına
   çalıştırılan bir paket ise yeni bir sahne alır; denetim iki durumda da geçmelidir. Her denetimden sonra
   `Engine.time_scale` 1'e döner; zaman yavaşken veya durmuşken çöken denetim sonrakini etkilemez.
@@ -81,6 +86,21 @@ geçmek, gereken her dosya ve proje ayarının kopyalandığını kanıtlamaz.
   `VISIBLE`), bu yüzden gizli imleç için testler `PointClickMoveInput.is_cursor_hidden()` değerini okur.
 - Sınırlar mümkün olduğunca bileşenlerin ayarlarından hesaplanır; bu yüzden `LocomotionSettings` ayarlamak testleri
   tek başına bozmaz.
+
+## Editördeki denetimler
+
+`tests/run_checks.gd` oyunu çalıştırır; bileşenlerin editör tarafı ise yalnızca editörde çalışır ve kendi denetimleri
+vardır: `tests/editor_tool_checks.tscn` sahnesini editörde açın ve Inspector'da **Run Checks** düğmesine basın. Bu
+denetimler oyunun gösteremediklerini kapsar: bir sahne düzenlenirken uyarının güncellendiğini (bağımlı bir düğüm, bir
+kaynak, bir devriyenin gövdesine eklenen veya gövdesinden alınan bir hareket düğümü), kameranın, dekor nesnelerinin,
+devriye gezen karakterlerin ve bir portal tabelasının önizlemelerini editörde gösterirken kaydedilen sahnenin
+ayarlananı koruduğunu, kalıtılmış bir dekor nesnesinin temel sahnesini izlemeyi sürdürdüğünü, girdi haritasının
+yalnızca editörün kendi eylemlerini tuttuğu editörde projenin girdi eylemlerinin sayıldığını, oyunun anahtarlarının
+(süzülme, bir devriye) editörde hiçbir şeyi değiştirmediğini, kopyalanmış bir devriye karakterinin tek bir model
+gösterdiğini ve betiği `@tool` olmadan `CameraArm` sınıfını genişleten bir kamera kolunun yine başlangıç görüntüsünü
+gösterdiğini. Inspector'daki **Status** ve **Results** sonucu gösterir ve sahneyle birlikte kaydedilmez; sonuç
+`.godot/editor_tool_checks/results.json` dosyasında da bulunur, çıktıya da durum satırı yazılır. Denetimler
+sahnelerini yalnızca her çalıştırmada temizlenen `.godot/editor_tool_checks/` klasörüne yazar.
 
 ## Denetim yazma
 
@@ -109,4 +129,4 @@ o çalıştırma için tüm oyunu bozar. Ayarlar düğümünü `_tree.root.get_n
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

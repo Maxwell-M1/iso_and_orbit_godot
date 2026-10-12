@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 70ad45747177 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 8647f511d8bb -->
 # ポイント・オブ・インタレスト
 
 [← ドキュメント目次（テンプレートのリポジトリ）](../../../docs/ja/index.md)
@@ -37,4 +37,4 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # 文档
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · **简体中文**
@@ -26,6 +26,7 @@
 - [操作](controls.md)：所有输入、点击与按住、配合右键的按键、相机。
 - [设置](settings.md)：设置窗口中的每个选项、它的键名、默认值及作用。
 - [英雄配置方案](configurations.md)：参数来源、精确节点路径、三种相互协调的配置及其验证方法。
+- [在编辑器中编辑场景](editor_authoring.md)：引用与警告、相机的初始视角、实体道具及其尺寸、巡逻路线、编辑器自身的检查。
 
 ### 代码
 
@@ -35,7 +36,7 @@
 
 ### 系统
 
-- [移动](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`，角色为动画和界面报告的信息、`CharacterMonitor`、台阶和斜坡，冲刺与体力、跳跃、下落（`FallSettings`）及边缘防护。
+- [移动](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、巡逻（`PatrolController`）、`GroundCharacter`，角色为动画和界面报告的信息、`CharacterMonitor`、台阶和斜坡，冲刺与体力、跳跃、下落（`FallSettings`）及边缘防护。
 - [相机](systems/camera.md)：`OrbitCameraRig`（环绕、缩放曲线、跟随）和 `CameraArm`（障碍物、拉近、淡化）。
 - [输入](systems/input.md)：`PointClickMoveInput`（点击、按住、按键、光标）和 `CharacterActionInput`。
 - [角色](systems/characters.md)：模型与装备、英雄外观、手部摆动、悬浮和剪影。
@@ -63,4 +64,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

@@ -1,5 +1,4 @@
-<!-- translation of docs/en/configurations.md @ 2173d5158953 -->
-<!-- translation of docs/en/configurations.md @ pending -->
+<!-- translation of docs/en/configurations.md @ ced3a1b9ab87 -->
 # Oynanabilir kahramanı yapılandırma
 
 [← Belge dizini](index.md)
@@ -197,4 +196,4 @@ Tüm özellikler: [Girdi](systems/input.md), [Hareket](systems/locomotion.md) ve
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

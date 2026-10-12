@@ -37,7 +37,8 @@ Places to walk to:
 
 - **Ancient Circle**, the ring of columns north-west of the spawn. Walk between the columns and the hero shows as a
   silhouette behind them.
-- **Travelers' Camp** in the east and **Farmstead by the Well** in the south-west, with NPCs.
+- **Travelers' Camp** in the east and **Farmstead by the Well** in the south-west, with NPCs. The Knight walks a
+  round from the farmstead through the hedge maze: stand in his way and after a while he speaks.
 - **Windswept Peak**, the mountain in the north-east: click its top and the hero takes the spiral trail.
 - The hedge maze, the platform with its ramp and stairs, and the U-shaped trap near the spawn, for testing pathfinding.
 - The ten hero looks in a row by the south wall. Pick one in Settings → Character → **Hero look**.
@@ -70,4 +71,4 @@ exit code. On a fresh clone, import the project once first, in the editor or wit
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

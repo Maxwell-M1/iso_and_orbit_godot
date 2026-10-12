@@ -26,8 +26,10 @@ connects them to its signals.
 ## Setup
 
 1. Copy this folder to `res://addons/iso_orbit/levels/`.
-2. In the main scene (the one that stays), add a `Node3D` with `level_host.gd` and put the start level under it as its
-   only child. The player's character, the camera and the interface go next to the host, not into a level.
+2. In the main scene (the one that stays), add a `Node3D` with `level_host.gd` and put the start level under it. The
+   host starts on the level set in `initial_level`, or on its first `Node3D` child if that is empty; with other 3D
+   children (a marker, a light) set it, or the host warns. The player's character, the camera and the interface go
+   next to the host, not into a level.
 3. Add `loading_screen.tscn` to the main scene and set it as the host's `loading_screen`, or leave that empty to
    change levels without a screen.
 4. In every level, add a `Marker3D` with `spawn_point.gd` named `default` (`spawn_name`) on the ground, and more
@@ -72,4 +74,4 @@ In the template repository: `docs/en/systems/levels.md` and `docs/en/integration
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # Documentación
 
 [English](../en/index.md) · **Español** · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -35,6 +35,8 @@ Elige una página. Las guías de instalación de los addons figuran después de 
   y qué cambia.
 - [Configuraciones del héroe](configurations.md): origen de los valores, rutas exactas de nodos, tres opciones
   coherentes y cómo comprobar el resultado.
+- [Edición de escenas en el editor](editor_authoring.md): referencias y advertencias, la vista inicial de la cámara,
+  los objetos sólidos y su tamaño, los recorridos de patrulla, las comprobaciones propias del editor.
 
 ### Código
 
@@ -47,9 +49,10 @@ Elige una página. Las guías de instalación de los addons figuran después de 
 
 ### Sistemas
 
-- [Locomoción](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`, lo
-  que el personaje informa para las animaciones y la interfaz, `CharacterMonitor`, escalones y pendientes, sprint y
-  resistencia, el salto, la caída (`FallSettings`) y la protección de bordes.
+- [Locomoción](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, patrullas
+  (`PatrolController`), `GroundCharacter`, lo que el personaje informa para las animaciones y la interfaz,
+  `CharacterMonitor`, escalones y pendientes, sprint y resistencia, el salto, la caída (`FallSettings`) y la protección
+  de bordes.
 - [Cámara](systems/camera.md): `OrbitCameraRig` (órbita, curva de zoom, seguimiento) y `CameraArm`
   (obstáculos, acercamiento, desvanecimiento).
 - [Entrada](systems/input.md): `PointClickMoveInput` (clic, pulsación mantenida, teclas, el cursor) y
@@ -83,4 +86,4 @@ Elige una página. Las guías de instalación de los addons figuran después de 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

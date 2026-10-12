@@ -1,4 +1,4 @@
-<!-- translation of docs/en/architecture.md @ adf142a1b736 -->
+<!-- translation of docs/en/architecture.md @ 808ba6991a13 -->
 # 架构
 
 [← 文档目录](index.md)
@@ -11,7 +11,7 @@
 
 ```
 Main (Node3D, main.gd)   游戏框架：连接关卡、英雄和界面
-├── Levels             LevelHost：当前关卡，在加载画面后方更换
+├── Levels             LevelHost：当前关卡，在加载画面后方更换；initial_level = World
 │   └── World          shared/world/world.tscn：初始关卡及其导航网格、地点、NPC 和传送台
 ├── Hero               gdscript/player/playable_hero.tscn：PlayableHero，玩家操控的英雄
 │   ├── Character          gdscript/player/player.tscn：GroundCharacter，分组 "player"
@@ -34,7 +34,7 @@ Main (Node3D, main.gd)   游戏框架：连接关卡、英雄和界面
 │   ├── ClickMarker        点击位置地面上的圆环
 │   └── PathView           NavigationPathView：调试路径线，默认隐藏
 ├── Hud                操作提示和速度、FpsCounter、CharacterState、DiscoveryToast、StaminaBar、
-│                      TravelPrompt（传送台上的旅行提示）
+│                      TravelPrompt（传送台上的旅行提示）、Subtitles（角色说的话）
 ├── SettingsApplier    设置 → 节点属性（仅限演示）
 ├── UiRoot             游戏上层的窗口：设置窗口
 └── LoadingScreen      LoadingScreen：关卡加载时显示的画面
@@ -102,6 +102,7 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | | `PointClickMoveInput`（Node） | 鼠标和右键 + WASD → 移动器命令；隐藏光标并修正其瞄准 |
 | | `ClickMarker`（Node3D） | 点击位置的标记（`click_marker.tscn`） |
 | | `NavigationPathView`（MeshInstance3D） | 绘制移动器的剩余路径 |
+| | `PatrolController`（Node） | 让角色沿关卡中绘制的路线（`Path3D`）行走：等待、返回，遇到挡路的角色时停下 |
 | `ground_character` | `GroundCharacter`（CharacterBody3D） | 重力、跳跃、带体力的冲刺、台阶、`move_and_slide()`、转动模型；报告自身的状态、脚步、起跳和落地，供动画、声音和界面使用 |
 | | `FallSettings`（Resource） | 下落重力、速度上限及趋近上限的制动方式；同一资源可由多个角色共享 |
 | | `LedgeGuard`（Node） | 在落差处让身体停下，或让它沿边缘滑行 |
@@ -137,6 +138,8 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `player/player.tscn`、`player_locomotion.tres` | 英雄的角色：带有全部部件的 `GroundCharacter` 及奔跑设置 |
 | `player/playable_hero.tscn`、`.gd` | `PlayableHero`：包含角色、输入、相机、点击标记和路径线，可直接放入游戏场景 |
 | `ui/travel_prompt.tscn`、`.gd` | `TravelPrompt`：传送台上的旅行提示，显示按键与地名 |
+| `ui/subtitle_display.tscn`、`.gd` | `SubtitleDisplay`：在屏幕底部显示角色说的话及其名字 |
+| `npc/patrol_actor.tscn`、`.gd`、`knight_patrol.tscn`、`island_patrol.tscn` | `PatrolActor`：沿关卡路线行走的角色，带有模型和头顶的名字；即骑士和孤岛上的游侠 |
 | `demo/hud.gd` | 操作提示和速度读数 |
 | `demo/settings_applier.gd` | 将设置应用到演示的节点，“设置 → 属性”集中在一处 |
 | `settings/game_settings.gd` | `GameSettings`，即 `Settings` 自动加载：默认值、`user://settings.cfg`、`changed` 信号；自行应用引擎设置 |
@@ -156,10 +159,9 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | `PlayerInput.hold_started` | `ClickMarker.fade_out` | 按住取代了点击，标记淡出 |
 | `Character/NavigationMover.arrived` | `ClickMarker.fade_out` | 角色到达了该点 |
 | `Character/NavigationMover.destination_cancelled` | `ClickMarker.fade_out` | 该点被放弃 |
-| `PlayerInput.hold_pending_changed(pending)` | `CameraRig.set_follow_paused` | 在判定按下是点击还是按住之前，相机不会自行转动 |
 | `PlayerInput.run_requested` | `CameraRig.end_follow_wait` | 新的奔跑开始：相机结束环绕后的等待，再次跟随 |
 
-`main.gd` 在代码中连接关卡容器与旅行提示，见[关卡](systems/levels.md#游戏框架)。
+`main.gd` 在代码中连接关卡容器、旅行提示和字幕，见[关卡](systems/levels.md#游戏框架)。
 
 ## 设置
 
@@ -173,6 +175,7 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 - **英雄与关卡容器并列，不属于某个关卡。** 关卡只包含世界的地面、道具、导航、光源和传送门。切换关卡时英雄、相机和界面持续存在，新关卡不用再复制它们，英雄携带的状态（体力、相机高度）也不会丢失。
 - **关卡容器不需要知道英雄的实现。** 它用信号报告切换的各阶段，游戏框架根据新关卡的信息放置英雄。可操控英雄也可以不使用关卡容器。
 - **相机是角色的兄弟节点，而不是子节点。** 它在 `_process` 中移动到目标的插值位置，自身不参与插值，因此开启物理插值（默认开启，设置 → 显示）后，在任何帧率下奔跑都很平滑。跟随模式根据目标每个物理帧的移动计算速度，因此任何 `Node3D` 都能作为目标；同一运动数据还能区分急转和弧线，使掉头不会带着相机绕转。相机的弹簧以短时间步计算，不同帧率下行为一致。
+- **组件在编辑器中检查自身，编辑器只保存你设置的内容。** 它们的脚本是工具脚本：在编辑器中，缺少什么或设置有误时会显示警告，并预览游戏开始时设置的内容（相机的视角、角色的模型和名字），但不会在编辑器里运行游戏，预览也从不写入场景。见[在编辑器中编辑场景](editor_authoring.md)。
 - **组件对设置一无所知。** `LedgeGuard`、`PointClickMoveInput`、`OrbitCameraRig` 等组件只读取自己的属性；只有 `settings_applier.gd` 和设置窗口与 `Settings` 自动加载通信。组件可以不带设置系统移植到其他项目。
 - **窗口遵循 Godot 的惯例。** 布局只使用容器；外观来自项目主题及其类型变体，而不是每个节点上的覆盖项。窗口通过信号请求关闭，由 `UiRoot` 关闭它（调用沿树向下，信号沿树向上）。按键都是输入动作。窗口打开时设置键盘焦点，关闭时恢复。窗口打开期间游戏暂停（`UiRoot` 以 `PROCESS_MODE_ALWAYS` 运行），相机会释放已捕获的光标。
 
@@ -181,14 +184,14 @@ LevelPortal ──traveller_entered──► LevelHost ──portal_entered─�
 | 文件夹 | 内容 |
 |---|---|
 | `addons/iso_orbit/` | 可复用的组件，每个部分一个文件夹 |
-| `gdscript/` | GDScript 版演示：主场景、英雄、设置系统和设置窗口、HUD 提示 |
+| `gdscript/` | GDScript 版演示：主场景、英雄、巡逻的 NPC、设置系统和设置窗口、HUD 提示、字幕 |
 | `shared/` | 不依赖脚本语言的演示内容：关卡、角色和装备、世界着色器和纹理、声音、UI 主题 |
 | `l10n/` | 界面翻译 |
 | `tests/` | 无头测试，见[测试](testing.md) |
 | `docs/` | 本文档 |
 
-`shared/` 旨在供将来的 C# 版演示复用，C# 版会在 `gdscript/` 旁边拥有自己的文件夹。目前还有两个例外：关卡与传送台使用组件脚本（`world.tscn`、`island.tscn`、`mountain.tscn` 使用 `point_of_interest.gd`，关卡使用 `spawn_point.gd`，`teleport_pad.tscn` 使用 `level_portal.gd`），另有两个小型道具脚本（`flicker.gd`、`hover_spin.gd`）位于 `shared/world/props/`。见[已知问题](known-issues.md)。
+`shared/` 旨在供将来的 C# 版演示复用，C# 版会在 `gdscript/` 旁边拥有自己的文件夹。目前还有三个例外：关卡与传送台使用组件脚本（`world.tscn`、`island.tscn`、`mountain.tscn` 使用 `point_of_interest.gd`，关卡使用 `spawn_point.gd`，`teleport_pad.tscn` 使用 `level_portal.gd`），关卡中放置了演示的巡逻角色（`gdscript/npc/knight_patrol.tscn`、`island_patrol.tscn`），另有三个道具脚本（`static_prop.gd`、`flicker.gd`、`hover_spin.gd`）位于 `shared/world/props/`。见[已知问题](known-issues.md)。
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

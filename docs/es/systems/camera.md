@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
+<!-- translation of docs/en/systems/camera.md @ b33e90b57ed1 -->
 # Cámara
 
 [← Índice de documentación](../index.md)
@@ -32,12 +32,21 @@ Si después entra otra cámara actual en la escena, vuelve a hacer actual esta c
 la vista. Consulta [Integración](../integration.md#la-cámara-sola) para copiarla sola o con todo el héroe, y
 [Preparación del proyecto](../project-setup.md) para las acciones de entrada y capas de física.
 
+En el editor el rig muestra la vista con la que empieza el juego: se sitúa en el objetivo, `focus_height` por encima de
+él, girado según `start_yaw`, con la inclinación y la distancia que fija `start_zoom`, y el brazo muestra la cámara a
+esa distancia. La transformación del rig, la de la cámara y, bajo un rig, la `length` del brazo las establece el juego,
+así que en el editor son vistas previas: un rig o una cámara movidos a mano vuelven a su sitio, la `length` del brazo
+es de solo lectura bajo un rig, y al guardar se conservan los valores con los que se cargó la escena. Un rig sin
+objetivo conserva la posición que le des. Consulta
+[Edición de escenas en el editor](../editor_authoring.md#la-cámara-en-el-editor).
+
 ## ¿Qué valores están activos?
 
 Los valores de script indicados abajo son los predeterminados de los componentes reutilizables.
 `gdscript/player/playable_hero.tscn` sustituye algunos; `SettingsApplier` de la demo aplica los valores guardados
-de `Settings` cuando se inicia la escena principal. Una copia de la escena del héroe funciona sin la ventana ni el
-autoload de ajustes de la demo, con los valores de la escena.
+de `Settings` cuando se inicia la escena principal (con su `use_saved_settings` desactivado, deja los valores de la
+escena). Una copia de la escena del héroe funciona sin la ventana ni el autoload de ajustes de la demo, con los
+valores de la escena.
 
 | Ajuste | Valor del script | Escena del héroe / demo recién iniciada |
 |---|---:|---:|
@@ -137,13 +146,16 @@ antes de terminar la anterior: conecta `run_requested` de la entrada a `end_foll
 Sin esa señal, un objetivo que nunca deja de moverse puede mantener la cámara esperando indefinidamente; desactiva
 la opción si tu juego no puede informar de carreras nuevas.
 
-`playable_hero.tscn` también conecta `PointClickMoveInput.hold_pending_changed` con `set_follow_paused()`. Esto
-pausa el seguimiento durante los primeros 0.2 s de una pulsación izquierda mientras la entrada decide si será
-un clic o una pulsación sostenida. `run_requested` termina la espera tras una órbita cuando comienza un clic, una
-pulsación sostenida o botón derecho + tecla. Pulsar el derecho durante una carrera iniciada con el izquierdo permite
-mirar alrededor; al soltarlo, esa carrera no cuenta como nueva y la vista queda donde la dejó el jugador hasta la
-siguiente parada o carrera. `keep_aim_on_camera_turn` de la entrada mantiene el cursor apuntando al mismo punto
-del mundo cuando se mueve la cámara y evita que la dirección de carrera persiga a la cámara.
+Los clics no interrumpen el seguimiento. Mientras la entrada decide si una pulsación izquierda es un clic o una
+pulsación sostenida (sus primeros 0.2 s), el giro, la inclinación y la altura continúan, y un clic hacia un punto nuevo
+solo da a la carrera una nueva dirección que seguir. Un seguimiento pausado en cada pulsación, con
+`PointClickMoveInput.hold_pending_changed` conectado a `set_follow_paused()` como hacía la plantilla antes de 1.3.0,
+detiene en cada clic el giro en curso, y el giro empieza de nuevo. En `playable_hero.tscn`, `run_requested` termina la
+espera tras una órbita cuando comienza un clic, una pulsación sostenida o botón derecho + tecla. Pulsar el derecho
+durante una carrera iniciada con el izquierdo permite mirar alrededor; al soltarlo, esa carrera no cuenta como nueva y
+la vista queda donde la dejó el jugador hasta la siguiente parada o carrera. `keep_aim_on_camera_turn` de la entrada
+mantiene el cursor apuntando al mismo punto del mundo cuando se mueve la cámara y evita que la dirección de carrera
+persiga a la cámara.
 
 Con `Engine.time_scale` en 0, los movimientos de seguimiento conservan su estado y se reanudan cuando avanza el
 tiempo. Si mueves manualmente el objetivo o lo teletransportas una distancia corta que no activa la comprobación
@@ -167,12 +179,13 @@ llama a `snap()` para recolocar cámara y brazo y reiniciar el historial de movi
 | Suavizado | `rotation_sharpness`, `zoom_sharpness` | 30, 10 | Valores mayores alcanzan antes el destino del ratón/rueda; 0 es inmediato |
 | Suavizado | `height_follow_time` | 0 s | Tiempo para recorrer cerca del 95% del cambio vertical del objetivo; 0 lo sigue exactamente |
 
-`look_along(direction)` orienta de inmediato la vista según la parte horizontal de una dirección en **espacio
-global** y detiene cualquier giro automático en curso. `snap()` aplica al instante giro, inclinación, zoom,
-posición del objetivo y respuesta del brazo a las colisiones; úsalo tras teletransportar. `get_zoom()` devuelve
-el zoom actual de 0–1. `is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` y
-`is_target_turning_sharply()` informan de esos estados. `set_follow_paused(paused)` y `end_follow_wait()` controlan
-las pausas anteriores.
+`look_along(direction)` orienta de inmediato la vista según la parte horizontal de una dirección en **espacio global** y
+detiene cualquier giro automático en curso. `snap()` aplica al instante giro, inclinación, zoom, posición del objetivo y
+respuesta del brazo a las colisiones; úsalo tras teletransportar. `get_zoom()` devuelve el zoom actual de 0–1.
+`is_rotating()`, `is_follow_paused()`, `is_follow_waiting()` y `is_target_turning_sharply()` informan de esos estados.
+`set_follow_paused(paused)` pausa el seguimiento hasta que se reanuda, por ejemplo mientras hay un diálogo en pantalla:
+un movimiento en curso frena y, tras la pausa, empieza de nuevo, así que no sirve para momentos tan cortos como un clic.
+`end_follow_wait()` termina la espera tras una órbita descrita arriba.
 
 El rig requiere un hijo brazo o cámara (o una propiedad `arm`/`camera` explícita); si falta, produce una aserción
 en compilaciones de depuración. Establece su rotación global, por lo que `start_yaw`, `look_along()` y el giro
@@ -236,4 +249,4 @@ escaleras, obstáculos, acercamiento opcional, grupos ignorados y transparencia.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

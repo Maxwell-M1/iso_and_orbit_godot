@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 78c912e8971a -->
+<!-- translation of docs/en/systems/locomotion.md @ 9cb53e2dd91e -->
 # Locomoción
 
 [← Índice de documentación](../index.md)
@@ -64,10 +64,8 @@ jugador modifica un ajuste; los valores guardados pueden sustituir los de arriba
 ajustes. Para modificar una demo en ejecución, abre panel Escena → Remoto → `Hero/Character/NavigationMover` →
 `settings`. El código lee los campos del recurso cada tick, pero los cambios del Inspector remoto no se guardan:
 copia el resultado al `.tres`. Usa un recurso separado para cada personaje si los cambios de ejecución no deben
-afectar a otros. Asígnalo antes de que el componente entre en el árbol o usa **Make Unique** en el editor:
-después de
-`_ready()`, `GroundMotion` conserva el recurso original. Sustituir entonces `mover.settings` no cambia los ajustes
-del movimiento; edita los campos del recurso existente durante la ejecución.
+afectar a otros: asigna otro recurso o usa **Make Unique** en el editor. Sustituir `mover.settings` durante la
+partida surte efecto al instante.
 
 Varios personajes pueden compartir un mismo recurso, por ejemplo todos los NPC de un mismo tipo.
 
@@ -127,6 +125,59 @@ error de esa magnitud. Por ello, el componente sigue la ruta por sí mismo en lu
 movimiento a la orientación: hacia atrás en línea recta recibe todo el `backward_speed_multiplier`, en diagonal
 hacia atrás una parte (S + D en modo lateral: 21% más lento), de costado nada. Así que la ralentización solo existe
 en el modo lateral de las teclas, ver [Entrada](input.md).
+
+## PatrolController: seguir un recorrido
+
+`PatrolController` lleva a un personaje por un recorrido dibujado en el nivel guiando a su `NavigationMover`: el propio
+script del personaje sigue moviendo el cuerpo. En el recorrido, el personaje se dirige hacia un punto de la línea por
+delante de él, sin buscar ruta, así que dibuja la línea por donde el personaje quepa; la navegación lo lleva desde su
+sitio hasta el recorrido y de vuelta. El caballero de la demo y el explorador de la isla caminan con él; consulta
+[Mundo y navegación](world-and-navigation.md#lugares-y-npc).
+
+El recorrido es un `Path3D` del nivel, fuera del personaje, dibujado con las herramientas de curvas del editor. El
+personaje recorre la línea que el editor dibuja para él, la misma que sigue un `PathFollow3D`: le dan forma los puntos,
+sus tiradores y el **Bake Interval** de la curva. Con los tiradores vacíos y un Bake Interval corto (el valor por
+defecto es 0.2 m), la línea va recta de punto a punto; saca los tiradores de un punto para redondear su esquina. Un Bake
+Interval más largo que los lados hace que el editor los dibuje curvos a través de los puntos, y el personaje los recorre
+curvos. Cuando empieza una patrulla (`restart()`, o al activar el controlador), se toman puntos sobre esa línea cada
+`sample_spacing`. El personaje avanza por ellos sin detenerse, apuntando al punto de la línea que está a `look_ahead` de
+él, así que gira con suavidad en las curvas, recortándolas un poco, y se detiene exactamente en el último punto; después
+vuelve por el camino más corto adonde empezó la patrulla (`return_to_start`), espera `cycle_wait` y empieza de nuevo
+(`repeat`). Sin `return_to_start`, espera en el último punto y después camina hasta el primero. Los caminos desde el
+sitio del personaje hasta el primer punto y de vuelta no están en la línea dibujada: para que el personaje no salga de
+ella, colócalo en el primer punto y cierra la curva (**Closed**). Una curva modificada se lee en el siguiente inicio. Un
+script puede dar los puntos por sí mismo (`set_route_points()`); sin recorrido el controlador no hace nada, así que un
+personaje sin recorrido simplemente se queda quieto.
+
+Un personaje delante del cuerpo detiene la patrulla: uno que esté en una zona como el haz de una linterna, desde el
+frente del cuerpo hasta `blocking_distance` por delante, tan ancha como el cuerpo allí y que se abre `blocking_angle`
+hacia cada lado. Un personaje a un lado o detrás no la detiene. La patrulla espera con el mismo punto como destino en
+lugar de saltárselo y sigue caminando cuando el camino queda libre. Tras `blocked_delay` segundos sin interrupción llega
+`blocked_long_enough(blocker)`, una vez por parada; entonces el caballero de la demo dice su frase. Para que otros
+personajes lo detengan, la máscara de colisión del cuerpo debe incluir su capa: en la demo los personajes están en la
+capa 2, y las máscaras del héroe y del caballero la incluyen.
+
+| Propiedad | Por defecto | Significado |
+|---|---|---|
+| `character`, `mover` | vacío: el padre y su primer hijo `NavigationMover` | El cuerpo que camina y su componente de movimiento, hijo directo del cuerpo |
+| `route` | vacío | El `Path3D` del nivel que se recorre |
+| `sample_spacing` | 0.25 m | El paso más largo entre los puntos tomados sobre la línea del recorrido |
+| `look_ahead` | 0.75 m | A qué distancia sobre la línea apunta el personaje: más lejos gira con más suavidad y recorta más las curvas |
+| `enabled` | activado | Desactivado: el personaje se detiene donde está. Activado de nuevo: empieza una patrulla nueva desde ahí |
+| `repeat`, `return_to_start` | activado, activado | Empezar de nuevo tras una ronda; volver al inicio tras el último punto |
+| `cycle_wait` | 10 s | La espera en el inicio tras una ronda, en tiempo de juego |
+| `waypoint_wait` | 0 s | La parada en cada punto de control de la curva |
+| `blocked_delay` | 6 s | Cuánto tiempo debe un personaje cerrar el paso antes de `blocked_long_enough` |
+| `blocking_distance` | 1 m | A qué distancia por delante del cuerpo lo detiene otro personaje |
+| `blocking_angle` | 25° | Cuánto se abre esa zona hacia cada lado |
+
+Con la navegación activada (`NavigationMover.use_navigation`), una patrulla espera al mapa de navegación antes de
+empezar. `stop()` detiene al personaje al instante y desactiva la patrulla. `get_state()`, `get_waypoint_index()`,
+`get_completed_cycles()` y `get_blocked_time()` indican lo que hace; `cycle_completed` llega tras cada ronda.
+
+`PatrolActor` de la demo (`gdscript/npc/patrol_actor.tscn`) es un personaje listo con un controlador así, su modelo y
+el nombre sobre la cabeza: pon una instancia en un nivel y establece su **Route**; consulta
+[Edición de escenas en el editor](../editor_authoring.md#patrullas).
 
 ## GroundCharacter
 
@@ -518,4 +569,4 @@ Las comprobaciones de escena en `tests/movement_checks.gd`, `tests/character_act
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

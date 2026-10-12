@@ -2,7 +2,7 @@
 
 **English** · [Español](README.es.md) · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
-Version 1.2.0 · Godot 4.7 (tested on 4.7.2) · GDScript · MIT
+Version 1.3.0 · Godot 4.7 (tested on 4.7.2) · GDScript · MIT
 
 A click-to-move character controller and an orbit camera for isometric and top-down RPGs. Click the ground and
 the hero runs there, pathing around obstacles; hold the button and the hero follows the cursor. The camera
@@ -68,6 +68,8 @@ All modes and their settings: [Controls](docs/en/controls.md).
 - Stairs up to 0.3 m are climbed and descended without leaving the ground; slopes up to 45° are walked up.
 - An optional floating mode: the hero hangs above the ground, glides over stairs, sways and leans into the run, with
   no footsteps, and comes down from a jump slowly.
+- Patrols: a character walks a route drawn as a curve in the level, waits at home between the rounds and stops for
+  anyone in the way, then reports it, for a line of dialogue, for example.
 
 **Camera**
 
@@ -91,6 +93,14 @@ All modes and their settings: [Controls](docs/en/controls.md).
 - The hero the player controls is one ready scene (`PlayableHero`): the character, its input, the camera and the
   click marker, with calls to put it anywhere.
 
+**In the editor**
+
+- The components check their setup: an empty link, a node in the wrong place or a missing input action shows as a
+  warning in the Scene dock, and the warning goes away as soon as it is fixed.
+- The camera shows its start view, a patrolling character its model and name, and a portal the title on its sign;
+  solid props are resized as a whole, model and collision together. No preview is saved into the scenes, so a diff
+  shows only what you changed.
+
 **Also included**
 
 - A settings window (F10) with tabs for controls, character, camera, display, interface and sound, saved to
@@ -103,10 +113,11 @@ All modes and their settings: [Controls](docs/en/controls.md).
   the latest events.
 - Two demo levels: an 80 × 80 m fenced glade with ruins, a camp, a farmstead, a hedge maze, a platform with a ramp
   and stairs, and a mountain with a spiral trail; and a small island in a lake, reached by a teleport pad. Five places
-  to discover, four on the glade with five NPCs posted at them and one on the island, and ten hero looks to choose
-  from.
+  to discover, four on the glade with five NPCs at them and one on the island; the knight walks a round through the
+  hedge maze and has a word for anyone in his way. Ten hero looks to choose from.
 - Headless tests of movement, input, jump, sprint and sounds, the character's state, stairs and slopes, the camera and
-  its arm, hero looks, the settings window and translations, levels and the teleport.
+  its arm, hero looks, the settings window and translations, levels and the teleport, patrols and props; checks of the
+  editor's part run in the editor.
 
 **Not included:** gamepad support, an in-game key-rebinding menu, or skeletal character animations. Input actions
 are configurable in Project Settings; the interface reads their current bindings. The models are static primitives.
@@ -186,7 +197,7 @@ the required actions, layers and optional demo dependencies.
 |---|---|
 | `addons/iso_orbit/` | The components, one folder per part you can take on its own |
 | `gdscript/` | The demo that assembles them: the game shell `main.tscn`, the playable hero, the settings system and window |
-| `shared/` | Demo content meant to be shared by the GDScript demo and a future C# one: the levels, characters and equipment, world shaders and textures, sounds, the UI theme. Two small GDScript scripts used by the levels live here too |
+| `shared/` | Demo content meant to be shared by the GDScript demo and a future C# one: the levels, characters and equipment, world shaders and textures, sounds, the UI theme. Three small GDScript prop scripts live here too, and the levels place the demo's patrolling characters from `gdscript/npc/` |
 | `l10n/` | Interface translations (gettext `.po`) |
 | `tests/` | Headless tests |
 | `docs/` | Documentation |
@@ -212,4 +223,4 @@ MIT, see [LICENSE](LICENSE). Exception: `icon.svg`, the Godot logo by Andrea Cal
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

@@ -1,5 +1,4 @@
-<!-- translation of docs/en/glossary.md @ 2c04d3857e30 -->
-<!-- translation of docs/en/glossary.md @ pending -->
+<!-- translation of docs/en/glossary.md @ 537f8443c59c -->
 # Glossário
 
 [← Índice da documentação](index.md)
@@ -18,7 +17,10 @@ Termos usados nesta documentação e no código.
 | **Corpo exclusivo da câmera** | Corpo na camada de física 3 (`camera`): para o braço, mas cliques, navegação e personagens o ignoram |
 | **Estado do personagem** | O que faz: parado, correndo, em corrida rápida, pulando ou caindo (`GroundCharacter.get_state()`, sinal `state_changed`) |
 | **Clique** | Pressionar e soltar o botão esquerdo antes do tempo de espera. O personagem percorre um caminho até o ponto em que o botão foi pressionado |
+| **Aviso de configuração** | Sinal de aviso ao lado de um nó no painel Cena (Scene) enquanto o nó está mal configurado: uma referência vazia, um pai errado, uma ação de entrada ausente. Os componentes se verificam no editor, e o aviso some assim que a configuração é corrigida |
 | **Tolerância do pulo após a borda** | Curto período após sair do chão em que o pulo ainda funciona (0.1 s, coyote time) |
+| **Dimensões** | `StaticProp.dimensions`: tamanho de um objeto sólido, em metros ao longo dos seus próprios eixos; modelo e colisão são redimensionados juntos. 0 num eixo mantém o tamanho das suas partes |
+| **Pré-visualização no editor** | O que um componente mostra no editor daquilo que o jogo configura no início: a vista inicial da câmera, o modelo e o nome de um personagem em patrulha, o título na placa de um portal, o tamanho de um objeto. Nunca é salva na cena |
 | **Exausto** | Estado após gastar todo o fôlego: sem corrida rápida até recuperá-lo a `recover_ratio` (30%) |
 | **Direção do olhar** | Para onde o personagem olha, diferente do deslocamento em passo lateral ou recuo. `NavigationMover.get_facing()` |
 | **Ajustes de queda** | Como o personagem desce após o topo do pulo ou uma borda: gravidade, velocidade máxima e frenagem do excesso (`FallSettings`). Não alteram a subida |
@@ -40,13 +42,16 @@ Termos usados nesta documentação e no código.
 | **Movimentador** | `NavigationMover`: converte comandos (`move_to`, `steer`, `stop`) em velocidade horizontal a cada tick; nunca move o corpo |
 | **Malha de navegação** | Área transitável gerada das colisões do nível na camada 1 (na ilha, também muros invisíveis da camada 4), guardada em cada cena. Os caminhos são buscados nela |
 | **Oferta de viagem** | `TravelPrompt`: tecla e texto “Teletransporte: …” enquanto o herói está num portal que pede confirmação. E (ação `interact`) ou clique viaja; afastar-se oculta a oferta |
+| **Patrulha** | Personagem que percorre sozinho uma rota do nível, espera em casa entre as rondas e se detém diante de quem estiver no caminho (`PatrolController`): o cavaleiro na clareira, o patrulheiro na ilha |
 | **Interpolação de física** | Desenhar corpos entre ticks de física na taxa de quadros da tela. Ativa por padrão; há ajuste para desligá-la |
 | **Inclinação** | Ângulo com que a câmera olha para baixo. Negativo no código, graus para baixo nas configurações |
 | **Giro a partir da parada** | Virar instantaneamente abaixo de `pivot_speed` (1 m/s) |
 | **Lugar** | Um `PointOfInterest`: área que mostra “Descoberto: …” na primeira entrada do jogador |
 | **Herói jogável** | `PlayableHero` (`playable_hero.tscn`): personagem controlado pelo jogador, com entrada, câmera, marcador e linha do caminho, colocado ao lado dos níveis |
 | **Portal** | `LevelPortal`: área que leva a outro nível; as plataformas de teleporte da demo são portais |
+| **Objeto (prop)** | Objeto sólido colocado num nível, uma cena com raiz `StaticProp`: movido pela raiz, redimensionado pelas suas dimensões |
 | **Aproximação por ocultação** | Câmera passando à frente de um obstáculo que esconde o personagem (`pull_in_on_occlusion`) |
+| **Rota** | O `Path3D` de um nível que uma patrulha percorre: a linha que o editor desenha para a sua curva |
 | **Giro brusco** | Mudança de direção mais rápida que `OrbitCameraRig.sharp_turn_speed` (360°/s), como uma inversão: a câmera ignora direções intermediárias e assume a nova após o giro |
 | **Cena principal** | Cena que permanece durante o jogo (`main.tscn` com `main.gd`): host, herói, interface e tela de carregamento |
 | **Passo lateral** | Modo de teclas com botão direito: personagem continua olhando para onde a câmera aponta enquanto anda de lado ou recua |
@@ -55,8 +60,9 @@ Termos usados nesta documentação e no código.
 | **Corrida rápida** | Correr mais depressa (×1.5) enquanto Shift fica pressionado ou por alternância, gastando fôlego |
 | **Altura do degrau** | Maior degrau que o personagem sobe sem pular: 0.3 m (`GroundCharacter.max_step_height`) |
 | **Fôlego** | Reserva da corrida rápida (`Stamina`): gasta durante a corrida e se recupera após uma pausa |
-| **Nível inicial** | Nível colocado no host pelo editor: `shared/world/world.tscn`, a clareira cercada. No jogo chama-se Vale Verde (nome na plataforma da ilha) |
+| **Nível inicial** | Nível colocado no host pelo editor e indicado no seu `initial_level`: `shared/world/world.tscn`, a clareira cercada. No jogo chama-se Vale Verde (nome na plataforma da ilha) |
 | **Controle direto da direção** | Correr sem caminho: `NavigationMover.steer()`. Segurar o botão guia rumo ao cursor por padrão |
+| **Legendas** | O que um personagem diz, na parte de baixo da tela, com seu nome (`SubtitleDisplay`) |
 | **Teleporte** | Colocar o personagem imediatamente noutro lugar, sem corrida ou tranco: `GroundCharacter.teleport()`, `PlayableHero.teleport()` |
 | **Tick** | Uma etapa da física; 60 por segundo |
 | **Viajante** | Corpo que pode usar um portal: membro do grupo `traveller_group` (`player` por padrão) |
@@ -67,4 +73,4 @@ Termos usados nesta documentação e no código.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

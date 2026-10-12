@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ de34e03b8dbc -->
 # Dünya ve navigasyon
 
 [← Belge dizini](../index.md)
@@ -63,11 +63,11 @@ oyun yeniden hesaplamaz. Seviye düzenlenince yeniden pişirin. İki seviye ayn�
 çarpışma maskesi farklıdır: adada 1 ve 4. katmanlar pişirilir.
 
 **Ne zaman:** 1. katmanda (`world`) çarpışma şekli olan herhangi bir şeyi taşıdığınızda, eklediğinizde,
-kaldırdığınızda veya yeniden boyutlandırdığınızda: bir kaya, bir sandık, bir duvar, bir ağaç, bir dekor nesnesi, bir
-NPC, dağ; adada 4. katmandaki (`bounds`) görünmez duvarlar da. Yalnızca görünüm değiştiğinde (bir örgü, malzeme)
-ya da 3. katmandaki (`camera`) gövdeler, oyuncunun
-karakteri (2. katman) ve alanlar (`Area3D`) için gerekmez. Unutursanız yollar taşınmış bir nesnenin içinden (karakter
-ona çarpar ve boyunca kayar) ya da eskiden durduğu boş yerin etrafından geçer.
+kaldırdığınızda veya yeniden boyutlandırdığınızda: bir kaya, bir sandık, bir duvar, bir ağaç, bir dekor nesnesi
+(`dimensions` ile de), yerinde duran bir NPC, dağ; adada 4. katmandaki (`bounds`) görünmez duvarlar da. Yalnızca
+görünüm değiştiğinde (bir örgü, malzeme) ya da 3. katmandaki (`camera`) gövdeler, hareket eden karakterler (2. katman)
+ve alanlar (`Area3D`) için gerekmez. Unutursanız yollar taşınmış bir nesnenin içinden (karakter ona çarpar ve boyunca
+kayar) ya da eskiden durduğu boş yerin etrafından geçer.
 
 **Editörde:**
 
@@ -102,26 +102,34 @@ editördeki Hata Ayıklama → Görünür Navigasyon (Debug → Visible Navigati
 - Güney duvarına sırtlarını dönmüş, boşluğun doğusunda sıra hâlinde **on kahraman görünümü** (bkz.
   [Karakterler](characters.md#kahraman-görünümleri)).
 
-Yerleşimi değiştirmek için seviye sahnesindeki nesne örneklerini düzenleyin, sonra navigasyonu yeniden pişirin.
-Regresyon testleri demoda belirli rotaları ve engel konumlarını kullanır; kendi düzeniniz için ayrı seviye açın
-veya test geometrisiyle birlikte testleri de güncelleyin.
+Her katı dekor nesnesinin kökü bir `StaticProp` düğümüdür: onu kökünden taşıyın ve modelini ve çarpışmasını birlikte
+değiştiren `dimensions` ile yeniden boyutlandırın; korunun ağaçları ve kayalar, farklı boyutlarda `grove_tree.tscn` ve
+`rock.tscn` örnekleridir. Bkz. [Editörde sahne düzenleme](../editor_authoring.md#katı-dekor-nesneleri). Yerleşimi
+değiştirmek için seviye sahnesindeki nesne örneklerini düzenleyin, sonra navigasyonu yeniden pişirin. Regresyon
+testleri demoda belirli rotaları ve engel konumlarını kullanır; kendi düzeniniz için ayrı seviye açın veya test
+geometrisiyle birlikte testleri de güncelleyin.
 
 ### Yerler ve NPC'ler
 
 Dört yer `PointOfInterest` alanıdır. Oyuncu birine ilk kez girdiğinde ekranın üstünde birkaç saniyeliğine
-"Keşfedildi: …" belirir. Her yerde, başlarının üstünde ad etiketleri (`Label3D`) olan NPC'ler yerin merkezine bakarak
-durur; Şövalye yol boyunca bakar.
+"Keşfedildi: …" belirir. Yerlerde, başlarının üstünde ad etiketleri (`Label3D`) olan NPC'ler yerlerin merkezine
+bakarak durur; Şövalye çiftlikten başlayan bir tur atar.
 
 | Yer | Nerede | Orada kim var |
 |---|---|---|
 | Rüzgârlı Doruk | Kuzeydoğudaki dağın zirvesi | Kristalli bir sunağın yanında Büyücü |
 | Yolcular Kampı | Doğu: çadır, kamp ateşi, fıçılar | Ateşin başında Korucu ve Cüce |
-| Kuyu Başındaki Çiftlik | Güneybatı: ev, kuyu | Yolun yanında nöbet tutan Şövalye |
+| Kuyu Başındaki Çiftlik | Güneybatı: ev, kuyu | Çalı labirentinin içinden geçip geri dönen bir tur atan Şövalye |
 | Kadim Çember | Başlangıç noktasının kuzeybatısındaki sütun halkası | Sunağın yanında Haydut |
 
-Her NPC, 1. katmanda kapsüllü bir `StaticBody3D` gövdesidir (`World/NavigationRegion3D/Characters`): navigasyon
-örgüsü onların etrafından geçer ve kimse içlerinden geçemez. Kamp, çiftlik ve harabeler `World/Places` altındadır;
-doruk `mountain.tscn` içindedir.
+Yerinde duran her NPC, 1. katmanda kapsüllü bir `StaticBody3D` gövdesidir (`World/NavigationRegion3D/Characters`):
+navigasyon örgüsü onların etrafından geçer ve kimse içlerinden geçemez. Şövalye bir `PatrolActor`, yani 2. katmanda bir
+karakterdir: `World/Routes/KnightPatrol` rotasında labirentin içinden geçip evin ve kuyunun yanındaki yerine döner,
+orada 10 sn bekler ve yeniden yola çıkar ([PatrolController](locomotion.md#patrolcontroller-rotada-yürüme)). Şövalye ile
+kahraman çarpışır; kahraman önünde, bir metreden yakında durduğunda şövalye durur; yanlarında ve arkasında kahraman onu
+durdurmaz. Kahraman 2,5 sn boyunca yolunu kesince şövalye altyazılarda babası hakkında bir soru sorar. Issız Ada'da bir
+korucu varış noktasının yakınında kısa bir tur atar ve rotasının her noktasında bir saniye durur. Kamp, çiftlik ve
+harabeler `World/Places` altındadır; doruk `mountain.tscn` içindedir.
 
 **Yeni bir yer:** herhangi bir dünya sahnesine bir çarpışma şekli ve bir `title` ile birlikte bir `PointOfInterest`
 (`collision_mask` özelliği karakterlerin 2. katmanını içeren bir `Area3D`) ekleyin. Bildirim her yeri grubu üzerinden
@@ -231,4 +239,4 @@ zaman siluet olarak görünür (bkz.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

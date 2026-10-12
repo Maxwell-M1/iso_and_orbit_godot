@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 70ad45747177 -->
+<!-- translation of addons/iso_orbit/points_of_interest/README.md @ 8647f511d8bb -->
 # Интересные места
 
 [← Оглавление документации (репозиторий шаблона)](../../../docs/ru/index.md)
@@ -44,4 +44,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

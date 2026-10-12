@@ -50,4 +50,4 @@ Real recorded sounds can replace these: put files with the same names in the fol
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

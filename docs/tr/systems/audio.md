@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
+<!-- translation of docs/en/systems/audio.md @ b72cbc1a1884 -->
 # Ses
 
 [← Belge dizini](../index.md)
@@ -53,4 +53,4 @@ Bunların yerine gerçek kayıt sesler kullanılabilir: aynı adlı dosyaları k
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

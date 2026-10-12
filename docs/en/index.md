@@ -27,6 +27,8 @@ Choose a page below. Addon setup guides are included after the system references
 - [Settings](settings.md): every option in the settings window, its key, its default and what it changes.
 - [Configurations](configurations.md): where values come from, exact node paths, three coherent setups and how to
   check the result.
+- [Editing scenes in the editor](editor_authoring.md): links and warnings, the camera's start view, solid props and
+  their size, patrol routes, the editor's own checks.
 
 ### Code
 
@@ -39,9 +41,9 @@ Choose a page below. Addon setup guides are included after the system references
 
 ### Systems
 
-- [Locomotion](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  what the character reports for animations and the interface, `CharacterMonitor`, stairs and slopes, sprint and
-  stamina, the jump, the fall (`FallSettings`), the ledge guard.
+- [Locomotion](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, patrols
+  (`PatrolController`), `GroundCharacter`, what the character reports for animations and the interface,
+  `CharacterMonitor`, stairs and slopes, sprint and stamina, the jump, the fall (`FallSettings`), the ledge guard.
 - [Camera](systems/camera.md): `OrbitCameraRig` (orbit, zoom curve, follow) and `CameraArm` (obstacles, pull-in,
   fading).
 - [Input](systems/input.md): `PointClickMoveInput` (click, hold, keys, the cursor) and `CharacterActionInput`.
@@ -72,4 +74,4 @@ Choose a page below. Addon setup guides are included after the system references
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

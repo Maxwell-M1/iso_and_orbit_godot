@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ e52ff77b332d -->
+<!-- translation of docs/en/project-setup.md @ 2f3486026502 -->
 # Configuração do projeto
 
 [← Índice da documentação](index.md)
@@ -18,10 +18,10 @@ colisão. Autoload, tema da interface, traduções, ajustes de exibição e sist
 
 | Camada | Nome | O que fica nela | Quem a lê |
 |---|---|---|---|
-| 1 | `world` | Chão, paredes, objetos, montanha, NPCs parados | Raio do clique (`PointClickMoveInput.ground_mask`), corpo do jogador e `LedgeGuard` (cujo `floor_mask` 0 usa a máscara do corpo), `CameraArm.collision_mask`, geração da malha de navegação |
-| 2 | `characters` | Corpo do jogador (`collision_layer = 2`) | Áreas `PointOfInterest` e `LevelPortal` (`collision_mask = 2`); braço da câmera ignora |
+| 1 | `world` | Chão, paredes, objetos, montanha, NPCs parados | Raio do clique (`PointClickMoveInput.ground_mask`), corpos do jogador e dos personagens em patrulha, `LedgeGuard` do jogador (cujo `floor_mask` 0 usa a máscara do corpo), `CameraArm.collision_mask`, geração da malha de navegação |
+| 2 | `characters` | Corpo do jogador e personagens em patrulha (`collision_layer = 2`) | Áreas `PointOfInterest` e `LevelPortal` (`collision_mask = 2`); corpos do herói e dos personagens em patrulha, que assim se detêm uns aos outros, e, pela máscara do herói, o `LedgeGuard` dele; braço da câmera ignora |
 | 3 | `camera` | Corpos que só param a câmera, como `RoofCameraBlocker` em `shared/world/props/house.tscn` | Só `CameraArm.collision_mask` |
-| 4 | `bounds` | Muros invisíveis na borda do nível, como `Edge` na ilha | Corpo do jogador (`collision_mask` = camadas 1 e 4), `LedgeGuard` e geração da malha quando necessário (como na ilha) |
+| 4 | `bounds` | Muros invisíveis na borda do nível, como `Edge` na ilha | Corpos do jogador e dos personagens em patrulha (`collision_mask` = camadas 1, 2 e 4), `LedgeGuard` do jogador e geração da malha quando necessário (como na ilha) |
 
 `CameraArm.collision_mask` tem como padrão as camadas 1 e 3 (`0b101`). Personagens na camada 2 nunca empurram a
 câmera. Um corpo na camada 3 para a câmera, mas é invisível para cliques, navegação e personagens, então você pode
@@ -31,7 +31,7 @@ para o personagem, mas cliques e câmera o atravessam; clicar no chão ou água 
 A camada de navegação 1 se chama `ground`; `NavigationMover.navigation_layers` a usa por padrão.
 Camadas de física e navegação são separadas: a camada física do colisor define quais raios e corpos o atingem;
 as camadas de navegação da região definem os caminhos consultáveis. No código, máscaras são campos de bits:
-camadas 1 e 4 são `1 | 8 = 9`; camadas 1 e 3, `1 | 4 = 5`. No Inspector, marque os números.
+camadas 1, 2 e 4 são `1 | 2 | 8 = 11`; camadas 1 e 3, `1 | 4 = 5`. No Inspector, marque os números.
 
 ## Ações de entrada
 
@@ -104,4 +104,4 @@ ou use **Redefinir tudo** na janela de configurações.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

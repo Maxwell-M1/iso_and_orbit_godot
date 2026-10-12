@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 262d20fd6cef -->
+<!-- translation of docs/en/settings.md @ 39df1e5739b5 -->
 # Configurações
 
 [← Índice da documentação](index.md)
@@ -13,8 +13,13 @@ configurações ao padrão.
 
 Os padrões estão em `DEFAULTS` em `gdscript/settings/game_settings.gd`. A demo os aplica às propriedades dos nós em
 `gdscript/demo/settings_applier.gd`; os padrões das propriedades dos próprios componentes podem ser diferentes, como
-indicado abaixo. Como o sistema de configurações funciona e como adicionar uma configuração:
-[UI](systems/ui.md#configurações).
+indicado abaixo. Para as configurações que aplica, `SettingsApplier` usa em vez disso como padrões os valores
+definidos na cena (na demo, eles coincidem com `DEFAULTS`): um valor alterado na cena é aquele com que o jogo começa
+até o jogador mudá-lo, e aquele ao qual **Redefinir tudo** retorna. Com `SettingsApplier.use_saved_settings`
+desligado, os nós da cena mantêm os valores definidos na cena, e a janela de configurações não os altera; as
+configurações da engine (tela cheia, taxa de quadros, V-Sync, interpolação de física, escala da interface, idioma,
+volume) continuam vindo das configurações salvas e da janela. Como o sistema de configurações funciona e como
+adicionar uma configuração: [UI](systems/ui.md#configurações).
 
 Para o herói copiado sem a demo, use [Configurações](configurations.md) para localizar as propriedades no Inspector
 e escolher uma combinação coerente. Esta página descreve o **menu da demo**. Os rótulos usam vínculos originais;
@@ -124,4 +129,4 @@ alinhamento, altura e tempo sem alinhamento da altura e som dos passos enquanto 
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

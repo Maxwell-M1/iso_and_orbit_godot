@@ -52,4 +52,4 @@ In the template repository: `docs/en/systems/characters.md` (including replacing
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

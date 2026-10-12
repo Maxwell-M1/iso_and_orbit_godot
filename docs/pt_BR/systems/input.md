@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 286e042594f2 -->
+<!-- translation of docs/en/systems/input.md @ 64c53fd9a7b2 -->
 # Entrada
 
 [← Índice da documentação](../index.md)
@@ -93,9 +93,12 @@ que estava fazendo (parado, ou correndo para onde corria), e não há marcador n
   para o ponto pressionado. Caso contrário, ele começaria pelo caminho até esse ponto, e um caminho contornando
   obstáculos pode levar a um lugar totalmente diferente do cursor.
 
-O custo é que um clique age ao soltar, cerca de 0,1 s mais tarde do que ao pressionar. Enquanto não está claro se o
-botão foi clicado ou está sendo segurado, `hold_pending_changed(true)` pausa o acompanhamento da câmera (conectado
-a `OrbitCameraRig.set_follow_paused()` em `playable_hero.tscn`), então um clique curto não a move.
+O custo é que um clique age ao soltar, cerca de 0,1 s mais tarde do que ao pressionar. Enquanto isso, o cursor fica onde
+o mouse o deixou, também enquanto a câmera gira atrás da corrida, e o acompanhamento da câmera continua: um clique não
+move o cursor nem interrompe um giro da câmera em curso. Um pressionamento que vira botão segurado mira de onde o cursor
+está nesse momento. `hold_pending_changed(true)` informa esse pressionamento, e o modelo não precisa dele. Não o conecte
+a `OrbitCameraRig.set_follow_paused()`, como o modelo fazia antes da 1.3.0: cada clique pararia o giro da câmera, e o
+giro recomeçaria.
 
 Se o botão direito já está segurado quando o esquerdo é pressionado, não há clique: o personagem corre seguindo a
 câmera na hora.
@@ -156,10 +159,11 @@ o direito mantendo o esquerdo torna a ocultá-lo. Pausar ou trocar de janela o m
 
 **Mantém a mira** (`keep_aim_on_camera_turn`, ligado por padrão). Enquanto o botão esquerdo está segurado, a direção da
 corrida vem do cursor, um ponto na tela. Se a câmera gira enquanto o cursor fica parado na tela, outro ponto do chão
-fica sob o cursor, o personagem vira atrás dele, a câmera vira atrás do personagem e ele corre em círculos. Por
-isso, com o botão pressionado, o componente move a mira junto com o mundo: o personagem mantém a direção enquanto
-a câmera se posiciona atrás. Mover o mouse ainda guia. A mesma mira preserva o rumo durante a órbita do botão
-direito usada para olhar em volta.
+fica sob o cursor, o personagem vira atrás dele, a câmera vira atrás do personagem e ele corre em círculos. Por isso,
+assim que o pressionamento vira botão segurado, o componente move a mira junto com o mundo: o personagem mantém a
+direção enquanto a câmera se posiciona atrás. Mover o mouse ainda guia. A mesma mira preserva o rumo durante a órbita do
+botão direito usada para olhar em volta. Antes disso, enquanto o pressionamento ainda pode ser um clique, o cursor fica
+onde está.
 
 Desligado, o cursor guia como ao dirigir um carro: segure-o à direita do personagem e o personagem vira para a direita
 até o cursor ficar bem à frente. Onde o sistema não consegue mover o cursor (Wayland, por exemplo), a direção da
@@ -240,4 +244,4 @@ modificadoras, apenas o estado normal da ação está disponível.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

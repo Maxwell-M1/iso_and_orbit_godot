@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ de34e03b8dbc -->
 # Mundo y navegación
 
 [← Índice de documentación](../index.md)
@@ -64,11 +64,11 @@ Tras editar un nivel, vuelve a hornear su malla. Ambas usan los mismos parámetr
 la isla hornea las capas 1 y 4.
 
 **Cuándo:** moviste, agregaste, quitaste o cambiaste el tamaño de algo con una forma de colisión en la capa 1
-(`world`): una roca, una caja, un muro, un árbol, un objeto, un PNJ o la montaña; en la isla, también una pared
-invisible de la capa 4 (`bounds`). No hace falta cuando solo cambió el
-aspecto (una malla, un material), ni para los cuerpos en la capa 3 (`camera`), el personaje del jugador (capa 2) y
-las áreas (`Area3D`). Si lo olvidas, las rutas atraviesan un objeto movido (el personaje choca contra él y se desliza
-a lo largo) o rodean el lugar vacío donde estaba.
+(`world`): una roca, una caja, un muro, un árbol, un objeto (también mediante sus `dimensions`), un PNJ inmóvil o la
+montaña; en la isla, también una pared invisible de la capa 4 (`bounds`). No hace falta cuando solo cambió el aspecto
+(una malla, un material), ni para los cuerpos en la capa 3 (`camera`), los personajes que se mueven (capa 2) y las
+áreas (`Area3D`). Si lo olvidas, las rutas atraviesan un objeto movido (el personaje choca contra él y se desliza a lo
+largo) o rodean el lugar vacío donde estaba.
 
 **En el editor:**
 
@@ -105,26 +105,34 @@ Configuración (F10) → Interfaz → **Línea de ruta del personaje** muestra l
 - **Los diez aspectos del héroe** en fila de espaldas al muro sur, al este del hueco (ver
   [Personajes](characters.md#aspectos-del-héroe)).
 
-Edita las instancias de objetos en la escena del nivel para cambiar su disposición y vuelve a hornear la malla.
-Las pruebas de regresión usan rutas y posiciones concretas de obstáculos de esta demo: usa otro nivel para tu
-distribución o actualiza las pruebas junto con su geometría.
+Cada objeto sólido tiene una raíz `StaticProp`: muévelo por la raíz y redimensiónalo con `dimensions`, que cambia a la
+vez su modelo y su colisión; los árboles de la arboleda y las rocas son instancias de `grove_tree.tscn` y `rock.tscn`
+de distintos tamaños. Consulta [Edición de escenas en el editor](../editor_authoring.md#objetos-sólidos). Edita las
+instancias de objetos en la escena del nivel para cambiar su disposición y vuelve a hornear la malla. Las pruebas de
+regresión usan rutas y posiciones concretas de obstáculos de esta demo: usa otro nivel para tu distribución o
+actualiza las pruebas junto con su geometría.
 
 ### Lugares y NPC
 
 Cuatro lugares son áreas `PointOfInterest`. La primera vez que el jugador entra en uno, aparece "Lugar descubierto: …"
-en la parte superior de la pantalla durante unos segundos. En cada lugar hay NPC con etiquetas de nombre (`Label3D`)
-sobre la cabeza, mirando hacia su centro; el Caballero mira hacia el camino.
+en la parte superior de la pantalla durante unos segundos. En los lugares hay NPC con etiquetas de nombre (`Label3D`)
+sobre la cabeza, mirando hacia el centro de cada lugar; el Caballero hace una ronda desde la granja.
 
 | Lugar | Dónde | Quién está ahí |
 |---|---|---|
 | Cumbre de los Vientos | La cima de la montaña al noreste | El Mago, junto a un altar con un cristal |
 | Campamento de Viajeros | Este: tienda, fogata, barriles | El Explorador y el Enano junto al fuego |
-| Granja del Pozo | Suroeste: casa, pozo | El Caballero, de guardia junto al camino |
+| Granja del Pozo | Suroeste: casa, pozo | El Caballero, que hace una ronda por el laberinto de setos y vuelve |
 | Círculo Antiguo | El anillo de columnas al noroeste del punto de aparición | El Pícaro, junto al altar |
 
-Cada NPC es un `StaticBody3D` con una cápsula en la capa 1 (`World/NavigationRegion3D/Characters`): la malla de
-navegación los rodea y nadie los atraviesa. El campamento, la granja y las ruinas están bajo `World/Places`; la cumbre
-está en `mountain.tscn`.
+Cada NPC inmóvil es un `StaticBody3D` con una cápsula en la capa 1 (`World/NavigationRegion3D/Characters`): la malla de
+navegación los rodea y nadie los atraviesa. El Caballero es un `PatrolActor`, un personaje en la capa 2 que sigue el
+recorrido `World/Routes/KnightPatrol` por el laberinto y vuelve a su sitio junto a la casa y el pozo, espera allí 10 s y
+empieza de nuevo ([PatrolController](locomotion.md#patrolcontroller-seguir-un-recorrido)). Él y el héroe chocan entre
+sí, y él se detiene cuando el héroe está delante de él, a menos de un metro; a sus lados y detrás de él el héroe no lo
+detiene. Cuando el héroe lleva 2.5 s cerrándole el paso, el Caballero le pregunta por su padre en los subtítulos. En
+Isla Solitaria un explorador hace una ronda corta cerca del punto de llegada y se detiene un segundo en cada punto de su
+recorrido. El campamento, la granja y las ruinas están bajo `World/Places`; la cumbre está en `mountain.tscn`.
 
 **Un lugar nuevo:** agrega un `PointOfInterest` (un `Area3D` cuya `collision_mask` incluya la capa 2 de los
 personajes) con una forma de colisión y un `title` a cualquier escena del mundo. El aviso encuentra cada lugar a
@@ -243,4 +251,4 @@ entonces se ve como una silueta (ver
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

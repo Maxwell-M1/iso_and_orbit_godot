@@ -37,10 +37,13 @@ The `Settings` autoload (`gdscript/settings/game_settings.gd`, class `GameSettin
   The part before the slash is the section in the file.
 - `DEFAULTS` holds every key with its default; the default's type is the setting's type. A value of the wrong type in
   the file (edited by hand) falls back to the default.
-- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()`, and the signal `changed(key, value)`.
-- Values load in `_init()`, before any scene node's `_ready()`, and are saved to `user://settings.cfg` when the
-  settings window closes and when the game exits. `persistent = false` stops saving; the tests
-  set it and reset everything to the defaults, so they ignore the player's settings and never overwrite them.
+- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()`, `set_scene_defaults(values)`, and the signal
+  `changed(key, value)`. `set_scene_defaults()` takes the values a scene was set up with: they replace `DEFAULTS` where
+  the player has saved nothing, and `reset_to_defaults()` returns to them.
+- Values load from `path` (`user://settings.cfg`) at their first use, at the latest in the autoload's `_ready()`, before
+  any scene node's `_ready()`, and are saved there when the settings window closes and when the game exits.
+  `persistent = false` stops saving; the tests set it and reset everything to the defaults, so they ignore the player's
+  settings and never overwrite them.
 - Keys listed in `_OBSOLETE_KEYS` are removed from the file on load.
 - Engine-level settings are applied by the class itself (`_apply_to_engine()`): full screen, frame rate cap and V-Sync,
   physics interpolation, interface scale, language, volume. Settings of scene nodes are applied by the scene: in the
@@ -50,8 +53,8 @@ The `Settings` autoload (`gdscript/settings/game_settings.gd`, class `GameSettin
 
 1. A key constant and a default in `DEFAULTS` in `GameSettings`.
 2. A control with that key in `settings_screen.tscn` (see below). The window's code does not change.
-3. A branch in `settings_applier.gd` that sets the property, or in `GameSettings._apply_to_engine()` if the engine
-   applies it.
+3. A branch in `settings_applier.gd` that sets the property and an entry in its `_capture_scene_defaults()` that reads
+   the property's value in the scene, or a branch in `GameSettings._apply_to_engine()` if the engine applies it.
 4. Its texts in the translations, see [Translations](#translations).
 
 ### The settings window
@@ -94,6 +97,7 @@ keyboard and the wheel change the scale at once.
 | `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Under the FPS counter: what the hero is doing (state, speed and blend, movement, turning, ground or air, steps and feet, stamina) and the latest events. Hidden by default. See [Locomotion](locomotion.md#charactermonitor-the-state-as-text) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | "Discovered: …" for `show_time` (3.5 s) when the player first enters a `PointOfInterest`. Finds all places through the `points_of_interest` group, also those added later, a level loaded during the game (`watch_added_places`, on; off: only the places there at startup); `show_discovery(title)` shows one by hand |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Appears when stamina starts to be spent, turns red while the character is exhausted (`StaminaBarExhausted` variation) and fades over 0.6 s when full again |
+| `Hud/Subtitles` | `SubtitleDisplay` (PanelContainer), `gdscript/ui/subtitle_display.gd` | What a character says, at the bottom of the screen with its name, for `display_time` (5 s): the knight's line when the hero blocks his way. `main.gd` connects the `speech_requested` signal of the characters of each level to `show_line()`; a change of level clears the line. The name, the line and the way they are joined (`%s: %s`) are translated |
 | `Hud/TravelPrompt` | `TravelPrompt` (Control), `gdscript/ui/travel_prompt.gd` | The offer to travel on a teleport pad, above the stamina bar: the key of `interact` in a badge (`InputNames.of_action()`, as the hints name their keys) and "Teleport to <place>". The key or a click confirms (`confirmed(portal)`), the key also with Shift or another modifier held (the hero often sprints onto the pad); the button never takes the keyboard focus, so Space jumps and does not press it. Not a window: the game goes on |
 
 The loading screen (`LoadingScreen` in `main.tscn`, from the `levels` addon) is not part of the HUD: it covers the game
@@ -106,9 +110,9 @@ The hint panel, the FPS counter, the path line and the character state panel are
 
 `shared/ui/ui_theme.tres` is the project theme (`gui/theme/custom`): panels, the window, buttons and these type
 variations: `WindowPanel`, `WindowLayout`, `TabPage`, `SettingsList`, `HintLabel`, `FpsCounter`, `DiscoveryToast`,
-`StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`. Nodes pick a variation by `theme_type_variation`
-instead of overriding styles one by one. The loading screen brings its own theme, `loading_screen_theme.tres` in its
-addon, so it looks the same in any project.
+`StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`, `SubtitlePanel`, `SubtitleText`. Nodes pick a variation
+by `theme_type_variation` instead of overriding styles one by one. The loading screen brings its own theme,
+`loading_screen_theme.tres` in its addon, so it looks the same in any project.
 
 ## Translations
 
@@ -191,4 +195,4 @@ works while the game is paused. There is no key rebinding tab in the demo's sett
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

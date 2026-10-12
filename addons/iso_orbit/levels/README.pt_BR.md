@@ -1,5 +1,4 @@
-<!-- translation of addons/iso_orbit/levels/README.md @ 8dd533b32064 -->
-<!-- translation of addons/iso_orbit/levels/README.md @ pending -->
+<!-- translation of addons/iso_orbit/levels/README.md @ 8704e905abc7 -->
 # Níveis
 
 [← Índice da documentação (repositório do modelo)](../../../docs/pt_BR/index.md)
@@ -31,8 +30,10 @@ sinais dele.
 ## Configuração
 
 1. Copie esta pasta para `res://addons/iso_orbit/levels/`.
-2. Na cena principal (que permanece), adicione um `Node3D` com `level_host.gd` e coloque o nível inicial como seu
-   único filho. O personagem, a câmera e a interface ficam ao lado do host, não dentro de um nível.
+2. Na cena principal (que permanece), adicione um `Node3D` com `level_host.gd` e coloque o nível inicial sob ele. O
+   host começa no nível definido em `initial_level` ou, se ele estiver vazio, no seu primeiro filho `Node3D`; com
+   outros filhos 3D (um marcador, uma luz), defina-o, senão o host emite um aviso. O personagem, a câmera e a
+   interface ficam ao lado do host, não dentro de um nível.
 3. Adicione `loading_screen.tscn` à cena principal e atribua-a a `loading_screen` do host; deixe vazio se quiser
    trocar de nível sem uma tela.
 4. Em cada nível, adicione um `Marker3D` com `spawn_point.gd`, cujo `spawn_name` seja `default`, no chão. Adicione
@@ -77,4 +78,4 @@ No repositório do modelo: `docs/pt_BR/systems/levels.md` e `docs/pt_BR/integrat
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 87915285e965 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ 51bf079322a3 -->
 # Personaje terrestre
 
 [← Índice de documentación (repositorio de la plantilla)](../../../docs/es/index.md)
@@ -53,13 +53,14 @@ Necesita `addons/iso_orbit/click_to_move`: el cuerpo lo controla un `NavigationM
 
    Establece `mover`, `visual`, `ledge_guard` y `stamina` del cuerpo. La demo también activa `floor_constant_speed` en
    el cuerpo, para que el personaje conserve su velocidad en las rampas, y lo pone en la capa de física 2, aparte del
-   nivel: colisiona con las capas 1 y 4 (nivel y paredes invisibles). `get_ground_height()` y, por defecto,
-   `LedgeGuard` buscan suelo con la misma máscara. El cuerpo sube escalones de hasta `max_step_height` (0.3 m) y
-   pendientes de hasta `floor_max_angle`. Para crear rutas por escaleras, hornea la malla con `agent_max_climb`
-   igual a la altura deseada y prueba la ruta contra el colisionador real. Mantén `LedgeGuard.max_drop` al menos
-   igual a `max_step_height` y `floor_snap_length` por debajo si necesitas `stair_taken` al bajar.
-   El cuerpo puede empezar girado: solo gira `Visual` respecto al cuerpo y mira inicialmente hacia su eje −Z;
-   después lo giras con `teleport(position, facing)` o `NavigationMover.face()`.
+   nivel: colisiona con las capas 1, 2 y 4 (el nivel, los demás personajes y las paredes invisibles).
+   `get_ground_height()` y, por defecto, `LedgeGuard` buscan suelo con la misma máscara, así que otro personaje
+   también cuenta como suelo; pon `LedgeGuard.floor_mask` en las capas 1 y 4 para dejar fuera a los personajes. El
+   cuerpo sube escalones de hasta `max_step_height` (0.3 m) y pendientes de hasta `floor_max_angle`. Para crear rutas
+   por escaleras, hornea la malla con `agent_max_climb` igual a la altura deseada y prueba la ruta contra el
+   colisionador real. Mantén `LedgeGuard.max_drop` al menos igual a `max_step_height` y `floor_snap_length` por debajo
+   si necesitas `stair_taken` al bajar. El cuerpo puede empezar girado: solo gira `Visual` respecto al cuerpo y mira
+   inicialmente hacia su eje −Z; después lo giras con `teleport(position, facing)` o `NavigationMover.face()`.
 3. Para las teclas, agrega un `Node` con `character_action_input.gd` y establece su `character`. Necesita las
    acciones de entrada `sprint` y `jump`; si falta una, informa una vez al inicio y no vuelve a leerla.
 4. Opcional: `CharacterSounds` con hijos `AudioStreamPlayer3D`, `HandSway` con `character` y el nodo de mano,
@@ -89,4 +90,4 @@ En el repositorio de la plantilla: `docs/es/integration.md`, `docs/es/systems/lo
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

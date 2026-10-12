@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ui_screens/README.md @ f510902e02d8 -->
+<!-- translation of addons/iso_orbit/ui_screens/README.md @ 6e5afc9c199d -->
 # Telas de UI
 
 [← Índice da documentação (repositório do template)](../../../docs/pt_BR/index.md)
@@ -56,4 +56,4 @@ No repositório do modelo: `docs/pt_BR/systems/ui.md` e, para janelas durante tr
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

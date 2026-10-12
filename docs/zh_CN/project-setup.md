@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ e52ff77b332d -->
+<!-- translation of docs/en/project-setup.md @ 2f3486026502 -->
 # 项目配置
 
 [← 文档目录](index.md)
@@ -13,16 +13,16 @@
 
 | 层 | 名称 | 包含什么 | 谁读取它 |
 |---|---|---|---|
-| 1 | `world` | 地面、墙、道具、山、站在关卡中的 NPC | 点击射线（`PointClickMoveInput.ground_mask`）、玩家身体及其 `LedgeGuard`（`floor_mask` 为 0 时沿用身体掩码）、`CameraArm.collision_mask`、导航网格烘焙 |
-| 2 | `characters` | 玩家的身体（`collision_layer = 2`） | `PointOfInterest` 和 `LevelPortal` 区域（`collision_mask = 2`）；相机臂忽略此层 |
+| 1 | `world` | 地面、墙、道具、山、站在关卡中的 NPC | 点击射线（`PointClickMoveInput.ground_mask`）、玩家和巡逻角色的身体、玩家的 `LedgeGuard`（`floor_mask` 为 0 时沿用身体掩码）、`CameraArm.collision_mask`、导航网格烘焙 |
+| 2 | `characters` | 玩家的身体和巡逻角色（`collision_layer = 2`） | `PointOfInterest` 和 `LevelPortal` 区域（`collision_mask = 2`）；英雄和巡逻角色的身体，因此它们会互相阻挡，英雄的 `LedgeGuard` 也通过英雄的掩码读取此层；相机臂忽略此层 |
 | 3 | `camera` | 只阻挡相机的物体，例如 `shared/world/props/house.tscn` 中的 `RoofCameraBlocker` | 仅 `CameraArm.collision_mask` |
-| 4 | `bounds` | 关卡边缘的隐形墙，例如孤岛上的 `Edge` | 玩家身体（`collision_mask` 包含第 1 和第 4 层）及其 `LedgeGuard`；按需供导航网格烘焙使用（如孤岛） |
+| 4 | `bounds` | 关卡边缘的隐形墙，例如孤岛上的 `Edge` | 玩家和巡逻角色的身体（`collision_mask` 包含第 1、2 和 4 层）、玩家的 `LedgeGuard`；按需供导航网格烘焙使用（如孤岛） |
 
 `CameraArm.collision_mask` 默认为第 1 和第 3 层（`0b101`）。第 2 层上的角色永远不会推动相机。第 3 层上的物体会阻挡相机，但点击、导航和角色都看不到它，因此可以让相机不进入屋顶，同时又不让任何人寻路走上屋顶。第 4 层的物体则相反：它挡住角色，但点击和相机可以穿过，因此点击隐形墙后方的地面或水面不会命中墙。
 
 导航层 1 名为 `ground`；`NavigationMover.navigation_layers` 默认使用它。
 
-物理层与导航层相互独立：碰撞体的物理层决定哪些射线和身体会命中它；导航区域的导航层决定移动器能查询哪些路径。代码中的掩码是位字段：第 1 与第 4 层为 `1 | 8 = 9`，第 1 与第 3 层为 `1 | 4 = 5`。在检查器中，请勾选对应编号的方框。
+物理层与导航层相互独立：碰撞体的物理层决定哪些射线和身体会命中它；导航区域的导航层决定移动器能查询哪些路径。代码中的掩码是位字段：第 1、2 和 4 层为 `1 | 2 | 8 = 11`，第 1 与第 3 层为 `1 | 4 = 5`。在检查器中，请勾选对应编号的方框。
 
 ## 输入动作
 
@@ -81,4 +81,4 @@ HUD、设置界面和加载提示会从这些动作生成按键名称。如果�
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 8fc9a768e40b -->
+<!-- translation of docs/en/systems/ui.md @ 9204acfc18b7 -->
 # UI
 
 [← 文档目录](../index.md)
@@ -28,8 +28,8 @@
 
 - 键是该类的常量（`GameSettings.LEDGE_GUARD` 即 `&"gameplay/ledge_guard"`），因此可以用在 `match` 中。斜杠之前的部分是文件中的节（section）。
 - `DEFAULTS` 包含每个键及其默认值；默认值的类型就是该设置的类型。文件中类型错误的值（手动编辑造成）会回退为默认值。
-- `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`，以及信号 `changed(key, value)`。
-- 设置值在 `_init()` 中加载，早于任何场景节点的 `_ready()`，并在设置窗口关闭和游戏退出时保存到 `user://settings.cfg`。`persistent = false` 会停止保存；测试会设置它并将所有设置重置为默认值，因此测试会忽略玩家的设置，也永远不会覆盖它们。
+- `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`、`set_scene_defaults(values)`，以及信号 `changed(key, value)`。`set_scene_defaults()` 接收场景配置时所设的值：在玩家没有保存值的地方，它们代替 `DEFAULTS`，`reset_to_defaults()` 也会恢复到这些值。
+- 设置值在首次使用时从 `path`（`user://settings.cfg`）加载，最迟在自动加载的 `_ready()` 中，早于任何场景节点的 `_ready()`；并在设置窗口关闭和游戏退出时保存到该文件。`persistent = false` 会停止保存；测试会设置它并将所有设置重置为默认值，因此测试会忽略玩家的设置，也永远不会覆盖它们。
 - `_OBSOLETE_KEYS` 中列出的键会在加载时从文件中移除。
 - 引擎层面的设置由该类自行应用（`_apply_to_engine()`）：全屏、帧率上限和 V-Sync、物理插值、界面缩放、语言、音量。场景节点的设置由场景应用：在演示中，`gdscript/demo/settings_applier.gd` 在启动时读取 `get_value()`，并监听 `changed`。
 
@@ -37,7 +37,7 @@
 
 1. 在 `GameSettings` 中添加一个键常量，并在 `DEFAULTS` 中添加默认值。
 2. 在 `settings_screen.tscn` 中添加一个使用该键的控件（见下文）。窗口的代码无需修改。
-3. 在 `settings_applier.gd` 中添加设置该属性的分支；如果由引擎应用，则添加到 `GameSettings._apply_to_engine()` 中。
+3. 在 `settings_applier.gd` 中添加设置该属性的分支，并在其 `_capture_scene_defaults()` 中添加一项，读取该属性在场景中的值；如果由引擎应用，则在 `GameSettings._apply_to_engine()` 中添加分支。
 4. 在翻译中添加其文本，见[翻译](#翻译)。
 
 ### 设置窗口
@@ -67,6 +67,7 @@
 | `Hud/CharacterState/Monitor` | `CharacterMonitor`（Label） | 位于 FPS 计数器下方：英雄在做什么（状态、速度和混合值、移动、转向、在地面还是空中、脚步和左右脚、体力）以及最近的事件。默认隐藏。见[移动](locomotion.md#charactermonitor以文本显示状态) |
 | `Hud/DiscoveryToast` | `DiscoveryToast`（Label） | 玩家首次进入 `PointOfInterest` 时显示“发现地点：……”，持续 `show_time`（3.5 秒）。通过 `points_of_interest` 分组找到所有地点，包括以后加载的关卡所新增的地点（`watch_added_places` 默认开启；关闭后只关注启动时已有地点）；`show_discovery(title)` 可手动显示一条 |
 | `Hud/StaminaBar` | `StaminaBar`（ProgressBar） | 开始消耗体力时出现，角色力竭期间变红（`StaminaBarExhausted` 变体），重新充满后在 0.6 秒内淡出 |
+| `Hud/Subtitles` | `SubtitleDisplay`（PanelContainer），`gdscript/ui/subtitle_display.gd` | 在屏幕底部显示角色说的话及其名字，持续 `display_time`（5 秒）：例如英雄挡住骑士的路时骑士的台词。`main.gd` 把每个关卡中角色的 `speech_requested` 信号连接到 `show_line()`；切换关卡会清除台词。名字、台词以及两者的连接方式（`%s: %s`）都会翻译 |
 | `Hud/TravelPrompt` | `TravelPrompt`（Control），`gdscript/ui/travel_prompt.gd` | 传送台上的旅行提示，位于体力条上方：徽章中的 `interact` 按键（`InputNames.of_action()`，与操作提示一样）和“传送至<地点>”。按键或点击都会确认（`confirmed(portal)`），即使同时按住 Shift 等修饰键也可以（英雄常常冲刺跑上传送台）；按钮不会夺取键盘焦点，因此空格只会跳跃，不会触发它。它不是窗口，游戏会继续运行 |
 
 加载画面（`main.tscn` 中的 `LoadingScreen`，来自 `levels` 插件）不属于 HUD：切换关卡时它盖住游戏，见[关卡](levels.md#加载画面)。画面取得截图时 HUD 会隐藏，然后在画面下方恢复。
@@ -75,7 +76,7 @@
 
 ## 主题
 
-`shared/ui/ui_theme.tres` 是项目主题（`gui/theme/custom`）：包括面板、窗口、按钮，以及以下类型变体：`WindowPanel`、`WindowLayout`、`TabPage`、`SettingsList`、`HintLabel`、`FpsCounter`、`DiscoveryToast`、`StaminaBar`、`StaminaBarExhausted`、`KeyBadge`、`TravelButton`。节点通过 `theme_type_variation` 选择变体，而不是逐个覆盖样式。加载画面使用插件中自己的主题 `loading_screen_theme.tres`，因此放进其他项目外观也相同。
+`shared/ui/ui_theme.tres` 是项目主题（`gui/theme/custom`）：包括面板、窗口、按钮，以及以下类型变体：`WindowPanel`、`WindowLayout`、`TabPage`、`SettingsList`、`HintLabel`、`FpsCounter`、`DiscoveryToast`、`StaminaBar`、`StaminaBarExhausted`、`KeyBadge`、`TravelButton`、`SubtitlePanel`、`SubtitleText`。节点通过 `theme_type_variation` 选择变体，而不是逐个覆盖样式。加载画面使用插件中自己的主题 `loading_screen_theme.tres`，因此放进其他项目外观也相同。
 
 ## 翻译
 
@@ -117,4 +118,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

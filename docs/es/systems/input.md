@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/input.md @ 286e042594f2 -->
+<!-- translation of docs/en/systems/input.md @ 64c53fd9a7b2 -->
 # Entrada
 
 [← Índice de documentación](../index.md)
@@ -91,9 +91,12 @@ haciendo lo que hacía (quieto, o corriendo hacia donde corría), y no hay marca
   (`hold_started`) y no gira primero hacia el punto presionado. De lo contrario empezaría a seguir la ruta hacia ese
   punto, y una ruta que rodea obstáculos puede llevar a un lugar completamente distinto del cursor.
 
-El precio es que un clic actúa al soltar, unos 0,1 s más tarde que al presionar. Mientras no está claro si una
-pulsación es un clic o una pulsación mantenida, `hold_pending_changed(true)` pausa el seguimiento de cámara
-(conectado con `OrbitCameraRig.set_follow_paused()` en `playable_hero.tscn`), así que un clic corto no la mueve.
+El precio es que un clic actúa al soltar, unos 0,1 s más tarde que al presionar. Mientras tanto, el cursor se queda
+donde lo dejó el ratón, también mientras la cámara gira tras la carrera, y el seguimiento de la cámara continúa: un clic
+no mueve el cursor ni detiene un giro de la cámara en curso. Una pulsación que se convierte en mantenida apunta desde
+donde está el cursor en ese momento. `hold_pending_changed(true)` informa de esa pulsación, y la plantilla no necesita
+nada de ella. No la conectes con `OrbitCameraRig.set_follow_paused()`, como hacía la plantilla antes de 1.3.0: cada clic
+detendría el giro de la cámara, y el giro empezaría de nuevo.
 
 Si el botón derecho ya está mantenido cuando se presiona el izquierdo, no hay clic: el personaje corre tras la cámara
 de inmediato.
@@ -154,10 +157,11 @@ si lo sueltas y mantienes el izquierdo, vuelve a ocultarse. Pausar o cambiar de 
 
 **Mantiene la mira** (`keep_aim_on_camera_turn`, activado por defecto). Mientras se mantiene el botón izquierdo, la
 dirección de carrera viene del cursor, un punto en la pantalla. Si la cámara gira mientras el cursor se queda quieto en
-la pantalla, bajo él queda otro punto del suelo, el personaje gira tras ese punto, la cámara gira tras el personaje
-y termina corriendo en círculos. Por eso, mientras se mantiene el botón, el componente mueve la mira con el mundo:
-el personaje conserva la dirección mientras la cámara se coloca detrás. Mover el ratón sigue dirigiendo. La misma
-mira conserva el rumbo al orbitar con el derecho para mirar alrededor durante la carrera.
+la pantalla, bajo él queda otro punto del suelo, el personaje gira tras ese punto, la cámara gira tras el personaje y
+termina corriendo en círculos. Por eso, en cuanto la pulsación se ha convertido en mantenida, el componente mueve la
+mira con el mundo: el personaje conserva la dirección mientras la cámara se coloca detrás. Mover el ratón sigue
+dirigiendo. La misma mira conserva el rumbo al orbitar con el derecho para mirar alrededor durante la carrera. Antes de
+eso, mientras la pulsación aún puede ser un clic, el cursor se queda donde está.
 
 Desactivado, el cursor conduce como un auto: mantenlo a la derecha del personaje y el personaje se desvía a la derecha
 hasta que el cursor queda justo delante. Donde el sistema no puede mover el cursor (Wayland, por ejemplo), la
@@ -239,4 +243,4 @@ que no sea modificadora, solo está disponible el estado normal de la acción.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

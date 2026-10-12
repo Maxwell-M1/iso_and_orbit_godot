@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 29860f203673 -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fe4a0c8606a9 -->
 # Перемещение по щелчку
 
 [← Оглавление документации (репозиторий шаблона)](../../../docs/ru/index.md)
@@ -26,6 +26,7 @@
 | `point_click_move_input.gd` | `PointClickMoveInput` (Node) | Мышь и ПКМ + WASD → команды контроллеру; `cancel()` сбрасывает текущее нажатие |
 | `click_marker.gd`, `click_marker.tscn` | `ClickMarker` (Node3D) | Метка в точке щелчка |
 | `navigation_path_view.gd` | `NavigationPathView` (MeshInstance3D) | Отладочная линия вдоль оставшегося пути |
+| `patrol_controller.gd` | `PatrolController` (Node) | Водит персонажа по маршруту, нарисованному на уровне (`Path3D`): может останавливаться в его точках (`waypoint_wait`), ждёт в начале (`cycle_wait`), останавливается перед персонажем на пути и сообщает об этом |
 
 Другие аддоны не нужны. Для готового тела с гравитацией, прыжком и ускорением добавьте
 `addons/iso_orbit/ground_character`.
@@ -54,31 +55,36 @@
    	move_and_slide()
    ```
 
-   Назначьте `NavigationMover.settings` ресурс `LocomotionSettings` до входа контроллера в дерево или оставьте
-   пустым для создания ресурса со значениями скрипта. Если персонажам нужны разные настройки, используйте
-   **Make Unique**. Изменение полей ресурса во время игры действует; замена `mover.settings` после `_ready()`
-   не обновляет созданный ранее объект `GroundMotion`. `GroundCharacter` из соседнего аддона обрабатывает ступени,
-   прыжок и защиту от обрывов, если они вам нужны.
+   Назначьте `NavigationMover.settings` ресурс `LocomotionSettings` или оставьте пустым для создания ресурса со
+   значениями скрипта. Если персонажам нужны разные настройки, используйте **Make Unique**. Изменение полей ресурса
+   во время игры действует на всех персонажей, которые его используют; замена `mover.settings` во время игры
+   действует сразу. `GroundCharacter` из соседнего аддона обрабатывает ступени, прыжок и защиту от обрывов, если они
+   вам нужны.
 
-4. Для управления мышью добавьте в любое место `Node` с `point_click_move_input.gd` и задайте его `mover` и
-   `camera`. Ему нужны действия ввода `move_to_cursor` (левая кнопка), `camera_rotate` (правая кнопка) и
-   `move_forward`, `move_back`, `move_left`, `move_right` (WASD). Об отсутствии действия сообщается один раз при
-   запуске; далее оно не читается. Щелчки попадают в физический слой 1 (`ground_mask`): не включайте в него
-   персонажей и невидимые стены, иначе щелчок попадёт в них. Если камера из `addons/iso_orbit/orbit_camera`,
-   соедините `hold_pending_changed` с её `set_follow_paused`, а `run_requested` — с `end_follow_wait`.
-   Осмотр во время бега (`look_around_while_held`) требует, чтобы `camera_steer_action` совпадало с действием
+4. Для управления мышью добавьте в любое место `Node` с `point_click_move_input.gd` и задайте его `mover` и `camera`.
+   Ему нужны действия ввода `move_to_cursor` (левая кнопка), `camera_rotate` (правая кнопка) и `move_forward`,
+   `move_back`, `move_left`, `move_right` (WASD). Об отсутствии действия сообщается один раз при запуске; далее оно не
+   читается. Щелчки попадают в физический слой 1 (`ground_mask`): не включайте в него персонажей и невидимые стены,
+   иначе щелчок попадёт в них. Если камера из `addons/iso_orbit/orbit_camera`, соедините `run_requested` с её
+   `end_follow_wait`, но не `hold_pending_changed` с её `set_follow_paused`: каждый щелчок останавливал бы поворот
+   камеры. Осмотр во время бега (`look_around_while_held`) требует, чтобы `camera_steer_action` совпадало с действием
    вращения камеры (её `rotate_action`; оба по умолчанию `camera_rotate`).
 5. Можно управлять контроллером из ИИ: `move_to(point)`, `steer(direction)`, `stop()`, слушая `arrived`. Сигнал
    означает конец пути, который может не дойти до запрошенной точки, если она недостижима.
+6. Для патруля добавьте под тело, рядом с его `NavigationMover`, `Node` с `patrol_controller.gd`. Нарисуйте `Path3D` на
+   уровне, вне персонажа и там, где персонаж проходит, и назначьте его в `route`. Персонаж идёт по линии, которую
+   редактор рисует для кривой, возвращается в начало, ждёт `cycle_wait` и идёт снова; `blocked_long_enough` сообщает о
+   персонаже, который простоял у него на пути `blocked_delay` секунд. Чтобы другие персонажи останавливали его, маска
+   коллизий тела должна включать их слой.
 
 Чтобы взять собранного героя с готовой сценой и настройками, следуйте `docs/ru/integration.md`, а не собирайте
 это тело вручную. Два режима ввода и настройки героя описаны в `docs/ru/systems/input.md`.
 
 ## Документация
 
-В репозитории шаблона: `docs/ru/integration.md`, `docs/ru/systems/locomotion.md` и
+В репозитории шаблона: `docs/ru/integration.md`, `docs/ru/systems/locomotion.md` (вместе с патрулями) и
 `docs/ru/systems/input.md`.
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

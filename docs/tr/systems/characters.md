@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 48c5e73646e2 -->
+<!-- translation of docs/en/systems/characters.md @ bfea84438c4d -->
 # Karakterler
 
 [← Belge dizini](../index.md)
@@ -336,4 +336,4 @@ gibi düzenleyin.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 262d20fd6cef -->
+<!-- translation of docs/en/settings.md @ 39df1e5739b5 -->
 # 设置
 
 [← 文档目录](index.md)
@@ -7,7 +7,7 @@
 
 F10 打开设置窗口并暂停游戏；按 Esc 或 F10 关闭。更改立即生效（只有用鼠标拖动界面缩放滑块时，要等松开才生效），并在窗口关闭和游戏退出时保存到 `user://settings.cfg`。**全部重置**会将所有设置恢复为默认值。
 
-默认值位于 `gdscript/settings/game_settings.gd` 的 `DEFAULTS` 中。演示在 `gdscript/demo/settings_applier.gd` 中将它们应用到节点属性；组件自身的属性默认值可能不同，下文会注明。设置系统的工作原理以及如何添加设置：[UI](systems/ui.md#设置)。
+默认值位于 `gdscript/settings/game_settings.gd` 的 `DEFAULTS` 中。演示在 `gdscript/demo/settings_applier.gd` 中将它们应用到节点属性；组件自身的属性默认值可能不同，下文会注明。对于它所应用的设置，`SettingsApplier` 改以场景中设置的值作为默认值（演示中这些值与 `DEFAULTS` 一致）：在场景中修改的值就是游戏开始时使用的值，直到玩家更改为止，也是**全部重置**所恢复的值。关闭 `SettingsApplier.use_saved_settings` 时，场景中的节点保留场景中设置的值，设置窗口也不会改变它们；引擎设置（全屏、帧率、V-Sync、物理插值、界面缩放、语言、音量）仍来自已保存的设置和设置窗口。设置系统的工作原理以及如何添加设置：[UI](systems/ui.md#设置)。
 
 单独使用复制来的英雄时，请参阅[配置方案](configurations.md)，查找检查器属性并选择协调一致的配置。本页说明的是**演示菜单**。以下标签使用原始按键绑定；运行中的菜单会根据 `InputMap` 替换为当前按键。
 
@@ -102,4 +102,4 @@ F10 打开设置窗口并暂停游戏；按 Esc 或 F10 关闭。更改立即生
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

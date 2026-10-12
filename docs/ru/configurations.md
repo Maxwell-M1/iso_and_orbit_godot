@@ -1,4 +1,4 @@
-<!-- translation of docs/en/configurations.md @ 2173d5158953 -->
+<!-- translation of docs/en/configurations.md @ ced3a1b9ab87 -->
 # Настройка игрового героя
 
 [← Оглавление документации](index.md)
@@ -199,4 +199,4 @@ func _ready() -> void:
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

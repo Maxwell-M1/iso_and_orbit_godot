@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 502ddfce7182 -->
+<!-- translation of docs/en/integration.md @ 8543b901c9a7 -->
 # Usando no seu projeto
 
 [← Índice da documentação](index.md)
@@ -25,7 +25,7 @@ mesmo local dentro do Godot. Mantenha a organização das pastas na primeira int
 | Addon | Classes | Requisitos |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`, `CameraArm` | Ações de entrada `camera_rotate`, `camera_zoom_in`, `camera_zoom_out`; camadas de física para o braço |
-| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView` | Um `NavigationRegion3D` com malha gerada no mundo (sem ele o personagem corre direto até o ponto). Para a entrada: qualquer `Camera3D` e as ações `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
+| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView`, `PatrolController` | Um `NavigationRegion3D` com malha gerada no mundo (sem ele o personagem corre direto até o ponto). Para a entrada: qualquer `Camera3D` e as ações `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
 | `ground_character` | `GroundCharacter`, `FallSettings`, `LedgeGuard`, `Stamina`, `CharacterActionInput`, `CharacterSounds`, `HandSway`, `CharacterHover`, `DampedSpring`, `CharacterAppearance`, `StaminaBar` | `click_to_move`. Para as teclas: ações `sprint` e `jump`. Para os sons: os seus próprios ou `shared/audio/character/`. Para o balanço da mão e modelos trocáveis: modelos voltados para −Z com um nó de mão |
 | `occluded_silhouette` | `OccludedSilhouette`, com seus shaders e materiais | Nada: funciona com qualquer modelo |
 | `points_of_interest` | `PointOfInterest`, `DiscoveryToast` | O corpo do jogador no grupo `player`, numa camada de física que as áreas enxergam |
@@ -100,12 +100,12 @@ dos níveis, não dentro de um deles. Seu script, `playable_hero.gd`, usa apenas
 - As partes são propriedades tipadas: `character`, `input`, `actions`, `camera_rig`, `camera_arm`, `camera`,
   `click_marker`, `path_view` e, no personagem, `sounds`, `appearance`, `hover`, `silhouette`.
 
-Para usar outro modelo, copie a cena e substitua `player.tscn` pelo seu personagem ou monte as partes manualmente.
-Duas conexões da câmera são essenciais: `PointClickMoveInput.hold_pending_changed` com
-`OrbitCameraRig.set_follow_paused` e `PointClickMoveInput.run_requested` com `OrbitCameraRig.end_follow_wait` (a câmera
-espera uma nova corrida após ser girada manualmente). Outras quatro mostram e ocultam o marcador de clique; veja
-[Arquitetura](architecture.md#conexões-feitas-na-cena). Mantenha `sharp_turn_speed` da câmera na metade da velocidade
-de giro do personagem ou menos: apenas `PlayableHero` verifica isso e emite aviso.
+Para usar outro modelo, copie a cena e substitua `player.tscn` pelo seu personagem ou monte as partes manualmente. Uma
+conexão da câmera é essencial: `PointClickMoveInput.run_requested` com `OrbitCameraRig.end_follow_wait` (a câmera espera
+uma nova corrida após ser girada manualmente). Outras quatro mostram e ocultam o marcador de clique; veja
+[Arquitetura](architecture.md#conexões-feitas-na-cena). Não conecte `hold_pending_changed` a `set_follow_paused`, como o
+modelo fazia antes da 1.3.0: cada clique pararia o giro da câmera. Mantenha `sharp_turn_speed` da câmera na metade da
+velocidade de giro do personagem ou menos: apenas `PlayableHero` verifica isso e emite aviso.
 
 ## Transferindo o herói da demo para o seu projeto
 
@@ -132,7 +132,7 @@ teste pequeno; adicione seus modelos, níveis e configurações depois que o her
      e todas as malhas atribuídas a ele precisam usar os mesmos tamanhos de célula;
    - interpolação de física ativada (`physics/common/physics_interpolation`): a câmera acompanha a posição
      interpolada do personagem. O herói foi testado com Jolt Physics (`physics/3d/physics_engine`);
-   - camadas de física: o corpo do herói fica na camada 2 e colide com as camadas 1 e 4; o clique procura o chão
+   - camadas de física: o corpo do herói fica na camada 2 e colide com as camadas 1, 2 e 4; o clique procura o chão
      na camada 1; o braço da câmera para nas camadas 1 e 3. Os nomes não importam, mas os números sim: ponha chão
      e paredes na camada 1 ou altere essas máscaras na sua cópia da cena.
 3. **Monte um nível de teste** sob um `NavigationRegion3D`. Crie um chão `StaticBody3D` com `BoxShape3D` e `BoxMesh`
@@ -207,7 +207,7 @@ exatos dos nós, os diferentes tipos de padrão e duas variantes úteis.
 | Os cliques não fazem nada | Ação no Input Map, câmera ativa, `PlayerInput.camera` e `ground_mask` do raio; um Control sobreposto pode consumir a entrada do mouse |
 | O herói anda contra uma parede em vez de contorná-la | Gere a malha com os colliders sob a região, confira as camadas de navegação da região/do movimentador e examine a malha resultante |
 | O caminho atravessa um degrau que o herói não consegue subir | Iguale a escalada a `max_step_height`, use células verticais finas, gere novamente e teste a geometria real |
-| Alterações da cena somem na inicialização | Uma cópia de `SettingsApplier` pode substituí-las por ajustes salvos; o herói independente não precisa dele |
+| Alterações da cena somem na inicialização | Uma cópia de `SettingsApplier` pode substituí-las por ajustes salvos: desligue o `use_saved_settings` dele ou deixe-o de fora, pois o herói independente não precisa dele |
 | A câmera gira de modo inesperado após mudar o movimento | Compare `turn_speed` do personagem e `sharp_turn_speed` da câmera; veja [Configurações](configurations.md#ajustes-sem-perder-a-configuração) |
 
 Outros detalhes:
@@ -225,13 +225,13 @@ Outros detalhes:
 
 ## Níveis
 
-Copie `addons/iso_orbit/levels/`. A cena principal mantém um `LevelHost` cujo único filho é o nível inicial, o herói
-ao lado dele e `loading_screen.tscn`. Seu script principal conecta os sinais do host: em `level_change_started`,
-retira o controle; em `level_loaded(level, spawn)`, posiciona o herói em `spawn`; em `level_change_finished`, devolve
-o controle; em `level_change_failed`, também o devolve (o nível permanece e `level_change_finished` não ocorre);
-em `portal_entered` e `portal_exited`, mostra e oculta a oferta de viagem. `gdscript/main.gd` faz exatamente isso.
-Cada nível precisa de um `SpawnPoint` chamado `default`; os portais são áreas `LevelPortal` com o caminho da cena
-de destino.
+Copie `addons/iso_orbit/levels/`. A cena principal mantém um `LevelHost` com o nível inicial como filho (com outros
+filhos 3D, indique-o em `initial_level`), o herói ao lado dele e `loading_screen.tscn`. Seu script principal conecta os
+sinais do host: em `level_change_started`, retira o controle; em `level_loaded(level, spawn)`, posiciona o herói em
+`spawn`; em `level_change_finished`, devolve o controle; em `level_change_failed`, também o devolve (o nível permanece
+e `level_change_finished` não ocorre); em `portal_entered` e `portal_exited`, mostra e oculta a oferta de viagem.
+`gdscript/main.gd` faz exatamente isso. Cada nível precisa de um `SpawnPoint` chamado `default`; os portais são áreas
+`LevelPortal` com o caminho da cena de destino.
 
 Se você já tiver um sistema de níveis, leve apenas o herói jogável e chame `place_at()` quando o nível estiver
 pronto; com outro personagem, chame `GroundCharacter.teleport()` para o mesmo efeito. Detalhes, padrões e
@@ -311,4 +311,4 @@ registre-o como o autoload `Settings`, substitua as chaves e o `DEFAULTS` pelos 
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

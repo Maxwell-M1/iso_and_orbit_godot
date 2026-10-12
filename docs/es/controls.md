@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ 18ede9271cf7 -->
+<!-- translation of docs/en/controls.md @ a842ae064734 -->
 # Controles
 
 [← Índice de documentación](index.md)
@@ -39,7 +39,8 @@ Si una pulsación es un clic o una pulsación mantenida se decide a los 0,2 s.
 - **Mantener** (se mantiene más tiempo): el héroe corre tras el cursor de inmediato y nunca gira hacia el punto
   donde presionaste.
 
-Hasta que se decide, el héroe sigue haciendo lo que estaba haciendo.
+Hasta que se decide, el héroe sigue haciendo lo que estaba haciendo, el cursor se queda donde lo pusiste y una cámara
+que sigue la carrera continúa girando.
 
 Cómo sigue el héroe a un botón mantenido (Configuración → Controles → **Clic izq. mantenido**):
 
@@ -131,11 +132,11 @@ la distribución del teclado: esas posiciones son ZQSD en AZERTY. Cambia las asi
 - **Zoom:** la rueda cambia la distancia y la inclinación juntas. Por debajo de la mitad la cámara se nivela rápido,
   así ves lo que hay delante.
 - **Seguimiento** (desactivado por defecto): Configuración → Cámara → **Girar la cámara siguiendo la carrera** y
-  **Alinear inclinación de cámara al correr** y **Alinear altura de cámara al correr**. No sigue mientras se
-  mantiene el derecho ni durante los primeros 0.2 s de una pulsación izquierda. Tras girarla con el derecho,
-  también para mirar alrededor durante la carrera, conserva la vista elegida hasta que el héroe se detiene o
-  inicia otra carrera con el izquierdo (clic o pulsación sostenida). No gira mientras frena o continúa hacia un
-  punto marcado. Las teclas requieren el derecho, así que nunca se siguen automáticamente.
+  **Alinear inclinación de cámara al correr** y **Alinear altura de cámara al correr**. No sigue mientras se mantiene el
+  derecho; los clics no la interrumpen. Tras girarla con el derecho, también para mirar alrededor durante la carrera,
+  conserva la vista elegida hasta que el héroe se detiene o inicia otra carrera con el izquierdo (clic o pulsación
+  sostenida). No gira mientras frena o continúa hacia un punto marcado. Las teclas requieren el derecho, así que nunca
+  se siguen automáticamente.
 - **Obstáculos:** la cámara se detiene ante una montaña, una pared o un techo que tenga detrás. Opcionalmente se
   acerca cuando un obstáculo oculta al héroe. Detrás de los obstáculos el héroe se ve como una silueta.
 
@@ -164,4 +165,4 @@ Detalles: [Locomoción](systems/locomotion.md).
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

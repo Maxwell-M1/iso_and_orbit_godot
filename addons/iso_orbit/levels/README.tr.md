@@ -1,5 +1,4 @@
-<!-- translation of addons/iso_orbit/levels/README.md @ 8dd533b32064 -->
-<!-- translation of addons/iso_orbit/levels/README.md @ pending -->
+<!-- translation of addons/iso_orbit/levels/README.md @ 8704e905abc7 -->
 # Seviyeler
 
 [← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
@@ -29,8 +28,10 @@ Başka eklenti gerekmez: seviye sunucusu karakteri, kamerayı veya arayüzü bil
 ## Kurulum
 
 1. Bu klasörü `res://addons/iso_orbit/levels/` konumuna kopyalayın.
-2. Ana sahneye (oyun boyunca kalan sahneye) `level_host.gd` kullanan bir `Node3D` ekleyin; başlangıç seviyesini tek
-   çocuğu yapın. Oyuncu karakteri, kamera ve arayüz, seviyenin içinde değil, sunucunun yanında dursun.
+2. Ana sahneye (oyun boyunca kalan sahneye) `level_host.gd` kullanan bir `Node3D` ekleyin ve başlangıç seviyesini
+   altına koyun. Sunucu `initial_level` içinde ayarlanan seviyeyle, bu alan boşsa ilk `Node3D` çocuğuyla başlar;
+   başka 3B çocuklar da (bir işaretçi, bir ışık) varsa alanı ayarlayın, yoksa sunucu uyarır. Oyuncu karakteri, kamera
+   ve arayüz, seviyenin içinde değil, sunucunun yanında dursun.
 3. Ana sahneye `loading_screen.tscn` ekleyip sunucunun `loading_screen` alanına atayın veya ekransız geçiş için
    alanı boş bırakın.
 4. Her seviyede `spawn_point.gd` kullanan, yerde duran ve `spawn_name` değeri `default` olan bir `Marker3D` ekleyin.
@@ -76,4 +77,4 @@ yapın: betiğin `Root` ve benzersiz adlarıyla `Background`, `Title`, `Bar`, `T
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

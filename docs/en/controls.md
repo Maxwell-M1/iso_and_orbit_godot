@@ -32,7 +32,8 @@ Whether a press is a click or a hold is decided after 0.2 s.
   you take over with a hold or the keys.
 - **Hold** (held longer): the hero runs after the cursor at once and never turns toward the point where you pressed.
 
-Until the decision, the hero keeps doing what it was doing.
+Until the decision, the hero keeps doing what it was doing, the cursor stays where you put it, and a camera that follows
+the run goes on turning.
 
 How the hero follows a held button (Settings → Controls → **Held LMB**):
 
@@ -118,12 +119,12 @@ the demo does not yet have an in-game rebinding menu.
   camera up and down** is on (off by default).
 - **Zoom:** the wheel changes the distance and the tilt together. Below the middle the camera levels out quickly, so
   you see what lies ahead.
-- **Follow** (off by default): Settings → Camera → **Turn the camera to follow the run**, **Align the camera tilt
-  on the run** and **Align the camera height on the run**. The camera does not follow while the right button is
-  held, or during the first 0.2 s of a left button press. After you turn the camera with the right button, also
-  while looking around on the run, it stays as you left it until the hero stops or you start a new run with the left
-  button (a click or a hold): it does not swing around while the hero brakes or runs on to a clicked point. The keys
-  need the right button, so walks by the keys are never followed.
+- **Follow** (off by default): Settings → Camera → **Turn the camera to follow the run**,
+  **Align the camera tilt on the run** and **Align the camera height on the run**. The camera does not follow while the
+  right button is held; clicks do not interrupt it. After you turn the camera with the right button, also while looking
+  around on the run, it stays as you left it until the hero stops or you start a new run with the left button (a click
+  or a hold): it does not swing around while the hero brakes or runs on to a clicked point. The keys need the right
+  button, so walks by the keys are never followed.
 - **Obstacles:** the camera stops at a mountain, a wall or a roof behind it. Optionally it moves in when an obstacle
   hides the hero. Behind obstacles the hero shows as a silhouette.
 
@@ -151,4 +152,4 @@ Details: [Locomotion](systems/locomotion.md).
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

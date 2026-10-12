@@ -1,5 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 94f2d396a032 -->
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ pending -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 920ed88160c2 -->
 # Yörünge kamerası
 
 [← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
@@ -38,8 +37,9 @@ Godot 4.7 için Iso & Orbit'in parçasıdır. MIT lisansı (bkz. `LICENSE`). Bu 
 
    Düzenek ve kol sırasıyla ilk doğrudan `CameraArm` ve `Camera3D` çocuklarını bulur; dışa aktarılan `arm` ve
    `camera` başvurularını da atayabilirsiniz. Kolu kamerayı yerleştirdiğinden `Camera3D` varsayılan yerel dönüşümde
-   kalsın. Etkin görüntü olması gerektiğinde Current özelliğini açın. Şablon kadrajı için görüş açısını 45°, uzak
-   düzlemi 300 dünya birimi yapın.
+   kalsın; editörde düzenek onu oyunun başlattığı yerde gösterir (`start_zoom`, `start_yaw`), kaydetme ise sahnenin
+   kendi değerlerini korur. Etkin görüntü olması gerektiğinde Current özelliğini açın. Şablon kadrajı için görüş
+   açısını 45°, uzak düzlemi 300 dünya birimi yapın.
 4. Katı dünya çarpışmasını 1. fizik katmanına koyun. Kolun varsayılan `collision_mask` değeri 1 ve 3. katmanlardır
    (`0b101`); 3. katmanda yalnız kameraya engel olan çatılar bulunabilir. Karakterleri bu maskeden çıkarın ki
    kamerayı itmesinler. Gövdeyi hariç tutmak için kendisine veya üst düğümüne `camera_ignore` ekleyin. İsterseniz
@@ -56,13 +56,13 @@ Koşunun arkasına dönmek için `follow_movement`; yalnız istediğiniz hizalam
 `follow_zoom` açın. Kahraman sahnesi başlangıçta üçünü de kapalı tutar. Açılar Inspector'da derece, GDScript
 atamalarında `deg_to_rad()` ile radyan kullanır.
 
-`follow_wait_after_rotate` açıkken bilinçli fare dönüşü sonrasında hedef yavaşlayana veya yeni koşu başlayana dek
-takip bekler. Girdi, hedef durmadan yeni koşu başlatıyorsa o anda `end_follow_wait()` çağırın. Şablon,
-`gdscript/player/playable_hero.tscn` içinde `PointClickMoveInput.run_requested` sinyalini buna,
-`hold_pending_changed` sinyalini `set_follow_paused()` yöntemine bağlar. Hedef sürekli hareket edip yeni koşuyu
-bildiremiyorsa bekleme seçeneğini kapalı bırakın. Ters yöne dönme sırasında kamera ara yönleri izlemesin diye
-`sharp_turn_speed` eşiğini karakter dönüş hızının yarısında veya altında tutun; şablonda kahramanın 720°/s
-dönüşüne karşı 360°/s kullanılır.
+`follow_wait_after_rotate` açıkken bilinçli fare dönüşü sonrasında hedef yavaşlayana veya yeni koşu başlayana dek takip
+bekler. Girdi, hedef durmadan yeni koşu başlatıyorsa o anda `end_follow_wait()` çağırın. Şablon,
+`gdscript/player/playable_hero.tscn` içinde `PointClickMoveInput.run_requested` sinyalini buna bağlar. Fare tuşuna
+basışlarda takibi duraklatmaz (`set_follow_paused()`): tıklama süren dönüşü durdurur ve dönüş baştan başlardı. Hedef
+sürekli hareket edip yeni koşuyu bildiremiyorsa bekleme seçeneğini kapalı bırakın. Ters yöne dönme sırasında kamera ara
+yönleri izlemesin diye `sharp_turn_speed` eşiğini karakter dönüş hızının yarısında veya altında tutun; şablonda
+kahramanın 720°/s dönüşüne karşı 360°/s kullanılır.
 
 Kol olmadan düzeneğin doğrudan `Camera3D` çocuğu da çalışır. Yakınlaştırma uzaklığında kalır ve duvarların
 içinden geçebilir; engel tepkisi ve saydamlaşma için `CameraArm` gerekir.
@@ -74,4 +74,4 @@ Yakınlaştırma eğrisi, bütün özellikler, örtülme davranışı ve denenen
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 29860f203673 -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fe4a0c8606a9 -->
 # 点击移动
 
 [← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
@@ -21,6 +21,7 @@
 | `point_click_move_input.gd` | `PointClickMoveInput`（Node） | 鼠标和右键 + WASD → 移动器命令；`cancel()` 取消正在进行的按住操作 |
 | `click_marker.gd`、`click_marker.tscn` | `ClickMarker`（Node3D） | 点击位置的标记 |
 | `navigation_path_view.gd` | `NavigationPathView`（MeshInstance3D） | 沿剩余路径绘制的调试线 |
+| `patrol_controller.gd` | `PatrolController`（Node） | 让角色沿关卡中绘制的路线（一个 `Path3D`）行走：可在路线的各点停留（`waypoint_wait`），在起点等待（`cycle_wait`），遇到挡路的角色时停下并报告 |
 
 不需要其他插件。如需带重力、跳跃和冲刺的现成身体，请添加 `addons/iso_orbit/ground_character`。
 
@@ -45,17 +46,18 @@
    	move_and_slide()
    ```
 
-   移动器进入场景树前，将 `NavigationMover.settings` 指定为 `LocomotionSettings` 资源；也可留空，由脚本以默认值创建。每个角色需要独立调整时，请使用 **Make Unique（设为唯一）**。运行中修改现有资源的字段会生效；但在 `_ready()` 后替换 `mover.settings`，不会更新已创建的 `GroundMotion` 实例。如果需要台阶、跳跃或边缘防护，可以使用配套插件中的 `GroundCharacter`。
+   将 `NavigationMover.settings` 指定为 `LocomotionSettings` 资源；也可留空，由脚本以默认值创建。每个角色需要独立调整时，请使用 **Make Unique（设为唯一）**。运行中修改资源的字段会生效，对使用该资源的每个角色都有效；运行中替换 `mover.settings` 会立即生效。如果需要台阶、跳跃或边缘防护，可以使用配套插件中的 `GroundCharacter`。
 
-4. 如需鼠标控制，在任意位置添加一个挂载 `point_click_move_input.gd` 的 `Node`，并设置其 `mover` 和 `camera`。它需要输入动作 `move_to_cursor`（左键）、`camera_rotate`（右键）以及 `move_forward`、`move_back`、`move_left`、`move_right`（WASD）；缺少的动作会在启动时报告一次，之后不会读取。点击射线检测第 1 物理层（`ground_mask`）：角色层和隐形墙不要包含在内，否则点击可能命中角色或墙。若使用 `addons/iso_orbit/orbit_camera` 的相机，请将 `hold_pending_changed` 连接到相机的 `set_follow_paused`，将 `run_requested` 连接到 `end_follow_wait`。奔跑中环顾四周（`look_around_while_held`）要求 `camera_steer_action` 与旋转相机的动作相同，即相机支架的 `rotate_action`；两者默认都是 `camera_rotate`。
+4. 如需鼠标控制，在任意位置添加一个挂载 `point_click_move_input.gd` 的 `Node`，并设置其 `mover` 和 `camera`。它需要输入动作 `move_to_cursor`（左键）、`camera_rotate`（右键）以及 `move_forward`、`move_back`、`move_left`、`move_right`（WASD）；缺少的动作会在启动时报告一次，之后不会读取。点击射线检测第 1 物理层（`ground_mask`）：角色层和隐形墙不要包含在内，否则点击可能命中角色或墙。若使用 `addons/iso_orbit/orbit_camera` 的相机，请将 `run_requested` 连接到相机的 `end_follow_wait`，但不要将 `hold_pending_changed` 连接到 `set_follow_paused`：否则每次点击都会让相机的转动停下。奔跑中环顾四周（`look_around_while_held`）要求 `camera_steer_action` 与旋转相机的动作相同，即相机支架的 `rotate_action`；两者默认都是 `camera_rotate`。
 5. 或者由 AI 向移动器下达命令：`move_to(point)`、`steer(direction)`、`stop()`，并监听 `arrived`。该信号表示到达路径终点；目标点不可达时，终点可能位于请求点之前。
+6. 如需巡逻，在身体下、其 `NavigationMover` 旁边添加挂载 `patrol_controller.gd` 的 `Node`。在关卡中、角色之外且角色能通过的地方绘制一个 `Path3D`，并将其指定给 `route`。角色沿编辑器为曲线绘制的线行走，回到起点，等待 `cycle_wait` 后再次出发；有角色挡路达 `blocked_delay` 秒时，`blocked_long_enough` 会报告该角色。要被其他角色挡住，身体的碰撞掩码必须包含它们所在的层。
 
 若要使用已装配好的英雄及其场景设置，请按 `docs/zh_CN/integration.md` 的迁移说明复制，不必手动构建此身体。两种输入模式及英雄的设置见 `docs/zh_CN/systems/input.md`。
 
 ## 文档
 
-见模板仓库中的 `docs/zh_CN/integration.md`、`docs/zh_CN/systems/locomotion.md` 和 `docs/zh_CN/systems/input.md`。
+见模板仓库中的 `docs/zh_CN/integration.md`、`docs/zh_CN/systems/locomotion.md`（含巡逻）和 `docs/zh_CN/systems/input.md`。
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

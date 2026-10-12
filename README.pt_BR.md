@@ -1,11 +1,11 @@
-<!-- translation of README.md @ 84a666a02ac2 -->
+<!-- translation of README.md @ b3a8780c2051 -->
 # Iso & Orbit - Template de câmera e controlador de personagem
 
 [English](README.md) · [Español](README.es.md) · [日本語](README.ja.md) · **Português (Brasil)** · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
 > Esta é uma tradução do [original em inglês](README.md). Onde houver diferenças, a versão em inglês é a correta.
 
-Versão 1.2.0 · Godot 4.7 (testado na 4.7.2) · GDScript · MIT
+Versão 1.3.0 · Godot 4.7 (testado na 4.7.2) · GDScript · MIT
 
 Um controlador de personagem de clicar para mover e uma câmera orbital para RPGs isométricos e de visão de cima.
 Clique no chão e o herói corre até lá, contornando obstáculos; segure o botão e o herói segue o cursor. A câmera
@@ -71,6 +71,8 @@ Todos os modos e suas configurações: [Controles](docs/pt_BR/controls.md).
 - Degraus de até 0,3 m são subidos e descidos sem sair do chão; encostas de até 45° são subidas andando.
 - Flutuação opcional: o herói permanece acima do chão, desliza por degraus, oscila e se inclina na corrida, sem
   passos, e desce lentamente após um pulo.
+- Patrulhas: um personagem percorre uma rota desenhada como curva no nível, espera em casa entre as rondas e se
+  detém diante de quem estiver no caminho, e depois informa isso, por exemplo para uma fala.
 
 **Câmera**
 
@@ -97,6 +99,14 @@ Todos os modos e suas configurações: [Controles](docs/pt_BR/controls.md).
 - O herói controlado pelo jogador vem numa cena pronta (`PlayableHero`): personagem, entrada, câmera e marcador
   de clique, com métodos para colocá-lo em qualquer lugar.
 
+**No editor**
+
+- Os componentes verificam a própria configuração: uma referência vazia, um nó no lugar errado ou uma ação de
+  entrada ausente aparece como aviso no painel Cena (Scene), e o aviso some assim que o problema é corrigido.
+- A câmera mostra sua vista inicial, um personagem em patrulha mostra seu modelo e nome, e um portal mostra o título
+  na placa; objetos sólidos são redimensionados por inteiro, modelo e colisão juntos. Nenhuma pré-visualização é
+  salva nas cenas, então um diff mostra só o que você mudou.
+
 **Também incluído**
 
 - Uma janela de configurações (F10) com abas de controles, personagem, câmera, exibição, interface e som, salvas em
@@ -109,9 +119,12 @@ Todos os modos e suas configurações: [Controles](docs/pt_BR/controls.md).
   sons estão conectados aos sinais, e um painel (Configurações → Interface) mostra tudo ao vivo com os últimos eventos.
 - Dois níveis de demonstração: uma clareira cercada de 80 × 80 m com ruínas, acampamento, sítio, labirinto de
   sebes, plataforma com rampa e escada e montanha com trilha espiral; e uma ilha pequena num lago, acessível por
-  teleporte. Cinco lugares para descobrir: quatro na clareira, com cinco NPCs, e um na ilha; dez aparências do herói.
+  teleporte. Cinco lugares para descobrir: quatro na clareira, com cinco NPCs, e um na ilha; o cavaleiro faz uma
+  ronda pelo labirinto de sebes e tem algo a dizer a quem estiver no seu caminho. Dez aparências do herói para
+  escolher.
 - Testes headless de movimento, entrada, pulo, corrida rápida e sons, do estado do personagem, de degraus e encostas,
-  da câmera e seu braço, das aparências do herói, da janela de configurações, traduções, níveis e teleporte.
+  da câmera e seu braço, das aparências do herói, da janela de configurações, traduções, níveis e teleporte,
+  patrulhas e objetos; as verificações da parte do editor rodam no editor.
 
 **Não incluído:** suporte a gamepad, menu para remapear teclas no jogo nem animações esqueléticas. As ações de
 entrada são configuráveis em Project Settings; a interface lê os vínculos atuais. Os modelos são primitivas
@@ -194,7 +207,7 @@ projeto](docs/pt_BR/project-setup.md) lista as ações, camadas e dependências 
 |---|---|
 | `addons/iso_orbit/` | Os componentes, uma pasta por parte que pode ser usada sozinha |
 | `gdscript/` | A demo que os monta: cena principal `main.tscn`, herói jogável, sistema e janela de configurações |
-| `shared/` | Conteúdo da demo compartilhável com uma futura versão C#: níveis, personagens e equipamentos, shaders e texturas do mundo, sons e tema da UI. Dois scripts GDScript dos níveis também ficam aqui |
+| `shared/` | Conteúdo da demo compartilhável com uma futura versão C#: níveis, personagens e equipamentos, shaders e texturas do mundo, sons e tema da UI. Três scripts GDScript pequenos dos objetos também ficam aqui, e os níveis colocam os personagens em patrulha da demo, de `gdscript/npc/` |
 | `l10n/` | Traduções da interface (gettext `.po`) |
 | `tests/` | Testes headless |
 | `docs/` | Documentação |
@@ -221,4 +234,4 @@ MIT, veja [LICENSE](LICENSE). Exceção: `icon.svg`, o logotipo do Godot por And
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

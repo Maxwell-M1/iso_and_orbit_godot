@@ -1,4 +1,4 @@
-<!-- translation of docs/en/controls.md @ 18ede9271cf7 -->
+<!-- translation of docs/en/controls.md @ a842ae064734 -->
 # Kontroller
 
 [← Belge dizini](index.md)
@@ -36,7 +36,8 @@ Bir basışın tıklama mı yoksa basılı tutma mı olduğuna 0,2 sn sonra kara
 - **Basılı tutma** (daha uzun basılırsa): kahraman hemen imlecin peşinden koşar ve hiçbir zaman bastığınız noktaya
   doğru dönmez.
 
-Karar verilene kadar kahraman yaptığı şeyi sürdürür.
+Karar verilene kadar kahraman yaptığı şeyi sürdürür, imleç bıraktığınız yerde kalır ve koşuyu takip eden kamera dönmeye
+devam eder.
 
 Kahramanın basılı tuşu nasıl izleyeceği (Ayarlar → Kontroller → **Basılı sol tuş**):
 
@@ -127,10 +128,10 @@ henüz oyun içi yeniden atama menüsü yoktur.
 - **Yakınlaştırma:** tekerlek mesafeyi ve eğimi birlikte değiştirir. Orta seviyenin altında kamera hızla yataylaşır,
   böylece ileride ne olduğunu görürsünüz.
 - **Takip** (varsayılan olarak kapalı): Ayarlar → Kamera → **Kamerayı koşu yönüne çevir**,
-  **Koşarken kamera eğimini hizala** ve **Koşarken kamera yüksekliğini hizala**. Sağ tuş basılıyken veya sol
-  tuşa basışın ilk 0.2 s'sinde kamera takip etmez. Sağ tuşla, koşarken etrafa bakma dahil, döndürüldükten sonra
-  kahraman durana veya sol tuşla yeni koşu başlatılana kadar seçilen açıda kalır; karakter frenlerken veya
-  tıklanmış noktaya koşarken birden dönmez. Tuşlar sağ tuşu gerektirdiğinden tuşlarla yürüyüş izlenmez.
+  **Koşarken kamera eğimini hizala** ve **Koşarken kamera yüksekliğini hizala**. Sağ tuş basılıyken kamera takip etmez;
+  tıklamalar takibi kesmez. Sağ tuşla, koşarken etrafa bakma dahil, döndürüldükten sonra kahraman durana veya sol tuşla
+  yeni koşu başlatılana kadar seçilen açıda kalır; karakter frenlerken veya tıklanmış noktaya koşarken birden dönmez.
+  Tuşlar sağ tuşu gerektirdiğinden tuşlarla yürüyüş izlenmez.
 - **Engeller:** kamera arkasındaki dağda, duvarda veya çatıda durur. İsteğe bağlı olarak bir engel kahramanı
   gizlediğinde yaklaşır. Engellerin arkasında kahraman siluet olarak görünür.
 
@@ -158,4 +159,4 @@ Ayrıntılar: [Hareket](systems/locomotion.md).
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

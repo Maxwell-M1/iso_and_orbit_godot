@@ -53,4 +53,4 @@ In the template repository: `docs/en/systems/ui.md` and, for windows during a le
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

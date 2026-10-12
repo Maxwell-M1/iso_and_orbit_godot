@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ 2c04d3857e30 -->
+<!-- translation of docs/en/glossary.md @ 537f8443c59c -->
 # 术语表
 
 [← 文档目录](index.md)
@@ -16,7 +16,10 @@
 | **仅阻挡相机的物体（Camera-only body）** | 位于物理层 3（`camera`）上的物体：它会阻挡相机臂，但点击、导航和角色都会忽略它 |
 | **角色状态（Character state）** | 角色在做什么：站立、奔跑、冲刺、跳跃或下落（`GroundCharacter.get_state()`，信号 `state_changed`） |
 | **点击（Click）** | 在按住延迟内松开的一次左键按下。角色沿路径跑向按下按键时的位置 |
+| **配置警告（Configuration warning）** | 节点设置有误时，“场景”面板中该节点旁的警告标志：空引用、父节点不对、缺少输入动作。组件在编辑器中检查自身，配置一修正，警告随即消失 |
 | **土狼时间（Coyote time）** | 走出边缘后的一小段时间，在此期间跳跃仍然有效（0.1 秒） |
+| **尺寸（Dimensions）** | `StaticProp.dimensions`：实体道具的尺寸，以米为单位，沿道具自身的轴计量；其模型和碰撞一起调整大小。某个轴上为 0 时，该轴保持各部件原有的尺寸 |
+| **编辑器预览（Editor preview）** | 组件在编辑器中显示的、游戏开始时才设置的内容：相机的初始视角、巡逻角色的模型和名字、传送门标牌上的地名、道具的尺寸。它从不保存到场景中 |
 | **力竭（Exhausted）** | 体力耗尽后的状态：在体力恢复到 `recover_ratio`（30%）之前不能冲刺 |
 | **朝向（Facing）** | 角色面朝的方向，区别于它移动的方向。侧移或后退时两者不同。`NavigationMover.get_facing()` |
 | **下落设置（Fall settings）** | 角色在跳跃顶点之后或走出边缘后如何下降：下落重力、最大下落速度，以及超速时如何减速（`FallSettings`）。跳跃上升阶段不受其影响 |
@@ -38,13 +41,16 @@
 | **移动器（Mover）** | `NavigationMover`：每个物理帧把命令（`move_to`、`steer`、`stop`）转换为水平速度。它从不移动身体 |
 | **导航网格（Navigation mesh）** | 根据关卡第 1 层的碰撞体烘焙的可行走区域（岛上还包括第 4 层的隐形墙），保存在各关卡场景中；路径在其上搜索 |
 | **旅行提示（Offer to travel）** | `TravelPrompt`：英雄站在先询问玩家的传送门（如传送台）上时，屏幕上的按键及“传送至……”提示。按 E（`interact` 动作）或点击可旅行，走开后提示消失 |
+| **巡逻（Patrol）** | 角色自行沿关卡中的路线行走，两轮之间在出发点等待，有人挡路时停下（`PatrolController`）：草地上的骑士、孤岛上的游侠 |
 | **物理插值（Physics interpolation）** | 以显示帧率在物理帧之间绘制物体。默认开启；可通过设置关闭 |
 | **俯仰角、倾角（Pitch, tilt）** | 相机向下看的陡峭程度。代码中为负角度，设置中为向下的度数 |
 | **原地转身（Pivot）** | 静止时（低于 `pivot_speed`，即 1 米/秒）的瞬间转身 |
 | **地点（Place）** | `PointOfInterest`：玩家首次进入时显示“发现地点：…”的区域 |
 | **可操控的英雄（Playable hero）** | `PlayableHero`（`playable_hero.tscn`）：包含输入、相机、点击标记和路径线的玩家英雄，应与关卡并列放在游戏场景中 |
 | **传送门（Portal）** | `LevelPortal`：通往另一关卡的区域；演示中的传送台就是传送门 |
+| **道具（Prop）** | 放在关卡中的实体物件，即根节点为 `StaticProp` 的场景：通过根节点移动，用其尺寸调整大小 |
 | **拉近（Pull-in）** | 相机移到遮挡角色的障碍物前方（`pull_in_on_occlusion`） |
+| **路线（Route）** | 巡逻所走的关卡 `Path3D`：编辑器为其曲线绘制的线 |
 | **急转（Sharp turn）** | 奔跑方向以高于 `OrbitCameraRig.sharp_turn_speed`（360°/秒）的速率改变，例如掉头；相机不会跟随经过的中间方向，而会在转向后接上新方向 |
 | **游戏框架（Shell）** | 游戏运行期间持续存在的场景（带 `main.gd` 的 `main.tscn`）：包含关卡容器、英雄、界面和加载画面 |
 | **侧移（Sidestep）** | 配合右键的一种按键模式：角色在向侧面或向后移动时，保持面朝相机所看方向 |
@@ -53,8 +59,9 @@
 | **冲刺（Sprint）** | 按住 Shift 或用 Shift 切换开启时更快地奔跑（×1.5），消耗体力 |
 | **台阶高度（Stair height）** | 角色不用跳跃就能走上的最高台阶：0.3 米（`GroundCharacter.max_step_height`） |
 | **体力（Stamina）** | 冲刺储备（`Stamina`）：冲刺时消耗，停顿后恢复 |
-| **初始关卡（Start level）** | 编辑器中放在关卡容器下、游戏启动时加载的关卡：`shared/world/world.tscn`，即有栅栏的草地；岛上传送台显示它的名称“翠谷” |
+| **初始关卡（Start level）** | 编辑器中放在关卡容器下、由容器的 `initial_level` 指定、游戏启动时加载的关卡：`shared/world/world.tscn`，即有栅栏的草地；岛上传送台显示它的名称“翠谷” |
 | **方向操控（Steer）** | 不使用路径朝某方向奔跑：`NavigationMover.steer()`。默认情况下，按住按键会朝光标方向操控 |
+| **字幕（Subtitles）** | 角色说的话，连同其名字显示在屏幕底部（`SubtitleDisplay`） |
 | **传送（Teleport）** | 立即将角色放到别处，无须奔跑，也不会跳动：`GroundCharacter.teleport()`、`PlayableHero.teleport()` |
 | **物理帧（Tick）** | 一个物理步；每秒 60 个 |
 | **旅行者（Traveller）** | 可使用传送门的身体，位于传送门的 `traveller_group` 分组中（默认为 `player`） |
@@ -65,4 +72,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

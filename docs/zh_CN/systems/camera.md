@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/camera.md @ d5569844bc1c -->
+<!-- translation of docs/en/systems/camera.md @ b33e90b57ed1 -->
 # 相机
 
 [← 文档目录](../index.md)
@@ -19,9 +19,11 @@ PlayableHero (模板中固定不动的根节点)
 
 `Camera3D` 的初始局部变换应保持默认值：相机臂负责设置其局部位置和旋转。模板将它设为 **Current（当前）**，视野角为 45°，远裁剪面为 300 个世界单位。如果稍后场景中出现另一个当前相机，当英雄应掌握视角时，请重新将此相机设为当前。如何复制相机或整个英雄见[集成指南](../integration.md#单独使用相机)，输入动作及物理层见[项目配置](../project-setup.md)。
 
+在编辑器中，支架会显示游戏开始时的视角：它位于目标处、高出目标 `focus_height`，按 `start_yaw` 转向，倾角和距离由 `start_zoom` 决定，相机臂则把相机显示在该距离上。支架的变换、相机的变换以及支架下相机臂的 `length` 都由游戏设置，因此它们在编辑器中只是预览：手动移动的支架或相机会回到原位，支架下相机臂的 `length` 为只读，保存时保留场景加载时的值。没有目标的支架会保持你设定的位置。见[在编辑器中编辑场景](../editor_authoring.md#编辑器中的相机)。
+
 ## 当前生效的是哪组参数？
 
-以下脚本参数是可复用组件的默认值。`gdscript/player/playable_hero.tscn` 覆盖其中少数参数；主场景启动后，演示的 `SettingsApplier` 再应用已保存的 `Settings` 值。复制来的英雄场景不需要演示设置窗口或自动加载，会使用场景中保存的值。
+以下脚本参数是可复用组件的默认值。`gdscript/player/playable_hero.tscn` 覆盖其中少数参数；主场景启动后，演示的 `SettingsApplier` 再应用已保存的 `Settings` 值（关闭其 `use_saved_settings` 时，它会保留场景中的值）。复制来的英雄场景不需要演示设置窗口或自动加载，会使用场景中保存的值。
 
 | 设置 | 脚本默认值 | 可操控英雄场景／全新演示 |
 |---|---:|---:|
@@ -78,7 +80,7 @@ PlayableHero (模板中固定不动的根节点)
 
 按住右键时，三种跟随运动都会停止拉动。开启 `follow_wait_after_rotate` 后，持续至少 0.2 秒或鼠标移动至少 2 像素的一次环绕结束时，会在本次奔跑继续期间保持选定视角。如果松开右键之前失去焦点或游戏暂停，也一样；短促的点击不会开始等待。关闭此选项时，环绕结束就恢复跟随。等待在以下情况结束：移动速度降到 `follow_min_speed` 以下、`end_follow_wait()` 报告新的奔跑、调用 `snap()`、目标改变，或一次移动超过 `teleport_speed`。旧奔跑尚未停下就可能开始新奔跑，因此使用此选项时请将输入的 `run_requested` 信号连接到 `end_follow_wait()`。若目标持续移动而游戏无法报告新奔跑，相机可能无限期等待；此时请关闭等待选项。
 
-`playable_hero.tscn` 还将 `PointClickMoveInput.hold_pending_changed` 连接到 `set_follow_paused()`。左键按下的最初 0.2 秒，输入尚在判断点击还是按住，此连接会暂停跟随。`run_requested` 则会在新点击、新按住或右键 + 方向键开始行走时结束环绕后的等待。持续按住左键奔跑时按右键可用于环顾四周；右键松开后，那段奔跑并不算新奔跑，因此相机会保持玩家选定的视角，直到之后停下或开始新的奔跑。输入的 `keep_aim_on_camera_turn` 会在相机移动时使光标继续瞄准同一世界位置，避免奔跑方向追着相机转。
+点击不会中断跟随。输入判断左键按下是点击还是按住期间（最初 0.2 秒），转动、倾角和高度的跟随都会继续，点击新的地点只会给奔跑一个新的跟随方向。若像 1.3.0 之前的模板那样把 `PointClickMoveInput.hold_pending_changed` 连接到 `set_follow_paused()`，在每次按下时暂停跟随，那么每次点击都会让正在进行的转动停下，然后重新开始。在 `playable_hero.tscn` 中，输入的 `run_requested` 则会在新点击、新按住或右键 + 方向键开始行走时结束环绕后的等待。持续按住左键奔跑时按右键可用于环顾四周；右键松开后，那段奔跑并不算新奔跑，因此相机会保持玩家选定的视角，直到之后停下或开始新的奔跑。输入的 `keep_aim_on_camera_turn` 会在相机移动时使光标继续瞄准同一世界位置，避免奔跑方向追着相机转。
 
 当 `Engine.time_scale` 为 0 时，跟随运动保持当前状态，时间继续后再恢复。如果手动移动目标，或短距离传送未触发 `teleport_speed` 检查，请调用 `snap()`，使相机及相机臂立即就位并重置运动历史。
 
@@ -99,7 +101,7 @@ PlayableHero (模板中固定不动的根节点)
 | 平滑 | `rotation_sharpness`、`zoom_sharpness` | 30、10 | 值越高，越快达到鼠标／滚轮目标；0 为立即变化 |
 | 平滑 | `height_follow_time` | 0 秒 | 跟随目标竖向位置完成约 95% 变化的用时；0 为精确跟踪 |
 
-`look_along(direction)` 会立即让视角沿**世界空间**方向的水平分量观察，并停止正在进行的自动转向。`snap()` 会立即应用当前偏航、倾角、缩放、目标位置和相机臂的碰撞响应；传送后应调用它。`get_zoom()` 返回当前 0–1 缩放值。`is_rotating()`、`is_follow_paused()`、`is_follow_waiting()` 和 `is_target_turning_sharply()` 报告相应状态。`set_follow_paused(paused)` 与 `end_follow_wait()` 控制上文所述暂停。
+`look_along(direction)` 会立即让视角沿**世界空间**方向的水平分量观察，并停止正在进行的自动转向。`snap()` 会立即应用当前偏航、倾角、缩放、目标位置和相机臂的碰撞响应；传送后应调用它。`get_zoom()` 返回当前 0–1 缩放值。`is_rotating()`、`is_follow_paused()`、`is_follow_waiting()` 和 `is_target_turning_sharply()` 报告相应状态。`set_follow_paused(paused)` 会暂停跟随，直到恢复为止，例如屏幕上显示对话时：正在进行的运动会制动，暂停结束后从头开始，因此不适用于点击这样短暂的时刻。`end_follow_wait()` 结束上文所述的环绕后等待。
 
 支架需要相机臂或相机子节点（也可以显式设置 `arm`／`camera` 属性）；调试构建中缺少时会触发断言。它设置全局旋转，因此即使固定的英雄根节点本身被旋转，`start_yaw`、`look_along()` 和自动转向仍使用世界坐标轴。
 
@@ -134,4 +136,4 @@ PlayableHero (模板中固定不动的根节点)
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ bbedeba37f15 -->
 # Engel Arkası Siluet
 
 [← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
@@ -57,4 +57,4 @@ Godot 4.5+ sürümlerinde deneysel olan stencil arabelleğini kullanır. Forward
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

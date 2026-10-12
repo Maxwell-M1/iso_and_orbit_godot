@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 78c912e8971a -->
+<!-- translation of docs/en/systems/locomotion.md @ 9cb53e2dd91e -->
 # 移动
 
 [← 文档目录](../index.md)
@@ -43,7 +43,7 @@
 
 由于冲刺只提高速度上限，全速冲刺后的制动会花更长时间、走更远距离：以默认制动率从 8.25 米/秒停下约需 1.36 米，而从 5.5 米/秒停下约需 0.61 米。若点击的目标就在前方很近处，`max_braking_multiplier` 可使角色更快停下。
 
-演示的 `SettingsApplier` 会在启动以及玩家调整设置时改变 `sprint_speed_multiplier` 和 `backward_speed_multiplier`；已保存设置可能覆盖上述值。插件本身不依赖设置系统。要调整运行中的演示，请打开“场景”面板 → 远程（Remote）→ `Hero/Character/NavigationMover` → `settings`。代码每帧读取资源字段，但远程检查器中的改动不会保存：请把确定的值写回 `.tres` 文件。运行时不希望角色之间相互影响，就为每个角色使用独立资源；应在移动器进入场景树前分配，或在编辑器中使用 **Make Unique（设为唯一）**。`_ready()` 后 `GroundMotion` 已持有原资源，此时替换 `mover.settings` 不会替换它正在使用的设置；运行时请编辑原资源的字段。
+演示的 `SettingsApplier` 会在启动以及玩家调整设置时改变 `sprint_speed_multiplier` 和 `backward_speed_multiplier`；已保存设置可能覆盖上述值。插件本身不依赖设置系统。要调整运行中的演示，请打开“场景”面板 → 远程（Remote）→ `Hero/Character/NavigationMover` → `settings`。代码每帧读取资源字段，但远程检查器中的改动不会保存：请把确定的值写回 `.tres` 文件。运行时不希望角色之间相互影响，就为每个角色使用独立资源：指定另一个资源，或在编辑器中使用 **Make Unique（设为唯一）**。运行中替换 `mover.settings` 会立即生效。
 
 一个资源可以由多个角色共享，例如同一类的所有 NPC。
 
@@ -85,6 +85,32 @@
 **路径点在水平面内比较。**Recast 导航网格悬在地面上方约两个单元格高度处（此处为 0.05 米）。若用三维距离与角色脚部比较，就会差出这么多，这也是移动器自行跟随路径、而不使用 `NavigationAgent3D` 的原因。
 
 **后退更慢。** 当 `steer()` 收到 `facing` 时，速度按移动方向与朝向相反的程度缩放：正后方应用完整的 `backward_speed_multiplier`，斜后方应用其中一部分（侧移时 S + D：慢 21%），横向则不减速。因此减速只存在于按键的侧移模式中，见[输入](input.md)。
+
+## PatrolController：沿路线行走
+
+`PatrolController` 通过引导角色的 `NavigationMover`，让角色沿关卡中绘制的路线行走：移动身体的仍是角色自己的脚本。在路线上，角色不做寻路，而是朝前方线上的一个点前进，因此请把线画在角色能通过的地方；从角色所在位置到路线以及返回的路由导航引导。演示中的骑士和孤岛上的游侠都靠它巡逻，见[世界与导航](world-and-navigation.md#地点与-npc)。
+
+路线是关卡中的一个 `Path3D`，位于角色之外，用编辑器的曲线工具绘制。角色沿着编辑器为这条路线绘制的线行走，`PathFollow3D` 跟随的也是这条线：线的形状由各点、点的手柄以及曲线的 **Bake Interval** 决定。手柄为空且 Bake Interval 较短（默认值为 0.2 米）时，线从一个点笔直走到下一个点；要让某个拐角变圆，就拉出该点的手柄。Bake Interval 比各边更长时，编辑器会把各边画成穿过各点的弧线，角色也沿这些弧线行走。巡逻开始时（调用 `restart()`，或开启控制器），会在这条线上每隔 `sample_spacing` 取一个点。角色瞄准线上与自己相距 `look_ahead` 的那个点，不停顿地沿这些点前进，因此在弯处会平滑转向、略微切弯，并精确停在最后一个点上；然后沿最短路径回到巡逻开始的位置（`return_to_start`），等待 `cycle_wait` 后再次出发（`repeat`）。不开启 `return_to_start` 时，角色在最后一个点等待，然后走向第一个点。从角色所在位置走到第一个点以及从那里返回的路不在所绘制的线上：要让角色始终不离开这条线，就把角色放在第一个点上并闭合曲线（**Closed**）。修改后的曲线在下次开始时读取。脚本也可以自行提供这些点（`set_route_points()`）；没有路线时控制器什么也不做，因此没有路线的角色只会站着。
+
+身体前方的角色会让巡逻停下：位于一个像手电筒光束的区域内的角色，这个区域从身体前端向前延伸 `blocking_distance`，在前端与身体同宽，并向两侧各张开 `blocking_angle`。在侧面或后面的角色不会让它停下。巡逻原地等待，目标仍是同一个点，不会跳过它；路一通就继续走。连续挡路 `blocked_delay` 秒后，会发出 `blocked_long_enough(blocker)`，每次停下只发出一次；演示中的骑士此时会说出他的台词。要被其他角色挡住，身体的碰撞掩码必须包含它们所在的层：演示中的角色位于第 2 层，英雄和骑士的掩码都包含该层。
+
+| 属性 | 默认值 | 含义 |
+|---|---|---|
+| `character`、`mover` | 空：父节点，以及它的第一个 `NavigationMover` 子节点 | 要行走的身体及其移动器，后者是身体的直接子节点 |
+| `route` | 空 | 要行走的关卡 `Path3D` |
+| `sample_spacing` | 0.25 米 | 在路线的线上所取相邻点之间的最大间距 |
+| `look_ahead` | 0.75 米 | 角色沿线瞄准多远的点：越远，转向越平缓，切弯也越多 |
+| `enabled` | 开 | 关闭：角色停在原地。再次开启：从该处开始新的巡逻 |
+| `repeat`、`return_to_start` | 开、开 | 每轮结束后再次出发；走完最后一个点后回到起点 |
+| `cycle_wait` | 10 秒 | 每轮结束后在起点等待的时间，按游戏时间计 |
+| `waypoint_wait` | 0 秒 | 在曲线每个控制点上停留的时间 |
+| `blocked_delay` | 6 秒 | 角色要挡路多久才会发出 `blocked_long_enough` |
+| `blocking_distance` | 1 米 | 身体前方多远以内的其他角色会让它停下 |
+| `blocking_angle` | 25° | 该区域向每侧张开的角度 |
+
+开启导航（`NavigationMover.use_navigation`）时，巡逻会等导航地图就绪后才开始。`stop()` 让角色立即停下并关闭巡逻。`get_state()`、`get_waypoint_index()`、`get_completed_cycles()` 和 `get_blocked_time()` 反映它当前在做什么；每轮结束后发出 `cycle_completed`。
+
+演示中的 `PatrolActor`（`gdscript/npc/patrol_actor.tscn`）是带有这种控制器、模型和头顶名字的现成角色：把它的实例放进关卡并设置其 **Route** 即可，见[在编辑器中编辑场景](../editor_authoring.md#巡逻)。
 
 ## GroundCharacter
 
@@ -338,4 +364,4 @@ Stamina 100%
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

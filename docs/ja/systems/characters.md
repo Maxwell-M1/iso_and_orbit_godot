@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/characters.md @ 48c5e73646e2 -->
+<!-- translation of docs/en/systems/characters.md @ bfea84438c4d -->
 # キャラクター
 
 [← ドキュメント目次](../index.md)
@@ -204,4 +204,4 @@ Player (GroundCharacter)   Hero/Character in the demo
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

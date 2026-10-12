@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 87915285e965 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ 51bf079322a3 -->
 # 地上キャラクター
 
 [← ドキュメント目次（テンプレートのリポジトリ）](../../../docs/ja/index.md)
@@ -44,7 +44,7 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
    └── Stamina      任意
    ```
 
-   ボディの`mover`、`visual`、`ledge_guard`、`stamina`を設定します。デモではスロープで速度を保つ`floor_constant_speed`をオンにし、ボディを物理レイヤー2へ置き、レベルと見えない壁のレイヤー1と4に衝突させます。`get_ground_height()`とデフォルトの`LedgeGuard`は同じマスクで地面を探します。ボディは`max_step_height`（0.3 m）までの段と`floor_max_angle`までの斜面を上ります。階段の経路には`agent_max_climb`を越えたい段差高に合わせてメッシュをベイクし、実際のコライダーで試します。`LedgeGuard.max_drop`は`max_step_height`以上にし、下り段差で`stair_taken`が必要なら`floor_snap_length`はそれより小さくします。レベルでボディが回転していても、キャラクターはボディに対して`Visual`だけを回し、最初はボディの−Zを向きます。その後は`teleport(position, facing)`または`NavigationMover.face()`で向きを変えます。
+   ボディの`mover`、`visual`、`ledge_guard`、`stamina`を設定します。デモではスロープで速度を保つ`floor_constant_speed`をオンにし、ボディをレベルとは別の物理レイヤー2へ置き、レイヤー1、2、4（レベル、ほかのキャラクター、見えない壁）に衝突させます。`get_ground_height()`とデフォルトの`LedgeGuard`は同じマスクで地面を探すため、ほかのキャラクターも地面とみなされます。キャラクターを除くには、`LedgeGuard.floor_mask`をレイヤー1と4にします。ボディは`max_step_height`（0.3 m）までの段と`floor_max_angle`までの斜面を上ります。階段の経路には`agent_max_climb`を越えたい段差高に合わせてメッシュをベイクし、実際のコライダーで試します。`LedgeGuard.max_drop`は`max_step_height`以上にし、下り段差で`stair_taken`が必要なら`floor_snap_length`はそれより小さくします。レベルでボディが回転していても、キャラクターはボディに対して`Visual`だけを回し、最初はボディの−Zを向きます。その後は`teleport(position, facing)`または`NavigationMover.face()`で向きを変えます。
 3. キー操作には`character_action_input.gd`を付けた`Node`を追加し、その`character`を設定します。入力アクション`sprint`と`jump`が必要です。欠けたものは起動時に一度報告され、その後は読みません。
 4. 任意：`AudioStreamPlayer3D`の子を持つ`CharacterSounds`、`character`とモデルの手を設定した`HandSway`、`slot`とモデルシーン一覧を持つ`CharacterAppearance`、デバッグパネル用に`CanvasLayer`内へ置く`CharacterMonitor`。`LedgeGuard.floor_mask`のデフォルト0はボディの衝突マスクを使い、ボディが立てない急な面を除きます。
 5. 浮遊させるには、`character_hover.gd`を付けた`Node3D`を`Visual`とモデルの間（`Visual/Hover/Model`）に置きます。`CharacterAppearance`を使うなら、その`slot`に浮遊ノードを指定します。浮遊中は歩数が止まり、`fall`（`FallSettings`）を設定すればゆっくり下降できます。上がるのはモデルで、ボディと衝突形状は変わりません。
@@ -60,4 +60,4 @@ AIも同じボディを動かせます：`NavigationMover.move_to()`と`GroundCh
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

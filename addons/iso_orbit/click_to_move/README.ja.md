@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 29860f203673 -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fe4a0c8606a9 -->
 # クリック移動
 
 [← ドキュメント目次（テンプレートのリポジトリ）](../../../docs/ja/index.md)
@@ -21,6 +21,7 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 | `point_click_move_input.gd` | `PointClickMoveInput`（Node） | マウスと右ボタン＋WASD → ムーバーへの命令。`cancel()`は押下中の入力を忘れる |
 | `click_marker.gd`、`click_marker.tscn` | `ClickMarker`（Node3D） | クリックした地点のマーカー |
 | `navigation_path_view.gd` | `NavigationPathView`（MeshInstance3D） | 残りの経路に沿ったデバッグ用の線 |
+| `patrol_controller.gd` | `PatrolController`（Node） | レベルに描いたルート（`Path3D`）に沿ってキャラクターを歩かせる。ルートのポイントごとに止まることができ（`waypoint_wait`）、始点で待ち（`cycle_wait`）、行く手をふさぐキャラクターの前で止まってそれを報告する |
 
 ほかのアドオンは必要ありません。重力、ジャンプ、ダッシュを備えた完成済みのボディが必要なら、`addons/iso_orbit/ground_character`を追加してください。
 
@@ -45,17 +46,18 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
    	move_and_slide()
    ```
 
-   ムーバーがツリーへ入る前に、`NavigationMover.settings`へ`LocomotionSettings`リソースを割り当てます。空ならスクリプトのデフォルト値で作ります。キャラクターごとに調整するなら**Make Unique**を使います。実行中はリソースのフィールドを変更できますが、`_ready()`後に`mover.settings`を交換しても、すでに作られた`GroundMotion`の設定は変わりません。階段、ジャンプ、崖ガードが必要なら、対応するアドオンの`GroundCharacter`を使います。
+   `NavigationMover.settings`へ`LocomotionSettings`リソースを割り当てます。空ならスクリプトのデフォルト値で作ります。キャラクターごとに調整するなら**Make Unique**を使います。実行中にリソースのフィールドを変更すると、そのリソースを使うすべてのキャラクターに反映されます。実行中に`mover.settings`を交換した場合も、すぐに反映されます。階段、ジャンプ、崖ガードが必要なら、対応するアドオンの`GroundCharacter`を使います。
 
-4. マウスで操作するには、`point_click_move_input.gd`を付けた`Node`を任意の場所に追加し、その`mover`と`camera`を設定します。入力アクション`move_to_cursor`（左ボタン）、`camera_rotate`（右ボタン）、`move_forward`、`move_back`、`move_left`、`move_right`（WASD）が必要です。欠けていれば開始時に一度報告し、その後は読みません。クリックは物理レイヤー1（`ground_mask`）に当たります。キャラクターや見えない壁のレイヤーは外し、地面の代わりにそれらを拾わないようにします。`addons/iso_orbit/orbit_camera`のオービットカメラを使うなら、`hold_pending_changed`を`set_follow_paused`へ、`run_requested`を`end_follow_wait`へ接続します。走行中の見回し（`look_around_while_held`）には、`camera_steer_action`とリグの`rotate_action`が同じカメラ回転アクション（両方`camera_rotate`）である必要があります。
+4. マウスで操作するには、`point_click_move_input.gd`を付けた`Node`を任意の場所に追加し、その`mover`と`camera`を設定します。入力アクション`move_to_cursor`（左ボタン）、`camera_rotate`（右ボタン）、`move_forward`、`move_back`、`move_left`、`move_right`（WASD）が必要です。欠けていれば開始時に一度報告し、その後は読みません。クリックは物理レイヤー1（`ground_mask`）に当たります。キャラクターや見えない壁のレイヤーは外し、地面の代わりにそれらを拾わないようにします。`addons/iso_orbit/orbit_camera`のオービットカメラを使うなら、`run_requested`を`end_follow_wait`へ接続します。ただし`hold_pending_changed`を`set_follow_paused`へは接続しません。クリックのたびにカメラの旋回が止まるためです。走行中の見回し（`look_around_while_held`）には、`camera_steer_action`とリグの`rotate_action`が同じカメラ回転アクション（両方`camera_rotate`）である必要があります。
 5. またはAIから`move_to(point)`、`steer(direction)`、`stop()`を命じ、`arrived`を受け取ります。これは要求地点ではなく、その手前で終わる場合もある経路の終端に達したことを表します。
+6. 巡回させるには、`patrol_controller.gd`を付けた`Node`をボディの下、その`NavigationMover`の隣に追加します。キャラクターの外、キャラクターが通れるレベルの場所に`Path3D`を描き、`route`に割り当てます。キャラクターはエディターがカーブに描く線の上を歩き、始点へ戻って`cycle_wait`だけ待ち、また歩き出します。`blocked_long_enough`は、`blocked_delay`秒のあいだ行く手に立ち続けたキャラクターを報告します。ほかのキャラクターの前で止まるには、ボディの衝突マスクにそのレイヤーを含める必要があります。
 
 組み立て済みヒーローには手作業でこのボディを作る代わりに、`docs/ja/integration.md`のコピー手順とシーン設定を使います。2つの入力モードとヒーローの設定は`docs/ja/systems/input.md`を参照してください。
 
 ## ドキュメント
 
-テンプレートのリポジトリ内：`docs/ja/integration.md`、`docs/ja/systems/locomotion.md`、`docs/ja/systems/input.md`。
+テンプレートのリポジトリ内：`docs/ja/integration.md`、`docs/ja/systems/locomotion.md`（巡回を含む）、`docs/ja/systems/input.md`。
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

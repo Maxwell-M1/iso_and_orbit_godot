@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 8fc9a768e40b -->
+<!-- translation of docs/en/systems/ui.md @ 9204acfc18b7 -->
 # UI
 
 [← ドキュメント目次](../index.md)
@@ -28,8 +28,8 @@
 
 - キーはクラスの定数（`GameSettings.LEDGE_GUARD`は`&"gameplay/ledge_guard"`）なので、`match`で使えます。スラッシュの前の部分は、ファイル内のセクションです。
 - `DEFAULTS`はすべてのキーとそのデフォルト値を持ち、デフォルト値の型がその設定の型になります。ファイル内の値の型が間違っている場合（手で編集したなど）は、デフォルト値に戻ります。
-- `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`と、シグナル`changed(key, value)`。
-- 値はどのシーンノードの`_ready()`よりも前に`_init()`で読み込まれ、設定ウィンドウを閉じたときとゲームの終了時に`user://settings.cfg`へ保存されます。`persistent = false`で保存が止まります。テストはこれを設定してすべてをデフォルトに戻すので、プレイヤーの設定を無視し、上書きすることもありません。
+- `get_value(key)`、`set_value(key, value)`、`reset_to_defaults()`、`set_scene_defaults(values)`と、シグナル`changed(key, value)`。`set_scene_defaults()`は、シーンに設定されている値を受け取ります。プレイヤーが何も保存していない設定ではそれらの値が`DEFAULTS`に代わり、`reset_to_defaults()`もそれらの値に戻します。
+- 値は最初に使われるとき、遅くとも自動読み込みの`_ready()`で、どのシーンノードの`_ready()`よりも前に`path`（`user://settings.cfg`）から読み込まれ、設定ウィンドウを閉じたときとゲームの終了時にそこへ保存されます。`persistent = false`で保存が止まります。テストはこれを設定してすべてをデフォルトに戻すので、プレイヤーの設定を無視し、上書きすることもありません。
 - `_OBSOLETE_KEYS`に挙げられたキーは、読み込み時にファイルから削除されます。
 - エンジンレベルの設定は、クラス自身が適用します（`_apply_to_engine()`）：フルスクリーン、フレームレート上限とV-Sync、物理補間、UIスケール、言語、音量。シーンノードの設定はシーン側で適用します。デモでは、`gdscript/demo/settings_applier.gd`が起動時に`get_value()`を読み、`changed`を受け取ります。
 
@@ -37,7 +37,7 @@
 
 1. `GameSettings`にキーの定数と、`DEFAULTS`のデフォルト値を追加します。
 2. `settings_screen.tscn`にそのキーを持つコントロールを追加します（下記参照）。ウィンドウのコードは変更しません。
-3. `settings_applier.gd`にプロパティを設定する分岐を追加します。エンジンが適用する設定なら、`GameSettings._apply_to_engine()`に追加します。
+3. `settings_applier.gd`にプロパティを設定する分岐を追加し、その`_capture_scene_defaults()`にシーン内でのプロパティの値を読む項目を加えます。エンジンが適用する設定なら、代わりに`GameSettings._apply_to_engine()`に分岐を追加します。
 4. そのテキストを翻訳に追加します。[翻訳](#翻訳)を参照してください。
 
 ### 設定ウィンドウ
@@ -67,6 +67,7 @@ UIスケールはルートウィンドウの`content_scale_factor`です。ス�
 | `Hud/CharacterState/Monitor` | `CharacterMonitor`（Label） | FPSカウンターの下に、主人公が何をしているか（状態、速度とブレンド、移動、旋回、地上か空中か、ステップと足、スタミナ）と最新のイベントを表示する。デフォルトでは非表示。[ロコモーション](locomotion.md#charactermonitor状態を文字で表示)を参照 |
 | `Hud/DiscoveryToast` | `DiscoveryToast`（Label） | プレイヤーが初めて`PointOfInterest`に入ったとき「発見：…」を`show_time`（3.5 s）表示する。`points_of_interest`グループから、後で読み込まれたレベルを含むすべての場所を探す（`watch_added_places`はオン。オフなら起動時の場所だけ）。`show_discovery(title)`で手動表示もできる |
 | `Hud/StaminaBar` | `StaminaBar`（ProgressBar） | スタミナの消費が始まると現れ、キャラクターが疲労困憊の間は赤くなり（`StaminaBarExhausted`バリエーション）、再び満タンになると0.6秒かけて消える |
+| `Hud/Subtitles` | `SubtitleDisplay`（PanelContainer）、`gdscript/ui/subtitle_display.gd` | キャラクターのセリフを、その名前とともに画面下部に`display_time`（5 s）表示する。たとえばヒーローが行く手をふさいだときの騎士のセリフ。`main.gd`は各レベルのキャラクターの`speech_requested`シグナルを`show_line()`へ接続し、レベルが切り替わるとセリフを消す。名前、セリフ、それらのつなぎ方（`%s: %s`）は翻訳される |
 | `Hud/TravelPrompt` | `TravelPrompt`（Control）、`gdscript/ui/travel_prompt.gd` | スタミナバーの上に出るテレポートパッドの移動案内。`interact`のキーをバッジに示し（ヒントと同じ`InputNames.of_action()`）、「○○へテレポート」を表示する。キーまたはクリックで確定（`confirmed(portal)`）し、ダッシュ後のShiftなど修飾キーを押していても使える。ボタンはキーボードフォーカスを取らず、Spaceはジャンプのまま。ウィンドウではなくゲームは進み続ける |
 
 ローディング画面（`main.tscn`の`LoadingScreen`、`levels`アドオン）はHUDではなく、レベル切り替え中にゲームを覆います。[レベル](levels.md#ローディング画面)を参照してください。画面の取り込み中はHUDが隠れ、その後画面の背後で戻ります。
@@ -75,7 +76,7 @@ UIスケールはルートウィンドウの`content_scale_factor`です。ス�
 
 ## テーマ
 
-`shared/ui/ui_theme.tres`はプロジェクトのテーマ（`gui/theme/custom`）です。パネル、ウィンドウ、ボタンと、`WindowPanel`、`WindowLayout`、`TabPage`、`SettingsList`、`HintLabel`、`FpsCounter`、`DiscoveryToast`、`StaminaBar`、`StaminaBarExhausted`、`KeyBadge`、`TravelButton`のタイプバリエーションを持ちます。ノードは個別にスタイルを上書きせず`theme_type_variation`を選びます。ローディング画面はアドオン内の独自テーマ`loading_screen_theme.tres`を持ち、どのプロジェクトでも同じ見た目になります。
+`shared/ui/ui_theme.tres`はプロジェクトのテーマ（`gui/theme/custom`）です。パネル、ウィンドウ、ボタンと、`WindowPanel`、`WindowLayout`、`TabPage`、`SettingsList`、`HintLabel`、`FpsCounter`、`DiscoveryToast`、`StaminaBar`、`StaminaBarExhausted`、`KeyBadge`、`TravelButton`、`SubtitlePanel`、`SubtitleText`のタイプバリエーションを持ちます。ノードは個別にスタイルを上書きせず`theme_type_variation`を選びます。ローディング画面はアドオン内の独自テーマ`loading_screen_theme.tres`を持ち、どのプロジェクトでも同じ見た目になります。
 
 ## 翻訳
 
@@ -117,4 +118,4 @@ UIスケールはルートウィンドウの`content_scale_factor`です。ス�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

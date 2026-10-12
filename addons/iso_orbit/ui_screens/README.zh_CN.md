@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ui_screens/README.md @ f510902e02d8 -->
+<!-- translation of addons/iso_orbit/ui_screens/README.md @ 6e5afc9c199d -->
 # UI 窗口
 
 [← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
@@ -42,4 +42,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

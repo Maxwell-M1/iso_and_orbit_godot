@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/ui.md @ 8fc9a768e40b -->
+<!-- translation of docs/en/systems/ui.md @ 9204acfc18b7 -->
 # Interfaz de usuario
 
 [← Índice de documentación](../index.md)
@@ -42,11 +42,13 @@ El autoload `Settings` (`gdscript/settings/game_settings.gd`, clase `GameSetting
   en `match`. La parte antes de la barra es la sección en el archivo.
 - `DEFAULTS` contiene cada clave con su valor por defecto; el tipo del valor por defecto es el tipo de la opción. Un
   valor del tipo incorrecto en el archivo (editado a mano) vuelve al valor por defecto.
-- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()` y la señal `changed(key, value)`.
-- Los valores se cargan en `_init()`, antes del `_ready()` de cualquier nodo de la escena, y se guardan en
-  `user://settings.cfg` cuando se cierra la ventana de configuración y cuando se sale del juego. `persistent = false`
-  detiene el guardado; las pruebas lo establecen y restablecen todo a los valores por defecto, así que ignoran la
-  configuración del jugador y nunca la sobrescriben.
+- `get_value(key)`, `set_value(key, value)`, `reset_to_defaults()`, `set_scene_defaults(values)` y la señal
+  `changed(key, value)`. `set_scene_defaults()` toma los valores con los que se preparó una escena: sustituyen a
+  `DEFAULTS` donde el jugador no ha guardado nada, y `reset_to_defaults()` vuelve a ellos.
+- Los valores se cargan desde `path` (`user://settings.cfg`) en su primer uso, a más tardar en el `_ready()` del
+  autoload, antes del `_ready()` de cualquier nodo de la escena, y se guardan allí cuando se cierra la ventana de
+  configuración y cuando se sale del juego. `persistent = false` detiene el guardado; las pruebas lo establecen y
+  restablecen todo a los valores por defecto, así que ignoran la configuración del jugador y nunca la sobrescriben.
 - Las claves listadas en `_OBSOLETE_KEYS` se eliminan del archivo al cargarlo.
 - Los ajustes a nivel de motor los aplica la propia clase (`_apply_to_engine()`): pantalla completa, límite de
   fotogramas y V-Sync, interpolación de física, escala de la interfaz, idioma, volumen. Los ajustes de los nodos de la
@@ -57,8 +59,8 @@ El autoload `Settings` (`gdscript/settings/game_settings.gd`, clase `GameSetting
 
 1. Una constante de clave y un valor por defecto en `DEFAULTS` en `GameSettings`.
 2. Un control con esa clave en `settings_screen.tscn` (ver abajo). El código de la ventana no cambia.
-3. Una rama en `settings_applier.gd` que establezca la propiedad, o en `GameSettings._apply_to_engine()` si la
-   aplica el motor.
+3. Una rama en `settings_applier.gd` que establezca la propiedad y una entrada en su `_capture_scene_defaults()` que
+   lea el valor de la propiedad en la escena, o una rama en `GameSettings._apply_to_engine()` si la aplica el motor.
 4. Sus textos en las traducciones, ver [Traducciones](#traducciones).
 
 ### La ventana de configuración
@@ -102,6 +104,7 @@ el control deslizante se alejaría de él. El teclado y la rueda cambian la esca
 | `Hud/CharacterState/Monitor` | `CharacterMonitor` (Label) | Debajo del contador de FPS: lo que está haciendo el héroe (estado, velocidad y mezcla, movimiento, giro, suelo o aire, pasos y pies, resistencia) y los últimos eventos. Oculto por defecto. Ver [Locomoción](locomotion.md#charactermonitor-el-estado-como-texto) |
 | `Hud/DiscoveryToast` | `DiscoveryToast` (Label) | «Lugar descubierto: …» durante `show_time` (3.5 s) al entrar por primera vez en un `PointOfInterest`. Encuentra todos mediante `points_of_interest`, incluso los añadidos después al cargar otro nivel (`watch_added_places` activado; desactivado: solo lugares iniciales); `show_discovery(title)` permite mostrar uno manualmente |
 | `Hud/StaminaBar` | `StaminaBar` (ProgressBar) | Aparece cuando empieza a gastarse la resistencia, se pone roja mientras el personaje está agotado (variación `StaminaBarExhausted`) y se desvanece en 0,6 s cuando vuelve a estar llena |
+| `Hud/Subtitles` | `SubtitleDisplay` (PanelContainer), `gdscript/ui/subtitle_display.gd` | Lo que dice un personaje, en la parte inferior de la pantalla con su nombre, durante `display_time` (5 s): la frase del caballero cuando el héroe le cierra el paso. `main.gd` conecta la señal `speech_requested` de los personajes de cada nivel con `show_line()`; un cambio de nivel borra la frase. El nombre, la frase y la forma de unirlos (`%s: %s`) se traducen |
 | `Hud/TravelPrompt` | `TravelPrompt` (Control), `gdscript/ui/travel_prompt.gd` | Invitación a viajar en una plataforma, sobre la barra de resistencia: tecla de `interact` en un distintivo (`InputNames.of_action()`) y «Teletransporte: <lugar>». La tecla o un clic confirma (`confirmed(portal)`), también con Mayús u otro modificador. El botón no toma el foco: Espacio salta y no lo pulsa. No es una ventana: el juego sigue |
 
 La pantalla de carga (`LoadingScreen` en `main.tscn`, del addon `levels`) no pertenece al HUD: cubre el juego
@@ -115,9 +118,9 @@ Configuración → Interfaz.
 
 `shared/ui/ui_theme.tres` es el tema del proyecto (`gui/theme/custom`): paneles, la ventana, botones y estas
 variaciones de tipo: `WindowPanel`, `WindowLayout`, `TabPage`, `SettingsList`, `HintLabel`, `FpsCounter`,
-`DiscoveryToast`, `StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`. Los nodos eligen una variación
-con `theme_type_variation` en vez de sobrescribir estilos. La pantalla de carga lleva su propio tema,
-`loading_screen_theme.tres`, para mantener el mismo aspecto en cualquier proyecto.
+`DiscoveryToast`, `StaminaBar`, `StaminaBarExhausted`, `KeyBadge`, `TravelButton`, `SubtitlePanel`, `SubtitleText`.
+Los nodos eligen una variación con `theme_type_variation` en vez de sobrescribir estilos. La pantalla de carga lleva
+su propio tema, `loading_screen_theme.tres`, para mantener el mismo aspecto en cualquier proyecto.
 
 ## Traducciones
 
@@ -204,4 +207,4 @@ con el juego pausado. La demo no incluye una pestaña para reasignar teclas dura
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

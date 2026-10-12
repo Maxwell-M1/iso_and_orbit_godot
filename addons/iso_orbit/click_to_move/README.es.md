@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 29860f203673 -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fe4a0c8606a9 -->
 # Movimiento por clic
 
 [← Índice de documentación (repositorio de la plantilla)](../../../docs/es/index.md)
@@ -26,6 +26,7 @@ Parte de Iso & Orbit, una plantilla de cámara y controlador de personaje para G
 | `point_click_move_input.gd` | `PointClickMoveInput` (Node) | Ratón y botón derecho + WASD → órdenes de movimiento; `cancel()` descarta una pulsación en curso |
 | `click_marker.gd`, `click_marker.tscn` | `ClickMarker` (Node3D) | El marcador en el punto del clic |
 | `navigation_path_view.gd` | `NavigationPathView` (MeshInstance3D) | Una línea de depuración a lo largo de la ruta restante |
+| `patrol_controller.gd` | `PatrolController` (Node) | Lleva al personaje por un recorrido dibujado en el nivel (un `Path3D`): puede detenerse en sus puntos (`waypoint_wait`), espera en el inicio (`cycle_wait`), se detiene ante un personaje que le cierra el paso e informa de ello |
 
 No se necesita ningún otro addon. Para un cuerpo listo para usar con gravedad, salto y sprint, agrega
 `addons/iso_orbit/ground_character`.
@@ -55,31 +56,36 @@ No se necesita ningún otro addon. Para un cuerpo listo para usar con gravedad, 
    	move_and_slide()
    ```
 
-   Asigna a `NavigationMover.settings` un recurso `LocomotionSettings` antes de que el componente entre en el
-   árbol o déjalo vacío para crear uno con los valores del script. Usa **Make Unique** si cada personaje necesita
-   ajustes independientes. Cambiar campos del recurso durante la partida funciona, pero sustituir
-   `mover.settings` después de `_ready()` no cambia el recurso que ya usa `GroundMotion`. `GroundCharacter` del
-   addon complementario se ocupa de escaleras, saltos y protección de bordes.
+   Asigna a `NavigationMover.settings` un recurso `LocomotionSettings` o déjalo vacío para crear uno con los valores
+   del script. Usa **Make Unique** si cada personaje necesita ajustes independientes. Cambiar campos del recurso
+   durante la partida funciona, para todos los personajes que lo usan; sustituir `mover.settings` durante la partida
+   surte efecto al instante. `GroundCharacter` del addon complementario se ocupa de escaleras, saltos y protección de
+   bordes.
 
-4. Para controlar con el ratón, agrega un `Node` con `point_click_move_input.gd` en cualquier lugar y asigna
-   `mover` y `camera`. Necesita las acciones `move_to_cursor` (botón izquierdo), `camera_rotate` (derecho) y
-   `move_forward`, `move_back`, `move_left`, `move_right` (WASD). Si falta una, informa una vez al inicio y luego
-   no intenta leerla. Los clics detectan la capa de física 1 (`ground_mask`): deja fuera la capa de personajes y
-   las paredes invisibles para que el clic no apunte a ellos. Si usas la cámara de
-   `addons/iso_orbit/orbit_camera`, conecta `hold_pending_changed` a `set_follow_paused` y `run_requested` a
-   `end_follow_wait`. Mirar alrededor durante una carrera (`look_around_while_held`) requiere que
-   `camera_steer_action` sea la acción que gira la cámara (`rotate_action` en el rig, ambas `camera_rotate`).
+4. Para controlar con el ratón, agrega un `Node` con `point_click_move_input.gd` en cualquier lugar y asigna `mover` y
+   `camera`. Necesita las acciones `move_to_cursor` (botón izquierdo), `camera_rotate` (derecho) y `move_forward`,
+   `move_back`, `move_left`, `move_right` (WASD). Si falta una, informa una vez al inicio y luego no intenta leerla. Los
+   clics detectan la capa de física 1 (`ground_mask`): deja fuera la capa de personajes y las paredes invisibles para
+   que el clic no apunte a ellos. Si usas la cámara de `addons/iso_orbit/orbit_camera`, conecta `run_requested` a
+   `end_follow_wait`, pero no `hold_pending_changed` a `set_follow_paused`: cada clic detendría el giro de la cámara.
+   Mirar alrededor durante una carrera (`look_around_while_held`) requiere que `camera_steer_action` sea la acción que
+   gira la cámara (`rotate_action` en el rig, ambas `camera_rotate`).
 5. También puedes mandar la IA con `move_to(point)`, `steer(direction)`, `stop()` y escuchar `arrived`. Indica que
    se llegó al final de la ruta, que puede estar antes del destino solicitado si este es inaccesible.
+6. Para una patrulla, agrega un `Node` con `patrol_controller.gd` bajo el cuerpo, junto a su `NavigationMover`. Dibuja
+   un `Path3D` en el nivel, fuera del personaje y por donde el personaje quepa, y asígnalo a `route`. El personaje
+   recorre la línea que el editor dibuja para la curva, vuelve al inicio, espera `cycle_wait` y empieza de nuevo;
+   `blocked_long_enough` informa de un personaje que lleva `blocked_delay` segundos cerrándole el paso. Para que otros
+   personajes lo detengan, la máscara de colisión del cuerpo debe incluir su capa.
 
 Para copiar el héroe ya montado, con sus archivos y ajustes de escena, consulta `docs/es/integration.md` en vez
 de crear el cuerpo a mano. `docs/es/systems/input.md` explica los dos modos de entrada y los ajustes del héroe.
 
 ## Documentación
 
-En el repositorio de la plantilla: `docs/es/integration.md`, `docs/es/systems/locomotion.md` y
+En el repositorio de la plantilla: `docs/es/integration.md`, `docs/es/systems/locomotion.md` (con las patrullas) y
 `docs/es/systems/input.md`.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

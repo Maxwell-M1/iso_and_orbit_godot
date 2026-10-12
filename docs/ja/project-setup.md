@@ -1,4 +1,4 @@
-<!-- translation of docs/en/project-setup.md @ e52ff77b332d -->
+<!-- translation of docs/en/project-setup.md @ 2f3486026502 -->
 # プロジェクトのセットアップ
 
 [← ドキュメント目次](index.md)
@@ -13,14 +13,14 @@
 
 | レイヤー | 名前 | 何が置かれるか | 誰が読むか |
 |---|---|---|---|
-| 1 | `world` | 地面、壁、小道具、山、レベルに立っているNPC | クリックレイ（`PointClickMoveInput.ground_mask`）、プレイヤーのボディと`LedgeGuard`（`floor_mask`が0ならボディのマスク）、`CameraArm.collision_mask`、ナビゲーションメッシュのベイク |
-| 2 | `characters` | プレイヤーのボディ（`collision_layer = 2`） | `PointOfInterest`と`LevelPortal`のエリア（`collision_mask = 2`）。カメラアームは無視する |
+| 1 | `world` | 地面、壁、小道具、山、レベルに立っているNPC | クリックレイ（`PointClickMoveInput.ground_mask`）、プレイヤーと巡回するキャラクターのボディ、プレイヤーの`LedgeGuard`（`floor_mask`が0ならボディのマスク）、`CameraArm.collision_mask`、ナビゲーションメッシュのベイク |
+| 2 | `characters` | プレイヤーのボディと巡回するキャラクター（`collision_layer = 2`） | `PointOfInterest`と`LevelPortal`のエリア（`collision_mask = 2`）。ヒーローと巡回するキャラクターのボディ（互いに止め合うため）、ヒーローのマスクを通じてその`LedgeGuard`。カメラアームは無視する |
 | 3 | `camera` | カメラだけを止めるボディ。たとえば`shared/world/props/house.tscn`の`RoofCameraBlocker` | `CameraArm.collision_mask`のみ |
-| 4 | `bounds` | 島の`Edge`など、レベル端の見えない壁 | プレイヤーのボディ（`collision_mask`はレイヤー1と4）とその`LedgeGuard`、必要なレベル（島）のナビゲーションメッシュのベイク |
+| 4 | `bounds` | 島の`Edge`など、レベル端の見えない壁 | プレイヤーと巡回するキャラクターのボディ（`collision_mask`はレイヤー1、2、4）、プレイヤーの`LedgeGuard`、必要なレベル（島）のナビゲーションメッシュのベイク |
 
 `CameraArm.collision_mask`のデフォルトはレイヤー1と3（`0b101`）です。レイヤー2のキャラクターがカメラを押すことはありません。レイヤー3のボディはカメラを止めますが、クリック、ナビゲーション、キャラクターからは見えません。誰も屋根の上へ経路を引けないまま、カメラを屋根から守れます。レイヤー4は逆で、キャラクターを止めますが、クリックとカメラは通過します。見えない壁の向こうの地面や水をクリックしても、レイが壁に当たることはありません。
 
-ナビゲーションレイヤー1の名前は`ground`です。`NavigationMover.navigation_layers`のデフォルトはこのレイヤーです。物理レイヤーとナビゲーションレイヤーは別の設定です。コライダーの物理レイヤーはレイとボディの衝突を決め、リージョンのナビゲーションレイヤーはムーバーが探せる経路を決めます。コードではマスクはビット値で、レイヤー1と4が`1 | 8 = 9`、レイヤー1と3が`1 | 4 = 5`です。インスペクターでは番号のチェックボックスを選びます。
+ナビゲーションレイヤー1の名前は`ground`です。`NavigationMover.navigation_layers`のデフォルトはこのレイヤーです。物理レイヤーとナビゲーションレイヤーは別の設定です。コライダーの物理レイヤーはレイとボディの衝突を決め、リージョンのナビゲーションレイヤーはムーバーが探せる経路を決めます。コードではマスクはビット値で、レイヤー1、2、4が`1 | 2 | 8 = 11`、レイヤー1と3が`1 | 4 = 5`です。インスペクターでは番号のチェックボックスを選びます。
 
 ## 入力アクション
 
@@ -79,4 +79,4 @@ HUD、設定、ローディング画面のヒントはアクションからキ�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

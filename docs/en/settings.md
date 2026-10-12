@@ -7,8 +7,13 @@ scale, dragged with the mouse, waits for the release) and are saved to `user://s
 and when the game exits. **Reset all** returns every setting to its default.
 
 The defaults are in `DEFAULTS` in `gdscript/settings/game_settings.gd`. The demo applies them to node properties in
-`gdscript/demo/settings_applier.gd`; the components' own property defaults can differ, as noted below. How the
-settings system works and how to add a setting: [UI](systems/ui.md#settings).
+`gdscript/demo/settings_applier.gd`; the components' own property defaults can differ, as noted below. For the settings
+it applies, `SettingsApplier` takes the values set in the scene as the defaults instead (in the demo they match
+`DEFAULTS`): a value changed in the scene is what the game starts with until the player changes it, and what
+**Reset all** returns to. With `SettingsApplier.use_saved_settings` off, the scene's nodes keep the values set in the
+scene, and the settings window does not change them; the engine settings (full screen, frame rate, V-Sync, physics
+interpolation, interface scale, language, volume) still come from the saved settings and the window. How the settings
+system works and how to add a setting: [UI](systems/ui.md#settings).
 
 For a standalone copied hero, use [Configurations](configurations.md) to find the Inspector properties and choose
 a coherent setup. This page describes the **demo menu**. Labels below use the original bindings; the running menu
@@ -119,4 +124,4 @@ steps then).
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/levels/README.md @ 8dd533b32064 -->
+<!-- translation of addons/iso_orbit/levels/README.md @ 8704e905abc7 -->
 # 关卡
 
 [← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
@@ -25,7 +25,7 @@
 ## 配置
 
 1. 将此文件夹复制到 `res://addons/iso_orbit/levels/`。
-2. 在持续存在的主场景中，添加挂载 `level_host.gd` 的 `Node3D`，并将初始关卡作为其唯一子节点。玩家角色、相机和界面应放在容器旁边，不要放进关卡。
+2. 在持续存在的主场景中，添加挂载 `level_host.gd` 的 `Node3D`，并将初始关卡放在它下面。容器从 `initial_level` 指定的关卡开始；该属性为空时，从它的第一个 `Node3D` 子节点开始。如果还有其他 3D 子节点（标记、灯光），请设置该属性，否则容器会发出警告。玩家角色、相机和界面应放在容器旁边，不要放进关卡。
 3. 将 `loading_screen.tscn` 加入主场景，并指定为容器的 `loading_screen`；也可留空，使关卡切换时不显示加载画面。
 4. 在每个关卡的地面上添加挂载 `spawn_point.gd` 的 `Marker3D`，将其 `spawn_name` 设为 `default`；传送门抵达位置则添加其他名称的出生点。
 5. 添加传送门时，创建挂载 `level_portal.gd` 的 `Area3D` 及碰撞形状；其 `collision_mask` 必须包含角色所在层。设置 `target_level`（场景文件）、`target_spawn` 和 `title`。将角色身体放入 `player` 分组，或修改 `traveller_group`。
@@ -48,4 +48,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

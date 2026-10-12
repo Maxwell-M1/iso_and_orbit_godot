@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/locomotion.md @ 78c912e8971a -->
+<!-- translation of docs/en/systems/locomotion.md @ 9cb53e2dd91e -->
 # Hareket
 
 [← Belge dizini](../index.md)
@@ -64,10 +64,8 @@ Demo `SettingsApplier`, başlangıçta ve oyuncu ayarı değiştirdiğinde `spri
 Eklentinin kendi ayar sistemi yoktur. Çalışan demoda ayar için Scene paneli → Remote →
 `Hero/Character/NavigationMover` → `settings` yolunu kullanın. Kod kaynak alanlarını her tikte okur; ancak Remote
 değişiklikleri kaydedilmez: sonucu `.tres` dosyasına geçirin. Çalışma zamanı değişikliklerinin başkalarını
-etkilememesi için her karaktere ayrı kaynak kullanın. Kaynağı hareket düğümü sahne ağacına girmeden atayın veya
-editörde **Make Unique** kullanın: `_ready()` sonrasında `GroundMotion` eski kaynağı tutar, dolayısıyla o anda
-`mover.settings` kaynağını değiştirmek hareket ayarlarını değiştirmez. Çalışırken mevcut kaynağın alanlarını
-düzenleyin.
+etkilememesi için her karaktere ayrı kaynak kullanın: başka bir kaynak atayın veya editörde **Make Unique** kullanın.
+Oyun sırasında `mover.settings` kaynağını değiştirmek hemen etkili olur.
 
 Tek bir kaynak birkaç karakter tarafından paylaşılabilir, örneğin aynı türden tüm NPC'ler.
 
@@ -125,6 +123,58 @@ hareketlendiricinin `NavigationAgent3D` kullanmak yerine yolu kendisinin izlemes
 olduğuna göre ölçeklenir: tam geriye `backward_speed_multiplier` değerinin tamamı, çapraz geriye bir kısmı uygulanır
 (yana adımda S + D: %21 daha yavaş), yana hiç uygulanmaz. Bu yüzden yavaşlama yalnızca tuşların yana adım modunda
 vardır, bkz. [Girdi](input.md).
+
+## PatrolController: rotada yürüme
+
+`PatrolController`, karakterin `NavigationMover` düğümünü yöneterek onu seviyede çizilmiş bir rota boyunca yürütür:
+gövdeyi yine karakterin kendi betiği hareket ettirir. Rota üzerinde karakter, yol aramadan, çizginin önündeki bir
+noktasına yönelir; bu yüzden çizgiyi karakterin sığdığı yere çizin. Karakterin yerinden rotaya ve geri dönüşte onu
+navigasyon götürür. Demonun şövalyesi ve adanın korucusu bununla yürür, bkz.
+[Dünya ve navigasyon](world-and-navigation.md#yerler-ve-npcler).
+
+Rota, seviyenin karakterin dışında duran ve editörün eğri araçlarıyla çizilen bir `Path3D` düğümüdür. Karakter, editörün
+bu rota için çizdiği çizgide yürür; bir `PathFollow3D` de aynı çizgiyi izler: çizgiye noktalar, onların tutamaçları ve
+eğrinin **Bake Interval** değeri biçim verir. Tutamaçlar boşken ve Bake Interval kısayken (varsayılanı 0.2 m) çizgi
+noktadan noktaya düz gider; bir köşeyi yuvarlamak için o noktanın tutamaçlarını çekip çıkarın. Kenarlardan uzun bir Bake
+Interval, editörün kenarları noktalardan geçen kavisler olarak çizmesini sağlar ve karakter de onlarda kavisli yürür.
+Devriye başladığında (`restart()` ile veya kontrolcü açıldığında) bu çizgi üzerinde her `sample_spacing` aralığında
+noktalar alınır. Karakter, çizginin kendisinden `look_ahead` uzaklıktaki noktasını hedefleyerek bu noktalar boyunca
+durmadan yürür; böylece kavislerde onları biraz keserek yumuşakça döner ve son noktada tam olarak durur; ardından en
+kısa yoldan devriyenin başladığı yere döner (`return_to_start`), `cycle_wait` kadar bekler ve yeniden yola çıkar
+(`repeat`). `return_to_start` olmadan son noktada bekler, sonra ilk noktaya yürür. Karakterin yerinden ilk noktaya giden
+ve oradan geri dönen yollar çizilen çizginin parçası değildir: karakterin çizgiden çıkmaması için onu ilk noktaya koyun
+ve eğriyi kapatın (**Closed**). Değişen eğri bir sonraki başlangıçta okunur. Noktaları bir betik de kendisi verebilir
+(`set_route_points()`); rota yoksa kontrolcü hiçbir şey yapmaz, bu yüzden rotası olmayan bir karakter yalnızca durur.
+
+Gövdenin önündeki bir karakter devriyeyi durdurur: el feneri ışığı gibi bir alanda, gövdenin önünden `blocking_distance`
+kadar ileriye uzanan, orada gövde genişliğinde olup her iki yana `blocking_angle` kadar açılan alanda duran bir
+karakter. Yanda ya da arkada duran bir karakter onu durdurmaz. Devriye noktayı atlamak yerine aynı noktayı bekler ve yol
+açılınca yürümeyi sürdürür. Ara vermeden geçen `blocked_delay` saniyeden sonra her duruşta bir kez
+`blocked_long_enough(blocker)` gelir; demonun şövalyesi o zaman repliğini söyler. Başka karakterlerin onu durdurabilmesi
+için gövdenin çarpışma maskesi onların katmanını içermelidir: demoda karakterler 2. katmandadır, kahramanın ve
+şövalyenin maskeleri de bu katmanı içerir.
+
+| Özellik | Varsayılan | Anlamı |
+|---|---|---|
+| `character`, `mover` | boş: üst düğüm ve onun ilk `NavigationMover` çocuğu | Yürütülecek gövde ve onun hareket düğümü, gövdenin doğrudan çocuğu |
+| `route` | boş | Seviyede yürünecek `Path3D` |
+| `sample_spacing` | 0,25 m | Rota çizgisi üzerinde alınan noktalar arasındaki en uzun adım |
+| `look_ahead` | 0,75 m | Karakterin çizgi üzerinde ne kadar ileriyi hedeflediği: daha uzun değer daha yumuşak döner ve kavisleri daha çok keser |
+| `enabled` | açık | Kapalı: karakter olduğu yerde durur. Yeniden açık: oradan yeni bir devriye başlar |
+| `repeat`, `return_to_start` | açık, açık | Bir turdan sonra yeniden yola çıkar; son noktadan sonra başlangıca döner |
+| `cycle_wait` | 10 sn | Bir turdan sonra başlangıçtaki bekleme, oyun zamanıyla |
+| `waypoint_wait` | 0 sn | Eğrinin her kontrol noktasındaki duruş |
+| `blocked_delay` | 6 sn | `blocked_long_enough` gelmeden önce bir karakterin yolda ne kadar durması gerektiği |
+| `blocking_distance` | 1 m | Başka bir karakterin gövdeyi önünde ne kadar uzaktan durdurduğu |
+| `blocking_angle` | 25° | Bu alanın her iki yana ne kadar açıldığı |
+
+Navigasyon açıkken (`NavigationMover.use_navigation`) devriye başlamadan önce navigasyon haritasını bekler. `stop()`
+karakteri hemen durdurur ve devriyeyi kapatır. `get_state()`, `get_waypoint_index()`, `get_completed_cycles()` ve
+`get_blocked_time()` ne yaptığını söyler; her turdan sonra `cycle_completed` gelir.
+
+Demonun `PatrolActor` sahnesi (`gdscript/npc/patrol_actor.tscn`), böyle bir kontrolcüsü, modeli ve başının
+üstünde adı olan hazır bir karakterdir: bir örneğini seviyeye koyun ve **Route** alanını ayarlayın, bkz.
+[Editörde sahne düzenleme](../editor_authoring.md#devriyeler).
 
 ## GroundCharacter
 
@@ -493,4 +543,4 @@ sahne denemeleri sağlanan kahramanı saniyede 60 fizik tikinde dener:
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

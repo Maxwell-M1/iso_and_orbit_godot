@@ -1,4 +1,4 @@
-<!-- translation of docs/en/integration.md @ 502ddfce7182 -->
+<!-- translation of docs/en/integration.md @ 8543b901c9a7 -->
 # Использование в своём проекте
 
 [← Оглавление документации](index.md)
@@ -24,7 +24,7 @@
 | Аддон | Классы | Что нужно |
 |---|---|---|
 | `orbit_camera` | `OrbitCameraRig`, `CameraArm` | Действия ввода `camera_rotate`, `camera_zoom_in`, `camera_zoom_out`; физические слои для держателя камеры |
-| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView` | Запечённый `NavigationRegion3D` в мире (без него персонаж бежит прямо к точке). Для ввода: любая `Camera3D` и действия `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
+| `click_to_move` | `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `PointClickMoveInput`, `ClickMarker`, `NavigationPathView`, `PatrolController` | Запечённый `NavigationRegion3D` в мире (без него персонаж бежит прямо к точке). Для ввода: любая `Camera3D` и действия `move_to_cursor`, `camera_rotate`, `move_forward`, `move_back`, `move_left`, `move_right` |
 | `ground_character` | `GroundCharacter`, `FallSettings`, `LedgeGuard`, `Stamina`, `CharacterActionInput`, `CharacterSounds`, `HandSway`, `CharacterHover`, `DampedSpring`, `CharacterAppearance`, `StaminaBar` | `click_to_move`. Для клавиш: действия `sprint` и `jump`. Для звуков: свои или `shared/audio/character/`. Для покачивания руки и сменных моделей: модели, смотрящие в −Z, с узлом руки |
 | `occluded_silhouette` | `OccludedSilhouette` с его шейдерами и материалами | Ничего: работает с любой моделью |
 | `points_of_interest` | `PointOfInterest`, `DiscoveryToast` | Тело игрока в группе `player`, на физическом слое, который видят области |
@@ -98,12 +98,12 @@
 - Части доступны как типизированные свойства: `character`, `input`, `actions`, `camera_rig`, `camera_arm`, `camera`,
   `click_marker`, `path_view`, а также `sounds`, `appearance`, `hover` и `silhouette` персонажа.
 
-Для своей модели сделайте копию сцены и замените в ней `player.tscn` своим персонажем либо соберите узлы вручную.
-Для камеры важны два соединения: `PointClickMoveInput.hold_pending_changed` → `OrbitCameraRig.set_follow_paused` и
-`PointClickMoveInput.run_requested` → `OrbitCameraRig.end_follow_wait` (после ручного вращения камера ждёт нового
-забега). Ещё четыре соединения показывают и скрывают маркер щелчка; см.
-[Архитектура](architecture.md#соединения-в-сцене). Держите `sharp_turn_speed` камеры не выше половины скорости
-поворота персонажа: это проверяет и сообщает предупреждением только `PlayableHero`.
+Для своей модели сделайте копию сцены и замените в ней `player.tscn` своим персонажем либо соберите узлы вручную. Для
+камеры важно одно соединение: `PointClickMoveInput.run_requested` → `OrbitCameraRig.end_follow_wait` (после ручного
+вращения камера ждёт нового забега). Ещё четыре соединения показывают и скрывают маркер щелчка; см.
+[Архитектура](architecture.md#соединения-в-сцене). Не соединяйте `hold_pending_changed` с `set_follow_paused`, как делал
+шаблон до версии 1.3.0: каждый щелчок останавливал бы поворот камеры. Держите `sharp_turn_speed` камеры не выше половины
+скорости поворота персонажа: это проверяет и сообщает предупреждением только `PlayableHero`.
 
 ## Перенос героя из демо в свой проект
 
@@ -129,7 +129,7 @@
      Карта навигации и все назначенные ей сетки должны использовать одинаковые размеры ячеек;
    - включите интерполяцию физики (`physics/common/physics_interpolation`): камера следует за интерполированной
      позицией персонажа. Герой проверен с Jolt Physics (`physics/3d/physics_engine`);
-   - физические слои: тело героя находится на слое 2 и сталкивается со слоями 1 и 4, луч щелчка ищет землю на
+   - физические слои: тело героя находится на слое 2 и сталкивается со слоями 1, 2 и 4, луч щелчка ищет землю на
      слое 1, держатель камеры останавливается на слоях 1 и 3. Названия не важны, важны номера: поместите землю
      и стены на слой 1 либо измените эти маски в копии сцены.
 3. **Постройте тестовый уровень** под `NavigationRegion3D`. Земля — `StaticBody3D` с `BoxShape3D` и видимым
@@ -204,7 +204,7 @@
 | Щелчки ничего не делают | Действие InputMap, активная камера, `PlayerInput.camera` и `ground_mask` луча; наложенный Control может поглощать ввод мыши |
 | Герой идёт в стену, а не вокруг неё | Запеките коллайдеры под регионом, проверьте навигационные слои региона и контроллера, осмотрите полученную сетку |
 | Путь пересекает слишком высокую ступень | Согласуйте подъём с `max_step_height`, уменьшите вертикальную ячейку и заново запеките; проверьте реальную геометрию |
-| Изменения сцены исчезают при запуске | Скопированный `SettingsApplier` может перезаписать их сохранёнными настройками; отдельному герою он не нужен |
+| Изменения сцены исчезают при запуске | Скопированный `SettingsApplier` может перезаписать их сохранёнными настройками: выключите его `use_saved_settings` или не берите его вовсе — отдельному герою он не нужен |
 | Камера неожиданно поворачивается после правки движения | Сравните `turn_speed` персонажа и `sharp_turn_speed` камеры; см. [Конфигурации](configurations.md#настройка-без-нарушения-работы-варианта) |
 
 Также учитывайте:
@@ -221,13 +221,13 @@
 
 ## Уровни
 
-Скопируйте `addons/iso_orbit/levels/`. Главная сцена содержит `LevelHost` с начальным уровнем как единственным
-дочерним узлом, героя рядом с ним и `loading_screen.tscn`. Главный скрипт соединяет сигналы хоста: при
-`level_change_started` отключает управление, при `level_loaded(level, spawn)` ставит героя на `spawn`, при
-`level_change_finished` возвращает управление, при `level_change_failed` тоже возвращает его (уровень остаётся,
-а `level_change_finished` не приходит); `portal_entered` и `portal_exited` показывают и скрывают приглашение к
-переходу. Так работает `gdscript/main.gd`. Каждому уровню нужен `SpawnPoint` с именем `default`; порталы — это
-области `LevelPortal` с путём к целевой сцене.
+Скопируйте `addons/iso_orbit/levels/`. Главная сцена содержит `LevelHost` с начальным уровнем в качестве дочернего
+узла (если у хоста есть и другие дочерние 3D-узлы, назовите уровень в `initial_level`), героя рядом с ним и
+`loading_screen.tscn`. Главный скрипт соединяет сигналы хоста: при `level_change_started` отключает управление, при
+`level_loaded(level, spawn)` ставит героя на `spawn`, при `level_change_finished` возвращает управление, при
+`level_change_failed` тоже возвращает его (уровень остаётся, а `level_change_finished` не приходит);
+`portal_entered` и `portal_exited` показывают и скрывают приглашение к переходу. Так работает `gdscript/main.gd`.
+Каждому уровню нужен `SpawnPoint` с именем `default`; порталы — это области `LevelPortal` с путём к целевой сцене.
 
 При своей системе уровней возьмите только игрового героя и вызовите `place_at()`, когда уровень готов. Для своего
 персонажа тот же эффект даёт `GroundCharacter.teleport()`. Подробности, значения по умолчанию и совместимые
@@ -308,4 +308,4 @@ func _physics_process(delta: float) -> void:
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

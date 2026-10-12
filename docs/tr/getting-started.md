@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ a68235d39cbc -->
+<!-- translation of docs/en/getting-started.md @ a5bc6554ba04 -->
 # Başlarken
 
 [← Belge dizini](index.md)
@@ -40,7 +40,8 @@ Gidilecek yerler:
 
 - **Kadim Çember**, başlangıç noktasının kuzeybatısındaki sütun halkası. Sütunların arasında yürüyün, kahraman
   onların arkasında siluet olarak görünür.
-- Doğuda **Yolcular Kampı** ve güneybatıda **Kuyu Başındaki Çiftlik**, NPC'lerle birlikte.
+- Doğuda **Yolcular Kampı** ve güneybatıda **Kuyu Başındaki Çiftlik**, NPC'lerle birlikte. Şövalye çiftlikten
+  başlayıp çalı labirentinden geçen bir tur atar: yolunu kesin, bir süre sonra konuşur.
 - **Rüzgârlı Doruk**, kuzeydoğudaki dağ: zirvesine tıklayın, kahraman sarmal patikayı izler.
 - Yol bulmayı denemek için çalı labirenti, rampalı ve merdivenli platform ile başlangıç noktasının yakınındaki U biçimli
   tuzak.
@@ -75,4 +76,4 @@ Burada `godot`, Godot 4.7.2 çalıştırılabilir dosyanızdır. Windows'ta çı
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

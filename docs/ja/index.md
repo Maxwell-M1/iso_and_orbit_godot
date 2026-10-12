@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # ドキュメント
 
 [English](../en/index.md) · [Español](../es/index.md) · **日本語** · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -26,6 +26,7 @@ Godot 4.7でアイソメトリックやトップダウンのRPGを作るため�
 - [操作方法](controls.md)：すべての入力、クリックと長押しの違い、右ボタンと組み合わせるキー、カメラ。
 - [設定](settings.md)：設定ウィンドウの全項目について、そのキー、デフォルト値、変更される内容。
 - [ヒーローの構成](configurations.md)：値の供給元、正確なノードパス、3つの一貫した構成と確認方法。
+- [エディターでのシーン編集](editor_authoring.md)：参照と警告、カメラの開始時の視点、固体の小道具とそのサイズ、巡回ルート、エディター側のチェック。
 
 ### コード
 
@@ -35,7 +36,7 @@ Godot 4.7でアイソメトリックやトップダウンのRPGを作るため�
 
 ### システム
 
-- [ロコモーション](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、`GroundCharacter`、アニメーションとインターフェースのためにキャラクターが通知すること、`CharacterMonitor`、階段と斜面、ダッシュとスタミナ、ジャンプ、落下（`FallSettings`）、崖ガード。
+- [ロコモーション](systems/locomotion.md)：`LocomotionSettings`、`GroundMotion`、`NavigationMover`、巡回（`PatrolController`）、`GroundCharacter`、アニメーションとインターフェースのためにキャラクターが通知すること、`CharacterMonitor`、階段と斜面、ダッシュとスタミナ、ジャンプ、落下（`FallSettings`）、崖ガード。
 - [カメラ](systems/camera.md)：`OrbitCameraRig`（回転、ズームカーブ、追従）と`CameraArm`（障害物、接近、フェード）。
 - [入力](systems/input.md)：`PointClickMoveInput`（クリック、長押し、キー、カーソル）と`CharacterActionInput`。
 - [キャラクター](systems/characters.md)：モデルと装備、ヒーローの外見、手の揺れ、浮遊、シルエット。
@@ -63,4 +64,4 @@ Godot 4.7でアイソメトリックやトップダウンのRPGを作るため�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

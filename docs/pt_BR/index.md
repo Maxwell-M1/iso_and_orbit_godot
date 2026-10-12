@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # Documentação
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · **Português (Brasil)** · [Русский](../ru/index.md) · [Türkçe](../tr/index.md) · [简体中文](../zh_CN/index.md)
@@ -32,6 +32,8 @@ Escolha uma página abaixo. Os guias dos addons vêm após as referências dos s
 - [Configurações](settings.md): todas as opções da janela de configurações, sua chave, seu padrão e o que ela muda.
 - [Configurações do herói](configurations.md): origem dos valores, caminhos exatos dos nós, três configurações
   completas e como conferir o resultado.
+- [Editando cenas no editor](editor_authoring.md): referências e avisos, a vista inicial da câmera, objetos sólidos e
+  seu tamanho, rotas de patrulha, as verificações próprias do editor.
 
 ### Código
 
@@ -44,9 +46,10 @@ Escolha uma página abaixo. Os guias dos addons vêm após as referências dos s
 
 ### Sistemas
 
-- [Locomoção](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  o que o personagem informa para animações e a interface, `CharacterMonitor`, degraus e encostas, corrida rápida e
-  fôlego, o pulo, a queda (`FallSettings`) e a proteção de bordas.
+- [Locomoção](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, patrulhas
+  (`PatrolController`), `GroundCharacter`, o que o personagem informa para animações e a interface,
+  `CharacterMonitor`, degraus e encostas, corrida rápida e fôlego, o pulo, a queda (`FallSettings`) e a proteção de
+  bordas.
 - [Câmera](systems/camera.md): `OrbitCameraRig` (órbita, curva de zoom, seguir) e `CameraArm` (obstáculos,
   aproximação, esmaecimento).
 - [Entrada](systems/input.md): `PointClickMoveInput` (clique, segurar, teclas, o cursor) e `CharacterActionInput`.
@@ -78,4 +81,4 @@ Escolha uma página abaixo. Os guias dos addons vêm após as referências dos s
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

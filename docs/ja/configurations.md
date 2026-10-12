@@ -1,4 +1,4 @@
-<!-- translation of docs/en/configurations.md @ 2173d5158953 -->
+<!-- translation of docs/en/configurations.md @ ced3a1b9ab87 -->
 # 操作するヒーローの設定
 
 [← ドキュメント目次](index.md)
@@ -142,4 +142,4 @@ func _ready() -> void:
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

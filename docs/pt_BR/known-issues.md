@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
+<!-- translation of docs/en/known-issues.md @ 66849ce12ecb -->
 # Problemas conhecidos
 
 [← Índice da documentação](index.md)
@@ -27,10 +27,10 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
   modelo cai com ele.
 - **Para cima é +Y.** O personagem e os componentes suportam apenas `Vector3.UP` como direção superior.
 - **Sem desvio entre personagens.** `NavigationMover` segue um caminho e não usa o desvio da navegação (avoidance),
-  então personagens em movimento não desviam uns dos outros. O corpo do jogador está na camada 2 e só colide com a
-  camadas 1 e 4, então dois personagens feitos a partir de `player.tscn` se atravessam; adicione a camada 2 à
-  `collision_mask` deles se eles devem bloquear um ao outro. Os NPCs da demo ficam parados e entram na geração da
-  malha de navegação como obstáculos.
+  então personagens em movimento não desviam uns dos outros. O corpo do jogador e os personagens em patrulha estão na
+  camada 2 e colidem com as camadas 1, 2 e 4, então bloqueiam uns aos outros: o que está no caminho detém o outro, e
+  uma patrulha espera até o caminho ficar livre. Os NPCs parados entram na geração da malha de navegação como
+  obstáculos; o cavaleiro e o patrulheiro em patrulha, não, pois se movem.
 - **A malha de navegação é gerada com antecedência.** Mover um obstáculo em tempo de execução não muda os caminhos.
   Depois de editar o nível, gere a malha de novo
   ([Mundo e navegação](systems/world-and-navigation.md#gerando-novamente-a-malha-de-navegação)).
@@ -90,13 +90,14 @@ Limitações do projeto e peculiaridades da engine que ele contorna. Cada item d
   componentes: `world.tscn`, `island.tscn` e `mountain.tscn` usam
   `addons/iso_orbit/points_of_interest/point_of_interest.gd`; ambos os níveis usam
   `addons/iso_orbit/levels/spawn_point.gd`, e `shared/world/props/teleport_pad.tscn` usa
-  `addons/iso_orbit/levels/level_portal.gd`. Dois scripts pequenos de objetos também ficam em
-  `shared/world/props/`. Uma versão em C# precisaria de scripts próprios para lugares, pontos de entrada e
-  portais ou de uma forma de marcá-los só na cena.
+  `addons/iso_orbit/levels/level_portal.gd`. Os níveis também posicionam os personagens em patrulha da demo, cenas de
+  `gdscript/npc/`, e três scripts de objetos ficam em `shared/world/props/` (`static_prop.gd`, `flicker.gd`,
+  `hover_spin.gd`). Uma versão em C# precisaria de scripts próprios para lugares, pontos de entrada, portais, objetos
+  e personagens em patrulha ou de uma forma de marcá-los só na cena.
 - **Recursos vazados reportados na saída.** Se um script sai logo depois de tocar passos, a engine pode reportar
   objetos `AudioStreamPlayback` vazados: com `--fixed-fps`, o tempo de jogo corre à frente do tempo real enquanto os
   sons ainda tocam. Libere a cena e espere um momento antes de sair; `tests/run_checks.gd` espera 0,1 s.
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

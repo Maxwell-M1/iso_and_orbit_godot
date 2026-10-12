@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/levels.md @ dc39dc2f669b -->
+<!-- translation of docs/en/systems/levels.md @ 0382449aab6e -->
 # Niveles
 
 [← Índice de documentación](../index.md)
@@ -18,10 +18,11 @@ son sus hermanos, de modo que los niveles cambian a su alrededor.
 
 | Nodo | Clase | Función |
 |---|---|---|
-| `Levels` | `LevelHost` | Aloja el nivel actual como único hijo y lo cambia |
+| `Levels` | `LevelHost` | Aloja el nivel actual y lo cambia; `initial_level` indica el nivel inicial |
 | `Levels/World` | | Nivel inicial, `shared/world/world.tscn`, colocado en el editor |
 | `Hero` | `PlayableHero` | Personaje del jugador, con entrada, cámara, marcador de clic y línea de ruta |
 | `Hud/TravelPrompt` | `TravelPrompt` | Invitación a viajar sobre una plataforma |
+| `Hud/Subtitles` | `SubtitleDisplay` | Lo que dicen los personajes del nivel |
 | `LoadingScreen` | `LoadingScreen` | Pantalla visible mientras se carga otro nivel |
 
 `gdscript/main.gd` los conecta así:
@@ -31,8 +32,8 @@ son sus hermanos, de modo que los niveles cambian a su alrededor.
 | `LevelHost.portal_entered(portal)` | Muestra la invitación de ese portal, salvo si viaja automáticamente. Si se entra en dos portales a la vez, muestra el último |
 | `LevelHost.portal_exited(portal)` | Oculta esa invitación; si el héroe sigue en otro portal, ofrece ese |
 | `TravelPrompt.confirmed(portal)` | `portal.travel()` |
-| `LevelHost.level_change_started` | Oculta la invitación y el HUD, y quita el control al héroe |
-| `LevelHost.level_loaded(level, spawn)` | Marca los lugares descubiertos anteriormente, coloca al héroe en `spawn` con la cámara detrás y muestra el HUD bajo la pantalla |
+| `LevelHost.level_change_started` | Oculta la invitación, los subtítulos y el HUD, y quita el control al héroe |
+| `LevelHost.level_loaded(level, spawn)` | Marca los lugares descubiertos anteriormente, conecta lo que dicen los personajes del nivel con los subtítulos, coloca al héroe en `spawn` con la cámara detrás y muestra el HUD bajo la pantalla |
 | `LevelHost.level_change_finished` | Devuelve el control |
 | `LevelHost.level_change_failed` | Muestra el HUD, devuelve el control y ofrece otra vez el portal si el héroe sigue en él |
 
@@ -73,6 +74,7 @@ Ajustes del host:
 
 | Propiedad | Valor predeterminado | Significado |
 |---|---|---|
+| `initial_level` | vacío; la demo asigna `World` | Nivel en el que empieza el juego, un hijo del host. Vacío: el primer hijo que sea un `Node3D`. Con varios hijos 3D (un marcador, una luz) y ninguno indicado, el host muestra una advertencia en el editor |
 | `loading_screen` | vacío; la demo asigna su `LoadingScreen` | Pantalla que cubre el juego durante la carga. Vacío: el nivel cambia a la vista del jugador |
 | `min_loading_time` | 0.6 s | Tiempo mínimo de la pantalla para que una carga rápida no produzca un destello |
 | `warmup_frames` | 3 | Fotogramas dibujados detrás antes de retirarla; los shaders nuevos se compilan fuera de la vista |
@@ -92,9 +94,8 @@ Señales y métodos del host:
 | `is_changing()` | Hay un cambio en curso desde que se acepta `change_level()` hasta `level_change_finished` o `level_change_failed` |
 | `find_spawn_point(spawn_name = &"default", level = null)` | Busca un punto de aparición; consulta [Puntos de aparición](#puntos-de-aparición) |
 
-El nivel inicial colocado en el editor no se anuncia: no emite `level_loaded`. Su punto `default` está listo.
-El juego lo prepara en `_ready()`
-mediante `get_current_level()` y `find_spawn_point()`, como hace `gdscript/main.gd`.
+El nivel inicial (`initial_level`, o el primer hijo 3D) no se anuncia: no llega ningún `level_loaded` para él, y el
+juego lo prepara en su `_ready()` mediante `get_current_level()` y `find_spawn_point()`, como hace `gdscript/main.gd`.
 
 Una solicitud durante otro cambio se rechaza (`ERR_BUSY`), así que pulsar E de nuevo o entrar en otro portal no
 tiene efecto. `change_level()` comprueba el archivo de inmediato: si falta devuelve `ERR_FILE_NOT_FOUND`; si no es
@@ -127,7 +128,7 @@ portales del nivel actual, incluidos los que se agreguen más tarde, por ejemplo
 | `target_level` | | Archivo de escena del nivel de destino. Es una ruta, no una escena cargada: dos niveles pueden enlazarse mutuamente. También funciona una ruta `uid://` elegida en el Inspector |
 | `target_spawn` | `default` | Punto de aparición al que se llega |
 | `title` | | Nombre del lugar de destino para la invitación, la pantalla y el letrero. Se traduce al mostrarlo |
-| `title_label` | | `Label3D` sobre el portal que muestra `title`; el portal escribe allí el título |
+| `title_label` | | `Label3D` sobre el portal que muestra `title`; el portal escribe allí el título, también en el editor, donde la escena conserva el texto propio del letrero |
 | `traveller_group` | `player` | Puede viajar un cuerpo que pertenezca a este grupo |
 | `auto_travel` | desactivado | Viaja al entrar un viajero sin pedir confirmación |
 
@@ -168,7 +169,7 @@ cambio, un punto ausente produce además una advertencia; si no hay ningún punt
 como `spawn`, de modo que el personaje llega al origen del nivel. Cada nivel necesita un punto `default`: ahí
 empieza el juego y llega cualquier portal sin `target_spawn`. Se usa `spawn_name`, no el nombre del nodo: los
 puntos `default` de la demo se llaman `Start` y `Arrival`. Da nombres propios a los demás: si dejas un segundo
-punto como `default`, hay dos y la búsqueda por ese nombre obtiene el primero en el orden del árbol.
+punto como `default`, será otro `default`, y la búsqueda por ese nombre obtiene el primero en el orden del árbol.
 
 ## La pantalla de carga
 
@@ -206,8 +207,8 @@ también actualiza un consejo ya visible.
 
 `gdscript/player/playable_hero.tscn` está listo para colocarse en una escena de juego: contiene el personaje
 (`player.tscn`, en el grupo `player`), `PointClickMoveInput`, `CharacterActionInput`, el rig de cámara con brazo y
-cámara, marcador de clic y línea de ruta, con ajustes y seis conexiones dentro de la escena. La escena del
-personaje por sí sola no incluye esas partes, por lo que una IA puede controlar el mismo `player.tscn`.
+cámara, marcador de clic y línea de ruta, con ajustes y cinco conexiones dentro de la escena. La escena del personaje
+por sí sola no incluye esas partes, por lo que una IA puede controlar el mismo `player.tscn`.
 
 `PlayableHero` (`playable_hero.gd`) expone las partes como propiedades tipadas (`character`, `input`, `actions`,
 `camera_rig`, `camera_arm`, `camera`, `click_marker`, `path_view`, y del personaje `sounds`, `appearance`,
@@ -275,4 +276,4 @@ lugar. No tienen colisión, así que las mallas de navegación bajo ellas no cam
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

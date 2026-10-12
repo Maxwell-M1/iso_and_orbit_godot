@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 94f2d396a032 -->
+<!-- translation of addons/iso_orbit/orbit_camera/README.md @ 920ed88160c2 -->
 # オービットカメラ
 
 [← ドキュメント目次（テンプレートリポジトリ）](../../../docs/ja/index.md)
@@ -30,13 +30,13 @@ Godot 4.7用Iso & Orbitの一部です。MITライセンス（`LICENSE`を参照
            └── Camera3D (Current = on)
    ```
 
-   リグとアームはそれぞれ最初の直接の子`CameraArm`と`Camera3D`を探します。エクスポートされた`arm`と`camera`を明示的に設定することもできます。アームが配置するため`Camera3D`のローカルトランスフォームは初期値にします。この視点を使うときはCurrentにします。テンプレートと同じ構図には視野角45°、遠方クリップ距離300ワールド単位を設定します。
+   リグとアームはそれぞれ最初の直接の子`CameraArm`と`Camera3D`を探します。エクスポートされた`arm`と`camera`を明示的に設定することもできます。アームが配置するため`Camera3D`のローカルトランスフォームは初期値にします。エディターではリグがカメラをゲーム開始時の位置（`start_zoom`、`start_yaw`）に表示し、保存時にはシーン自身の値が保たれます。この視点を使うときはCurrentにします。テンプレートと同じ構図には視野角45°、遠方クリップ距離300ワールド単位を設定します。
 4. 固体のワールド形状を物理レイヤー1に置きます。アームのデフォルトの`collision_mask`はレイヤー1と3（`0b101`）です。レイヤー3には屋根などカメラ専用の障害物を置けます。キャラクターをそのマスクから外し、カメラを押さないようにします。ボディかその親を`camera_ignore`へ入れると除外されます。任意で`CameraArm.fade_target`へモデルのルートを指定すると、アームが非常に短いとき半透明になります。
 5. ターゲットが物理ティックで動くなら**Project Settings → Physics → Common → Physics Interpolation**を有効にします。リグは描画フレームごとにターゲットの補間位置を追い、自身の補間はオフにします。アームとカメラはデフォルトでそのモードを継承します。
 
 スクリプトのデフォルトは手動オービットで、3つの走行時自動調整はすべてオフです。時間と目標値が設定されていても有効にはなりません。テンプレートのヒーロー向けに調整済みの任意の追従には、`follow_time = 1.1` s、`follow_pitch_angle = -22°`、`follow_pitch_time = 1.1` s、`follow_zoom_level = 0.55`、`follow_zoom_time = 1.5` s、`follow_wait_after_rotate = true`、`height_follow_time = 0.15` sを使います。走行の後ろへ旋回するなら`follow_movement`を有効にし、傾きやズームを合わせたい場合だけ`follow_pitch`と`follow_zoom`を有効にします。ヒーローの初期状態では3つともオフです。角度はインスペクターでは度で指定し、GDScriptでは`deg_to_rad()`によるラジアンを代入します。
 
-`follow_wait_after_rotate`がオンなら、意図したマウスオービットの後は、ターゲットが減速するか新しい走行を始めるまで追従を待機します。停止前に入力が次の走行を始める場合は`end_follow_wait()`を呼びます。テンプレートの`gdscript/player/playable_hero.tscn`では`PointClickMoveInput.run_requested`をこれに、`hold_pending_changed`を`set_follow_paused()`へ接続します。ターゲットが常に動き続け、新しい走行を通知できないなら待機オプションをオフにします。反転中の途中方向へカメラを引っ張らないよう`sharp_turn_speed`はキャラクターの旋回速度の半分以下に保ちます。テンプレートではヒーローの720°/sに対して360°/sです。
+`follow_wait_after_rotate`がオンなら、意図したマウスオービットの後は、ターゲットが減速するか新しい走行を始めるまで追従を待機します。停止前に入力が次の走行を始める場合は`end_follow_wait()`を呼びます。テンプレートの`gdscript/player/playable_hero.tscn`では`PointClickMoveInput.run_requested`をこれに接続します。マウスボタンの押下で追従を一時停止（`set_follow_paused()`）することはしません。クリックで進行中の旋回が止まり、最初からやり直しになるためです。ターゲットが常に動き続け、新しい走行を通知できないなら待機オプションをオフにします。反転中の途中方向へカメラを引っ張らないよう`sharp_turn_speed`はキャラクターの旋回速度の半分以下に保ちます。テンプレートではヒーローの720°/sに対して360°/sです。
 
 アームがなくても、リグの直接の子に`Camera3D`を置けば動きます。カメラはズーム距離に留まり、壁を通過することがあります。障害物への対応とフェードには`CameraArm`が必要です。
 
@@ -44,4 +44,4 @@ Godot 4.7用Iso & Orbitの一部です。MITライセンス（`LICENSE`を参照
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

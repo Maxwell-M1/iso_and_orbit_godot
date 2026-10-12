@@ -47,15 +47,16 @@ Needs `addons/iso_orbit/click_to_move`: the body is driven by a `NavigationMover
    └── Stamina      optional
    ```
 
-   Set the body's `mover`, `visual`, `ledge_guard` and `stamina`. The demo also sets `floor_constant_speed` on the
-   body, so the character keeps its speed on ramps, and puts it on physics layer 2, apart from the level, colliding
-   with layers 1 and 4 (the level and its invisible walls): `get_ground_height()` and, by default, `LedgeGuard` look
-   for ground with the same mask. The body climbs stairs up to `max_step_height` (0.3 m) and slopes up to its
-   `floor_max_angle`; for paths up stairs, bake the navigation mesh with `agent_max_climb` matched to the intended
-   step height and test the baked route against the actual collider. Keep `LedgeGuard.max_drop` at least as high as
-   `max_step_height`, and `floor_snap_length` below it if you need `stair_taken` on down steps.
-   The body may stand turned in the level: the character turns only `Visual`, relative to the body, and starts facing
-   along the body's −Z; later, `teleport(position, facing)` or `NavigationMover.face()` turns it.
+   Set the body's `mover`, `visual`, `ledge_guard` and `stamina`. The demo also sets `floor_constant_speed` on the body,
+   so the character keeps its speed on ramps, and puts it on physics layer 2, apart from the level, colliding with
+   layers 1, 2 and 4 (the level, the other characters and the invisible walls): `get_ground_height()` and, by default,
+   `LedgeGuard` look for ground with the same mask, so another character counts as ground too; set
+   `LedgeGuard.floor_mask` to layers 1 and 4 to leave the characters out. The body climbs stairs up to `max_step_height`
+   (0.3 m) and slopes up to its `floor_max_angle`; for paths up stairs, bake the navigation mesh with `agent_max_climb`
+   matched to the intended step height and test the baked route against the actual collider. Keep `LedgeGuard.max_drop`
+   at least as high as `max_step_height`, and `floor_snap_length` below it if you need `stair_taken` on down steps. The
+   body may stand turned in the level: the character turns only `Visual`, relative to the body, and starts facing along
+   the body's −Z; later, `teleport(position, facing)` or `NavigationMover.face()` turns it.
 3. For the keys, add a `Node` with `character_action_input.gd` and set its `character`. It needs the input actions
    `sprint` and `jump`; a missing one is reported once at the start and is not read after that.
 4. Optional: `CharacterSounds` with `AudioStreamPlayer3D` children, `HandSway` with its `character` and the model's
@@ -85,4 +86,4 @@ In the template repository: `docs/en/integration.md`, `docs/en/systems/locomotio
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

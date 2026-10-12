@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 87915285e965 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ 51bf079322a3 -->
 # 地面角色
 
 [← 文档目录（模板仓库）](../../../docs/zh_CN/index.md)
@@ -44,7 +44,7 @@
    └── Stamina      可选
    ```
 
-   设置身体的 `mover`、`visual`、`ledge_guard` 和 `stamina`。演示还在身体上启用 `floor_constant_speed`，使角色在坡道上保持速度，并把身体放在第 2 物理层，与第 1 和第 4 层（关卡及其隐形墙）碰撞：`get_ground_height()` 和默认的 `LedgeGuard` 用相同掩码寻找地面。身体能走上不超过 `max_step_height`（0.3 米）的台阶和不超过其 `floor_max_angle` 的斜坡；烘焙台阶路径时，应让 `agent_max_climb` 与预期台阶高度匹配，并用实际碰撞体测试烘焙的路线。`LedgeGuard.max_drop` 应至少等于 `max_step_height`；若需要下台阶时发出 `stair_taken`，则 `floor_snap_length` 要小于台阶高度。身体在关卡中可以预先旋转：角色只相对身体转动 `Visual`，初始面朝身体的 −Z；之后可用 `teleport(position, facing)` 或 `NavigationMover.face()` 使其转向。
+   设置身体的 `mover`、`visual`、`ledge_guard` 和 `stamina`。演示还在身体上启用 `floor_constant_speed`，使角色在坡道上保持速度，并把身体放在第 2 物理层，与第 1、2 和 4 层（关卡、其他角色和隐形墙）碰撞：`get_ground_height()` 和默认的 `LedgeGuard` 用相同掩码寻找地面，因此其他角色也算作地面；若要排除角色，请将 `LedgeGuard.floor_mask` 设为第 1 和第 4 层。身体能走上不超过 `max_step_height`（0.3 米）的台阶和不超过其 `floor_max_angle` 的斜坡；烘焙台阶路径时，应让 `agent_max_climb` 与预期台阶高度匹配，并用实际碰撞体测试烘焙的路线。`LedgeGuard.max_drop` 应至少等于 `max_step_height`；若需要下台阶时发出 `stair_taken`，则 `floor_snap_length` 要小于台阶高度。身体在关卡中可以预先旋转：角色只相对身体转动 `Visual`，初始面朝身体的 −Z；之后可用 `teleport(position, facing)` 或 `NavigationMover.face()` 使其转向。
 3. 如需按键控制，添加一个挂载 `character_action_input.gd` 的 `Node`，并设置其 `character`。它需要输入动作 `sprint` 和 `jump`；缺少的动作会在启动时报告一次，之后不会读取。
 4. 可选：带 `AudioStreamPlayer3D` 子节点的 `CharacterSounds`；设置了 `character` 与模型手部节点的 `HandSway`；带有 `slot` 和模型场景列表的 `CharacterAppearance`；作为调试面板放在 `CanvasLayer` 中的 `CharacterMonitor`。`LedgeGuard.floor_mask` 默认是 0，此时沿用身体的碰撞掩码，并排除陡得无法站立的表面。
 5. 如需悬浮，在 `Visual` 与模型之间放一个挂载 `character_hover.gd` 的 `Node3D`（`Visual/Hover/Model`）；若使用 `CharacterAppearance`，将它设为 `slot`。悬浮时该组件关闭脚步计数；如果指定其 `fall`（`FallSettings`），角色还能更慢地下落。升高的是模型，身体和碰撞形状不会升高。
@@ -60,4 +60,4 @@ AI 也可以驱动同一个身体：调用 `NavigationMover.move_to()` 和 `Grou
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

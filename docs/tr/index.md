@@ -1,4 +1,4 @@
-<!-- translation of docs/en/index.md @ 0499e77e2e07 -->
+<!-- translation of docs/en/index.md @ fa07b3336a5f -->
 # Belgeler
 
 [English](../en/index.md) · [Español](../es/index.md) · [日本語](../ja/index.md) · [Português (Brasil)](../pt_BR/index.md) · [Русский](../ru/index.md) · **Türkçe** · [简体中文](../zh_CN/index.md)
@@ -32,6 +32,8 @@ Bir sayfa seçin. Eklenti kurulum kılavuzları sistem başvurularından sonra g
 - [Ayarlar](settings.md): ayarlar penceresindeki her seçenek, anahtarı, varsayılan değeri ve neyi değiştirdiği.
 - [Kahraman yapılandırmaları](configurations.md): değerlerin kaynağı, kesin düğüm yolları, üç uyumlu düzen ve
   sonucun nasıl denetleneceği.
+- [Editörde sahne düzenleme](editor_authoring.md): bağlantılar ve uyarılar, kameranın başlangıç görüntüsü, katı dekor
+  nesneleri ve boyutları, devriye rotaları, editörün kendi denetimleri.
 
 ### Kod
 
@@ -44,9 +46,9 @@ Bir sayfa seçin. Eklenti kurulum kılavuzları sistem başvurularından sonra g
 
 ### Sistemler
 
-- [Hareket](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, `GroundCharacter`,
-  karakterin animasyonlar ve arayüz için bildirdikleri, `CharacterMonitor`, basamaklar ve eğimler, depar ve
-  dayanıklılık, zıplama, düşüş (`FallSettings`) ve kenar koruması.
+- [Hareket](systems/locomotion.md): `LocomotionSettings`, `GroundMotion`, `NavigationMover`, devriyeler
+  (`PatrolController`), `GroundCharacter`, karakterin animasyonlar ve arayüz için bildirdikleri, `CharacterMonitor`,
+  basamaklar ve eğimler, depar ve dayanıklılık, zıplama, düşüş (`FallSettings`) ve kenar koruması.
 - [Kamera](systems/camera.md): `OrbitCameraRig` (yörünge, yakınlaştırma eğrisi, takip) ve `CameraArm` (engeller,
   yaklaşma, saydamlaşma).
 - [Girdi](systems/input.md): `PointClickMoveInput` (tıklama, basılı tutma, tuşlar, imleç) ve `CharacterActionInput`.
@@ -77,4 +79,4 @@ Bir sayfa seçin. Eklenti kurulum kılavuzları sistem başvurularından sonra g
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
+<!-- translation of docs/en/systems/audio.md @ b72cbc1a1884 -->
 # Audio
 
 [← Índice de documentación](../index.md)
@@ -57,4 +57,4 @@ Se pueden reemplazar por sonidos grabados reales: pon en la carpeta archivos con
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

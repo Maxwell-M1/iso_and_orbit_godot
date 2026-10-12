@@ -1,4 +1,4 @@
-<!-- translation of docs/en/known-issues.md @ 2fc99af68b14 -->
+<!-- translation of docs/en/known-issues.md @ 66849ce12ecb -->
 # Bilinen sorunlar
 
 [← Belge dizini](index.md)
@@ -25,10 +25,10 @@ gerektiğini söyler.
   girebilir; kamera odağı ve kol denetimi gövde yüksekliğinde kalır. Boşluk üzerinde model gövdeyle düşer.
 - **Yukarı yön +Y'dir.** Karakter ve bileşenleri yalnız `Vector3.UP` destekler.
 - **Karakterler arasında kaçınma yok.** `NavigationMover` bir yolu izler ve navigasyon kaçınmasını (avoidance)
-  kullanmaz; bu yüzden hareket eden karakterler birbirlerinin etrafından dolaşmaz. Oyuncunun gövdesi 2. katmandadır
-  ve yalnızca 1 ve 4. katmanlarla çarpışır; bu yüzden `player.tscn` ile yapılmış iki karakter birbirinin içinden geçer;
-  birbirlerini engellemeleri gerekiyorsa `collision_mask` özelliklerine 2. katmanı ekleyin. Demodaki NPC'ler yerinde
-  durur ve navigasyon örgüsüne engel olarak pişirilmiştir.
+  kullanmaz; bu yüzden hareket eden karakterler birbirlerinin etrafından dolaşmaz. Oyuncunun gövdesi ve devriye gezen
+  karakterler 2. katmandadır ve 1, 2 ve 4. katmanlarla çarpışır; bu yüzden birbirlerini engellerler: yolu kesen
+  diğerini durdurur, devriye de yol açılana kadar bekler. Yerinde duran NPC'ler navigasyon örgüsüne engel olarak
+  pişirilmiştir; devriye gezen şövalye ve korucu ise hareket ettikleri için pişirilmemiştir.
 - **Navigasyon örgüsü önceden pişirilmiştir.** Çalışma anında bir engeli taşımak yolları değiştirmez. Seviyeyi
   düzenledikten sonra örgüyü yeniden pişirin
   ([Dünya ve navigasyon](systems/world-and-navigation.md#navigasyon-örgüsünü-yeniden-pişirme)).
@@ -88,13 +88,14 @@ gerektiğini söyler.
   `world.tscn`, `island.tscn` ve `mountain.tscn` dosyalarında
   `addons/iso_orbit/points_of_interest/point_of_interest.gd`; iki seviyede
   `addons/iso_orbit/levels/spawn_point.gd`; `shared/world/props/teleport_pad.tscn` içinde
-  `addons/iso_orbit/levels/level_portal.gd` vardır. İki küçük dekor betiği de `shared/world/props/` içindedir.
-  C# sürümünün yerler, doğuş noktaları ve portallar için kendi betikleri ya da onları yalnız sahneyle işaretleme
-  yolu gerekir.
+  `addons/iso_orbit/levels/level_portal.gd` vardır. Seviyeler ayrıca demonun `gdscript/npc/` içindeki sahneleri olan
+  devriye gezen karakterlerini yerleştirir; üç dekor betiği de `shared/world/props/` içindedir (`static_prop.gd`,
+  `flicker.gd`, `hover_spin.gd`). C# sürümünün yerler, doğuş noktaları, portallar, dekor nesneleri ve devriye gezen
+  karakterler için kendi betikleri ya da onları yalnız sahneyle işaretleme yolu gerekir.
 - **Çıkışta bildirilen sızan kaynaklar.** Bir betik ayak sesleri çaldıktan hemen sonra çıkarsa motor sızan
   `AudioStreamPlayback` nesneleri bildirebilir: `--fixed-fps` ile oyun süresi gerçek zamanın önüne geçer, sesler ise
   hâlâ çalar. Çıkmadan önce sahneyi serbest bırakın ve bir süre bekleyin; `tests/run_checks.gd` 0,1 sn bekler.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

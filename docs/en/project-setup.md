@@ -13,10 +13,10 @@ autoload, UI theme, translations, display settings and level system are optional
 
 | Layer | Name | What is on it | Who reads it |
 |---|---|---|---|
-| 1 | `world` | Ground, walls, props, the mountain, the NPCs standing in the level | Click raycast (`PointClickMoveInput.ground_mask`), the player's body and its `LedgeGuard` (whose `floor_mask` 0 takes the body's mask), `CameraArm.collision_mask`, navigation mesh baking |
-| 2 | `characters` | The player's body (`collision_layer = 2`) | `PointOfInterest` and `LevelPortal` areas (`collision_mask = 2`); the camera arm ignores it |
+| 1 | `world` | Ground, walls, props, the mountain, the NPCs standing in the level | Click raycast (`PointClickMoveInput.ground_mask`), the bodies of the player and of the patrolling characters, the player's `LedgeGuard` (whose `floor_mask` 0 takes the body's mask), `CameraArm.collision_mask`, navigation mesh baking |
+| 2 | `characters` | The player's body and the patrolling characters (`collision_layer = 2`) | `PointOfInterest` and `LevelPortal` areas (`collision_mask = 2`); the bodies of the hero and the patrolling characters, so they stop each other, and through the hero's mask its `LedgeGuard`; the camera arm ignores it |
 | 3 | `camera` | Bodies that only stop the camera, such as `RoofCameraBlocker` in `shared/world/props/house.tscn` | `CameraArm.collision_mask` only |
-| 4 | `bounds` | Invisible walls at the edge of a level, such as the island's `Edge` | The player's body (`collision_mask` = layers 1 and 4) and its `LedgeGuard`, navigation mesh baking where the mesh asks for it (the island's) |
+| 4 | `bounds` | Invisible walls at the edge of a level, such as the island's `Edge` | The bodies of the player and of the patrolling characters (`collision_mask` = layers 1, 2 and 4), the player's `LedgeGuard`, navigation mesh baking where the mesh asks for it (the island's) |
 
 `CameraArm.collision_mask` defaults to layers 1 and 3 (`0b101`). Characters on layer 2 never push the camera. A
 body on layer 3 stops the camera but is invisible to clicks, navigation and characters, so you can keep the camera
@@ -26,8 +26,8 @@ the wall.
 
 Navigation layer 1 is named `ground`; `NavigationMover.navigation_layers` defaults to it.
 Physics layers and navigation layers are separate: a collider's physics layer decides what rays and bodies hit;
-the region's navigation layers decide which paths the mover can query. In code, masks are bit fields: layers 1 and
-4 are `1 | 8 = 9`, while layers 1 and 3 are `1 | 4 = 5`. In the Inspector, tick the numbered boxes.
+the region's navigation layers decide which paths the mover can query. In code, masks are bit fields: layers 1, 2
+and 4 are `1 | 2 | 8 = 11`, while layers 1 and 3 are `1 | 4 = 5`. In the Inspector, tick the numbered boxes.
 
 ## Input actions
 
@@ -97,4 +97,4 @@ Data Folder). Delete the file to return to the defaults, or use **Reset all** in
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

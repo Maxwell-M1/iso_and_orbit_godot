@@ -1,4 +1,4 @@
-<!-- translation of docs/en/settings.md @ 262d20fd6cef -->
+<!-- translation of docs/en/settings.md @ 39df1e5739b5 -->
 # Ayarlar
 
 [← Belge dizini](index.md)
@@ -12,7 +12,12 @@ varsayılan değerine döndürür.
 
 Varsayılan değerler `gdscript/settings/game_settings.gd` dosyasındaki `DEFAULTS` içindedir. Demo bunları
 `gdscript/demo/settings_applier.gd` içinde düğüm özelliklerine uygular; aşağıda belirtildiği gibi bileşenlerin kendi
-özellik varsayılanları farklı olabilir. Ayarlar sisteminin nasıl çalıştığı ve yeni bir ayarın nasıl ekleneceği:
+özellik varsayılanları farklı olabilir. `SettingsApplier`, uyguladığı ayarlar için bunların yerine sahnede ayarlanan
+değerleri varsayılan olarak alır (demoda bunlar `DEFAULTS` ile aynıdır): sahnede değiştirilen bir değer, oyuncu onu
+değiştirene kadar oyunun başladığı değerdir ve **Tümünü sıfırla** da ona döndürür. `SettingsApplier.use_saved_settings`
+kapalıyken sahnenin düğümleri sahnede ayarlanan değerleri korur ve ayarlar penceresi onları değiştirmez; motor
+ayarları (tam ekran, kare hızı, V-Sync, fizik enterpolasyonu, arayüz ölçeği, dil, ses düzeyi) yine kaydedilmiş
+ayarlardan ve pencereden gelir. Ayarlar sisteminin nasıl çalıştığı ve yeni bir ayarın nasıl ekleneceği:
 [Arayüz](systems/ui.md#ayarlar).
 
 Tek başına kopyalanmış kahraman için Inspector özelliklerini bulmak ve uyumlu düzen seçmek üzere
@@ -123,4 +128,4 @@ olmadan yükseklik ve süresi, kahraman süzülürken ayak sesleri (o sırada ad
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

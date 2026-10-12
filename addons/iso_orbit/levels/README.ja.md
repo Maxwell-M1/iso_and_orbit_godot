@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/levels/README.md @ 8dd533b32064 -->
+<!-- translation of addons/iso_orbit/levels/README.md @ 8704e905abc7 -->
 # レベル
 
 [← ドキュメント目次（テンプレートリポジトリ）](../../../docs/ja/index.md)
@@ -25,7 +25,7 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 ## セットアップ
 
 1. このフォルダを`res://addons/iso_orbit/levels/`へコピーします。
-2. 常駐するメインシーンに`level_host.gd`を付けた`Node3D`を追加し、開始レベルを唯一の子にします。プレイヤーのキャラクター、カメラ、インターフェースはホストの隣に配置し、レベルの中には入れません。
+2. 常駐するメインシーンに`level_host.gd`を付けた`Node3D`を追加し、その下に開始レベルを置きます。ホストは`initial_level`に設定したレベルで開始し、それが空なら最初の`Node3D`の子で開始します。ほかにも3Dの子（マーカー、ライトなど）があるならこれを設定してください。設定しないとホストが警告します。プレイヤーのキャラクター、カメラ、インターフェースはホストの隣に配置し、レベルの中には入れません。
 3. メインシーンに`loading_screen.tscn`を追加し、ホストの`loading_screen`に設定します。空のままなら画面なしでレベルを切り替えます。
 4. すべてのレベルで、`spawn_point.gd`を付けた`Marker3D`を地面上に置き、`spawn_name`を`default`にします。ポータルの到着先には別の名前を付けた地点も追加します。
 5. ポータルには`level_portal.gd`を付けた`Area3D`とコリジョンシェイプを追加します。`collision_mask`にはキャラクターのレイヤーを含めます。`target_level`（シーンファイル）、`target_spawn`、`title`を設定します。キャラクターのボディを`player`グループに入れるか、`traveller_group`を変更します。
@@ -48,4 +48,4 @@ Godot 4.7用のカメラとキャラクターコントローラーのテンプ�
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

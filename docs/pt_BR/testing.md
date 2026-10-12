@@ -1,4 +1,4 @@
-<!-- translation of docs/en/testing.md @ fd518f56694a -->
+<!-- translation of docs/en/testing.md @ cce377f8600d -->
 # Testes
 
 [← Índice da documentação](index.md)
@@ -43,16 +43,18 @@ relacionadas à sua alteração; use a execução completa antes de integrar mud
 | Suíte | Verificações principais |
 |---|---|
 | `movement_checks.gd` | Aceleração, frenagem, mudança de destino, giro, destinos alcançáveis e inacessíveis, caminhos entre obstáculos, rampas e bordas |
-| `world_checks.gd` | Navegação pelo terreno da demo, áreas de descoberta, colisão de NPCs estáticos e modelos do herói em exposição |
+| `world_checks.gd` | Navegação pelo terreno da demo, áreas de descoberta, colisões com os personagens nos locais e modelos do herói em exposição |
 | `hero_look_checks.gd` | Troca dos dez modelos, posição dos equipamentos, silhuetas e movimento das mãos |
 | `character_actions_checks.gd` | Corrida rápida e cansaço, modo segurado/alternado, remapeamento e liberação de modificadoras, pulo antecipado/tolerância de borda, ajustes temporários de queda, sinais e sons |
 | `character_state_checks.gd` | Avisos de configuração, estado e dados de animação, degraus/encostas, teleporte, flutuação, interpolação, tempo de jogo parado e painel monitor |
 | `input_checks.gd` | Clique versus botão segurado, ordem dos dois botões, modos de hold, modos das teclas, captura do cursor, cancelamento e ações ausentes |
-| `camera_checks.gd` | Órbita/zoom e acompanhamento em diferentes taxas de quadros/ticks, giros bruscos, corrida rumo à câmera, espera após órbita manual, alinhamentos de inclinação/zoom/altura e teleporte |
+| `camera_checks.gd` | Órbita/zoom e acompanhamento em diferentes taxas de quadros/ticks, giros bruscos, corrida rumo à câmera, espera após órbita manual, cliques que não interrompem o acompanhamento, alinhamentos de inclinação/zoom/altura e teleporte |
 | `camera_arm_checks.gd` | Folga diante de obstáculos, camadas de colisão, grupos ignorados, aproximação opcional ao ocultar o alvo e transparência perto dele |
 | `settings_window_checks.gd` | Pausa e foco, todas as abas, mapeamento das propriedades, controles dependentes, escala da interface, redefinição e fechamento |
 | `localization_checks.gd` | Cobertura das traduções, tokens de ações preservados, mudança de idioma, nomes das 12 ações remapeáveis, dicas/janelas abertas/dicas de carregamento e herança das traduções |
 | `level_checks.gd` | Pontos de entrada, ofertas de viagem, progresso e pausa no carregamento, troca de cenas, estado do herói preservado e recuperação de falhas |
+| `patrol_checks.gd` | A ronda do cavaleiro pela linha desenhada para a sua rota, passando por cada um dos pontos dela, virando suavemente, a espera em casa e a ronda seguinte; a parada diante do herói e a fala após 2.5 s; uma patrulha detida só por um personagem à frente, a um metro e um pouco para os lados; o patrulheiro da ilha e suas paradas; rotas a partir de curvas giradas e fechadas e de um script; os pontos de uma rota na linha desenhada com um Bake Interval longo e um curto, as paradas nos pontos de controle dela; referências ausentes |
+| `editor_authoring_checks.gd` | Um recurso de ajustes de movimento compartilhado por movimentadores e substituído durante o jogo; o caminho do arquivo de configurações e as configurações salvas sobre os valores da cena, e os valores da cena mantidos com `use_saved_settings` desligado; o nível inicial; avisos de configuração; objetos inteiros (mover, `dimensions` e seu 0, uma raiz com escala, Surface Material, partes adicionadas, um modelo, uma parte animada); a opção da exceção da câmera com seu ângulo |
 
 Para as configurações de entrada e câmera documentadas, comece com `movement`, `character_actions`, `input`,
 `camera` e `settings_window`. O filtro `camera` seleciona ambas as suítes da câmera. Ao copiar o herói para outro
@@ -61,8 +63,11 @@ a suíte deste repositório não comprova que todos os arquivos e ajustes necess
 
 ## Como os testes se comportam
 
-- Eles rodam com as configurações padrão e não salvam nada: as configurações do jogador são redefinidas para o padrão
-  durante a execução e nunca são sobrescritas.
+- Eles rodam com as configurações padrão e nunca mexem nas do jogador: as configurações são redefinidas para o padrão
+  durante a execução e nunca são salvas, e a única verificação que lê um arquivo de configurações grava o seu próprio
+  em `.godot/` e o remove.
+- Os personagens em patrulha ficam parados em todas as suítes, exceto `patrol_checks.gd`, que os põe para andar ela
+  mesma: um cavaleiro andando atrapalharia outras verificações.
 - Cada verificação restaura o que mudou. As suítes rodam uma após a outra numa única cena principal, enquanto uma suíte
   rodada sozinha recebe uma nova, e uma verificação precisa passar nos dois casos. Após cada uma,
   `Engine.time_scale` volta a 1, para uma falha com tempo lento ou parado não afetar a próxima.
@@ -83,6 +88,20 @@ a suíte deste repositório não comprova que todos os arquivos e ajustes necess
   `VISIBLE`), então, para o cursor oculto, os testes leem `PointClickMoveInput.is_cursor_hidden()`.
 - Os limites são calculados a partir das configurações dos componentes sempre que possível, então ajustar
   `LocomotionSettings` não quebra os testes por si só.
+
+## Verificações no editor
+
+`tests/run_checks.gd` roda o jogo; a parte de editor dos componentes roda só no editor e tem verificações próprias:
+abra `tests/editor_tool_checks.tscn` no editor e pressione **Run Checks** no Inspector. Elas cobrem o que o jogo não
+consegue mostrar: que um aviso se atualiza enquanto uma cena é editada (um nó dependente, um recurso, um movimentador
+adicionado ao corpo de uma patrulha ou retirado dele), que a câmera, os objetos, os personagens em patrulha e a placa de
+um portal mostram suas pré-visualizações no editor enquanto uma cena salva mantém o que foi definido, que um objeto
+herdado continua seguindo sua base, que as ações de entrada do projeto contam no editor, onde o mapa de entrada contém
+só as do próprio editor, que opções do jogo (flutuação, uma patrulha) não mudam nada no editor, que um personagem em
+patrulha copiado mostra um único modelo e que um braço de câmera cujo script estende `CameraArm` sem `@tool` ainda
+mostra a vista inicial. **Status** e **Results** no Inspector mostram o resultado e não são salvos com a cena;
+`.godot/editor_tool_checks/results.json` também o contém, e a saída recebe a linha de status. As verificações gravam
+suas cenas só em `.godot/editor_tool_checks/`, que cada execução limpa.
 
 ## Escrevendo uma verificação
 
@@ -111,4 +130,4 @@ falha ao compilar e quebra o jogo inteiro naquela execução. Obtenha o nó de c
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

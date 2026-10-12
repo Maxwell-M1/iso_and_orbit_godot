@@ -1,4 +1,4 @@
-<!-- translation of docs/en/getting-started.md @ a68235d39cbc -->
+<!-- translation of docs/en/getting-started.md @ a5bc6554ba04 -->
 # Primeiros passos
 
 [← Índice da documentação](index.md)
@@ -41,7 +41,8 @@ Locais para visitar:
 
 - **Círculo Antigo**, o anel de colunas a noroeste do spawn. Ande entre as colunas e o herói aparece como silhueta
   atrás delas.
-- **Acampamento dos Viajantes** no leste e **Sítio do Poço** no sudoeste, com NPCs.
+- **Acampamento dos Viajantes** no leste e **Sítio do Poço** no sudoeste, com NPCs. O Cavaleiro faz uma ronda do
+  sítio pelo labirinto de sebes: fique no caminho dele e, depois de um tempo, ele fala.
 - **Pico dos Ventos**, a montanha no nordeste: clique no topo e o herói pega a trilha em espiral.
 - O labirinto de sebes, a plataforma com sua rampa e sua escada e a armadilha em forma de U perto do spawn, para
   testar a busca de caminhos.
@@ -78,4 +79,4 @@ código de saída. Num clone novo, importe o projeto uma vez antes, no editor ou
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

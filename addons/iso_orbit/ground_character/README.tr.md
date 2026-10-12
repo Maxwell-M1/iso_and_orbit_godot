@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/ground_character/README.md @ 87915285e965 -->
+<!-- translation of addons/iso_orbit/ground_character/README.md @ 51bf079322a3 -->
 # Zemin Karakteri
 
 [← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
@@ -53,13 +53,15 @@ Godot 4.7 için bir kamera ve karakter kontrolcüsü şablonu olan Iso & Orbit'i
 
    Gövdenin `mover`, `visual`, `ledge_guard` ve `stamina` özelliklerini ayarlayın. Demo ayrıca gövdede
    `floor_constant_speed` ayarlar, böylece karakter rampalarda hızını korur; gövdeyi de seviyeden ayrı olarak 2. fizik
-   katmanına koyar; seviye ve görünmez duvarları içeren 1 ve 4. katmanlarla çarpışır. `get_ground_height()` ve
-   varsayılan `LedgeGuard`, aynı maskeyle zemin arar. Gövde `max_step_height` (0.3 m) basamağa ve
-   `floor_max_angle` eğimine kadar çıkabilir. Basamak rotaları için navigasyon örgüsünün `agent_max_climb` değerini
-   hedeflenen basamak yüksekliğine eşleyip pişirilmiş yolu gerçek çarpışmada deneyin. `LedgeGuard.max_drop`,
-   `max_step_height` değerinden düşük olmasın; inişte `stair_taken` istiyorsanız `floor_snap_length` daha kısa olsun.
-   Gövde sahnede dönük durabilir: karakter yalnız gövdeye göre `Visual` düğümünü döndürür ve gövdenin −Z yönüne
-   bakarak başlar. Sonradan `teleport(position, facing)` veya `NavigationMover.face()` onu döndürür.
+   katmanına koyar ve 1, 2 ve 4. katmanlarla (seviye, diğer karakterler ve görünmez duvarlar) çarpıştırır.
+   `get_ground_height()` ve varsayılan olarak `LedgeGuard` aynı maskeyle zemin arar, bu yüzden başka bir karakter de
+   zemin sayılır; karakterleri dışarıda bırakmak için `LedgeGuard.floor_mask` değerini 1 ve 4. katmanlara ayarlayın.
+   Gövde `max_step_height` (0.3 m) basamağa ve `floor_max_angle` eğimine kadar çıkabilir. Basamak rotaları için
+   navigasyon örgüsünün `agent_max_climb` değerini hedeflenen basamak yüksekliğine eşleyip pişirilmiş yolu gerçek
+   çarpışmada deneyin. `LedgeGuard.max_drop`, `max_step_height` değerinden düşük olmasın; inişte `stair_taken`
+   istiyorsanız `floor_snap_length` daha kısa olsun. Gövde sahnede dönük durabilir: karakter yalnız gövdeye göre
+   `Visual` düğümünü döndürür ve gövdenin −Z yönüne bakarak başlar. Sonradan `teleport(position, facing)` veya
+   `NavigationMover.face()` onu döndürür.
 3. Tuşlar için `character_action_input.gd` betikli bir `Node` ekleyin ve `character` özelliğini ayarlayın. `sprint`
    ve `jump` girdi eylemlerine ihtiyaç duyar; eksik olan başlangıçta bir kez bildirilir ve sonra okunmaz.
 4. İsteğe bağlı: `AudioStreamPlayer3D` çocuklarıyla `CharacterSounds`; `character` ve model el düğümü atanmış
@@ -89,4 +91,4 @@ için `docs/tr/systems/levels.md`.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

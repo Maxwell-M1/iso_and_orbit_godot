@@ -1,4 +1,4 @@
-<!-- translation of docs/en/glossary.md @ 2c04d3857e30 -->
+<!-- translation of docs/en/glossary.md @ 537f8443c59c -->
 # Glosario
 
 [← Índice de documentación](index.md)
@@ -17,7 +17,10 @@ Términos tal como los usan esta documentación y el código.
 | **Cuerpo solo para la cámara** (camera-only body) | Un cuerpo en la capa de física 3 (`camera`): detiene el brazo de la cámara, pero los clics, la navegación y los personajes lo ignoran |
 | **Estado del personaje** (character state) | Lo que está haciendo el personaje: estar quieto, correr, esprintar, saltar o caer (`GroundCharacter.get_state()`, la señal `state_changed`) |
 | **Clic** (click) | Una pulsación del botón izquierdo que se suelta dentro del retardo de pulsación. El personaje corre por una ruta hasta el punto donde se presionó el botón |
+| **Advertencia de configuración** (configuration warning) | Un signo de advertencia junto a un nodo en el panel Escena mientras el nodo está mal configurado: una referencia vacía, un padre equivocado, una acción de entrada que falta. Los componentes se comprueban a sí mismos en el editor, y la advertencia desaparece en cuanto se corrige la configuración |
 | **Tiempo de coyote** (coyote time) | Un breve lapso después de salir caminando de un borde en el que el salto todavía funciona (0,1 s) |
+| **Dimensiones** (dimensions) | `StaticProp.dimensions`: el tamaño de un objeto sólido, en metros a lo largo de sus propios ejes; su modelo y su colisión se redimensionan a la vez. 0 en un eje conserva el tamaño de sus partes |
+| **Vista previa en el editor** (editor preview) | Lo que un componente muestra en el editor de lo que el juego prepara al inicio: la vista inicial de la cámara, el modelo y el nombre de un personaje que patrulla, el título del letrero de un portal, el tamaño de un objeto. Nunca se guarda en la escena |
 | **Agotado** (exhausted) | El estado después de que se acaba la resistencia: no hay sprint hasta que la resistencia se recupere hasta `recover_ratio` (30%) |
 | **Orientación** (facing) | Hacia dónde mira el personaje, a diferencia de hacia dónde se mueve. Difieren al desplazarse de costado o retroceder. `NavigationMover.get_facing()` |
 | **Ajustes de caída** (fall settings) | Cómo desciende el personaje tras un salto o un borde: gravedad, velocidad máxima y frenado de un exceso (`FallSettings`). No modifican el ascenso |
@@ -39,13 +42,16 @@ Términos tal como los usan esta documentación y el código.
 | **Componente de movimiento** (mover) | `NavigationMover`: convierte las órdenes (`move_to`, `steer`, `stop`) en velocidad horizontal por tick; el cuerpo realiza el desplazamiento |
 | **Malla de navegación** (navigation mesh) | Zona transitable horneada desde las colisiones de la capa 1 (en la isla también las paredes invisibles de la capa 4), guardada en la escena de cada nivel. Las rutas se buscan allí |
 | **Invitación a viajar** (offer to travel) | `TravelPrompt`: tecla y «Teletransporte: …» mientras el héroe está en un portal que pide confirmación. E (`interact`) o un clic viajan; alejarse la oculta |
+| **Patrulla** (patrol) | Un personaje que sigue por sí solo un recorrido del nivel, espera en el punto de partida entre ronda y ronda y se detiene ante quien le cierre el paso (`PatrolController`): el caballero en el prado, el explorador en la isla |
 | **Interpolación de física** (physics interpolation) | Dibujar los cuerpos entre ticks de física a la tasa de fotogramas de la pantalla. Activada por defecto; una opción la desactiva |
 | **Inclinación** (pitch, tilt) | Cuán empinada mira la cámara hacia abajo. Ángulos negativos en el código, grados hacia abajo en la configuración |
 | **Pivote** (pivot) | Girar al instante desde parado, por debajo de `pivot_speed` (1 m/s) |
 | **Lugar** (place) | Un `PointOfInterest`: un área que muestra "Lugar descubierto: …" la primera vez que el jugador entra en ella |
 | **Héroe jugable** (playable hero) | `PlayableHero` (`playable_hero.tscn`): héroe controlado por el jugador, con entrada, cámara, marcador de clic y línea de ruta, junto a los niveles |
 | **Portal** (portal) | `LevelPortal`: área que conduce a otro nivel; las plataformas de teletransporte de la demo son portales |
+| **Objeto** (prop) | Un objeto sólido colocado en un nivel, una escena con una raíz `StaticProp`: se mueve por la raíz y se redimensiona con sus dimensiones |
 | **Acercamiento** (pull-in) | La cámara que se coloca delante de un obstáculo que oculta al personaje (`pull_in_on_occlusion`) |
+| **Recorrido** (route) | El `Path3D` de un nivel que sigue una patrulla: la línea que el editor dibuja para su curva |
 | **Giro brusco** (sharp turn) | Giro de carrera más rápido que `OrbitCameraRig.sharp_turn_speed` (360°/s), como un cambio de sentido: la cámara omite las direcciones intermedias y adopta la nueva al terminar |
 | **Escena principal** (shell) | Escena que permanece durante la partida (`main.tscn` con `main.gd`): host de niveles, héroe, interfaz y pantalla de carga |
 | **Lateral** (sidestep) | Un modo de las teclas con el botón derecho: el personaje sigue mirando hacia donde mira la cámara mientras se mueve de costado o hacia atrás |
@@ -54,8 +60,9 @@ Términos tal como los usan esta documentación y el código.
 | **Sprint** (sprint) | Correr más rápido (×1,5) mientras Shift está mantenido o activado, gastando resistencia |
 | **Altura de escalón** (stair height) | El escalón más alto al que el personaje sube sin saltar: 0,3 m (`GroundCharacter.max_step_height`) |
 | **Resistencia** (stamina) | La reserva para el sprint (`Stamina`): se gasta al esprintar y se recupera tras una pausa |
-| **Nivel inicial** (start level) | Nivel colocado en el host desde el editor: `shared/world/world.tscn`, claro cercado o prado. Dentro del juego se llama Valle Verde, título de la plataforma de la isla |
+| **Nivel inicial** (start level) | Nivel en el que empieza el juego, colocado en el host desde el editor e indicado en su `initial_level`: `shared/world/world.tscn`, claro cercado o prado. Dentro del juego se llama Valle Verde, título de la plataforma de la isla |
 | **Dirigir** (steer) | Correr en una dirección sin ruta: `NavigationMover.steer()`. Mantener el botón dirige hacia el cursor por defecto |
+| **Subtítulos** (subtitles) | Lo que dice un personaje, en la parte inferior de la pantalla con su nombre (`SubtitleDisplay`) |
 | **Teletransporte** (teleport) | Colocar al personaje de inmediato en otro lugar, sin carrera ni sacudida: `GroundCharacter.teleport()`, `PlayableHero.teleport()` |
 | **Tick** (tick) | Un paso de física; 60 por segundo |
 | **Viajero** (traveller) | Cuerpo que puede usar un portal: pertenece al grupo `traveller_group` del portal (`player` por defecto) |
@@ -66,4 +73,4 @@ Términos tal como los usan esta documentación y el código.
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

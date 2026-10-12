@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ bbedeba37f15 -->
 # Силуэт за препятствиями
 
 [← Оглавление документации (репозиторий шаблона)](../../../docs/ru/index.md)
@@ -55,4 +55,4 @@
 
 ---
 
-*Страница соответствует Iso & Orbit 1.2.0.*
+*Страница соответствует Iso & Orbit 1.3.0.*

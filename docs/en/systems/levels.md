@@ -13,10 +13,11 @@ hero and the interface are its siblings, so the levels change around them.
 
 | Node | Class | Job |
 |---|---|---|
-| `Levels` | `LevelHost` | Holds the current level as its only child and changes it |
+| `Levels` | `LevelHost` | Holds the current level and changes it; `initial_level` names the start level |
 | `Levels/World` | | The start level, `shared/world/world.tscn`, placed in the editor |
 | `Hero` | `PlayableHero` | The player's character with its input, camera, click marker and path line |
 | `Hud/TravelPrompt` | `TravelPrompt` | The offer to travel on a pad |
+| `Hud/Subtitles` | `SubtitleDisplay` | What the characters of the level say |
 | `LoadingScreen` | `LoadingScreen` | The screen while a level loads |
 
 `gdscript/main.gd` connects them:
@@ -26,8 +27,8 @@ hero and the interface are its siblings, so the levels change around them.
 | `LevelHost.portal_entered(portal)` | Shows the offer for the portal, unless it travels by itself. In two portals at once, the offer is for the one entered last |
 | `LevelHost.portal_exited(portal)` | Hides that offer; if the hero still stands in another portal, offers that one |
 | `TravelPrompt.confirmed(portal)` | `portal.travel()` |
-| `LevelHost.level_change_started` | Hides the offer and the HUD, takes the hero's controls away |
-| `LevelHost.level_loaded(level, spawn)` | Marks the places found before as found, puts the hero at `spawn` with the camera behind it, shows the HUD under the screen |
+| `LevelHost.level_change_started` | Hides the offer, the subtitles and the HUD, takes the hero's controls away |
+| `LevelHost.level_loaded(level, spawn)` | Marks the places found before as found, connects what the level's characters say to the subtitles, puts the hero at `spawn` with the camera behind it, shows the HUD under the screen |
 | `LevelHost.level_change_finished` | Gives the controls back |
 | `LevelHost.level_change_failed` | Shows the HUD, gives the controls back and offers the portal again if the hero still stands in it |
 
@@ -67,6 +68,7 @@ The level host's settings:
 
 | Property | Default | Meaning |
 |---|---|---|
+| `initial_level` | empty; the demo sets `World` | The level the game starts on, a child of the host. Empty: the first child that is a `Node3D`. With several 3D children (a marker, a light) and none set, the host shows a warning in the editor |
 | `loading_screen` | empty; the demo sets its `LoadingScreen` | The screen over the game while a level loads. Empty: the level changes in front of the player |
 | `min_loading_time` | 0.6 s | The screen stays at least this long, so that a fast load does not flash it |
 | `warmup_frames` | 3 | Frames drawn behind the screen before it goes, so that the shaders of the new level compile out of sight |
@@ -86,8 +88,8 @@ The level host's signals and methods:
 | `is_changing()` | A change goes on: from an accepted `change_level()` until `level_change_finished` or `level_change_failed` |
 | `find_spawn_point(spawn_name = &"default", level = null)` | A spawn point of a level, see [Spawn points](#spawn-points) |
 
-The start level placed in the editor is not announced: no `level_loaded` comes for it, and the game sets it up in its
-`_ready()` with `get_current_level()` and `find_spawn_point()`, as `gdscript/main.gd` does.
+The start level (`initial_level`, or the first 3D child) is not announced: no `level_loaded` comes for it, and the game
+sets it up in its `_ready()` with `get_current_level()` and `find_spawn_point()`, as `gdscript/main.gd` does.
 
 A request while a change goes on is refused (`ERR_BUSY`), so a second press of E or a portal entered during the change
 does nothing. `change_level()` checks the file at once: a missing file returns `ERR_FILE_NOT_FOUND`, a file that is not
@@ -120,7 +122,7 @@ of the current level, also those added to it later: a portal that opens after a 
 | `target_level` | | The scene file of the level to travel to. A path, not a loaded scene, so two levels can lead to each other; a path picked in the inspector as `uid://` works too |
 | `target_spawn` | `default` | The spawn point to arrive at |
 | `title` | | The name of the place the portal leads to: for the offer, the loading screen and the sign. Translated where it is shown |
-| `title_label` | | A `Label3D` over the portal that shows `title`; the portal writes the title into it |
+| `title_label` | | A `Label3D` over the portal that shows `title`; the portal writes the title into it, in the editor too, where the scene keeps the sign's own text |
 | `traveller_group` | `player` | Who can travel: a body in this group |
 | `auto_travel` | off | Travel as soon as a traveller enters, without an offer |
 
@@ -196,7 +198,7 @@ the loading screen to `ActionTexts.GROUP`, so refreshing key names also updates 
 
 `gdscript/player/playable_hero.tscn` is the hero the player controls, ready to put into a game scene: the character
 (`player.tscn`, in the group `player`), `PointClickMoveInput`, `CharacterActionInput`, the camera rig with its arm and
-camera, the click marker and the path line, with their settings and their six connections inside the scene. The
+camera, the click marker and the path line, with their settings and their five connections inside the scene. The
 character scene itself has none of this, so an AI can drive the same `player.tscn`.
 
 `PlayableHero` (`playable_hero.gd`) gives the parts as typed properties (`character`, `input`, `actions`,
@@ -266,4 +268,4 @@ navigation meshes under them did not change.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

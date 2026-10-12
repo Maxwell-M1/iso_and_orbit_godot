@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/click_to_move/README.md @ 29860f203673 -->
+<!-- translation of addons/iso_orbit/click_to_move/README.md @ fe4a0c8606a9 -->
 # Tıklayarak Hareket
 
 [← Belge dizini (şablon deposu)](../../../docs/tr/index.md)
@@ -25,6 +25,7 @@ Godot 4.7 için bir kamera ve karakter kontrolcüsü şablonu olan Iso & Orbit'i
 | `point_click_move_input.gd` | `PointClickMoveInput` (Node) | Fare ve sağ tuş + WASD → hareket düğümü komutları; `cancel()` sürmekte olan basışı unutur |
 | `click_marker.gd`, `click_marker.tscn` | `ClickMarker` (Node3D) | Tıklanan noktadaki işaretçi |
 | `navigation_path_view.gd` | `NavigationPathView` (MeshInstance3D) | Kalan yol boyunca bir hata ayıklama çizgisi |
+| `patrol_controller.gd` | `PatrolController` (Node) | Karakteri seviyede çizilmiş bir rota (bir `Path3D`) boyunca yürütür: rotanın noktalarında durabilir (`waypoint_wait`), başlangıçta bekler (`cycle_wait`), yolundaki bir karakter için durur ve bunu bildirir |
 
 Başka bir eklenti gerekmez. Yerçekimi, zıplama ve depar içeren hazır bir gövde için
 `addons/iso_orbit/ground_character` ekleyin.
@@ -53,31 +54,37 @@ Başka bir eklenti gerekmez. Yerçekimi, zıplama ve depar içeren hazır bir g�
    	move_and_slide()
    ```
 
-   `NavigationMover.settings` alanına hareket düğümü ağaca girmeden önce `LocomotionSettings` kaynağı atayın veya
-   betik varsayılanlarıyla oluşturması için boş bırakın. Her karakter ayrı ayar istiyorsa **Make Unique** kullanın.
-   Çalışırken kaynak alanlarını değiştirmek işe yarar; `_ready()` sonrasında `mover.settings` kaynağını değiştirmek,
-   oluşturulmuş `GroundMotion` örneğindeki kaynağı değiştirmez. Merdiven, zıplama ve kenar koruması için kardeş
-   eklentideki `GroundCharacter` bileşenini kullanın.
+   `NavigationMover.settings` alanına bir `LocomotionSettings` kaynağı atayın veya betik varsayılanlarıyla
+   oluşturması için boş bırakın. Her karakter ayrı ayar istiyorsa **Make Unique** kullanın. Oyun sırasında kaynağın
+   alanlarını değiştirmek, onu kullanan her karakter için işe yarar; oyun sırasında `mover.settings` kaynağını
+   değiştirmek hemen etkili olur. Merdiven, zıplama ve kenar koruması için kardeş eklentideki `GroundCharacter`
+   bileşenini kullanın.
 
-4. Fareyle kontrol için herhangi bir yere `point_click_move_input.gd` betikli bir `Node` ekleyin ve `mover` ile
-   `camera` özelliklerini ayarlayın. `move_to_cursor` (sol tuş), `camera_rotate` (sağ tuş) ve `move_forward`,
-   `move_back`, `move_left`, `move_right` (WASD) girdi eylemlerine ihtiyaç duyar. Eksik eylem başlangıçta bir kez
-   bildirilir ve sonrasında okunmaz. Tıklamalar 1. fizik katmanına isabet eder (`ground_mask`): karakter katmanını
-   ve görünmez duvarları bunun dışında tutun; yoksa tıklama onlara isabet edebilir.
-   `addons/iso_orbit/orbit_camera` kamerasıyla `hold_pending_changed` sinyalini `set_follow_paused`,
-   `run_requested` sinyalini `end_follow_wait` yöntemine bağlayın. Koşarken etrafa bakma
-   (`look_around_while_held`), `camera_steer_action` değerinin kamerayı döndüren eylem olmasına bağlıdır
-   (düzeneğin `rotate_action` alanı; ikisi de `camera_rotate`).
+4. Fareyle kontrol için herhangi bir yere `point_click_move_input.gd` betikli bir `Node` ekleyin ve `mover` ile `camera`
+   özelliklerini ayarlayın. `move_to_cursor` (sol tuş), `camera_rotate` (sağ tuş) ve `move_forward`, `move_back`,
+   `move_left`, `move_right` (WASD) girdi eylemlerine ihtiyaç duyar. Eksik eylem başlangıçta bir kez bildirilir ve
+   sonrasında okunmaz. Tıklamalar 1. fizik katmanına isabet eder (`ground_mask`): karakter katmanını ve görünmez
+   duvarları bunun dışında tutun; yoksa tıklama onlara isabet edebilir. `addons/iso_orbit/orbit_camera` kamerasıyla
+   `run_requested` sinyalini `end_follow_wait` yöntemine bağlayın, ancak `hold_pending_changed` sinyalini
+   `set_follow_paused` yöntemine bağlamayın: her tıklama kameranın dönüşünü durdururdu. Koşarken etrafa bakma
+   (`look_around_while_held`), `camera_steer_action` değerinin kamerayı döndüren eylem olmasına bağlıdır (düzeneğin
+   `rotate_action` alanı; ikisi de `camera_rotate`).
 5. Ya da hareketlendiriciye yapay zekâdan komut verin: `move_to(point)`, `steer(direction)`, `stop()`; ve `arrived`
    sinyalini dinleyin. Bu, istenen nokta erişilemezse ondan önce bitebilen yolun sonuna varıldığını bildirir.
+6. Devriye için gövdenin altına, `NavigationMover` düğümünün yanına `patrol_controller.gd` betikli bir `Node` ekleyin.
+   Seviyede, karakterin dışında ve karakterin sığdığı bir yerde bir `Path3D` çizin ve onu `route` alanına atayın.
+   Karakter, editörün eğri için çizdiği çizgide yürür, başlangıca döner, `cycle_wait` kadar bekler ve yeniden yola
+   çıkar; `blocked_long_enough`, `blocked_delay` saniye boyunca yolunda durmuş bir karakteri bildirir. Başka
+   karakterlerin onu durdurabilmesi için gövdenin çarpışma maskesi onların katmanını içermelidir.
 
 Hazır kahramanın kopyalama tarifi ve sahne ayarları için bu gövdeyi elle kurmak yerine `docs/tr/integration.md`
 sayfasını kullanın. İki girdi modu ve kahramanın ayarları `docs/tr/systems/input.md` içinde açıklanır.
 
 ## Belgeler
 
-Şablon deposunda: `docs/tr/integration.md`, `docs/tr/systems/locomotion.md` ve `docs/tr/systems/input.md`.
+Şablon deposunda: `docs/tr/integration.md`, `docs/tr/systems/locomotion.md` (devriyelerle birlikte) ve
+`docs/tr/systems/input.md`.
 
 ---
 
-*Bu sayfa Iso & Orbit 1.2.0 sürümüne karşılık gelir.*
+*Bu sayfa Iso & Orbit 1.3.0 sürümüne karşılık gelir.*

@@ -22,9 +22,10 @@ Limitations of the project and engine quirks it works around. Each entry says wh
   the body.
 - **Up is +Y.** The character and its components support only `Vector3.UP` as up.
 - **No avoidance between characters.** `NavigationMover` follows a path and does not use navigation avoidance, so
-  moving characters do not steer around each other. The player's body is on layer 2 and collides only with layers 1
-  and 4, so two characters made from `player.tscn` pass through each other; add layer 2 to their `collision_mask` if
-  they should block each other. The NPCs in the demo stand still and are baked into the navigation mesh as obstacles.
+  moving characters do not steer around each other. The player's body and the patrolling characters are on layer 2 and
+  collide with layers 1, 2 and 4, so they block each other: the one in the way stops the other, and a patrol waits
+  until the way is free. The NPCs that stand still are baked into the navigation mesh as obstacles; the patrolling
+  knight and ranger are not, since they move.
 - **The navigation mesh is baked in advance.** Moving an obstacle at runtime does not change paths. After editing the
   level, rebake the mesh ([World and navigation](systems/world-and-navigation.md#rebaking-the-navigation-mesh)).
 - **Tested engine and renderer.** Use Godot 4.7.2, Jolt Physics and Forward+ for the verified setup. Compatibility
@@ -80,12 +81,14 @@ Limitations of the project and engine quirks it works around. Each entry says wh
 - **`shared/` is not fully language-neutral yet.** The levels and the pad use scripts of the components: `world.tscn`,
   `island.tscn` and `mountain.tscn` use `addons/iso_orbit/points_of_interest/point_of_interest.gd`, both levels
   `addons/iso_orbit/levels/spawn_point.gd`, and `shared/world/props/teleport_pad.tscn`
-  `addons/iso_orbit/levels/level_portal.gd`. Two small prop scripts live in `shared/world/props/` too. A C# version
-  would need its own scripts for places, spawn points and portals, or a scene-only way to mark them.
+  `addons/iso_orbit/levels/level_portal.gd`. The levels also place the demo's patrolling characters, scenes of
+  `gdscript/npc/`, and three prop scripts live in `shared/world/props/` (`static_prop.gd`, `flicker.gd`,
+  `hover_spin.gd`). A C# version would need its own scripts for places, spawn points, portals, props and patrolling
+  characters, or a scene-only way to mark them.
 - **Leaked resources reported on exit.** If a script exits right after footsteps play, the engine may report leaked
   `AudioStreamPlayback` objects: with `--fixed-fps` game time runs ahead of real time while the sounds still play.
   Free the scene and wait a moment before quitting; `tests/run_checks.gd` waits 0.1 s.
 
 ---
 
-*This page matches Iso & Orbit 1.2.0.*
+*This page matches Iso & Orbit 1.3.0.*

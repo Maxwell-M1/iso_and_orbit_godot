@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/levels.md @ dc39dc2f669b -->
+<!-- translation of docs/en/systems/levels.md @ 0382449aab6e -->
 # 关卡
 
 [← 文档目录](../index.md)
@@ -13,10 +13,11 @@
 
 | 节点 | 类 | 作用 |
 |---|---|---|
-| `Levels` | `LevelHost` | 以当前关卡为唯一子节点，并负责切换它 |
+| `Levels` | `LevelHost` | 容纳当前关卡并负责切换它；`initial_level` 指定初始关卡 |
 | `Levels/World` | | 在编辑器中放入的初始关卡 `shared/world/world.tscn` |
 | `Hero` | `PlayableHero` | 玩家角色，包含输入、相机、点击标记和路径线 |
 | `Hud/TravelPrompt` | `TravelPrompt` | 站上传送台时显示的旅行提示 |
+| `Hud/Subtitles` | `SubtitleDisplay` | 关卡中角色说的话 |
 | `LoadingScreen` | `LoadingScreen` | 加载关卡时显示的画面 |
 
 `gdscript/main.gd` 将它们连接起来：
@@ -26,8 +27,8 @@
 | `LevelHost.portal_entered(portal)` | 显示该传送门的旅行提示，自动旅行的门除外；若同时进入两扇门，则提示最后进入的门 |
 | `LevelHost.portal_exited(portal)` | 隐藏对应提示；如果英雄仍站在另一扇门中，就提示那一扇 |
 | `TravelPrompt.confirmed(portal)` | 调用 `portal.travel()` |
-| `LevelHost.level_change_started` | 隐藏旅行提示和 HUD，并禁用英雄操控 |
-| `LevelHost.level_loaded(level, spawn)` | 将以前发现过的地点标记为已发现，让英雄出现在 `spawn`，相机转到其后方，并在加载画面下恢复 HUD |
+| `LevelHost.level_change_started` | 隐藏旅行提示、字幕和 HUD，并禁用英雄操控 |
+| `LevelHost.level_loaded(level, spawn)` | 将以前发现过的地点标记为已发现，把关卡中角色说的话接到字幕上，让英雄出现在 `spawn`，相机转到其后方，并在加载画面下恢复 HUD |
 | `LevelHost.level_change_finished` | 恢复操控 |
 | `LevelHost.level_change_failed` | 显示 HUD、恢复操控；如果英雄仍站在传送门内，再次显示提示 |
 
@@ -52,6 +53,7 @@
 
 | 属性 | 默认值 | 含义 |
 |---|---|---|
+| `initial_level` | 空；演示设为 `World` | 游戏开始时所在的关卡，即容器的一个子节点。留空时：第一个属于 `Node3D` 的子节点。如果有多个 3D 子节点（标记、灯光）且未设置此项，容器会在编辑器中显示警告 |
 | `loading_screen` | 空；演示指定其 `LoadingScreen` | 加载关卡时盖在游戏上的画面。留空时，玩家会直接看到关卡更换 |
 | `min_loading_time` | 0.6 秒 | 画面至少保持这么久，避免快速加载时闪现 |
 | `warmup_frames` | 3 | 画面消失前在其背后绘制的帧数，让新关卡着色器在看不见时编译 |
@@ -71,7 +73,7 @@
 | `is_changing()` | 是否正在切换：从接受 `change_level()` 到 `level_change_finished` 或 `level_change_failed` |
 | `find_spawn_point(spawn_name = &"default", level = null)` | 关卡中的出生点，见[出生点](#出生点) |
 
-编辑器中放置的初始关卡不会发出 `level_loaded`；游戏在 `_ready()` 中通过 `get_current_level()` 和 `find_spawn_point()` 设置它，`gdscript/main.gd` 即是示例。
+初始关卡（`initial_level`，或第一个 3D 子节点）不会被通报：不会为它发出 `level_loaded`，游戏在 `_ready()` 中通过 `get_current_level()` 和 `find_spawn_point()` 设置它，`gdscript/main.gd` 即是示例。
 
 切换进行中再次请求会返回 `ERR_BUSY`，因此重复按 E 或切换中进入另一扇门不会产生效果。`change_level()` 会立即检查文件：文件不存在返回 `ERR_FILE_NOT_FOUND`；文件不是场景返回 `ERR_INVALID_PARAMETER`；两种情况都不会启动切换。若场景加载失败或其根节点不是 `Node3D`，当前关卡保持不变：错误写入输出，暂停结束，加载画面不等待 `min_loading_time` 就淡出，随后发出 `level_change_failed`。失败的加载会被清理，因此修复文件后，稍后的请求会重新加载。
 
@@ -90,7 +92,7 @@
 | `target_level` | | 要前往的关卡场景文件。使用路径而不是已加载场景，因此两个关卡可以相互指向；在检查器中选出的 `uid://` 路径也可以 |
 | `target_spawn` | `default` | 抵达时使用的出生点 |
 | `title` | | 目标地点名称：显示在旅行提示、加载画面和告示牌上；显示时会翻译 |
-| `title_label` | | 位于传送门上方、显示 `title` 的 `Label3D`；传送门会为它写入标题 |
+| `title_label` | | 位于传送门上方、显示 `title` 的 `Label3D`；传送门会为它写入标题，在编辑器中也会写入，但场景保存的仍是标牌原有的文字 |
 | `traveller_group` | `player` | 哪些对象可以旅行：身体必须位于此分组 |
 | `auto_travel` | 关闭 | 旅行者进入时立刻旅行，不显示提示 |
 
@@ -130,7 +132,7 @@
 
 ## 可操控的英雄
 
-`gdscript/player/playable_hero.tscn` 是可直接放入游戏场景的玩家英雄：角色（`player.tscn`，位于 `player` 分组）、`PointClickMoveInput`、`CharacterActionInput`、带相机臂和相机的相机支架、点击标记、路径线，以及相应设置和场景内部的六条连接。角色场景本身不含这些部分，因此 AI 也能驱动同一个 `player.tscn`。
+`gdscript/player/playable_hero.tscn` 是可直接放入游戏场景的玩家英雄：角色（`player.tscn`，位于 `player` 分组）、`PointClickMoveInput`、`CharacterActionInput`、带相机臂和相机的相机支架、点击标记、路径线，以及相应设置和场景内部的五条连接。角色场景本身不含这些部分，因此 AI 也能驱动同一个 `player.tscn`。
 
 `PlayableHero`（`playable_hero.gd`）以带类型的属性暴露组件（`character`、`input`、`actions`、`camera_rig`、`camera_arm`、`camera`、`click_marker`、`path_view`，以及角色的 `sounds`、`appearance`、`hover`、`silhouette`），并提供以下三种操作：
 
@@ -169,4 +171,4 @@
 
 ---
 
-*本页对应 Iso & Orbit 1.2.0。*
+*本页对应 Iso & Orbit 1.3.0。*

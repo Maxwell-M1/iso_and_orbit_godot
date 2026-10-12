@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/audio.md @ b3c2dd1a52a9 -->
+<!-- translation of docs/en/systems/audio.md @ b72cbc1a1884 -->
 # オーディオ
 
 [← ドキュメント目次](../index.md)
@@ -38,4 +38,4 @@
 
 ---
 
-*このページは Iso & Orbit 1.2.0 に対応しています。*
+*このページは Iso & Orbit 1.3.0 に対応しています。*

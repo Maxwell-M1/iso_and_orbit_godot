@@ -1,4 +1,4 @@
-<!-- translation of docs/en/configurations.md @ 2173d5158953 -->
+<!-- translation of docs/en/configurations.md @ ced3a1b9ab87 -->
 # Configurar el héroe jugable
 
 [← Índice de documentación](index.md)
@@ -206,4 +206,4 @@ Referencias de propiedades: [Entrada](systems/input.md), [Locomoción](systems/l
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

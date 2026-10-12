@@ -1,4 +1,4 @@
-<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ af038a43f7c2 -->
+<!-- translation of addons/iso_orbit/occluded_silhouette/README.md @ bbedeba37f15 -->
 # Silueta ocluida
 
 [← Índice de documentación (repositorio de la plantilla)](../../../docs/es/index.md)
@@ -58,4 +58,4 @@ En el repositorio de la plantilla: `docs/es/systems/characters.md` (incluida la 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*

@@ -1,4 +1,4 @@
-<!-- translation of docs/en/systems/world-and-navigation.md @ c9c7a768629e -->
+<!-- translation of docs/en/systems/world-and-navigation.md @ de34e03b8dbc -->
 # Mundo e navegação
 
 [← Índice da documentação](../index.md)
@@ -64,10 +64,10 @@ Após editar um nível, gere a sua malha novamente. Os parâmetros são iguais, 
 inclui camadas 1 e 4.
 
 **Quando:** mudou, adicionou, removeu ou redimensionou algo com forma de colisão na camada 1 (`world`): rocha,
-caixote, muro, árvore, objeto, NPC ou montanha; na ilha, também muro invisível (camada 4, `bounds`). Não é
-necessário se só a aparência mudou (malha ou material), nem para corpos na camada 3 (`camera`), personagem do
-jogador (camada 2) ou áreas (`Area3D`). Sem atualizar, caminhos atravessam um objeto movido ou contornam o
-espaço vazio onde estava.
+caixote, muro, árvore, objeto (também via `dimensions`), NPC parado ou montanha; na ilha, também muro invisível
+(camada 4, `bounds`). Não é necessário se só a aparência mudou (malha ou material), nem para corpos na camada 3
+(`camera`), personagens que se movem (camada 2) ou áreas (`Area3D`). Sem atualizar, caminhos atravessam um objeto
+movido ou contornam o espaço vazio onde estava.
 
 **No editor:**
 
@@ -100,9 +100,12 @@ no editor a mostra, e Configurações (F10) → Interface → **Linha do caminho
 - **As dez aparências do herói** em fila de costas para o muro sul, a leste da abertura (veja
   [Personagens](characters.md#aparências-do-herói)).
 
-Edite as instâncias dos objetos na cena do nível para alterar a disposição e gere a navegação novamente. Os
-testes de regressão usam rotas e posições específicas da demo; use outro nível para seu layout ou atualize os
-testes junto da geometria que eles examinam.
+Todo objeto sólido tem uma raiz `StaticProp`: mova-o pela raiz e redimensione-o com `dimensions`, que muda seu
+modelo e sua colisão juntos; as árvores do bosque e as rochas são instâncias de `grove_tree.tscn` e `rock.tscn` em
+tamanhos diferentes. Veja [Editando cenas no editor](../editor_authoring.md#objetos-sólidos). Edite as instâncias dos
+objetos na cena do nível para alterar a disposição e gere a navegação novamente. Os testes de regressão usam rotas e
+posições específicas da demo; use outro nível para seu layout ou atualize os testes junto da geometria que eles
+examinam.
 
 A floresta, os arbustos e os pedregulhos foram posicionados uma vez por um script descartável com uma semente fixa,
 deixando livres os lugares que os testes usam (rotas, a corrida pela faixa sul, o pulo da plataforma, tudo em volta do
@@ -112,19 +115,24 @@ livres.
 ### Locais e NPCs
 
 Quatro locais são áreas `PointOfInterest`. Na primeira vez que o jogador entra num deles, "Descoberto: …" aparece no
-alto da tela por alguns segundos. Em cada local há NPCs com rótulos de nome (`Label3D`) sobre a cabeça, virados para o
-centro do local; o Cavaleiro olha ao longo da estrada.
+alto da tela por alguns segundos. Nos locais há NPCs com rótulos de nome (`Label3D`) sobre a cabeça, virados para o
+centro de cada local; o Cavaleiro faz uma ronda a partir do sítio.
 
 | Local | Onde | Quem está lá |
 |---|---|---|
 | Pico dos Ventos | O topo da montanha no nordeste | O Mago, junto a um altar com um cristal |
 | Acampamento dos Viajantes | Leste: barraca, fogueira, barris | O Patrulheiro e o Anão junto ao fogo |
-| Sítio do Poço | Sudoeste: casa, poço | O Cavaleiro de guarda junto à estrada |
+| Sítio do Poço | Sudoeste: casa, poço | O Cavaleiro, que faz uma ronda pelo labirinto de sebes e volta |
 | Círculo Antigo | O anel de colunas a noroeste do spawn | O Ladino junto ao altar |
 
-Cada NPC é um `StaticBody3D` com uma cápsula na camada 1 (`World/NavigationRegion3D/Characters`): a malha de
-navegação os contorna e ninguém os atravessa. O acampamento, o sítio e as ruínas estão sob `World/Places`; o pico está
-em `mountain.tscn`.
+Cada NPC parado é um `StaticBody3D` com uma cápsula na camada 1 (`World/NavigationRegion3D/Characters`): a malha de
+navegação os contorna e ninguém os atravessa. O Cavaleiro é um `PatrolActor`, um personagem na camada 2 que percorre a
+rota `World/Routes/KnightPatrol` pelo labirinto e volta ao seu lugar junto à casa e ao poço, espera ali 10 s e recomeça
+([PatrolController](locomotion.md#patrolcontroller-percorrendo-uma-rota)). Ele e o herói colidem, e ele para quando o
+herói fica à frente dele, a menos de um metro; dos lados e atrás dele, o herói não o detém. Quando o herói fica 2.5 s no
+caminho dele, o Cavaleiro pergunta, nas legendas, sobre o próprio pai. Na Ilha Solitária, um patrulheiro faz uma ronda
+curta perto do ponto de chegada, parando um segundo em cada ponto da sua rota. O acampamento, o sítio e as ruínas estão
+sob `World/Places`; o pico está em `mountain.tscn`.
 
 **Um novo local:** adicione um `PointOfInterest` (um `Area3D` cuja `collision_mask` inclui a camada 2 dos personagens)
 com uma forma de colisão e um `title` a qualquer cena do mundo. O aviso encontra todos os locais pelo grupo,
@@ -237,4 +245,4 @@ silhueta (veja [Personagens](characters.md#occludedsilhouette-uma-forma-a-arma-c
 
 ---
 
-*Esta página corresponde ao Iso & Orbit 1.2.0.*
+*Esta página corresponde ao Iso & Orbit 1.3.0.*

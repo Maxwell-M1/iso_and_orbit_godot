@@ -1,11 +1,11 @@
-<!-- translation of README.md @ 84a666a02ac2 -->
+<!-- translation of README.md @ b3a8780c2051 -->
 # Iso & Orbit - Plantilla de cámara y controlador de personaje
 
 [English](README.md) · **Español** · [日本語](README.ja.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh_CN.md)
 
 > Esta es una traducción del [original en inglés](README.md). Si hay diferencias, la versión en inglés es la correcta.
 
-Versión 1.2.0 · Godot 4.7 (probado en 4.7.2) · GDScript · MIT
+Versión 1.3.0 · Godot 4.7 (probado en 4.7.2) · GDScript · MIT
 
 Un controlador de personaje con movimiento por clic y una cámara orbital para RPG isométricos y cenitales. Haz clic
 en el suelo y el héroe corre hasta allí, rodeando los obstáculos; mantén el botón y el héroe sigue al cursor. La
@@ -72,6 +72,9 @@ Todos los modos y sus opciones: [Controles](docs/es/controls.md).
   caminando.
 - Modo flotante opcional: el héroe se eleva sobre el suelo, se desliza por escaleras, oscila y se inclina al correr,
   sin pasos, y desciende lentamente tras saltar.
+- Patrullas: un personaje sigue un recorrido dibujado como una curva en el nivel, espera en el punto de partida entre
+  ronda y ronda y se detiene ante quien le cierre el paso; después informa de ello, por ejemplo para una línea de
+  diálogo.
 
 **Cámara**
 
@@ -98,6 +101,14 @@ Todos los modos y sus opciones: [Controles](docs/es/controls.md).
 - El héroe controlado por el jugador es una escena lista (`PlayableHero`) con personaje, entrada, cámara y marcador,
   y métodos para colocarlo en cualquier lugar.
 
+**En el editor**
+
+- Los componentes comprueban su configuración: una referencia vacía, un nodo en un lugar equivocado o una acción de
+  entrada que falta aparece como advertencia en el panel Escena, y la advertencia desaparece en cuanto se corrige.
+- La cámara muestra su vista inicial, un personaje que patrulla su modelo y su nombre, y un portal el título de su
+  letrero; los objetos sólidos se redimensionan enteros, modelo y colisión a la vez. Ninguna vista previa se guarda en
+  las escenas, así que un diff muestra solo lo que cambiaste.
+
 **También incluye**
 
 - Una ventana de configuración (F10) con pestañas de controles, personaje, cámara, pantalla, interfaz y sonido, que
@@ -111,9 +122,11 @@ Todos los modos y sus opciones: [Controles](docs/es/controls.md).
   eventos.
 - Dos niveles de demo: un claro cercado de 80 × 80 m con ruinas, campamento, granja, laberinto, plataforma con
   rampa y escaleras, y montaña de sendero espiral; y una isla en un lago a la que se llega por teletransporte.
-  Cinco lugares por descubrir, cuatro en el claro con cinco PNJ y uno en la isla, y diez aspectos de héroe.
+  Cinco lugares por descubrir, cuatro en el claro con cinco PNJ y uno en la isla; el caballero hace una ronda por el
+  laberinto de setos y tiene unas palabras para quien se le cruce en el camino. Diez aspectos de héroe para elegir.
 - Pruebas headless de movimiento, entrada, salto, sprint y sonidos, del estado del personaje, de escalones y
-  pendientes, cámara y brazo, aspectos del héroe, ventana de ajustes, traducciones, niveles y teletransporte.
+  pendientes, cámara y brazo, aspectos del héroe, ventana de ajustes, traducciones, niveles y teletransporte,
+  patrullas y objetos; las comprobaciones de la parte del editor se ejecutan en el editor.
 
 **No incluye:** gamepad, menú de reasignación de teclas durante la partida ni animaciones esqueléticas. Las acciones
 se configuran en Ajustes del proyecto y la interfaz muestra sus asignaciones actuales. Los modelos son primitivas.
@@ -195,7 +208,7 @@ acciones, capas y dependencias opcionales de la demo.
 |---|---|
 | `addons/iso_orbit/` | Los componentes, una carpeta por cada parte que puedes tomar por separado |
 | `gdscript/` | La demo que los ensambla: escena principal `main.tscn`, héroe jugable y sistema y ventana de ajustes |
-| `shared/` | Contenido para la demo GDScript y una futura versión C#: niveles, personajes y equipo, shaders y texturas del mundo, sonidos y tema de interfaz. También hay dos scripts GDScript pequeños usados por los niveles |
+| `shared/` | Contenido para la demo GDScript y una futura versión C#: niveles, personajes y equipo, shaders y texturas del mundo, sonidos y tema de interfaz. También hay tres scripts GDScript pequeños de los objetos, y los niveles colocan los personajes que patrullan de la demo, de `gdscript/npc/` |
 | `l10n/` | Traducciones de la interfaz (gettext `.po`) |
 | `tests/` | Pruebas headless |
 | `docs/` | Documentación |
@@ -224,4 +237,4 @@ MIT, ver [LICENSE](LICENSE). Excepción: `icon.svg`, el logo de Godot de Andrea 
 
 ---
 
-*Esta página corresponde a Iso & Orbit 1.2.0.*
+*Esta página corresponde a Iso & Orbit 1.3.0.*
