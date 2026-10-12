@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://c87pp147hwgur" path="res://addons/iso_orbit/ground_character/character_monitor.gd" id="15_monitor"]
 [ext_resource type="PackedScene" path="res://gdscript/ui/travel_prompt.tscn" id="16_prompt"]
 [ext_resource type="PackedScene" path="res://addons/iso_orbit/levels/loading_screen.tscn" id="17_loading"]
-[ext_resource type="Script" path="res://addons/iso_orbit/ui_screens/action_texts.gd" id="18_action_texts"]
+[ext_resource type="Script" uid="uid://bipgg8yaxnu45" path="res://addons/iso_orbit/ui_screens/action_texts.gd" id="18_action_texts"]
 
 [node name="Main" type="Node3D" unique_id=94359211 node_paths=PackedStringArray("levels", "hero", "hud", "travel_prompt")]
 script = ExtResource("1_main")
@@ -22,13 +22,14 @@ hero = NodePath("Hero")
 hud = NodePath("Hud")
 travel_prompt = NodePath("Hud/TravelPrompt")
 
-[node name="Levels" type="Node3D" parent="." node_paths=PackedStringArray("loading_screen")]
+[node name="Levels" type="Node3D" parent="." unique_id=412706328 node_paths=PackedStringArray("initial_level", "loading_screen")]
 script = ExtResource("2_levels")
+initial_level = NodePath("World")
 loading_screen = NodePath("../LoadingScreen")
 
 [node name="World" parent="Levels" unique_id=675439468 instance=ExtResource("3_world")]
 
-[node name="Hero" parent="." instance=ExtResource("4_hero")]
+[node name="Hero" parent="." unique_id=170348475 instance=ExtResource("4_hero")]
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=1610239526 node_paths=PackedStringArray("character")]
 script = ExtResource("7_hud")
@@ -107,9 +108,9 @@ character = NodePath("../../../Hero/Character")
 [node name="StaminaBar" parent="Hud" unique_id=301746729 node_paths=PackedStringArray("stamina") instance=ExtResource("12_stamina_bar")]
 stamina = NodePath("../../Hero/Character/Stamina")
 
-[node name="TravelPrompt" parent="Hud" instance=ExtResource("16_prompt")]
+[node name="TravelPrompt" parent="Hud" unique_id=413280102 instance=ExtResource("16_prompt")]
 
-[node name="ActionTexts" type="Node" parent="Hud"]
+[node name="ActionTexts" type="Node" parent="Hud" unique_id=338964639]
 script = ExtResource("18_action_texts")
 
 [node name="SettingsApplier" type="Node" parent="." unique_id=2100275332 node_paths=PackedStringArray("hero", "help_panel", "fps_counter", "character_state", "look_help", "keys_help", "strafe_help", "sprint_help", "jump_help")]
@@ -126,5 +127,5 @@ jump_help = NodePath("../Hud/Panel/Lines/JumpHelp")
 
 [node name="UiRoot" parent="." unique_id=414458971 instance=ExtResource("10_ui_root")]
 
-[node name="LoadingScreen" parent="." instance=ExtResource("17_loading")]
+[node name="LoadingScreen" parent="." unique_id=207394549 instance=ExtResource("17_loading")]
 tips = PackedStringArray("Hold {move_to_cursor} and the hero runs after the cursor; let go, and it stops.", "Hold {camera_rotate} and move the mouse to turn the camera; {camera_zoom_in/camera_zoom_out} lowers and raises it.", "Hold {camera_rotate}, then {move_to_cursor}: the hero runs where the camera looks.", "While the hero runs after the cursor, hold {camera_rotate} to look around: the run keeps its course.", "{sprint} makes the hero run faster for as long as stamina lasts.", "{toggle_settings} opens the settings: controls, camera, display, sound and more.")

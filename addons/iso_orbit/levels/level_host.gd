@@ -1,9 +1,10 @@
+@tool
 class_name LevelHost
 extends Node3D
 ## Holds the current level, the scene of the world: its ground, props, navigation and light. The level changes here
 ## ([method change_level]), behind a loading screen ([member loading_screen]), while the rest of the game stays: the
-## player's character and the interface are siblings of the host, not parts of a level. A child placed in the editor
-## is the level the game starts on; the host does not announce it, the game sets it up itself
+## player's character and the interface are siblings of the host, not parts of a level. The level the game starts on
+## is a child placed in the editor ([member initial_level]); the host does not announce it, the game sets it up itself
 ## ([method get_current_level], [method find_spawn_point]).
 ##
 ## A change starts after the request, not inside it (a portal asks from a physics callback, where a level must not
@@ -47,6 +48,13 @@ const _FILES_SHARE := 0.85
 const _BUILT_SHARE := 0.9
 const _NAVIGATION_SHARE := 0.95
 
+## The level the game starts on: a child of the host. Not set: the first child that is a [Node3D]. Set it when the host
+## has other 3D children (a marker, a light), so that the order of the children does not decide.
+@export var initial_level: Node3D:
+	set(value):
+		initial_level = value
+		update_configuration_warnings()
+
 ## The screen over the game while a level loads. Without it the level changes in front of the player.
 @export var loading_screen: LoadingScreen
 
@@ -71,16 +79,18 @@ var _loading_path := ""
 
 
 func _ready() -> void:
-	for child in get_children():
-		if child is Node3D:
-			_level = child
-			break
+	if Engine.is_editor_hint():
+		return
+	_level = initial_level if initial_level != null else _find_first_level()
+	assert(_level == null or _level.get_parent() == self, "Initial Level must be a direct child.")
 	if _level != null:
 		_connect_portals(_level)
 	get_tree().node_added.connect(_on_node_added)
 
 
 func _exit_tree() -> void:
+	if Engine.is_editor_hint():
+		return
 	# Gone in the middle of a change (the game scene changed, for example): the change ends here, and so does the pause
 	# of the host. A load that is over is collected; one still going is left to the loader.
 	if _changing:
@@ -361,3 +371,19 @@ static func _get_file(path: String) -> String:
 		return path
 	var id := ResourceUID.text_to_id(path)
 	return ResourceUID.get_id_path(id) if ResourceUID.has_id(id) else ""
+
+
+func _find_first_level() -> Node3D:
+	for child: Node in get_children():
+		if child is Node3D:
+			return child
+	return null
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if initial_level != null and initial_level.get_parent() != self:
+		warnings.append("Initial Level must be a direct child of this host.")
+	elif initial_level == null and get_children().filter(func(child: Node) -> bool: return child is Node3D).size() > 1:
+		warnings.append("Several 3D children could be the start level: assign Initial Level.")
+	return warnings
