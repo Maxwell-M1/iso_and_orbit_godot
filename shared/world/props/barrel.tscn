@@ -1,5 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b647w3uw44rpr"]
 
+[ext_resource type="Script" uid="uid://bm27p0ndipaev" path="res://shared/world/props/static_prop.gd" id="1_obvdn"]
 [ext_resource type="Material" path="res://shared/world/materials/wood_barrel.tres" id="1_wood"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_barrel"]
@@ -14,12 +15,14 @@ height = 0.9
 radial_segments = 10
 rings = 1
 
-[node name="Barrel" type="StaticBody3D"]
+[node name="Barrel" type="StaticBody3D" unique_id=641392847]
+script = ExtResource("1_obvdn")
+metadata/_edit_group_ = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1486617039]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("CylinderShape3D_barrel")
 
-[node name="Body" type="MeshInstance3D" parent="."]
+[node name="Body" type="MeshInstance3D" parent="." unique_id=249338157]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 mesh = SubResource("CylinderMesh_barrel")

@@ -5,6 +5,7 @@ extends Node3D
 ## .godot/editor_tool_checks/results.json. The fixtures go only into that folder, which every run clears: no scene of
 ## the project and no player preference is written.
 
+const PILLAR := preload("res://shared/world/props/stone_pillar.tscn")
 const PAD := preload("res://shared/world/props/teleport_pad.tscn")
 const OUT := "res://.godot/editor_tool_checks/"
 
@@ -38,6 +39,9 @@ func _run() -> void:
 	await _check_hover_switch()
 	await _check_camera_save()
 	await _check_arm_without_tool()
+	await _check_saved_source()
+	await _check_inheritance()
+	await _check_live_authoring()
 	var failed := Array(results).any(func(result: String) -> bool: return result.begins_with("FAIL"))
 	status = "failed" if failed else "passed"
 	var file := FileAccess.open(OUT + "results.json", FileAccess.WRITE)
@@ -60,6 +64,13 @@ func _save(node: Node, path: String) -> void:
 	var packed := PackedScene.new()
 	_expect(packed.pack(node) == OK and ResourceSaver.save(packed, path) == OK, "save the isolated fixture")
 	node.propagate_notification(NOTIFICATION_EDITOR_POST_SAVE)
+
+
+func _load_prop(path: String) -> StaticProp:
+	var packed := ResourceLoader.load(path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP) as PackedScene
+	var prop := packed.instantiate(PackedScene.GEN_EDIT_STATE_MAIN) as StaticProp
+	add_child(prop)
+	return prop
 
 
 func _load(path: String) -> Node:
@@ -342,3 +353,96 @@ func _check_arm_without_tool() -> void:
 	_expect(view.transform.is_equal_approx(authored_view), "and gives the camera back its own transform for saving")
 	rig.propagate_notification(NOTIFICATION_EDITOR_POST_SAVE)
 	rig.free()
+
+
+func _check_saved_source() -> void:
+	var prop := PILLAR.instantiate(PackedScene.GEN_EDIT_STATE_MAIN) as StaticProp
+	add_child(prop)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color.ORANGE
+	prop.dimensions.y = 6.4
+	prop.surface_material = material
+	_save(prop, OUT + "source.tscn")
+	_expect(is_equal_approx(prop.get_node("CollisionShape3D").shape.height, 6.4),
+		"post-save restores the resized preview")
+	prop.free()
+	prop = _load_prop(OUT + "source.tscn")
+	prop.surface_material = null
+	_expect(prop.get_node("MeshInstance3D").material_override == null,
+		"reopen and clear Surface Material restores authored materials")
+	_expect(is_equal_approx(prop.get_node("CollisionShape3D").shape.height, 6.4), "reopen applies Dimensions once")
+	_save(prop, OUT + "source_cleared.tscn")
+	prop.free()
+	prop = _load_prop(OUT + "source_cleared.tscn")
+	_expect(prop.get_node("MeshInstance3D").material_override == null
+		and is_equal_approx(prop.get_node("CollisionShape3D").shape.height, 6.4),
+		"a second save/reopen preserves the cleared material and size")
+	prop.free()
+
+
+func _check_inheritance() -> void:
+	var base_text := FileAccess.get_file_as_string("res://shared/world/props/stone_pillar.tscn")
+	# A copy under another path, without the uid of the prop's scene: that would lead back to the prop itself.
+	var header := base_text.get_slice("\n", 0)
+	base_text = RegEx.create_from_string(' uid="[^"]*"').sub(header, "") + base_text.substr(header.length())
+	var file := FileAccess.open(OUT + "base.tscn", FileAccess.WRITE)
+	file.store_string(base_text)
+	file.close()
+	file = FileAccess.open(OUT + "variant.tscn", FileAccess.WRITE)
+	file.store_string('[gd_scene format=3]\n[ext_resource type="PackedScene" path="' + OUT
+		+ 'base.tscn" id="1"]\n[node name="Variant" instance=ExtResource("1")]\n')
+	file.close()
+	var prop := _load_prop(OUT + "variant.tscn")
+	_save(prop, OUT + "variant.tscn")
+	_expect(not FileAccess.get_file_as_string(OUT + "variant.tscn").contains("shape ="),
+		"an unchanged inheritor does not freeze the base shape")
+	prop.free()
+	file = FileAccess.open(OUT + "base.tscn", FileAccess.WRITE)
+	file.store_string(base_text.replace("height = 3.2", "height = 5.0"))
+	file.close()
+	prop = _load_prop(OUT + "variant.tscn")
+	var mesh := prop.get_node("MeshInstance3D") as MeshInstance3D
+	_expect(is_equal_approx(prop.get_node("CollisionShape3D").shape.height, 5.0)
+		and is_equal_approx(mesh.mesh.height * mesh.scale.y, 5.0),
+		"editing the base changes both inherited visual and collision")
+	prop.dimensions.y = 8.0
+	_save(prop, OUT + "variant.tscn")
+	_expect(not FileAccess.get_file_as_string(OUT + "variant.tscn").contains("shape ="),
+		"a resized inheritor stores Dimensions without a computed shape override")
+	prop.free()
+	prop = _load_prop(OUT + "variant.tscn")
+	_expect(is_equal_approx(prop.get_node("CollisionShape3D").shape.height, 8.0),
+		"a resized inheritor reopens with matching collision")
+	prop.free()
+
+
+func _check_live_authoring() -> void:
+	var prop := PILLAR.instantiate() as StaticProp
+	add_child(prop)
+	var mesh := MeshInstance3D.new()
+	mesh.mesh = CylinderMesh.new()
+	mesh.position.x = 4.0
+	prop.add_child(mesh)
+	var collision := CollisionShape3D.new()
+	collision.shape = CylinderShape3D.new()
+	collision.position.x = 4.0
+	prop.add_child(collision)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	prop.dimensions = prop.get_natural_size() * 2.0
+	_expect(mesh.scale.is_equal_approx(prop.get_node("MeshInstance3D").scale)
+		and is_equal_approx(collision.shape.get_debug_mesh().get_aabb().size.y, mesh.mesh.height * mesh.scale.y),
+		"added visuals and collision resize together in the editor")
+	prop.surface_material = StandardMaterial3D.new()
+	_expect(mesh.material_override == prop.surface_material, "added visual receives Surface Material in the editor")
+	var later_shape := CollisionShape3D.new()
+	prop.add_child(later_shape)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	later_shape.shape = BoxShape3D.new()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	prop.dimensions *= 2.0
+	_expect(later_shape.shape.get_debug_mesh().get_aabb().size.y > 1.5,
+		"a shape assigned after adding an empty collider participates in resizing")
+	prop.free()

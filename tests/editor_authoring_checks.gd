@@ -1,10 +1,13 @@
 extends "res://tests/check_suite.gd"
-## Regression checks for authored settings, scene contracts and the start level.
+## Regression checks for authored settings, scene contracts, the start level and whole props.
+
+const PROP := preload("res://shared/world/props/stone_pillar.tscn")
 
 
 func _checks() -> Array[Callable]:
 	return [_check_contracts, _check_initial_level, _check_settings_path, _check_scene_settings,
-		_check_follow_exception, _check_settings_sharing]
+		_check_follow_exception, _check_settings_sharing, _check_prop_editing, _check_prop_additions,
+		_check_animated_prop]
 
 
 func _check_contracts() -> void:
@@ -165,3 +168,99 @@ func _check_settings_sharing() -> void:
 	_expect(movers[1].settings != null and movers[1].settings.max_speed == LocomotionSettings.new().max_speed,
 		"no resource assigned during play: the mover runs on the default settings")
 	holder.free()
+
+
+func _check_prop_editing() -> void:
+	print("\n== a prop's root moves and resizes both the model and collision")
+	var prop := PROP.instantiate() as StaticProp
+	var other := PROP.instantiate() as StaticProp
+	_tree.root.add_child(prop)
+	_tree.root.add_child(other)
+	var mesh := prop.get_node("MeshInstance3D") as MeshInstance3D
+	var shape := prop.get_node("CollisionShape3D") as CollisionShape3D
+	var before_mesh := mesh.global_position
+	var before_shape := shape.global_position
+	prop.position += Vector3(2, 1, 3)
+	_expect((mesh.global_position - before_mesh).is_equal_approx(Vector3(2, 1, 3))
+		and (shape.global_position - before_shape).is_equal_approx(Vector3(2, 1, 3)),
+		"moving the root moves its visible geometry and physical geometry together")
+	_expect(other.dimensions == Vector3.ZERO and is_equal_approx(other.get_node("CollisionShape3D").shape.height, 3.2),
+		"a prop of the size of its parts keeps Dimensions at 0: nothing computed is written into it")
+	prop.dimensions = Vector3(0, 4.2, 0)
+	var mesh_height: float = mesh.mesh.height * mesh.basis.y.length()
+	_expect(is_equal_approx(mesh_height, 4.2) and is_equal_approx(shape.shape.height, 4.2)
+		and is_equal_approx(shape.shape.radius, 0.5) and is_equal_approx(mesh.basis.x.length(), 1.0),
+		"Dimensions changes the visible pillar height and collider height together, 0 keeps the width of the parts")
+	_expect(is_equal_approx(other.get_node("CollisionShape3D").shape.height, 3.2),
+		"resizing an instance does not change a sibling's shape")
+	var material := StandardMaterial3D.new()
+	prop.surface_material = material
+	prop.surface_material = null
+	_expect(mesh.material_override == null, "clearing the surface override restores authored materials")
+	_expect(prop._get_configuration_warnings().is_empty(), "a prop resized by Dimensions has no warning")
+	prop.scale = Vector3.ONE * 2.0
+	_expect("scale of its root" in " ".join(prop._get_configuration_warnings()), "a scaled root asks for Dimensions")
+	prop.free()
+	other.free()
+	var capsule := CapsuleShape3D.new()
+	var resized := StaticProp._resized_shape(capsule, Basis.IDENTITY.scaled(Vector3(1, 2, 1)))
+	_expect(resized is ConvexPolygonShape3D,
+		"non-uniform capsule resizing preserves stretched round ends in a convex shape")
+	var rotation := Basis(Vector3.FORWARD, PI / 4.0)
+	var box := StaticProp._resized_shape(BoxShape3D.new(),
+		rotation.inverse() * Basis.IDENTITY.scaled(Vector3(1, 2, 1)) * rotation)
+	_expect(box is ConvexPolygonShape3D, "a rotated box bakes its shear into collision geometry")
+	# A figure: a capsule and a whole character model, a scene of many parts.
+	var model_prop := StaticProp.new()
+	var capsule_shape := CollisionShape3D.new()
+	capsule_shape.shape = CapsuleShape3D.new()
+	capsule_shape.position.y = 1.0
+	model_prop.add_child(capsule_shape)
+	var model := (load("res://shared/characters/models/mage.tscn") as PackedScene).instantiate() as Node3D
+	model_prop.add_child(model)
+	_tree.root.add_child(model_prop)
+	var model_scale := model.global_basis.y.length()
+	model_prop.dimensions.y = model_prop.get_natural_size().y * 2.0
+	_expect(is_equal_approx(model.global_basis.y.length(), model_scale * 2.0),
+		"resizing a compound model scales its whole authored branch")
+	model_prop.free()
+
+
+func _check_prop_additions() -> void:
+	print("\n== newly authored parts participate in whole-object resizing")
+	var prop := PROP.instantiate() as StaticProp
+	_tree.root.add_child(prop)
+	var added_mesh := MeshInstance3D.new()
+	added_mesh.mesh = CylinderMesh.new()
+	added_mesh.position.x = 4.0
+	prop.add_child(added_mesh)
+	var added_shape := CollisionShape3D.new()
+	added_shape.shape = CylinderShape3D.new()
+	added_shape.position.x = 4.0
+	prop.add_child(added_shape)
+	prop.dimensions = prop.get_natural_size() * 2.0
+	var original := prop.get_node("MeshInstance3D") as MeshInstance3D
+	_expect(original.scale.is_equal_approx(added_mesh.scale), "old and newly added visuals use the same resize ratio")
+	_expect(is_equal_approx(added_shape.shape.get_debug_mesh().get_aabb().size.y,
+			added_mesh.mesh.height * added_mesh.scale.y),
+		"a newly added collider matches its resized visual")
+	var material := StandardMaterial3D.new()
+	prop.surface_material = material
+	_expect(added_mesh.material_override == material, "Surface Material reaches newly added meshes")
+	prop.free()
+
+
+func _check_animated_prop() -> void:
+	print("\n== a resized mountain preserves the crystal's animation rest pose")
+	var mountain := (load("res://shared/world/mountain/mountain.tscn") as PackedScene).instantiate() as StaticProp
+	mountain.dimensions.y = mountain.get_natural_size().y * 2.0
+	_tree.root.add_child(mountain)
+	var crystal := mountain.get_node("Shrine/CrystalAnchor/Crystal") as MeshInstance3D
+	var before := crystal.global_position
+	crystal._process(0.0)
+	_expect(crystal.global_position.is_equal_approx(before) and is_equal_approx(before.y, 23.5),
+		"the first animation frame keeps the preview's resized crystal height")
+	await _frames(10)
+	_expect(absf(crystal.global_position.y - before.y) <= 0.241,
+		"subsequent animation frames bob around the resized rest pose")
+	mountain.free()

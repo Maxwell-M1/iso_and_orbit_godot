@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://shared/world/props/static_prop.gd" id="1_iff6l"]
+[ext_resource type="Material" path="res://shared/world/materials/rock.tres" id="2_k17ug"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_rock"]
+points = PackedVector3Array(0.7274615, 0, 0.42, 0, 0.3110493, 0.5938215, 0, 0, 0.84, 0, -0.3111355, 0.5938215, 0.5142646, -0.3111355, 0.2968285, 0.7274615, 0, -0.4201644, 0.5142646, 0.3110493, 0.2968285, 0, 0.4399999, 0, -0.5144069, 0.3110493, 0.2968285, -0.7274613, 0, 0.4198355, -0.5144069, -0.3111355, 0.2968285, 0, -0.44, 0, 0.5142646, -0.3111355, -0.296993, 0, -0.3111355, -0.5939859, 0, 0, -0.84, 0, 0.3110493, -0.5939859, 0.5142646, 0.3110493, -0.296993, -0.5144069, 0.3110493, -0.296993, -0.7274613, 0, -0.42, -0.5144069, -0.3111355, -0.296993)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rock"]
+material = ExtResource("2_k17ug")
+radius = 0.84
+height = 0.88
+radial_segments = 6
+rings = 3
+
+[node name="Rock" type="StaticBody3D" unique_id=749725306]
+editor_description = "Move this root. Dimensions controls the visible object and its collision together."
+script = ExtResource("1_iff6l")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1661763897]
+shape = SubResource("ConvexPolygonShape3D_rock")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1431864766]
+mesh = SubResource("SphereMesh_rock")

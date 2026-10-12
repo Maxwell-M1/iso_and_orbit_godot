@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://shared/world/props/static_prop.gd" id="1_7v5xp"]
+[ext_resource type="Material" path="res://shared/world/materials/stone_altar.tres" id="2_f5fe5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mclfv"]
+size = Vector3(2, 1, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_45gm1"]
+material = ExtResource("2_f5fe5")
+size = Vector3(2, 1, 2)
+
+[node name="SolidBox" type="StaticBody3D" unique_id=491477889]
+editor_description = "Move this root. Dimensions controls the visible object and its collision together."
+script = ExtResource("1_7v5xp")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=362007924]
+shape = SubResource("BoxShape3D_mclfv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1023403953]
+mesh = SubResource("BoxMesh_45gm1")

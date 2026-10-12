@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://shared/world/props/static_prop.gd" id="1_bgwly"]
+[ext_resource type="Material" path="res://shared/world/materials/stone_column.tres" id="2_1f30k"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_s70ap"]
+height = 3.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_820js"]
+material = ExtResource("2_1f30k")
+height = 3.2
+
+[node name="StonePillar" type="StaticBody3D" unique_id=1644158118]
+editor_description = "Move this root. Dimensions controls the visible object and its collision together."
+script = ExtResource("1_bgwly")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1798867725]
+shape = SubResource("CylinderShape3D_s70ap")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=928520745]
+mesh = SubResource("CylinderMesh_820js")

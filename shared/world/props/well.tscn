@@ -1,5 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c1xhiuvc6y3nb"]
 
+[ext_resource type="Script" uid="uid://bm27p0ndipaev" path="res://shared/world/props/static_prop.gd" id="1_d8wwj"]
 [ext_resource type="Material" path="res://shared/world/materials/stone_well.tres" id="1_stone"]
 [ext_resource type="Material" path="res://shared/world/materials/water.tres" id="2_water"]
 [ext_resource type="Material" path="res://shared/world/materials/wood_post.tres" id="3_wood"]
@@ -47,43 +48,44 @@ rings = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_post"]
 material = ExtResource("3_wood")
-size = Vector3(0.15, 2.0, 0.15)
+size = Vector3(0.15, 2, 0.15)
 
 [sub_resource type="PrismMesh" id="PrismMesh_roof"]
 material = ExtResource("4_thatch")
-left_to_right = 0.5
 size = Vector3(2.4, 0.8, 1.6)
 
-[node name="Well" type="StaticBody3D"]
+[node name="Well" type="StaticBody3D" unique_id=1098179088]
+script = ExtResource("1_d8wwj")
+metadata/_edit_group_ = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1735773389]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("CylinderShape3D_well")
 
-[node name="Ring" type="MeshInstance3D" parent="."]
+[node name="Ring" type="MeshInstance3D" parent="." unique_id=739813725]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 mesh = SubResource("CylinderMesh_ring")
 
-[node name="Inner" type="MeshInstance3D" parent="."]
+[node name="Inner" type="MeshInstance3D" parent="." unique_id=157507550]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 mesh = SubResource("CylinderMesh_inner")
 
-[node name="Coping" type="MeshInstance3D" parent="."]
+[node name="Coping" type="MeshInstance3D" parent="." unique_id=462041873]
 transform = Transform3D(1, 0, 0, 0, 0.6, 0, 0, 0, 1, 0, 0.8, 0)
 mesh = SubResource("TorusMesh_coping")
 
-[node name="Water" type="MeshInstance3D" parent="."]
+[node name="Water" type="MeshInstance3D" parent="." unique_id=1870371685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 mesh = SubResource("CylinderMesh_water")
 
-[node name="PostLeft" type="MeshInstance3D" parent="."]
+[node name="PostLeft" type="MeshInstance3D" parent="." unique_id=151376621]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.0, 0)
 mesh = SubResource("BoxMesh_post")
 
-[node name="PostRight" type="MeshInstance3D" parent="."]
+[node name="PostRight" type="MeshInstance3D" parent="." unique_id=341130855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 1.0, 0)
 mesh = SubResource("BoxMesh_post")
 
-[node name="Roof" type="MeshInstance3D" parent="."]
+[node name="Roof" type="MeshInstance3D" parent="." unique_id=660415736]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
 mesh = SubResource("PrismMesh_roof")
