@@ -1,10 +1,14 @@
+@tool
 class_name ClickMarker
 extends Node3D
 ## A marker on the ground at the click point: it appears with a short "bounce" and fades out when the character
 ## arrives or the run to it is abandoned (for example, the character is steered with the keys).
 
 ## What to show and fade out. If not set, the first child [GeometryInstance3D] is used.
-@export var geometry: GeometryInstance3D
+@export var geometry: GeometryInstance3D:
+	set(value):
+		geometry = value
+		update_configuration_warnings()
 
 ## How long the appearance lasts.
 @export_range(0.0, 1.0, 0.01, "suffix:s") var appear_time := 0.18
@@ -19,6 +23,8 @@ var _tween: Tween
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	# The marker jumps to a new point instantly; physics interpolation would drag it from the old one.
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	if geometry == null:
@@ -62,3 +68,10 @@ func _find_child_geometry() -> GeometryInstance3D:
 		if child is GeometryInstance3D:
 			return child as GeometryInstance3D
 	return null
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if geometry == null and _find_child_geometry() == null:
+		warnings.append("Assign Geometry or add a GeometryInstance3D child.")
+	return warnings

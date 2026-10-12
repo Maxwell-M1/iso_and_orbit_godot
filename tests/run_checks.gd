@@ -26,6 +26,7 @@ const SUITES := [
 	preload("res://tests/settings_window_checks.gd"),
 	preload("res://tests/localization_checks.gd"),
 	preload("res://tests/level_checks.gd"),
+	preload("res://tests/editor_authoring_checks.gd"),
 ]
 const CheckSuite := preload("res://tests/check_suite.gd")
 ## If a check hangs (the script crashed before quit()), it ends in failure after this many seconds of game time. While a

@@ -1,3 +1,4 @@
+@tool
 class_name TravelPrompt
 extends Control
 ## The offer to travel while the hero stands at a portal that asks first ([LevelPortal]): the key and "Teleport to
@@ -11,7 +12,10 @@ signal confirmed(portal: LevelPortal)
 @export var text_format := "Teleport to %s"
 
 ## The input action that confirms; its key is shown next to the offer.
-@export var action := &"interact"
+@export var action := &"interact":
+	set(value):
+		action = value
+		update_configuration_warnings()
 
 var _portal: LevelPortal
 
@@ -20,6 +24,8 @@ var _portal: LevelPortal
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	add_to_group(ActionTexts.GROUP)
 	# The key is named by the keyboard, and the text is composed of two translations: neither is translated as a whole.
 	_key.auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
@@ -31,6 +37,8 @@ func _ready() -> void:
 
 
 func _shortcut_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	# Not a shortcut of the button: that one wants exactly the modifiers of the action, and the key must work with Shift
 	# held too (the hero sprints onto the pad).
 	# A missing action is reported once at the start and then not read: the engine would report it at every event.
@@ -64,6 +72,8 @@ func get_portal() -> LevelPortal:
 
 
 func _notification(what: int) -> void:
+	if Engine.is_editor_hint():
+		return
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		refresh()
 
@@ -82,3 +92,11 @@ func _on_pressed() -> void:
 
 func _update_text() -> void:
 	_button.text = tr(text_format) % tr(_portal.title)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	# Project settings, not InputMap: in the editor InputMap holds only the editor's own actions.
+	if action != &"" and not ProjectSettings.has_setting("input/" + action):
+		warnings.append("Add input action '%s' in Project Settings > Input Map." % action)
+	return warnings

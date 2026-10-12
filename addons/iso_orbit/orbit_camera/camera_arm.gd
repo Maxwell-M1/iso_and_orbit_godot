@@ -1,3 +1,4 @@
+@tool
 class_name CameraArm
 extends Node3D
 ## The arm that holds the camera: the camera hangs at the end of an arm of length [member length] (the node's local
@@ -30,7 +31,10 @@ const _MAX_IGNORED_HITS := 8
 @export_range(0.0, 100.0, 0.01, "or_greater", "suffix:m") var length := 10.0
 
 ## The camera at the end of the arm. If not set, the first child [Camera3D] is used.
-@export var camera: Camera3D
+@export var camera: Camera3D:
+	set(value):
+		camera = value
+		update_configuration_warnings()
 
 @export_group("Collision")
 ## Do not go inside bodies: if a hill or wall is behind the camera, the camera rests against it and moves toward the
@@ -81,9 +85,15 @@ const _MAX_IGNORED_HITS := 8
 ## What to make semi-transparent when the camera comes very close (usually the character model). Not set: nothing.
 @export var fade_target: Node3D
 ## When the arm is shorter than this, the target starts to become more transparent.
-@export_range(0.0, 10.0, 0.01, "suffix:m") var fade_start_length := 1.5
+@export_range(0.0, 10.0, 0.01, "suffix:m") var fade_start_length := 1.5:
+	set(value):
+		fade_start_length = value
+		update_configuration_warnings()
 ## At this length and shorter, the target is transparent by [member fade_transparency].
-@export_range(0.0, 10.0, 0.01, "suffix:m") var fade_end_length := 0.7
+@export_range(0.0, 10.0, 0.01, "suffix:m") var fade_end_length := 0.7:
+	set(value):
+		fade_end_length = value
+		update_configuration_warnings()
 ## How transparent the target is right at the camera: 0 is opaque, 1 is invisible.
 @export_range(0.0, 1.0, 0.01) var fade_transparency := 0.75
 
@@ -118,11 +128,10 @@ var _debug_colors := PackedColorArray()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if camera == null:
-		for child: Node in get_children():
-			if child is Camera3D:
-				camera = child as Camera3D
-				break
+		camera = _find_camera()
 	assert(camera != null, "CameraArm needs a Camera3D child or the camera property set.")
 	_ray_query.hit_from_inside = false
 	_ray_query.hit_back_faces = false
@@ -132,6 +141,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_update(delta, false)
 
 
@@ -490,3 +501,21 @@ func _draw_debug() -> void:
 		mesh.surface_set_color(_debug_colors[i])
 		mesh.surface_add_vertex(_debug_lines[i])
 	mesh.surface_end()
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if _find_camera() == null:
+		warnings.append("Assign Camera or add a Camera3D child.")
+	if fade_start_length < fade_end_length:
+		warnings.append("Fade Start Length must not be below Fade End Length.")
+	return warnings
+
+
+func _find_camera() -> Camera3D:
+	if camera != null:
+		return camera
+	for child: Node in get_children():
+		if child is Camera3D:
+			return child
+	return null

@@ -1,3 +1,4 @@
+@tool
 class_name NavigationMover
 extends Node
 ## Leads the character to a destination along a navigation path: goes around obstacles, accelerates smoothly and
@@ -69,6 +70,8 @@ var _path_dirty := false
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	_body = get_parent() as Node3D
 	assert(_body != null, "NavigationMover must be a child of a Node3D (usually CharacterBody3D).")
 	if settings == null:
@@ -288,3 +291,10 @@ static func _flat(vector: Vector3) -> Vector3:
 
 static func _flat_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if not get_parent() is Node3D:
+		warnings.append("Place NavigationMover directly under the Node3D it moves.")
+	return warnings

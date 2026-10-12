@@ -1,10 +1,14 @@
+@tool
 class_name SettingSlider
 extends HSlider
 ## A slider bound to the numeric setting [member key]. The limits and the step are [Range] properties in the inspector.
 ## It writes the current value to [member value_label].
 
 ## The setting key, for example [code]camera/follow_time[/code] (see [GameSettings]).
-@export var key: StringName
+@export var key: StringName:
+	set(value):
+		key = value
+		update_configuration_warnings()
 
 ## Where to show the value. Optional.
 @export var value_label: Label
@@ -24,6 +28,8 @@ var _dragging := false
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(Settings.has_setting(key), "SettingSlider \"%s\": unknown setting \"%s\"." % [name, key])
 	set_value_no_signal(Settings.get_value(key))
 	if value_label != null:
@@ -37,6 +43,8 @@ func _ready() -> void:
 
 
 func _notification(what: int) -> void:
+	if Engine.is_editor_hint():
+		return
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_label()
 
@@ -69,3 +77,10 @@ func _update_label() -> void:
 		value_label.text = tr(zero_text)
 	else:
 		value_label.text = tr(value_format) % value
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if not GameSettings.DEFAULTS.has(key):
+		warnings.append("Choose a known GameSettings key.")
+	return warnings

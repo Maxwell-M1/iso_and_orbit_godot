@@ -1,3 +1,4 @@
+@tool
 class_name CharacterMonitor
 extends Label
 ## Shows as text what a [GroundCharacter] is doing right now and its latest events: for tuning animations, effects and
@@ -8,7 +9,10 @@ extends Label
 ## language, the log in the output stays in English.
 
 ## The character to watch. If not set, the parent is used when it is a [GroundCharacter].
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 
 ## How many latest events to show under the state. 0 shows only the state.
 @export_range(0, 50) var history_size := 6
@@ -23,6 +27,8 @@ var _events: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if character == null:
 		character = get_parent() as GroundCharacter
 	assert(character != null,
@@ -40,6 +46,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if is_visible_in_tree():
 		text = get_text_now()
 
@@ -158,3 +166,10 @@ func _text(phrase: String, translated: bool) -> String:
 ## [param value] rounded to [param step], so that a value that rounds to zero shows as +0 and not as −0.
 static func _signed(value: float, step: float) -> float:
 	return snappedf(value, step) + 0.0
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null and not get_parent() is GroundCharacter:
+		warnings.append("Assign Character or place the monitor under a GroundCharacter.")
+	return warnings

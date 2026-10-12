@@ -1,3 +1,4 @@
+@tool
 class_name StaminaBar
 extends ProgressBar
 ## The character's stamina bar ([Stamina]). It is visible while stamina is not full, and once stamina has recovered,
@@ -5,7 +6,10 @@ extends ProgressBar
 ## ([member exhausted_variation]).
 
 ## Whose stamina to show.
-@export var stamina: Stamina
+@export var stamina: Stamina:
+	set(value):
+		stamina = value
+		update_configuration_warnings()
 
 ## How many seconds the bar takes to fade out once stamina has recovered.
 @export_range(0.0, 5.0, 0.05, "suffix:s") var fade_time := 0.6
@@ -18,6 +22,8 @@ extends ProgressBar
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if stamina == null:
 		hide()
 		set_process(false)
@@ -30,6 +36,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	# It appears at once, as soon as stamina starts being spent, and fades out smoothly.
 	if not _is_full():
 		modulate.a = 1.0
@@ -49,3 +57,10 @@ func _on_exhausted_changed(exhausted: bool) -> void:
 
 func _is_full() -> bool:
 	return value >= max_value
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if stamina == null:
+		warnings.append("Assign Stamina in the Inspector.")
+	return warnings

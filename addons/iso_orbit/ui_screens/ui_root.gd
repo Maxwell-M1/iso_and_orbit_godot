@@ -1,3 +1,4 @@
+@tool
 class_name UiRoot
 extends CanvasLayer
 ## Windows over the game: they open as a stack, Esc ([code]ui_cancel[/code]) closes the top one, and while at least
@@ -13,10 +14,16 @@ signal screen_opened(screen: UiScreen)
 signal screen_closed(screen: UiScreen)
 
 ## The settings window.
-@export var settings_screen: PackedScene
+@export var settings_screen: PackedScene:
+	set(value):
+		settings_screen = value
+		update_configuration_warnings()
 
 ## The input action that opens and closes [member settings_screen].
-@export var settings_action := &"toggle_settings"
+@export var settings_action := &"toggle_settings":
+	set(value):
+		settings_action = value
+		update_configuration_warnings()
 
 ## Pause the game while at least one window is open.
 @export var pause_game := true
@@ -27,15 +34,21 @@ var _paused_by_ui := false
 
 
 func _init() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Only in the game: in the editor the value would be saved into the scene.
+	if not Engine.is_editor_hint():
+		process_mode = Node.PROCESS_MODE_ALWAYS
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if settings_screen != null and not InputMap.has_action(settings_action):
 		push_error("UiRoot: input action \"%s\" is missing in Project Settings > Input Map." % settings_action)
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	# A missing action is reported once at the start and then not read: the engine would report it at every event.
 	if settings_screen != null and InputMap.has_action(settings_action) and event.is_action_pressed(settings_action):
 		toggle(settings_screen)
@@ -119,3 +132,14 @@ func _on_close_requested(screen: UiScreen) -> void:
 	# Close only if this is the top window: the lower ones are covered and must not close by themselves.
 	if screen == get_top_screen():
 		close_top()
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	# Without a settings window the action is not read.
+	if settings_screen == null or settings_action == &"":
+		return warnings
+	# Project settings, not InputMap: in the editor InputMap holds only the editor's own actions.
+	if not ProjectSettings.has_setting("input/" + settings_action):
+		warnings.append("Add input action '%s' in Project Settings > Input Map." % settings_action)
+	return warnings

@@ -1,3 +1,4 @@
+@tool
 class_name SettingLanguageButton
 extends OptionButton
 ## A drop-down list of languages bound to the string setting [member key] (a language code). It builds the items
@@ -21,10 +22,15 @@ const NATIVE_NAMES := {
 }
 
 ## The setting key, for example [code]interface/language[/code] (see [GameSettings]).
-@export var key: StringName
+@export var key: StringName:
+	set(value):
+		key = value
+		update_configuration_warnings()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(Settings.has_setting(key), "SettingLanguageButton \"%s\": unknown setting \"%s\"." % [name, key])
 	auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
 	get_popup().auto_translate_mode = AUTO_TRANSLATE_MODE_DISABLED
@@ -64,3 +70,10 @@ func _on_item_selected(index: int) -> void:
 func _on_setting_changed(changed_key: StringName, value: Variant) -> void:
 	if changed_key == key:
 		_show(value)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if not GameSettings.DEFAULTS.has(key):
+		warnings.append("Choose a known GameSettings key.")
+	return warnings

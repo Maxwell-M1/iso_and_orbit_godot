@@ -1,3 +1,4 @@
+@tool
 class_name CharacterActionInput
 extends Node
 ## Character keys besides the mouse: sprint with [member sprint_action] (Shift) and jump with [member jump_action]
@@ -29,13 +30,22 @@ const _MODIFIER_MASKS := {
 }
 
 ## The character to control.
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 
 ## The "sprint" input action.
-@export var sprint_action := &"sprint"
+@export var sprint_action := &"sprint":
+	set(value):
+		sprint_action = value
+		update_configuration_warnings()
 
 ## The "jump" input action.
-@export var jump_action := &"jump"
+@export var jump_action := &"jump":
+	set(value):
+		jump_action = value
+		update_configuration_warnings()
 
 ## Hold the sprint key, or press it to turn sprint on and off.
 @export var sprint_mode := SprintMode.HOLD:
@@ -48,10 +58,14 @@ var _sprint_toggled := false
 
 func _init() -> void:
 	# Input comes before the character in the same physics tick: otherwise a press and a release reach it a tick later.
-	process_physics_priority = -1
+	# Only in the game: in the editor the value would be saved into the scene.
+	if not Engine.is_editor_hint():
+		process_physics_priority = -1
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(character != null, "CharacterActionInput needs the character property set.")
 	for action: StringName in [sprint_action, jump_action]:
 		if not InputMap.has_action(action):
@@ -62,6 +76,8 @@ func _ready() -> void:
 ## of the sprint key itself is skipped: it changes the action state anyway, and on some systems (X11) it carries the
 ## modifiers from before the press.
 func _input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	if sprint_mode != SprintMode.HOLD or not _is_pressed(sprint_action):
 		return
 	var with_modifiers := event as InputEventWithModifiers
@@ -78,6 +94,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	if _has_action(jump_action) and event.is_action_pressed(jump_action):
 		character.jump()
 	elif sprint_mode == SprintMode.TOGGLE and _has_action(sprint_action) and event.is_action_pressed(sprint_action):
@@ -88,6 +106,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if sprint_mode == SprintMode.HOLD:
 		# By polling, not by events: the key release may have gone to the UI or arrived while the game was paused.
 		character.sprint_requested = _is_pressed(sprint_action)
@@ -131,3 +151,14 @@ static func _get_modifier_masks(action: StringName) -> Array[int]:
 			return [] as Array[int]
 		masks.append(_MODIFIER_MASKS[key] | key_event.get_modifiers_mask())
 	return masks
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null:
+		warnings.append("Assign Character in the Inspector.")
+	# Project settings, not InputMap: in the editor InputMap holds only the editor's own actions.
+	for action: StringName in [sprint_action, jump_action]:
+		if action != &"" and not ProjectSettings.has_setting("input/" + action):
+			warnings.append("Add input action '%s' in Project Settings > Input Map." % action)
+	return warnings

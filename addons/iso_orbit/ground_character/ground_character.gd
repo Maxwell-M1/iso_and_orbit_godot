@@ -1,3 +1,4 @@
+@tool
 class_name GroundCharacter
 extends CharacterBody3D
 ## A character driven by [NavigationMover]: this is where gravity, jumping, sprinting, stairs, [method move_and_slide]
@@ -93,7 +94,10 @@ const _STAIR_SEARCH_STEP := 0.02
 const _SUPPORT_PROBE := 0.05
 
 ## The component that computes the horizontal velocity.
-@export var mover: NavigationMover
+@export var mover: NavigationMover:
+	set(value):
+		mover = value
+		update_configuration_warnings()
 
 ## The model to turn so that it faces along the run (or where [method NavigationMover.get_facing] says, if the
 ## character walks sideways). Its "face" is the −Z direction. It turns relative to its parent, so the body may stand
@@ -108,16 +112,33 @@ const _SUPPORT_PROBE := 0.05
 ## ground. 0 disables stepping: then the round bottom of the capsule climbs only about
 ## [code]radius × (1 − cos floor_max_angle)[/code] (0.1 m for the demo's capsule). The slope limit is the body's own
 ## [member CharacterBody3D.floor_max_angle].
-@export_range(0.0, 1.0, 0.01, "suffix:m") var max_step_height := 0.3
+@export_range(0.0, 1.0, 0.01, "suffix:m") var max_step_height := 0.3:
+	set(value):
+		max_step_height = value
+		update_configuration_warnings()
 ## Keeps the character from walking off cliffs. If not set, the character falls from any height. The guard does not
 ## hold back a jump.
-@export var ledge_guard: LedgeGuard
+@export var ledge_guard: LedgeGuard:
+	set(value):
+		if is_instance_valid(ledge_guard) and ledge_guard.max_drop_changed.is_connected(update_configuration_warnings):
+			ledge_guard.max_drop_changed.disconnect(update_configuration_warnings)
+		ledge_guard = value
+		# A warning compares the guard's max_drop with max_step_height.
+		if Engine.is_editor_hint() and ledge_guard != null:
+			ledge_guard.max_drop_changed.connect(update_configuration_warnings)
+		update_configuration_warnings()
 
 @export_group("Jump and fall")
 ## Whether the character can jump. When this is disabled, [method jump] does nothing.
-@export var can_jump := true
+@export var can_jump := true:
+	set(value):
+		can_jump = value
+		update_configuration_warnings()
 ## Jump height (of the feet), taking [member gravity_scale] into account.
-@export_range(0.0, 5.0, 0.05, "suffix:m") var jump_height := 1.0
+@export_range(0.0, 5.0, 0.05, "suffix:m") var jump_height := 1.0:
+	set(value):
+		jump_height = value
+		update_configuration_warnings()
 ## How long a jump is still possible after stepping off an edge: a jump pressed slightly late is not lost.
 @export_range(0.0, 0.5, 0.01, "suffix:s") var coyote_time := 0.1
 ## How long to remember a jump press in the air: a jump pressed slightly before landing fires on the ground.
@@ -125,13 +146,27 @@ const _SUPPORT_PROBE := 0.05
 ## How many times stronger gravity is for the character than in the world: on the rise of a jump, and on the way down
 ## too unless [member fall] sets another. The character in the game runs faster than a human and with normal gravity
 ## falls "like a feather"; with 3 it drops from 1.6 m in 0.33 s instead of 0.57 s.
-@export_range(0.0, 10.0, 0.05) var gravity_scale := 3.0
+@export_range(0.0, 10.0, 0.05) var gravity_scale := 3.0:
+	set(value):
+		gravity_scale = value
+		update_configuration_warnings()
 ## How the character falls ([FallSettings]): how fast the fall gains speed and the fastest fall. Empty: it falls with
 ## [member gravity_scale], without a limit. A component can put its own fall in its place for a while
 ## ([method set_fall_override]), as [CharacterHover] does while the character floats.
-@export var fall: FallSettings
+@export var fall: FallSettings:
+	set(value):
+		if fall != null and fall.changed.is_connected(update_configuration_warnings):
+			fall.changed.disconnect(update_configuration_warnings)
+		fall = value
+		# A warning compares the fall's max_speed with landing_min_speed.
+		if Engine.is_editor_hint() and fall != null:
+			fall.changed.connect(update_configuration_warnings)
+		update_configuration_warnings()
 ## A fall slower than this does not count as a landing ([signal landed]), only as [signal touched_floor].
-@export_range(0.0, 20.0, 0.1, "suffix:m/s") var landing_min_speed := 2.5
+@export_range(0.0, 20.0, 0.1, "suffix:m/s") var landing_min_speed := 2.5:
+	set(value):
+		landing_min_speed = value
+		update_configuration_warnings()
 
 @export_group("Sprint")
 ## Whether the character can sprint. If this is disabled mid-run, the character immediately sheds the excess speed by
@@ -204,6 +239,8 @@ var _ray_query := PhysicsRayQueryParameters3D.new()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(mover != null, "GroundCharacter needs the mover property set.")
 	for warning in get_setup_warnings():
 		push_warning("%s: %s" % [name, warning])
@@ -219,6 +256,8 @@ func _ready() -> void:
 ## [method move_and_slide] with stairs, then what the tick changed: floor contact, the stair, steps, the model's turn,
 ## the state.
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_update_sprint(delta)
 	var planar := mover.compute_velocity(delta)
 	velocity.x = planar.x
@@ -795,3 +834,11 @@ func _compute_state() -> State:
 	return State.SPRINTING if is_sprinting() else State.RUNNING
 
 #endregion
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if mover == null:
+		warnings.append("Assign Mover in the Inspector.")
+	warnings.append_array(get_setup_warnings())
+	return warnings

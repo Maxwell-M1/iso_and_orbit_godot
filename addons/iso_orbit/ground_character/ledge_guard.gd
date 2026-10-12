@@ -1,3 +1,4 @@
+@tool
 class_name LedgeGuard
 extends Node
 ## Keeps the character from walking off a cliff: at the edge it stops, and if it runs at the edge at an angle, it
@@ -15,11 +16,18 @@ extends Node
 ## [constant GroundCharacter.FLOOR_ANGLE_MARGIN], as the engine's own floor check). A mistake in the setup is printed
 ## as a warning when the component enters the tree ([method get_setup_warnings]).
 
+## [member max_drop] changed: in the editor the [GroundCharacter] checks its warning that compares it with the height
+## of a step again.
+signal max_drop_changed
+
 ## Guard the edge. A disabled component changes nothing.
 @export var enabled := true
 
 ## The height drop from which an edge counts as a cliff. A lower one is a step, which can be stepped off.
-@export_range(0.05, 10.0, 0.05, "suffix:m") var max_drop := 0.5
+@export_range(0.05, 10.0, 0.05, "suffix:m") var max_drop := 0.5:
+	set(value):
+		max_drop = value
+		max_drop_changed.emit()
 
 ## The character's center does not come closer to the edge than this. A larger value makes it stop farther from the
 ## edge.
@@ -35,7 +43,10 @@ extends Node
 
 ## What counts as ground. 0 (the default) takes the body's [member CollisionObject3D.collision_mask]: the guard counts
 ## as ground exactly what the body stands on.
-@export_flags_3d_physics var floor_mask := 0
+@export_flags_3d_physics var floor_mask := 0:
+	set(value):
+		floor_mask = value
+		update_configuration_warnings()
 
 ## How many times to refine the slide angle, twice as finely each time (6 gives a precision of about 1.4°).
 @export_range(1, 12) var slide_iterations := 6
@@ -45,6 +56,8 @@ var _query := PhysicsRayQueryParameters3D.new()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	_body = get_parent() as CharacterBody3D
 	assert(_body != null, "LedgeGuard must be a child of a CharacterBody3D.")
 	_query.exclude = [_body.get_rid()]
@@ -136,3 +149,7 @@ func _has_floor(point: Vector3) -> bool:
 	# A steep slope is not ground: the character cannot stand on it.
 	var steepness := (hit.normal as Vector3).angle_to(_body.up_direction)
 	return steepness <= _body.floor_max_angle + GroundCharacter.FLOOR_ANGLE_MARGIN
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	return get_setup_warnings()

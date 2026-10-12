@@ -1,3 +1,4 @@
+@tool
 class_name CharacterSounds
 extends Node3D
 ## Character sounds: footsteps, jump and landing, the sprint burst and the sprint. Plays them on [GroundCharacter]
@@ -8,7 +9,10 @@ extends Node3D
 ## ([member footsteps_enabled], [member jump_enabled], [member sprint_enabled]).
 
 ## Whose sounds these are. If not set, the parent.
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 
 @export_group("Players")
 ## Footsteps: a stream with several variants ([AudioStreamRandomizer]) so that the steps do not all sound the same.
@@ -26,13 +30,13 @@ extends Node3D
 @export var footsteps_enabled := true:
 	set(value):
 		footsteps_enabled = value
-		if not value and footsteps != null:
+		if not value and footsteps != null and not Engine.is_editor_hint():
 			footsteps.stop()
 ## Jump and landing.
 @export var jump_enabled := true:
 	set(value):
 		jump_enabled = value
-		if not value:
+		if not value and not Engine.is_editor_hint():
 			for player: AudioStreamPlayer3D in [jump, land]:
 				if player != null:
 					player.stop()
@@ -40,6 +44,8 @@ extends Node3D
 @export var sprint_enabled := true:
 	set(value):
 		sprint_enabled = value
+		if Engine.is_editor_hint():
+			return
 		if not value:
 			if sprint_start != null:
 				sprint_start.stop()
@@ -65,6 +71,8 @@ var _sprint_tween: Tween
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if character == null:
 		character = get_parent() as GroundCharacter
 	assert(character != null,
@@ -129,3 +137,10 @@ func _fade_sprint_loop(on: bool) -> void:
 ## The sprint loop is playing now (or fading out).
 func is_sprint_loop_playing() -> bool:
 	return sprint_loop != null and sprint_loop.playing
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null and not get_parent() is GroundCharacter:
+		warnings.append("Assign Character or place the sounds under a GroundCharacter.")
+	return warnings

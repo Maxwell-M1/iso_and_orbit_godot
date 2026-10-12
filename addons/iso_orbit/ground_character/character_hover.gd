@@ -1,3 +1,4 @@
+@tool
 class_name CharacterHover
 extends Node3D
 ## Makes a [GroundCharacter] float: the model hangs [member height] above the ground, glides over stairs instead of
@@ -51,7 +52,10 @@ const _MAX_SLOPE := deg_to_rad(60.0)
 const _MOTION_SMOOTHING := 0.25
 
 ## The character to make float. If not set, the nearest [GroundCharacter] above this node.
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 
 ## Float. Turned on, the model rises in [member rise_time]; turned off, it settles back onto the ground in the same
 ## time. Set before the first physics tick (in the scene, or by the game's settings at startup), it takes effect at
@@ -63,7 +67,7 @@ const _MOTION_SMOOTHING := 0.25
 		enabled = value
 		if _ticked:
 			_update_floating()
-		elif is_node_ready():
+		elif is_node_ready() and not Engine.is_editor_hint():
 			snap()
 		else:
 			_share = 1.0 if value else 0.0
@@ -168,10 +172,14 @@ var _drop := DampedSpring.new()
 
 func _init() -> void:
 	# After the character's body: its position and velocity for this tick are already computed.
-	process_physics_priority = 1
+	# Only in the game: in the editor the value would be saved into the scene.
+	if not Engine.is_editor_hint():
+		process_physics_priority = 1
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	if character == null:
 		character = _find_character()
 	assert(character != null,
@@ -187,18 +195,24 @@ func _ready() -> void:
 
 
 func _enter_tree() -> void:
+	if Engine.is_editor_hint():
+		return
 	# Back in the tree while floating: the steps stop again, and the fall is put in place again.
 	_update_steps()
 	_update_fall()
 
 
 func _exit_tree() -> void:
+	if Engine.is_editor_hint():
+		return
 	# Out of the tree the hover does not move the model: it lets the steps and the fall go.
 	_set_suppressing_steps(false)
 	_set_fall(null)
 
 
 func _notification(what: int) -> void:
+	if Engine.is_editor_hint():
+		return
 	# The character's physics interpolation was reset (the notification goes down to its children, and only while the
 	# interpolation is on). A teleport comes as its own signal too.
 	if what == NOTIFICATION_RESET_PHYSICS_INTERPOLATION and not _snapping and is_node_ready():
@@ -206,6 +220,8 @@ func _notification(what: int) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_ticked = true
 	var body_position := character.global_position
 	if Vector2(body_position.x - _last_position.x, body_position.z - _last_position.z).length() > _TELEPORT_DISTANCE:
@@ -443,3 +459,7 @@ func _on_touched_floor(fall_speed: float) -> void:
 func _on_jumped() -> void:
 	if _floating:
 		_drop.speed -= jump_kick
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	return get_setup_warnings()

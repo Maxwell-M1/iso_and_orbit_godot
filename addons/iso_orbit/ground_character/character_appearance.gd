@@ -1,3 +1,4 @@
+@tool
 class_name CharacterAppearance
 extends Node
 ## The character's look: which model sits in the model node. A look is a number in the [member models] list, starting
@@ -13,13 +14,19 @@ signal look_changed(model: Node3D)
 
 ## The node that holds the model (for the player, Visual/Hover: the [CharacterHover] under the Visual node that
 ## [GroundCharacter] turns).
-@export var slot: Node3D
+@export var slot: Node3D:
+	set(value):
+		slot = value
+		update_configuration_warnings()
 
 ## Name of the model node inside [member slot].
 @export var model_name := &"Model"
 
 ## Models to choose from. The look number is the position in the list, starting from 1.
-@export var models: Array[PackedScene] = []
+@export var models: Array[PackedScene] = []:
+	set(value):
+		models = value
+		update_configuration_warnings()
 
 ## Who gets the new model's hand. If not set, the hand does not sway.
 @export var hand_sway: HandSway
@@ -62,3 +69,12 @@ func get_look() -> int:
 ## The current model, or null.
 func get_model() -> Node3D:
 	return slot.get_node_or_null(NodePath(model_name)) as Node3D
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if slot == null:
+		warnings.append("Assign Slot in the Inspector.")
+	if models.is_empty() or models.has(null):
+		warnings.append("Assign a model scene for each appearance entry.")
+	return warnings

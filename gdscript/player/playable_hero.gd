@@ -1,3 +1,4 @@
+@tool
 class_name PlayableHero
 extends Node3D
 ## The hero the player controls, assembled and ready: the character (the base scene, which an AI can drive just as
@@ -10,13 +11,22 @@ extends Node3D
 
 @export_group("Parts")
 ## The character: the base scene, which an AI can drive just as well.
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 ## The mouse and the keys with the camera button.
-@export var input: PointClickMoveInput
+@export var input: PointClickMoveInput:
+	set(value):
+		input = value
+		update_configuration_warnings()
 ## Sprint and jump.
 @export var actions: CharacterActionInput
 ## The camera that follows the character; the mouse and the wheel turn and raise it.
-@export var camera_rig: OrbitCameraRig
+@export var camera_rig: OrbitCameraRig:
+	set(value):
+		camera_rig = value
+		update_configuration_warnings()
 ## The arm that holds the camera away from walls.
 @export var camera_arm: CameraArm
 ## The camera itself.
@@ -45,9 +55,15 @@ var controls_enabled := true:
 # How the input nodes processed before the controls were taken away: given back as they were.
 var _input_mode := Node.PROCESS_MODE_INHERIT
 var _actions_mode := Node.PROCESS_MODE_INHERIT
+# In the editor: the setup warnings shown now. They compare the camera with the character's settings, which tell the
+# hero nothing when they change, so the hero checks them again every frame.
+var _setup_warnings := PackedStringArray()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
+	set_process(false)
 	assert(character != null and input != null and camera_rig != null,
 			"PlayableHero needs the character, input and camera_rig properties set.")
 	for warning in get_setup_warnings():
@@ -68,6 +84,15 @@ func get_setup_warnings() -> PackedStringArray:
 				+ "Keep it at half the turn speed or lower.") % [camera_rig.name, rad_to_deg(camera_rig.sharp_turn_speed),
 				rad_to_deg(locomotion.turn_speed)])
 	return warnings
+
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint():
+		return
+	var warnings := get_setup_warnings()
+	if warnings != _setup_warnings:
+		_setup_warnings = warnings
+		update_configuration_warnings()
 
 
 func set_controls_enabled(enabled: bool) -> void:
@@ -105,3 +130,15 @@ func teleport(position: Vector3, facing := Vector3.ZERO, turn_camera := true) ->
 ## [param turn_camera].
 func place_at(marker: Node3D, turn_camera := true) -> void:
 	teleport(marker.global_position, -marker.global_basis.z, turn_camera)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null:
+		warnings.append("Assign Character in the Inspector.")
+	if input == null:
+		warnings.append("Assign Input in the Inspector.")
+	if camera_rig == null:
+		warnings.append("Assign Camera Rig in the Inspector.")
+	warnings.append_array(get_setup_warnings())
+	return warnings

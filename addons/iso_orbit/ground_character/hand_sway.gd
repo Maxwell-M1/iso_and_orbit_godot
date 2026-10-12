@@ -1,3 +1,4 @@
+@tool
 class_name HandSway
 extends Node
 ## Brings the model's "invisible hand" to life: the item in it (a staff) moves as it would in the hand of a walking
@@ -17,13 +18,17 @@ extends Node
 ## is its child or has a higher priority), so physics interpolation smooths the movement, just as it does for the body.
 
 ## The character whose steps and speed to track.
-@export var character: GroundCharacter
+@export var character: GroundCharacter:
+	set(value):
+		character = value
+		update_configuration_warnings()
 
 ## The hand node in the model (for example, [code]Visual/Hover/Model/RightHand[/code]). The model faces −Z. When the
 ## model is changed ([CharacterAppearance]), assign the new model's hand: its current position becomes the hand's place.
 @export var hand: Node3D:
 	set(value):
 		hand = value
+		update_configuration_warnings()
 		if hand != null:
 			_rest = hand.transform
 
@@ -70,10 +75,14 @@ var _drop := DampedSpring.new()
 
 func _init() -> void:
 	# After the character's body: its velocity and steps for this tick are already computed.
-	process_physics_priority = 1
+	# Only in the game: in the editor the value would be saved into the scene.
+	if not Engine.is_editor_hint():
+		process_physics_priority = 1
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(character != null, "HandSway needs the character property set.")
 	character.touched_floor.connect(_on_touched_floor)
 	character.jumped.connect(_on_jumped)
@@ -81,6 +90,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if not is_instance_valid(hand):
 		return
 	var on_floor := character.is_on_floor()
@@ -115,3 +126,12 @@ func _on_touched_floor(fall_speed: float) -> void:
 
 func _on_jumped() -> void:
 	_drop.speed -= jump_kick
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if character == null:
+		warnings.append("Assign Character in the Inspector.")
+	if hand == null:
+		warnings.append("Assign Hand in the Inspector.")
+	return warnings

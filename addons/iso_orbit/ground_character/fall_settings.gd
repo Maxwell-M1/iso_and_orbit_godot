@@ -1,3 +1,4 @@
+@tool
 class_name FallSettings
 extends Resource
 ## How a [GroundCharacter] falls: how fast the fall gains speed, the fastest fall, and how a faster fall slows down to
@@ -16,17 +17,26 @@ extends Resource
 ## [member GroundCharacter.gravity_scale] is for the rise: how fast the fall gains speed. Lower than the character's
 ## own scale, the character comes down more slowly than it goes up. 0 takes the character's own scale, so that only
 ## the limit changes.
-@export_range(0.0, 10.0, 0.05) var gravity_scale := 0.0
+@export_range(0.0, 10.0, 0.05) var gravity_scale := 0.0:
+	set(value):
+		gravity_scale = value
+		emit_changed()
 
 ## The fastest fall, m/s: the fall gains speed up to it and then goes on at it. 0 is no limit. A fall that gains speed
 ## only up to a limit below [member GroundCharacter.landing_min_speed] never lands
 ## ([signal GroundCharacter.landed]), it only touches the ground.
-@export_range(0.0, 50.0, 0.1, "or_greater", "suffix:m/s") var max_speed := 0.0
+@export_range(0.0, 50.0, 0.1, "or_greater", "suffix:m/s") var max_speed := 0.0:
+	set(value):
+		max_speed = value
+		emit_changed()
 
 ## In how long a fall faster than [member max_speed] slows down to it (95% of the excess speed is gone): after the
 ## character is thrown down, or when these settings come into effect mid-fall (floating turned on, for example). 0 is
 ## at once.
-@export_range(0.0, 2.0, 0.01, "suffix:s") var braking_time := 0.3
+@export_range(0.0, 2.0, 0.01, "suffix:s") var braking_time := 0.3:
+	set(value):
+		braking_time = value
+		emit_changed()
 
 
 ## The gravity scale of the fall for a character whose own scale is [param own]: [member gravity_scale], or

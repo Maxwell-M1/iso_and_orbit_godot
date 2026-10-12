@@ -1,3 +1,4 @@
+@tool
 class_name NavigationPathView
 extends MeshInstance3D
 ## A debug line of the remaining path of a [NavigationMover]: it shows how the character goes around obstacles.
@@ -5,7 +6,10 @@ extends MeshInstance3D
 ## The line follows the path points at the height of the navigation mesh, that is, slightly above the ground.
 
 ## Whose path to draw.
-@export var mover: NavigationMover
+@export var mover: NavigationMover:
+	set(value):
+		mover = value
+		update_configuration_warnings()
 
 ## The line color.
 @export var color := Color(1.0, 0.85, 0.25)
@@ -14,6 +18,8 @@ var _lines := ImmediateMesh.new()
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(mover != null, "NavigationPathView needs the mover property set.")
 	# The line is built every frame in world coordinates and must neither be smoothed nor move with the parent.
 	top_level = true
@@ -29,6 +35,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_lines.clear_surfaces()
 	if not visible:
 		return
@@ -43,3 +51,10 @@ func _process(_delta: float) -> void:
 	for point: Vector3 in path:
 		_lines.surface_add_vertex(point)
 	_lines.surface_end()
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if mover == null:
+		warnings.append("Assign Mover in the Inspector.")
+	return warnings

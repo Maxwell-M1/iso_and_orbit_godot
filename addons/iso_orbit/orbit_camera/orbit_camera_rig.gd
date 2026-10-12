@@ -1,3 +1,4 @@
+@tool
 class_name OrbitCameraRig
 extends Node3D
 ## An isometric RPG camera: it hangs above and to the side of the target and follows it.
@@ -101,18 +102,33 @@ class _FollowSpring:
 
 ## The arm with the camera at its end: the node sets its length, and the arm places the camera. If not set, the child
 ## [CameraArm] is used.
-@export var arm: CameraArm
+@export var arm: CameraArm:
+	set(value):
+		arm = value
+		update_configuration_warnings()
 
 ## The camera that the node places itself when there is no arm. If not set, the first child [Camera3D] is used.
-@export var camera: Camera3D
+@export var camera: Camera3D:
+	set(value):
+		camera = value
+		update_configuration_warnings()
 
 @export_group("Input")
 ## The input action that, while held, lets the mouse rotate the camera.
-@export var rotate_action := &"camera_rotate"
+@export var rotate_action := &"camera_rotate":
+	set(value):
+		rotate_action = value
+		update_configuration_warnings()
 ## The "lower the camera closer" action (wheel up).
-@export var zoom_in_action := &"camera_zoom_in"
+@export var zoom_in_action := &"camera_zoom_in":
+	set(value):
+		zoom_in_action = value
+		update_configuration_warnings()
 ## The "raise the camera farther" action (wheel down).
-@export var zoom_out_action := &"camera_zoom_out"
+@export var zoom_out_action := &"camera_zoom_out":
+	set(value):
+		zoom_out_action = value
+		update_configuration_warnings()
 ## How many degrees of rotation one pixel of mouse movement gives.
 @export_range(0.01, 2.0, 0.01, "suffix:°/px") var mouse_sensitivity := 0.25
 ## Change the camera pitch with vertical mouse movement. Without this, the mouse only rotates the camera around the
@@ -132,9 +148,15 @@ class _FollowSpring:
 ## Where the camera looks: at this height above the target's origin (on a character, roughly the chest).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var focus_height := 1.2
 ## The distance to the target when the camera is lowered all the way.
-@export_range(1.0, 50.0, 0.1, "suffix:m") var near_distance := 5.0
+@export_range(1.0, 50.0, 0.1, "suffix:m") var near_distance := 5.0:
+	set(value):
+		near_distance = value
+		update_configuration_warnings()
 ## The distance to the target when the camera is raised all the way.
-@export_range(1.0, 100.0, 0.1, "suffix:m") var far_distance := 20.0
+@export_range(1.0, 100.0, 0.1, "suffix:m") var far_distance := 20.0:
+	set(value):
+		far_distance = value
+		update_configuration_warnings()
 ## The pitch of the lowered camera: all the way down and already from [member flatten_end_zoom] (negative looks down).
 @export_range(-89.0, 0.0, 0.1, "radians_as_degrees") var near_pitch := deg_to_rad(-22.0)
 ## The pitch of the camera when it is raised all the way.
@@ -147,8 +169,14 @@ class _FollowSpring:
 ## Below this zoom, the camera looks at a shallow angle ([member near_pitch]) and only moves closer.
 @export_range(0.0, 1.0, 0.01) var flatten_end_zoom := 0.2
 ## The pitch limits, including the mouse offset.
-@export_range(-89.0, 0.0, 0.1, "radians_as_degrees") var min_pitch := deg_to_rad(-80.0)
-@export_range(-89.0, 0.0, 0.1, "radians_as_degrees") var max_pitch := deg_to_rad(-8.0)
+@export_range(-89.0, 0.0, 0.1, "radians_as_degrees") var min_pitch := deg_to_rad(-80.0):
+	set(value):
+		min_pitch = value
+		update_configuration_warnings()
+@export_range(-89.0, 0.0, 0.1, "radians_as_degrees") var max_pitch := deg_to_rad(-8.0):
+	set(value):
+		max_pitch = value
+		update_configuration_warnings()
 ## The zoom at start: 0 means the camera is lowered, 1 means it is raised.
 @export_range(0.0, 1.0, 0.01) var start_zoom := 0.55
 ## The rotation of the camera around the target at start.
@@ -277,6 +305,8 @@ var _has_follow_height := false
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	# Move in _process along the already interpolated target (see the class description); children inherit the mode.
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	if arm == null:
@@ -297,6 +327,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	if _has_action(rotate_action) and event.is_action_pressed(rotate_action):
 		_begin_rotate()
 	elif _has_action(rotate_action) and event.is_action_released(rotate_action):
@@ -321,6 +353,8 @@ static func _has_action(action: StringName) -> bool:
 
 
 func _notification(what: int) -> void:
+	if Engine.is_editor_hint():
+		return
 	# The window lost focus or the game was paused (a menu opened) in the middle of rotating: the button release may
 	# not reach the node, and the cursor must not be left captured.
 	if (what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_PAUSED) and _rotating:
@@ -328,10 +362,14 @@ func _notification(what: int) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_track_target_motion(delta)
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if _rotating:
 		_rotate_time += delta
 	_apply_mouse_motion()
@@ -687,3 +725,20 @@ static func _smooth(from: float, to: float, sharpness: float, delta: float) -> f
 	if sharpness <= 0.0:
 		return to
 	return lerpf(from, to, 1.0 - exp(-sharpness * delta))
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if arm == null and camera == null and _find_child(_is_camera_holder) == null:
+		warnings.append("Assign an arm/camera or add one as a child.")
+	if near_distance > far_distance or min_pitch > max_pitch:
+		warnings.append("The near/far distance and min/max pitch ranges must be ordered.")
+	# Project settings, not InputMap: in the editor InputMap holds only the editor's own actions.
+	for action: StringName in [rotate_action, zoom_in_action, zoom_out_action]:
+		if action != &"" and not ProjectSettings.has_setting("input/" + action):
+			warnings.append("Add input action '%s' in Project Settings > Input Map." % action)
+	return warnings
+
+
+static func _is_camera_holder(node: Node) -> bool:
+	return node is CameraArm or node is Camera3D

@@ -1,3 +1,4 @@
+@tool
 class_name PointClickMoveInput
 extends Node
 ## Mouse controls familiar from isometric RPGs: a click on the ground runs to that point, a held button runs after
@@ -94,13 +95,19 @@ const _CURSOR_TAKEOVER_DISTANCE := 8.0
 const _AIM_AHEAD := 4.0
 
 ## What to drive.
-@export var mover: NavigationMover
+@export var mover: NavigationMover:
+	set(value):
+		mover = value
+		update_configuration_warnings()
 
 ## The camera to cast the ray from and whose view direction is used. If not set, the window's current camera is used.
 @export var camera: Camera3D
 
 ## The "run to the cursor" input action.
-@export var move_action := &"move_to_cursor"
+@export var move_action := &"move_to_cursor":
+	set(value):
+		move_action = value
+		update_configuration_warnings()
 
 ## How the character runs while [member move_action] is held.
 @export var hold_mode := HoldMode.STEER
@@ -123,7 +130,10 @@ const _AIM_AHEAD := 4.0
 ## or pressed before the press of [member move_action] becomes a hold, it drives the run where the camera looks; pressed
 ## during a hold that runs after the cursor, it only turns the camera ([member look_around_while_held]). An empty name
 ## disables both.
-@export var camera_steer_action := &"camera_rotate"
+@export var camera_steer_action := &"camera_rotate":
+	set(value):
+		camera_steer_action = value
+		update_configuration_warnings()
 
 ## When [member camera_steer_action] is pressed while a hold already runs after the cursor, it only turns the camera
 ## (the action also rotates it), to look around: the run keeps its course, and the cursor stays over the ground spot it
@@ -182,13 +192,25 @@ const _AIM_AHEAD := 4.0
 ## goes where the camera looks (not while looking around, [member look_around_while_held]).
 @export var keys_with_camera_steer := KeysMode.SIDESTEP
 ## The "forward" input action (W): where the camera looks.
-@export var move_forward_action := &"move_forward"
+@export var move_forward_action := &"move_forward":
+	set(value):
+		move_forward_action = value
+		update_configuration_warnings()
 ## The "back" input action (S): toward the camera.
-@export var move_back_action := &"move_back"
+@export var move_back_action := &"move_back":
+	set(value):
+		move_back_action = value
+		update_configuration_warnings()
 ## The "left" input action (A).
-@export var move_left_action := &"move_left"
+@export var move_left_action := &"move_left":
+	set(value):
+		move_left_action = value
+		update_configuration_warnings()
 ## The "right" input action (D).
-@export var move_right_action := &"move_right"
+@export var move_right_action := &"move_right":
+	set(value):
+		move_right_action = value
+		update_configuration_warnings()
 
 var _cursor := Vector2.ZERO
 var _click_position := Vector2.ZERO
@@ -238,10 +260,14 @@ var _reveal_pending := false
 
 
 func _init() -> void:
-	process_priority = 1
+	# Only in the game: in the editor the value would be saved into the scene.
+	if not Engine.is_editor_hint():
+		process_priority = 1
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(mover != null, "PointClickMoveInput needs the mover property set.")
 	for action: StringName in [move_action, camera_steer_action, move_forward_action, move_back_action,
 			move_left_action, move_right_action]:
@@ -250,6 +276,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	# Only the press: the release is checked by polling in _physics_process, because the UI may intercept it, and then
 	# the character would run after the cursor forever.
 	if not _has_action(move_action) or not event.is_action_pressed(move_action):
@@ -277,6 +305,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
+	if Engine.is_editor_hint():
+		return
 	# A menu opened, the focus switched to another window, or the node left the scene in the middle of a run: the
 	# cursor is needed right away, not after the button is released.
 	if what in [NOTIFICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_EXIT_TREE]:
@@ -285,6 +315,8 @@ func _notification(what: int) -> void:
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_update_cursor_visibility()
 	_update_looking()
 	if (_looking or _reveal_pending) and keep_aim_on_camera_turn:
@@ -327,6 +359,8 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if _click_pending:
 		# Take the point right away (the camera and the character are still where they were at the press), but run
 		# there on release.
@@ -788,3 +822,15 @@ static func _is_cursor_captured() -> bool:
 
 static func _flat(vector: Vector3) -> Vector3:
 	return Vector3(vector.x, 0.0, vector.z)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if mover == null:
+		warnings.append("Assign Mover in the Inspector.")
+	# Project settings, not InputMap: in the editor InputMap holds only the editor's own actions.
+	for action: StringName in [move_action, camera_steer_action, move_forward_action, move_back_action,
+			move_left_action, move_right_action]:
+		if action != &"" and not ProjectSettings.has_setting("input/" + action):
+			warnings.append("Add input action '%s' in Project Settings > Input Map." % action)
+	return warnings

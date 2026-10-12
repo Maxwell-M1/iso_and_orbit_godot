@@ -1,3 +1,4 @@
+@tool
 class_name OccludedSilhouette
 extends Node
 ## The character's silhouette through whatever occludes it: puts a chain of passes over the meshes of
@@ -9,19 +10,34 @@ extends Node
 ## silhouette_common.gdshaderinc.
 
 ## Whose meshes to outline (usually the character's model node).
-@export var target: Node3D
+@export var target: Node3D:
+	set(value):
+		target = value
+		update_configuration_warnings()
 
 ## The invisible pass: where the character itself is visible (silhouette_mask.tres).
-@export var mask: Material
+@export var mask: Material:
+	set(value):
+		mask = value
+		update_configuration_warnings()
 
 ## Body fill (silhouette_body.tres).
-@export var body_fill: Material
+@export var body_fill: Material:
+	set(value):
+		body_fill = value
+		update_configuration_warnings()
 
 ## Fill for the equipment in the hands (silhouette_gear.tres).
-@export var gear_fill: Material
+@export var gear_fill: Material:
+	set(value):
+		gear_fill = value
+		update_configuration_warnings()
 
 ## Outline around the whole silhouette (silhouette_outline.tres).
-@export var outline: Material
+@export var outline: Material:
+	set(value):
+		outline = value
+		update_configuration_warnings()
 
 ## Meshes under nodes with these names are equipment in the hands; the rest are the body.
 @export var gear_nodes: Array[StringName] = [&"RightHand", &"LeftHand"]
@@ -37,6 +53,8 @@ var _gear_overlay: Material
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	assert(target != null and mask != null and body_fill != null and gear_fill != null and outline != null,
 			"OccludedSilhouette needs target, mask, body_fill, gear_fill and outline.")
 	_body_overlay = _chain(body_fill)
@@ -81,3 +99,18 @@ func _cover(mesh: GeometryInstance3D) -> void:
 func _on_node_added(node: Node) -> void:
 	if node is GeometryInstance3D and target.is_ancestor_of(node):
 		_cover(node as GeometryInstance3D)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if target == null:
+		warnings.append("Assign Target in the Inspector.")
+	if mask == null:
+		warnings.append("Assign Mask in the Inspector.")
+	if body_fill == null:
+		warnings.append("Assign Body Fill in the Inspector.")
+	if gear_fill == null:
+		warnings.append("Assign Gear Fill in the Inspector.")
+	if outline == null:
+		warnings.append("Assign Outline in the Inspector.")
+	return warnings

@@ -1,3 +1,4 @@
+@tool
 class_name PointOfInterest
 extends Area3D
 ## A place worth finding: when the player enters the area for the first time, the place is discovered
@@ -14,7 +15,10 @@ signal discovered(title: String)
 const GROUP := &"points_of_interest"
 
 ## The place name shown on screen.
-@export var title := ""
+@export var title := "":
+	set(value):
+		title = value
+		update_configuration_warnings()
 
 ## Who counts as the player: a body in this group.
 @export var player_group := &"player"
@@ -27,6 +31,8 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		return
 	body_entered.connect(_on_body_entered)
 
 
@@ -46,3 +52,12 @@ func _on_body_entered(body: Node3D) -> void:
 		return
 	_discovered = true
 	discovered.emit(title)
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := PackedStringArray()
+	if title.is_empty():
+		warnings.append("Give this place a title.")
+	if collision_mask == 0 or get_child_count() == 0:
+		warnings.append("Add a collision shape and enable the travellers' collision layer.")
+	return warnings
