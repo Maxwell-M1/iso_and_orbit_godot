@@ -7,6 +7,7 @@ extends UiScreen
 ##
 ## The tab pages are [ScrollContainer]s: a long tab scrolls (following the keyboard focus too), and the window does
 ## not grow. The window height is the [member Control.custom_minimum_size] of the [TabContainer].
+## The header reads the shared demo and addon release version from [code]application/config/version[/code].
 
 ## Settings that decide whether other controls of the window can be changed (see [method _update_dependent_rows]).
 const _DEPENDENCY_KEYS: Array[StringName] = [
@@ -42,9 +43,12 @@ const _DEPENDENCY_KEYS: Array[StringName] = [
 @onready var _sound_footsteps: CheckButton = %SoundFootsteps
 @onready var _vsync_hint: Label = %VsyncHint
 @onready var _fullscreen: CheckButton = %Fullscreen
+@onready var _version: Label = %Version
 
 
 func _ready() -> void:
+	var version: String = ProjectSettings.get_setting("application/config/version", "")
+	_version.text = "v%s" % version if not version.is_empty() else ""
 	Settings.changed.connect(_on_setting_changed)
 	_update_dependent_rows()
 	# Inside the editor (the Game tab or its floating window) the window belongs to the editor, and the game cannot
